@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-01-09
 
 ## Active Technologies
+- Markdown (command definitions), Bash 5.x (scripts) + Claude Code slash command system (003-scaffold-doit-commands)
+- File-based (markdown templates) (003-scaffold-doit-commands)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -22,6 +24,7 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 003-scaffold-doit-commands: Added Markdown (command definitions), Bash 5.x (scripts) + Claude Code slash command system
 
 - 001-doit-command-refactor: Added Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx
 

@@ -67,8 +67,8 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <project_name
 After initialization, you should see the following commands available in your AI agent:
 
 - `/doit.doit` - Create specifications
-- `/doit.plan` - Generate implementation plans  
-- `/doit.tasks` - Break down into actionable tasks
+- `/doit.planit` - Generate implementation plans  
+- `/doit.taskit` - Break down into actionable tasks
 
 The `.doit/scripts` directory will contain both `.sh` and `.ps1` scripts.
 

@@ -38,7 +38,7 @@ flowchart TD
 
 **Purpose**: Defines the structure for feature specifications
 
-**Used By**: `/doit.specify` command
+**Used By**: `/doit.specit` command
 
 **Output**: `specs/XXX-feature-name/spec.md`
 
@@ -108,7 +108,7 @@ Each user story follows this structure:
 
 **Purpose**: Defines the implementation plan structure
 
-**Used By**: `/doit.plan` command
+**Used By**: `/doit.planit` command
 
 **Output**: `specs/XXX-feature-name/plan.md`
 
@@ -191,7 +191,7 @@ flowchart LR
 
 **Purpose**: Defines the task breakdown structure
 
-**Used By**: `/doit.tasks` command
+**Used By**: `/doit.taskit` command
 
 **Output**: `specs/XXX-feature-name/tasks.md`
 
@@ -277,7 +277,7 @@ flowchart TD
 
 **Purpose**: Generic checklist format for validation
 
-**Used By**: `/doit.specify` (requirements checklist)
+**Used By**: `/doit.specit` (requirements checklist)
 
 **Output**: Various checklist files in `specs/XXX/checklists/`
 
@@ -319,7 +319,7 @@ flowchart TD
 
 **Purpose**: AI agent context file structure
 
-**Used By**: `/doit.plan` command
+**Used By**: `/doit.planit` command
 
 **Output**: `CLAUDE.md` (or equivalent agent file)
 

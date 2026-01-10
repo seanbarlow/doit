@@ -398,7 +398,7 @@ The `specify` CLI tool is used for:
 - **Upgrades:** `specify init --here --force` to update templates and commands
 - **Diagnostics:** `specify check` to verify tool installation
 
-Once you've run `specify init`, the slash commands (like `/doit.doit`, `/doit.plan`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `specify` again.
+Once you've run `specify init`, the slash commands (like `/doit.doit`, `/doit.planit`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `specify` again.
 
 **If your agent isn't recognizing slash commands:**
 

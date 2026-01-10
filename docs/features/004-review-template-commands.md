@@ -17,7 +17,7 @@ Remove legacy doit templates from `templates/commands/` and replace them with st
 | FR-003 | Templates in templates/commands/ match .doit/templates/commands/ | Done |
 | FR-004 | All templates reference .doit/ paths, not .specify/ | Done |
 | FR-005 | All templates have valid YAML frontmatter with description | Done |
-| FR-006 | doit.scaffold.md references correct template source paths | Done |
+| FR-006 | doit.scaffoldit.md references correct template source paths | Done |
 
 ## Technical Details
 
@@ -49,13 +49,13 @@ Remove legacy doit templates from `templates/commands/` and replace them with st
 
 - `templates/commands/doit.checkin.md`
 - `templates/commands/doit.constitution.md`
-- `templates/commands/doit.implement.md`
-- `templates/commands/doit.plan.md`
-- `templates/commands/doit.review.md`
-- `templates/commands/doit.scaffold.md`
-- `templates/commands/doit.specify.md`
-- `templates/commands/doit.tasks.md`
-- `templates/commands/doit.test.md`
+- `templates/commands/doit.implementit.md`
+- `templates/commands/doit.planit.md`
+- `templates/commands/doit.reviewit.md`
+- `templates/commands/doit.scaffoldit.md`
+- `templates/commands/doit.specit.md`
+- `templates/commands/doit.taskit.md`
+- `templates/commands/doit.testit.md`
 
 ## Testing
 

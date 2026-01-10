@@ -99,19 +99,19 @@ gantt
 >
 > **US5**: As a maintainer, I want the Python package directory renamed from `specify_cli` to `doit_cli`.
 
-- [ ] **T-002** [US5] Rename `src/specify_cli/` directory to `src/doit_cli/`
+- [x] **T-002** [US5] Rename `src/specify_cli/` directory to `src/doit_cli/`
   - Use `git mv src/specify_cli src/doit_cli`
   - Verify git tracking is preserved
   - **File**: [src/specify_cli/](../../src/specify_cli/) → `src/doit_cli/`
   - **Acceptance**: Directory renamed, git history preserved
 
-- [ ] **T-003** [US5] Update `pyproject.toml` package references
+- [x] **T-003** [US5] Update `pyproject.toml` package references
   - Replace `src/specify_cli` → `src/doit_cli` in `[tool.hatch.build.targets.wheel]`
   - Replace `specify_cli:main` → `doit_cli:main` in `[project.scripts]`
   - **File**: [pyproject.toml](../../pyproject.toml)
   - **Acceptance**: Package installs correctly with `pip install -e .`
 
-- [ ] **T-004** [US1] Update all branding strings in `src/doit_cli/__init__.py`
+- [x] **T-004** [US1] Update all branding strings in `src/doit_cli/__init__.py`
   - Replace "Specify CLI" → "Doit CLI" (docstrings, help text)
   - Replace "Specify Project Setup" → "Doit Project Setup" (banner)
   - Replace "Specify CLI Information" → "Doit CLI Information" (info panel)
@@ -130,42 +130,42 @@ gantt
 
 > **US2**: As a developer using the doit workflow, I want shorter, memorable command names within the `doit.` namespace.
 
-- [ ] **T-005** [P] [US2] Rename `doit.specify.md` to `doit.specit.md`
+- [x] **T-005** [P] [US2] Rename `doit.specify.md` to `doit.specit.md`
   - Use `git mv .doit/templates/commands/doit.specify.md .doit/templates/commands/doit.specit.md`
   - **File**: `.doit/templates/commands/doit.specify.md` → `doit.specit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-006** [P] [US2] Rename `doit.plan.md` to `doit.planit.md`
+- [x] **T-006** [P] [US2] Rename `doit.plan.md` to `doit.planit.md`
   - Use `git mv .doit/templates/commands/doit.plan.md .doit/templates/commands/doit.planit.md`
   - **File**: `.doit/templates/commands/doit.plan.md` → `doit.planit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-007** [P] [US2] Rename `doit.tasks.md` to `doit.taskit.md`
+- [x] **T-007** [P] [US2] Rename `doit.tasks.md` to `doit.taskit.md`
   - Use `git mv .doit/templates/commands/doit.tasks.md .doit/templates/commands/doit.taskit.md`
   - **File**: `.doit/templates/commands/doit.tasks.md` → `doit.taskit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-008** [P] [US2] Rename `doit.implement.md` to `doit.implementit.md`
+- [x] **T-008** [P] [US2] Rename `doit.implement.md` to `doit.implementit.md`
   - Use `git mv .doit/templates/commands/doit.implement.md .doit/templates/commands/doit.implementit.md`
   - **File**: `.doit/templates/commands/doit.implement.md` → `doit.implementit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-009** [P] [US2] Rename `doit.test.md` to `doit.testit.md`
+- [x] **T-009** [P] [US2] Rename `doit.test.md` to `doit.testit.md`
   - Use `git mv .doit/templates/commands/doit.test.md .doit/templates/commands/doit.testit.md`
   - **File**: `.doit/templates/commands/doit.test.md` → `doit.testit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-010** [P] [US2] Rename `doit.review.md` to `doit.reviewit.md`
+- [x] **T-010** [P] [US2] Rename `doit.review.md` to `doit.reviewit.md`
   - Use `git mv .doit/templates/commands/doit.review.md .doit/templates/commands/doit.reviewit.md`
   - **File**: `.doit/templates/commands/doit.review.md` → `doit.reviewit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-011** [P] [US2] Rename `doit.scaffold.md` to `doit.scaffoldit.md`
+- [x] **T-011** [P] [US2] Rename `doit.scaffold.md` to `doit.scaffoldit.md`
   - Use `git mv .doit/templates/commands/doit.scaffold.md .doit/templates/commands/doit.scaffoldit.md`
   - **File**: `.doit/templates/commands/doit.scaffold.md` → `doit.scaffoldit.md`
   - **Acceptance**: File renamed, git tracked
 
-- [ ] **T-012** [US2] Update internal skill name references in all command files
+- [x] **T-012** [US2] Update internal skill name references in all command files
   - In each renamed command file, update skill name in frontmatter/header
   - Update cross-references: `/doit.specify` → `/doit.specit`, etc.
   - Update "Run `/doit.plan` next" → "Run `/doit.planit` next"
@@ -191,7 +191,7 @@ gantt
   - **File**: [spec-driven.md](../../spec-driven.md)
   - **Acceptance**: Zero old command name references
 
-- [ ] **T-014** [P] [US4] Update `.doit/templates/*.md` files with new command names
+- [x] **T-014** [P] [US4] Update `.doit/templates/*.md` files with new command names
   - Update `spec-template.md`
   - Update `plan-template.md`
   - Update `tasks-template.md`

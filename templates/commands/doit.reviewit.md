@@ -194,7 +194,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
     ## Next Steps
 
-    - Run `/doit.test` for automated test execution
+    - Run `/doit.testit` for automated test execution
     - Address any CRITICAL or MAJOR findings before merge
     ```
 

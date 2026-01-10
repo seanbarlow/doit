@@ -110,26 +110,26 @@ Use the **`/doit.doit`** command to describe what you want to build. Focus on th
 
 ### 4. Create a technical implementation plan
 
-Use the **`/doit.plan`** command to provide your tech stack and architecture choices.
+Use the **`/doit.planit`** command to provide your tech stack and architecture choices.
 
 ```bash
-/doit.plan The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
+/doit.planit The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
 ```
 
 ### 5. Break down into tasks
 
-Use **`/doit.tasks`** to create an actionable task list from your implementation plan.
+Use **`/doit.taskit`** to create an actionable task list from your implementation plan.
 
 ```bash
-/doit.tasks
+/doit.taskit
 ```
 
 ### 6. Execute implementation
 
-Use **`/doit.implement`** to execute all tasks and build your feature according to the plan.
+Use **`/doit.implementit`** to execute all tasks and build your feature according to the plan.
 
 ```bash
-/doit.implement
+/doit.implementit
 ```
 
 For detailed step-by-step instructions, see our [comprehensive guide](./spec-driven.md).
@@ -254,9 +254,9 @@ Essential commands for the Spec-Driven Development workflow:
 | ----------------------- | ------------------------------------------------------------------------ |
 | `/doit.constitution` | Create or update project governing principles and development guidelines |
 | `/doit.doit`      | Define what you want to build (requirements and user stories)            |
-| `/doit.plan`         | Create technical implementation plans with your chosen tech stack        |
-| `/doit.tasks`        | Generate actionable task lists for implementation                        |
-| `/doit.implement`    | Execute all tasks to build the feature according to the plan             |
+| `/doit.planit`         | Create technical implementation plans with your chosen tech stack        |
+| `/doit.taskit`        | Generate actionable task lists for implementation                        |
+| `/doit.implementit`    | Execute all tasks to build the feature according to the plan             |
 
 #### Optional Commands
 
@@ -264,15 +264,15 @@ Additional commands for enhanced quality and validation:
 
 | Command              | Description                                                                                                                          |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `/doit.clarify`   | Clarify underspecified areas (recommended before `/doit.plan`; formerly `/quizme`)                                                |
-| `/doit.analyze`   | Cross-artifact consistency & coverage analysis (run after `/doit.tasks`, before `/doit.implement`)                             |
+| `/doit.clarify`   | Clarify underspecified areas (recommended before `/doit.planit`; formerly `/quizme`)                                                |
+| `/doit.analyze`   | Cross-artifact consistency & coverage analysis (run after `/doit.taskit`, before `/doit.implementit`)                             |
 | `/doit.checklist` | Generate custom quality checklists that validate requirements completeness, clarity, and consistency (like "unit tests for English") |
 
 ### Environment Variables
 
 | Variable          | Description                                                                                                                                                                                                                                                                                            |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SPECIFY_FEATURE` | Override feature detection for non-Git repositories. Set to the feature directory name (e.g., `001-photo-albums`) to work on a specific feature when not using Git branches.<br/>\*\*Must be set in the context of the agent you're working with prior to using `/doit.plan` or follow-up commands. |
+| `SPECIFY_FEATURE` | Override feature detection for non-Git repositories. Set to the feature directory name (e.g., `001-photo-albums`) to work on a specific feature when not using Git branches.<br/>\*\*Must be set in the context of the agent you're working with prior to using `/doit.planit` or follow-up commands. |
 
 ## 📚 Core Philosophy
 
@@ -393,7 +393,7 @@ Go to the project folder and run your AI agent. In our example, we're using `cla
 
 ![Bootstrapping Claude Code environment](./media/bootstrap-claude-code.gif)
 
-You will know that things are configured correctly if you see the `/doit.constitution`, `/doit.doit`, `/doit.plan`, `/doit.tasks`, and `/doit.implement` commands available.
+You will know that things are configured correctly if you see the `/doit.constitution`, `/doit.doit`, `/doit.planit`, `/doit.taskit`, and `/doit.implementit` commands available.
 
 The first step should be establishing your project's governing principles using the `/doit.constitution` command. This helps ensure consistent decision-making throughout all subsequent development phases:
 
@@ -489,7 +489,7 @@ It's important to use the interaction with Claude Code as an opportunity to clar
 
 ### **STEP 4:** Generate a plan
 
-You can now be specific about the tech stack and other technical requirements. You can use the `/doit.plan` command that is built into the project template with a prompt like this:
+You can now be specific about the tech stack and other technical requirements. You can use the `/doit.planit` command that is built into the project template with a prompt like this:
 
 ```text
 We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use
@@ -573,12 +573,12 @@ You can also ask Claude Code (if you have the [GitHub CLI](https://docs.github.c
 > [!NOTE]
 > Before you have the agent implement it, it's also worth prompting Claude Code to cross-check the details to see if there are any over-engineered pieces (remember - it can be over-eager). If over-engineered components or decisions exist, you can ask Claude Code to resolve them. Ensure that Claude Code follows the [constitution](base/memory/constitution.md) as the foundational piece that it must adhere to when establishing the plan.
 
-### **STEP 6:** Generate task breakdown with /doit.tasks
+### **STEP 6:** Generate task breakdown with /doit.taskit
 
-With the implementation plan validated, you can now break down the plan into specific, actionable tasks that can be executed in the correct order. Use the `/doit.tasks` command to automatically generate a detailed task breakdown from your implementation plan:
+With the implementation plan validated, you can now break down the plan into specific, actionable tasks that can be executed in the correct order. Use the `/doit.taskit` command to automatically generate a detailed task breakdown from your implementation plan:
 
 ```text
-/doit.tasks
+/doit.taskit
 ```
 
 This step creates a `tasks.md` file in your feature specification directory that contains:
@@ -590,17 +590,17 @@ This step creates a `tasks.md` file in your feature specification directory that
 - **Test-driven development structure** - If tests are requested, test tasks are included and ordered to be written before implementation
 - **Checkpoint validation** - Each user story phase includes checkpoints to validate independent functionality
 
-The generated tasks.md provides a clear roadmap for the `/doit.implement` command, ensuring systematic implementation that maintains code quality and allows for incremental delivery of user stories.
+The generated tasks.md provides a clear roadmap for the `/doit.implementit` command, ensuring systematic implementation that maintains code quality and allows for incremental delivery of user stories.
 
 ### **STEP 7:** Implementation
 
-Once ready, use the `/doit.implement` command to execute your implementation plan:
+Once ready, use the `/doit.implementit` command to execute your implementation plan:
 
 ```text
-/doit.implement
+/doit.implementit
 ```
 
-The `/doit.implement` command will:
+The `/doit.implementit` command will:
 
 - Validate that all prerequisites are in place (constitution, spec, plan, and tasks)
 - Parse the task breakdown from `tasks.md`

@@ -52,7 +52,81 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Parallel execution examples per story
    - Implementation strategy section (MVP first, incremental delivery)
 
-5. **Report**: Output path to generated tasks.md and summary:
+5. **Generate Mermaid Visualizations** (FR-008, FR-009, FR-010):
+
+   After generating the task list, create visual diagrams to show execution order and timelines:
+
+   a. **Task Dependencies Flowchart** (FR-008):
+      - Parse all generated tasks and their dependencies
+      - Identify parallel tasks (marked with [P])
+      - Group tasks by phase using subgraphs
+      - Generate flowchart showing task execution order
+      - Use `&` syntax for parallel tasks: `T003 --> T004 & T005`
+      - Replace content in `<!-- BEGIN:AUTO-GENERATED section="task-dependencies" -->` markers
+
+      ```mermaid
+      flowchart TD
+          subgraph "Phase 1: Setup"
+              T001[T001: Project init]
+          end
+
+          subgraph "Phase 2: Foundation"
+              T002[T002: Dependencies]
+              T003[T003: Core setup]
+          end
+
+          subgraph "Phase 3: US1"
+              T004[T004: Model A]
+              T005[T005: Model B]
+              T006[T006: Service]
+          end
+
+          T001 --> T002 --> T003
+          T003 --> T004 & T005
+          T004 & T005 --> T006
+      ```
+
+   b. **Phase Timeline Gantt Chart** (FR-009):
+      - Extract phases and their task counts
+      - Estimate duration based on task complexity (1 task ≈ 0.5-1 day)
+      - Generate gantt chart showing phase timeline
+      - Use `after` syntax for dependencies
+      - Replace content in `<!-- BEGIN:AUTO-GENERATED section="phase-timeline" -->` markers
+
+      ```mermaid
+      gantt
+          title Implementation Phases
+          dateFormat YYYY-MM-DD
+
+          section Phase 1: Setup
+          Project initialization    :a1, 2024-01-01, 1d
+
+          section Phase 2: Foundation
+          Core infrastructure       :b1, after a1, 2d
+
+          section Phase 3: US1 (P1)
+          User Story 1 implementation :c1, after b1, 3d
+
+          section Phase 4: US2 (P2)
+          User Story 2 implementation :d1, after c1, 2d
+
+          section Final: Polish
+          Cross-cutting concerns    :e1, after d1, 1d
+      ```
+
+   c. **Parallel Task Detection** (FR-010):
+      - Scan all tasks for [P] markers
+      - Group consecutive parallel tasks for diagram optimization
+      - In flowchart: Connect parallel tasks with `&` syntax
+      - Add legend note: "[P] = Can run in parallel"
+
+   d. **Diagram Validation**:
+      - Verify mermaid syntax is valid
+      - Check task count per subgraph (max 15 per phase)
+      - If exceeding limits, group smaller tasks into summary nodes
+      - Ensure all task IDs in diagram match task list
+
+6. **Report**: Output path to generated tasks.md and summary:
    - Total task count
    - Task count per user story
    - Parallel opportunities identified
@@ -60,7 +134,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
-6. **GitHub Issue Integration** (FR-050):
+7. **GitHub Issue Integration** (FR-050):
    - Check for `--skip-issues` in $ARGUMENTS - if present, skip issue creation (FR-021)
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found and not skipped:

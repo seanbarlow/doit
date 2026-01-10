@@ -323,7 +323,7 @@ After scaffolding, provide:
 - Confirmation that doit commands were generated (9 files in `.claude/commands/`)
 - Next steps for the user
 - Suggested commands to run (e.g., `npm install`, `pip install -r requirements.txt`)
-- Reminder to run `/doit.specify` to create feature specifications
+- Reminder to run `/doit.specit` to create feature specifications
 
 ## Validation
 

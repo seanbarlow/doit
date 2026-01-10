@@ -2,11 +2,14 @@
 description: Generate project folder structure and starter files based on tech stack from constitution or user input.
 handoffs:
   - label: Create Specification
-    agent: doit.doit
+    agent: doit.specit
     prompt: Create a feature specification for this scaffolded project. I want to build...
   - label: Update Constitution
     agent: doit.constitution
     prompt: Update the project constitution with additional details...
+  - label: Organize Documentation
+    agent: doit.documentit
+    prompt: Organize and index the project documentation...
 ---
 
 ## User Input
@@ -276,9 +279,10 @@ Generate comprehensive `.gitignore` based on tech stack:
 Generate the doit command suite for the new project:
 
 1. Create `.claude/commands/` directory in the target project
-2. Copy all 10 doit command templates from `.doit/templates/commands/`:
+2. Copy all 11 doit command templates from `.doit/templates/commands/`:
    - `doit.checkin.md` - Feature completion and PR creation
    - `doit.constitution.md` - Project constitution management
+   - `doit.documentit.md` - Documentation organization and indexing
    - `doit.implementit.md` - Task implementation execution
    - `doit.planit.md` - Implementation planning
    - `doit.reviewit.md` - Code review workflow
@@ -316,15 +320,73 @@ If the project already has files:
    - Missing recommended directories
    - Suggested improvements
 
-### 11. Output Summary
+### 11. Tech Stack Documentation (FR-015 to FR-018)
+
+After tech stack is determined (from constitution or user input), generate `.doit/memory/tech-stack.md`:
+
+1. Read `.doit/templates/tech-stack-template.md` for structure
+2. Populate with captured tech stack information:
+   - **Languages**: Primary language and version
+   - **Frameworks**: Main framework(s) with versions
+   - **Key Libraries**: Important dependencies with rationale
+   - **Infrastructure**: Hosting, cloud provider, database choices
+   - **Architecture Decisions**: Key decisions made during scaffolding
+
+3. If `tech-stack.md` already exists:
+   - Preserve content in "Custom Notes" section
+   - Update auto-generated sections between markers
+
+4. If `constitution.md` exists with tech info:
+   - Include relevant details from constitution
+   - Cross-reference but don't duplicate
+
+Example output structure:
+
+```markdown
+# Tech Stack
+
+**Generated**: 2026-01-10
+**Last Updated**: 2026-01-10
+
+## Languages
+
+| Language | Version | Purpose |
+| -------- | ------- | ------- |
+| TypeScript | 5.0+ | Primary |
+
+## Frameworks
+
+| Framework | Version | Purpose |
+| --------- | ------- | ------- |
+| React | 18.x | Frontend UI |
+| FastAPI | 0.100+ | Backend API |
+
+## Key Libraries
+
+| Library | Version | Purpose | Why Chosen |
+| ------- | ------- | ------- | ---------- |
+| Tailwind | 3.x | Styling | Rapid prototyping |
+
+<!-- BEGIN:AUTO-GENERATED section="scaffold-captured" -->
+Captured during scaffold on 2026-01-10
+<!-- END:AUTO-GENERATED -->
+
+## Custom Notes
+
+[User additions preserved here]
+```
+
+### 12. Output Summary
 
 After scaffolding, provide:
 
 - List of created directories and files
-- Confirmation that doit commands were generated (10 files in `.claude/commands/`)
+- Confirmation that doit commands were generated (11 files in `.claude/commands/`)
+- Confirmation that tech-stack.md was created in `.doit/memory/`
 - Next steps for the user
 - Suggested commands to run (e.g., `npm install`, `pip install -r requirements.txt`)
 - Reminder to run `/doit.specit` to create feature specifications
+- Reminder to run `/doit.documentit` to organize documentation
 
 ## Validation
 

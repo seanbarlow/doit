@@ -7,7 +7,7 @@
 
 ## Summary
 
-Comprehensive rename of the CLI tool from "Specify CLI" to "Doit CLI" and transformation of slash commands from the `/doit.*` pattern to shorter, action-oriented names (`/scaffoldit`, `/planit`, etc.). This creates a more memorable and streamlined command experience while maintaining consistency with the doit branding established in Feature 006.
+Comprehensive rename of the CLI tool from "Specify CLI" to "Doit CLI" and transformation of slash commands to shorter, action-oriented names within the `doit.` namespace (`/doit.scaffoldit`, `/doit.planit`, etc.). This creates more memorable command names while maintaining namespace isolation to avoid conflicts with other tools.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -30,7 +30,7 @@ As a developer setting up new projects, I want to use the `doit` command (alread
 
 ### User Story 2 - Slash Command Rename (Priority: P1)
 
-As a developer using the doit workflow, I want shorter, memorable command names (`/specit`, `/planit`, `/taskit`, etc.) so I can invoke commands more quickly and remember them easily.
+As a developer using the doit workflow, I want shorter, memorable command names (`/doit.specit`, `/doit.planit`, `/doit.taskit`, etc.) so I can invoke commands more quickly and remember them easily while maintaining namespace isolation.
 
 **Why this priority**: Commands are used frequently throughout development. Shorter, action-oriented names improve developer experience and productivity.
 
@@ -38,13 +38,13 @@ As a developer using the doit workflow, I want shorter, memorable command names 
 
 **Acceptance Scenarios**:
 
-1. **Given** a user types `/specit`, **When** executed, **Then** the specification workflow runs (previously `/doit.specify`)
-2. **Given** a user types `/planit`, **When** executed, **Then** the planning workflow runs (previously `/doit.plan`)
-3. **Given** a user types `/taskit`, **When** executed, **Then** the task generation workflow runs (previously `/doit.tasks`)
-4. **Given** a user types `/implementit`, **When** executed, **Then** the implementation workflow runs (previously `/doit.implement`)
-5. **Given** a user types `/testit`, **When** executed, **Then** the test workflow runs (previously `/doit.test`)
-6. **Given** a user types `/reviewit`, **When** executed, **Then** the review workflow runs (previously `/doit.review`)
-7. **Given** a user types `/scaffoldit`, **When** executed, **Then** the scaffold workflow runs (previously `/doit.scaffold`)
+1. **Given** a user types `/doit.specit`, **When** executed, **Then** the specification workflow runs (previously `/doit.specify`)
+2. **Given** a user types `/doit.planit`, **When** executed, **Then** the planning workflow runs (previously `/doit.plan`)
+3. **Given** a user types `/doit.taskit`, **When** executed, **Then** the task generation workflow runs (previously `/doit.tasks`)
+4. **Given** a user types `/doit.implementit`, **When** executed, **Then** the implementation workflow runs (previously `/doit.implement`)
+5. **Given** a user types `/doit.testit`, **When** executed, **Then** the test workflow runs (previously `/doit.test`)
+6. **Given** a user types `/doit.reviewit`, **When** executed, **Then** the review workflow runs (previously `/doit.review`)
+7. **Given** a user types `/doit.scaffoldit`, **When** executed, **Then** the scaffold workflow runs (previously `/doit.scaffold`)
 
 ---
 
@@ -73,8 +73,8 @@ As a developer reading documentation, I want all command references updated to t
 
 **Acceptance Scenarios**:
 
-1. **Given** any documentation file, **When** searching for `/doit.specify`, **Then** zero matches found (replaced with `/specit`)
-2. **Given** any documentation file, **When** searching for `/doit.plan`, **Then** zero matches found (replaced with `/planit`)
+1. **Given** any documentation file, **When** searching for `/doit.specify`, **Then** zero matches found (replaced with `/doit.specit`)
+2. **Given** any documentation file, **When** searching for `/doit.plan`, **Then** zero matches found (replaced with `/doit.planit`)
 3. **Given** the quickstart guide, **When** reviewing the workflow section, **Then** all commands use new names
 
 ---
@@ -138,13 +138,13 @@ flowchart LR
 
 #### Slash Command Rename
 
-- **FR-006**: System MUST rename `/doit.specify` command to `/specit`
-- **FR-007**: System MUST rename `/doit.plan` command to `/planit`
-- **FR-008**: System MUST rename `/doit.tasks` command to `/taskit`
-- **FR-009**: System MUST rename `/doit.implement` command to `/implementit`
-- **FR-010**: System MUST rename `/doit.test` command to `/testit`
-- **FR-011**: System MUST rename `/doit.review` command to `/reviewit`
-- **FR-012**: System MUST rename `/doit.scaffold` command to `/scaffoldit`
+- **FR-006**: System MUST rename `/doit.specify` command to `/doit.specit`
+- **FR-007**: System MUST rename `/doit.plan` command to `/doit.planit`
+- **FR-008**: System MUST rename `/doit.tasks` command to `/doit.taskit`
+- **FR-009**: System MUST rename `/doit.implement` command to `/doit.implementit`
+- **FR-010**: System MUST rename `/doit.test` command to `/doit.testit`
+- **FR-011**: System MUST rename `/doit.review` command to `/doit.reviewit`
+- **FR-012**: System MUST rename `/doit.scaffold` command to `/doit.scaffoldit`
 
 #### Preserved Commands
 
@@ -176,7 +176,7 @@ flowchart LR
 
 - **SC-001**: `doit --help` output contains "Doit CLI" and zero "Specify CLI" references
 - **SC-002**: `doit info` shows "Doit CLI Information" title
-- **SC-003**: All 7 renamed commands (`/specit`, `/planit`, `/taskit`, `/implementit`, `/testit`, `/reviewit`, `/scaffoldit`) execute successfully
+- **SC-003**: All 7 renamed commands (`/doit.specit`, `/doit.planit`, `/doit.taskit`, `/doit.implementit`, `/doit.testit`, `/doit.reviewit`, `/doit.scaffoldit`) execute successfully
 - **SC-004**: `/doit.constitution` and `/doit.checkin` continue to work unchanged
 - **SC-005**: `src/doit_cli/` directory exists and `src/specify_cli/` does not exist
 - **SC-006**: Zero documentation files contain old command names (`/doit.specify`, `/doit.plan`, etc.) except preserved ones
@@ -186,7 +186,7 @@ flowchart LR
 
 - The pyproject.toml already has `name = "doit-cli"` and script entry `doit = ...` - only internal references need updating
 - Old command names will simply not work after rename - no backwards compatibility layer needed
-- The `.doit/templates/commands/` directory structure will use new filenames (e.g., `specit.md` instead of `doit.specify.md`)
+- The `.doit/templates/commands/` directory structure will use new filenames (e.g., `doit.specit.md` instead of `doit.specify.md`)
 - Historical references in CHANGELOG.md should be preserved for accuracy
 
 ## Out of Scope

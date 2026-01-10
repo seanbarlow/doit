@@ -28,9 +28,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 007-007-doit-cli-rename: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 006-docs-doit-migration: Added Bash 5.x (text processing), Markdown (documentation) + grep, sed (standard Unix utilities)
 - 005-mermaid-visualization: Added Markdown (templates), Bash 5.x (helper scripts if needed) + Mermaid syntax (rendered by GitHub/VS Code), Claude Code slash command system
-- 004-review-template-commands: Added Bash 5.x (file operations only) + None (standard Unix utilities: rm, cp)
 
 
 <!-- MANUAL ADDITIONS START -->

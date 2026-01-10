@@ -326,6 +326,24 @@ def run_init(
     # Create agent directories and copy templates
     template_manager = TemplateManager(template_source)
 
+    # Copy workflow templates to .doit/templates/
+    workflow_result = template_manager.copy_workflow_templates(
+        target_dir=project.doit_folder / "templates",
+        overwrite=update or force,
+    )
+    result.created_files.extend(workflow_result.get("created", []))
+    result.updated_files.extend(workflow_result.get("updated", []))
+    result.skipped_files.extend(workflow_result.get("skipped", []))
+
+    # Copy GitHub issue templates to .github/ISSUE_TEMPLATE/
+    github_templates_result = template_manager.copy_github_issue_templates(
+        target_dir=project.path / ".github" / "ISSUE_TEMPLATE",
+        overwrite=update or force,
+    )
+    result.created_files.extend(github_templates_result.get("created", []))
+    result.updated_files.extend(github_templates_result.get("updated", []))
+    result.skipped_files.extend(github_templates_result.get("skipped", []))
+
     for agent in agents:
         scaffolder.create_agent_directory(agent)
 

@@ -1,0 +1,129 @@
+name: Task
+description: Create a specific implementation task
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Implementation Task
+        A Task is a specific, actionable piece of work that contributes to a feature.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done?
+      placeholder: "Describe the specific work to be completed..."
+    validations:
+      required: true
+
+  - type: input
+    id: parent-feature
+    attributes:
+      label: Parent Feature
+      description: Link to the parent feature issue
+      placeholder: "#123"
+    validations:
+      required: false
+
+  - type: input
+    id: task-id
+    attributes:
+      label: Task ID
+      description: Task identifier from tasks.md (e.g., T001, T002)
+      placeholder: "T###"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      description: Which implementation phase does this belong to?
+      options:
+        - Phase 1 - Setup
+        - Phase 2 - Foundational
+        - Phase 3 - Core Implementation
+        - Phase 4 - Integration
+        - Phase 5 - Testing
+        - Phase 6 - Polish
+    validations:
+      required: false
+
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: Definition of Done
+      description: Checklist of items that must be complete
+      placeholder: |
+        - [ ] Code implemented
+        - [ ] Unit tests written and passing
+        - [ ] Code reviewed
+        - [ ] Documentation updated
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Estimated Effort
+      description: How long will this task take?
+      options:
+        - XS (< 1 hour)
+        - S (1-4 hours)
+        - M (4-8 hours)
+        - L (1-2 days)
+        - XL (> 2 days - consider breaking down)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: parallel
+    attributes:
+      label: Parallel Execution
+      description: Can this task run in parallel with others?
+      options:
+        - label: This task can be worked on in parallel with other tasks (different files, no dependencies)
+          required: false
+
+  - type: textarea
+    id: part-of
+    attributes:
+      label: Part Of
+      description: Link to parent feature
+      placeholder: "Part of Feature #XXX"
+    validations:
+      required: false
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Files to Modify
+      description: List of files that will be created or modified
+      placeholder: |
+        - src/models/user.py (create)
+        - src/services/auth.py (modify)
+        - tests/test_auth.py (create)
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Other tasks this depends on
+      placeholder: |
+        - Depends on T001
+        - Blocked by #XXX
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: "Add any technical notes or references here..."
+    validations:
+      required: false

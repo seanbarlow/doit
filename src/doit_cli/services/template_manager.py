@@ -9,6 +9,22 @@ from ..models.agent import Agent
 from ..models.template import Template, DOIT_COMMANDS
 
 
+# Workflow templates to copy to .doit/templates/
+WORKFLOW_TEMPLATES = [
+    "spec-template.md",
+    "plan-template.md",
+    "tasks-template.md",
+    "checklist-template.md",
+]
+
+# GitHub issue templates to copy to .github/ISSUE_TEMPLATE/
+GITHUB_ISSUE_TEMPLATES = [
+    "epic.yml",
+    "feature.yml",
+    "task.yml",
+]
+
+
 class TemplateManager:
     """Service for managing and copying bundled templates."""
 
@@ -25,6 +41,29 @@ class TemplateManager:
         """
         self.custom_source = custom_source
 
+    def get_base_template_path(self) -> Path:
+        """Get the base path for all templates.
+
+        Returns:
+            Path to base templates directory
+        """
+        if self.custom_source:
+            return self.custom_source
+
+        # Use bundled templates
+        try:
+            # Try importlib.resources first (Python 3.9+)
+            import importlib.resources as resources
+
+            # Get the package location
+            with resources.as_file(resources.files("doit_cli")) as pkg_path:
+                return pkg_path / "templates"
+        except (ImportError, TypeError, AttributeError):
+            # Fallback: look relative to this file
+            # During development, templates are at repo_root/templates/
+            module_path = Path(__file__).parent.parent.parent.parent
+            return module_path / "templates"
+
     def get_template_source_path(self, agent: Agent) -> Path:
         """Get the source path for templates.
 
@@ -37,20 +76,7 @@ class TemplateManager:
         if self.custom_source:
             return self.custom_source / agent.template_directory
 
-        # Use bundled templates
-        # Templates are bundled at doit_cli/templates/commands/ and doit_cli/templates/prompts/
-        try:
-            # Try importlib.resources first (Python 3.9+)
-            import importlib.resources as resources
-
-            # Get the package location
-            with resources.as_file(resources.files("doit_cli")) as pkg_path:
-                return pkg_path / "templates" / agent.template_directory
-        except (ImportError, TypeError, AttributeError):
-            # Fallback: look relative to this file
-            # During development, templates are at repo_root/templates/
-            module_path = Path(__file__).parent.parent.parent.parent
-            return module_path / "templates" / agent.template_directory
+        return self.get_base_template_path() / agent.template_directory
 
     def get_bundled_templates(self, agent: Agent) -> list[Template]:
         """Get all bundled templates for an agent.
@@ -325,3 +351,108 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
             return True
 
         return False
+
+    def copy_workflow_templates(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy workflow templates (spec, plan, tasks, checklist) to target directory.
+
+        These are the templates used by doit commands to generate artifacts.
+
+        Args:
+            target_dir: Destination directory (typically .doit/templates/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        source_dir = self.get_base_template_path()
+        if not source_dir.exists():
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for template_name in WORKFLOW_TEMPLATES:
+            source_path = source_dir / template_name
+            if not source_path.exists():
+                continue
+
+            target_path = target_dir / template_name
+
+            if target_path.exists():
+                if overwrite:
+                    shutil.copy2(source_path, target_path)
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                shutil.copy2(source_path, target_path)
+                result["created"].append(target_path)
+
+        return result
+
+    def copy_github_issue_templates(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy GitHub issue templates (epic, feature, task) to target directory.
+
+        These are YAML templates for GitHub Issues.
+
+        Args:
+            target_dir: Destination directory (typically .github/ISSUE_TEMPLATE/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        # GitHub issue templates are stored in a different location
+        # They're at the repo root .github/ISSUE_TEMPLATE/, not in templates/
+        # But for bundled distribution, we'll look in templates/github-issue-templates/
+        source_dir = self.get_base_template_path() / "github-issue-templates"
+
+        if not source_dir.exists():
+            # Fallback: try repo root (development mode)
+            module_path = Path(__file__).parent.parent.parent.parent
+            source_dir = module_path / ".github" / "ISSUE_TEMPLATE"
+
+        if not source_dir.exists():
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for template_name in GITHUB_ISSUE_TEMPLATES:
+            source_path = source_dir / template_name
+            if not source_path.exists():
+                continue
+
+            target_path = target_dir / template_name
+
+            if target_path.exists():
+                if overwrite:
+                    shutil.copy2(source_path, target_path)
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                shutil.copy2(source_path, target_path)
+                result["created"].append(target_path)
+
+        return result

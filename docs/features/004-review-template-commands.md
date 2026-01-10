@@ -6,13 +6,13 @@
 
 ## Overview
 
-Remove legacy speckit templates from `templates/commands/` and replace them with standardized doit command templates from `.doit/templates/commands/`. This ensures a single authoritative source for command templates following the doit naming convention.
+Remove legacy doit templates from `templates/commands/` and replace them with standardized doit command templates from `.doit/templates/commands/`. This ensures a single authoritative source for command templates following the doit naming convention.
 
 ## Requirements Implemented
 
 | ID | Description | Status |
 |----|-------------|--------|
-| FR-001 | Remove all legacy speckit templates from templates/commands/ | Done |
+| FR-001 | Remove all legacy doit templates from templates/commands/ | Done |
 | FR-002 | Copy all 9 doit command templates to templates/commands/ | Done |
 | FR-003 | Templates in templates/commands/ match .doit/templates/commands/ | Done |
 | FR-004 | All templates reference .doit/ paths, not .specify/ | Done |
@@ -78,11 +78,11 @@ N/A - File operations feature
 
 | ID | Criterion | Status |
 |----|-----------|--------|
-| SC-001 | Zero legacy speckit templates remain | PASS |
+| SC-001 | Zero legacy doit templates remain | PASS |
 | SC-002 | 9 doit command templates exist | PASS |
 | SC-003 | Templates match source directory | PASS |
 | SC-004 | Zero .specify/ references | PASS |
-| SC-005 | Zero speckit references | PASS |
+| SC-005 | Zero doit references | PASS |
 
 ## Related Issues
 

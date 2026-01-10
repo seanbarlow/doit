@@ -899,10 +899,10 @@ def download_and_extract_template(project_path: Path, ai_assistant: str, script_
 
 
 def ensure_executable_scripts(project_path: Path, tracker: StepTracker | None = None) -> None:
-    """Ensure POSIX .sh scripts under .specify/scripts (recursively) have execute bits (no-op on Windows)."""
+    """Ensure POSIX .sh scripts under .doit/scripts (recursively) have execute bits (no-op on Windows)."""
     if os.name == "nt":
         return  # Windows: skip silently
-    scripts_root = project_path / ".specify" / "scripts"
+    scripts_root = project_path / ".doit" / "scripts"
     if not scripts_root.is_dir():
         return
     failures: list[str] = []
@@ -1220,7 +1220,7 @@ def init(
     steps_lines.append(f"{step_num}. Start using slash commands with your AI agent:")
 
     steps_lines.append("   2.1 [cyan]/doit.constitution[/] - Establish project principles")
-    steps_lines.append("   2.2 [cyan]/doit.specify[/] - Create baseline specification")
+    steps_lines.append("   2.2 [cyan]/doit.doit[/] - Create baseline specification")
     steps_lines.append("   2.3 [cyan]/doit.plan[/] - Create implementation plan")
     steps_lines.append("   2.4 [cyan]/doit.tasks[/] - Generate actionable tasks")
     steps_lines.append("   2.5 [cyan]/doit.implement[/] - Execute implementation")

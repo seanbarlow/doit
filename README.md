@@ -102,10 +102,10 @@ Use the **`/doit.constitution`** command to create your project's governing prin
 
 ### 3. Create the spec
 
-Use the **`/doit.specify`** command to describe what you want to build. Focus on the **what** and **why**, not the tech stack.
+Use the **`/doit.doit`** command to describe what you want to build. Focus on the **what** and **why**, not the tech stack.
 
 ```bash
-/doit.specify Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
+/doit.doit Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
 ```
 
 ### 4. Create a technical implementation plan
@@ -253,7 +253,7 @@ Essential commands for the Spec-Driven Development workflow:
 | Command                 | Description                                                              |
 | ----------------------- | ------------------------------------------------------------------------ |
 | `/doit.constitution` | Create or update project governing principles and development guidelines |
-| `/doit.specify`      | Define what you want to build (requirements and user stories)            |
+| `/doit.doit`      | Define what you want to build (requirements and user stories)            |
 | `/doit.plan`         | Create technical implementation plans with your chosen tech stack        |
 | `/doit.tasks`        | Generate actionable task lists for implementation                        |
 | `/doit.implement`    | Execute all tasks to build the feature according to the plan             |
@@ -393,7 +393,7 @@ Go to the project folder and run your AI agent. In our example, we're using `cla
 
 ![Bootstrapping Claude Code environment](./media/bootstrap-claude-code.gif)
 
-You will know that things are configured correctly if you see the `/doit.constitution`, `/doit.specify`, `/doit.plan`, `/doit.tasks`, and `/doit.implement` commands available.
+You will know that things are configured correctly if you see the `/doit.constitution`, `/doit.doit`, `/doit.plan`, `/doit.tasks`, and `/doit.implement` commands available.
 
 The first step should be establishing your project's governing principles using the `/doit.constitution` command. This helps ensure consistent decision-making throughout all subsequent development phases:
 
@@ -401,11 +401,11 @@ The first step should be establishing your project's governing principles using 
 /doit.constitution Create principles focused on code quality, testing standards, user experience consistency, and performance requirements. Include governance for how these principles should guide technical decisions and implementation choices.
 ```
 
-This step creates or updates the `.specify/memory/constitution.md` file with your project's foundational guidelines that the AI agent will reference during specification, planning, and implementation phases.
+This step creates or updates the `.doit/memory/constitution.md` file with your project's foundational guidelines that the AI agent will reference during specification, planning, and implementation phases.
 
 ### **STEP 2:** Create project specifications
 
-With your project principles established, you can now create the functional specifications. Use the `/doit.specify` command and then provide the concrete requirements for the project you want to develop.
+With your project principles established, you can now create the functional specifications. Use the `/doit.doit` command and then provide the concrete requirements for the project you want to develop.
 
 > [!IMPORTANT]
 > Be as explicit as possible about *what* you are trying to build and *why*. **Do not focus on the tech stack at this point**.
@@ -440,7 +440,7 @@ The produced specification should contain a set of user stories and functional r
 At this stage, your project folder contents should resemble the following:
 
 ```text
-└── .specify
+└── .doit
     ├── memory
     │  └── constitution.md
     ├── scripts

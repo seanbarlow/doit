@@ -2,11 +2,11 @@
 description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
 handoffs: 
   - label: Analyze For Consistency
-    agent: speckit.analyze
+    agent: doit.analyze
     prompt: Run a project analysis for consistency
     send: true
   - label: Implement Project
-    agent: speckit.implement
+    agent: doit.implement
     prompt: Start the implementation in phases
     send: true
 ---
@@ -59,6 +59,18 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Independent test criteria for each story
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
+
+6. **GitHub Issue Integration** (FR-050):
+   - Check for `--skip-issues` in $ARGUMENTS - if present, skip issue creation (FR-021)
+   - Detect GitHub remote: `git remote get-url origin`
+   - If GitHub remote found and not skipped:
+     - For each generated task, create a GitHub Task issue using the task.yml template
+     - Find parent Feature issues by searching for feature labels matching current spec
+     - Link Task issues to parent Feature using "Part of Feature #XXX" in body
+     - Add phase label (e.g., "Phase 3 - Core Implementation")
+     - Add effort estimate if extractable from task description
+   - If GitHub unavailable or API fails: Log warning and continue without issues (FR-022)
+   - Report: Number of issues created, any linking errors
 
 Context for task generation: $ARGUMENTS
 

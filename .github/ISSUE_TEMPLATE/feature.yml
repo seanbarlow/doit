@@ -1,0 +1,116 @@
+name: Feature
+description: Create a new feature or user story that delivers value
+title: "[Feature]: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature / User Story
+        A Feature represents a specific piece of functionality that delivers value to users.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature and the value it provides
+      placeholder: |
+        As a [type of user],
+        I want [goal/desire],
+        So that [benefit/value].
+    validations:
+      required: true
+
+  - type: input
+    id: parent-epic
+    attributes:
+      label: Parent Epic
+      description: Link to the parent epic issue
+      placeholder: "#123"
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-scenarios
+    attributes:
+      label: Acceptance Scenarios
+      description: Specific scenarios that must pass for this feature to be complete
+      placeholder: |
+        **Scenario 1: [Name]**
+        Given [context]
+        When [action]
+        Then [outcome]
+
+        **Scenario 2: [Name]**
+        Given [context]
+        When [action]
+        Then [outcome]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - P1 - Critical (MVP)
+        - P2 - High
+        - P3 - Medium
+        - P4 - Low (Nice to have)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size Estimate
+      description: Rough estimate of effort
+      options:
+        - XS (< 1 day)
+        - S (1-2 days)
+        - M (3-5 days)
+        - L (1-2 weeks)
+        - XL (> 2 weeks - consider breaking down)
+    validations:
+      required: false
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Implementation Tasks
+      description: Links to task issues (add as they are created)
+      placeholder: |
+        - [ ] #125 - Task A
+        - [ ] #126 - Task B
+    validations:
+      required: false
+
+  - type: textarea
+    id: part-of
+    attributes:
+      label: Part Of
+      description: Link to parent epic
+      placeholder: "Part of Epic #XXX"
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Other features or tasks this depends on
+      placeholder: |
+        - Blocked by #XXX
+        - Requires #YYY to be complete
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information, mockups, or references
+      placeholder: "Add screenshots, diagrams, or links here..."
+    validations:
+      required: false

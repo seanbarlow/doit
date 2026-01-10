@@ -1,0 +1,415 @@
+"""Init command for initializing doit project structure."""
+
+from pathlib import Path
+from typing import Annotated, Optional
+
+import typer
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.tree import Tree
+
+from ..models.agent import Agent
+from ..models.project import Project
+from ..models.results import InitResult
+from ..services.scaffolder import Scaffolder
+
+
+console = Console()
+
+# Type aliases for CLI options
+AgentOption = Annotated[
+    Optional[str],
+    typer.Option(
+        "--agent", "-a",
+        help="Target agent(s): claude, copilot, or claude,copilot for both"
+    )
+]
+
+TemplatesOption = Annotated[
+    Optional[Path],
+    typer.Option(
+        "--templates", "-t",
+        help="Custom template directory path"
+    )
+]
+
+UpdateFlag = Annotated[
+    bool,
+    typer.Option(
+        "--update", "-u",
+        help="Update existing project, preserving custom files"
+    )
+]
+
+ForceFlag = Annotated[
+    bool,
+    typer.Option(
+        "--force", "-f",
+        help="Overwrite existing files without backup"
+    )
+]
+
+YesFlag = Annotated[
+    bool,
+    typer.Option(
+        "--yes", "-y",
+        help="Skip confirmation prompts"
+    )
+]
+
+
+def display_init_result(result: InitResult, agents: list[Agent]) -> None:
+    """Display initialization result with rich formatting.
+
+    Args:
+        result: The initialization result to display
+        agents: List of agents that were initialized
+    """
+    if not result.success:
+        console.print(
+            Panel(
+                f"[red]Error:[/red] {result.error_message}",
+                title="[red]Initialization Failed[/red]",
+                border_style="red",
+            )
+        )
+        return
+
+    # Create a tree view of created structure
+    tree = Tree("[bold cyan]Doit Project Structure[/bold cyan]")
+
+    if result.created_directories:
+        dirs_branch = tree.add("[green]Created Directories[/green]")
+        for dir_path in sorted(result.created_directories):
+            rel_path = dir_path.relative_to(result.project.path)
+            dirs_branch.add(f"[dim]{rel_path}/[/dim]")
+
+    if result.created_files:
+        files_branch = tree.add("[green]Created Files[/green]")
+        for file_path in sorted(result.created_files):
+            rel_path = file_path.relative_to(result.project.path)
+            files_branch.add(f"[dim]{rel_path}[/dim]")
+
+    if result.updated_files:
+        updated_branch = tree.add("[yellow]Updated Files[/yellow]")
+        for file_path in sorted(result.updated_files):
+            rel_path = file_path.relative_to(result.project.path)
+            updated_branch.add(f"[dim]{rel_path}[/dim]")
+
+    if result.skipped_files:
+        skipped_branch = tree.add("[dim]Skipped Files (already exist)[/dim]")
+        for file_path in sorted(result.skipped_files):
+            rel_path = file_path.relative_to(result.project.path)
+            skipped_branch.add(f"[dim]{rel_path}[/dim]")
+
+    console.print()
+    console.print(Panel(tree, title="[bold green]Initialization Complete[/bold green]", border_style="green"))
+
+    # Display summary
+    console.print()
+    console.print(f"[bold]Summary:[/bold] {result.summary}")
+
+    # Display next steps
+    display_next_steps(agents)
+
+
+def display_next_steps(agents: list[Agent]) -> None:
+    """Display next steps guidance after initialization.
+
+    Args:
+        agents: List of agents that were initialized
+    """
+    steps = [
+        "1. Run [cyan]/doit.constitution[/cyan] to establish project principles",
+        "2. Run [cyan]/doit.specit[/cyan] to create your first feature specification",
+        "3. Run [cyan]/doit.planit[/cyan] to create an implementation plan",
+    ]
+
+    agent_names = ", ".join(a.display_name for a in agents)
+
+    console.print()
+    console.print(
+        Panel(
+            "\n".join(
+                [
+                    f"[bold]Initialized for:[/bold] {agent_names}",
+                    "",
+                    "[bold]Next Steps:[/bold]",
+                    *steps,
+                ]
+            ),
+            title="[cyan]Getting Started[/cyan]",
+            border_style="cyan",
+        )
+    )
+
+
+def prompt_agent_selection() -> list[Agent]:
+    """Prompt user to select target agent(s).
+
+    Returns:
+        List of selected agents
+    """
+    console.print()
+    console.print("[bold]Select target AI agent(s):[/bold]")
+    console.print()
+
+    table = Table(show_header=True, header_style="bold cyan")
+    table.add_column("Option", style="cyan", width=8)
+    table.add_column("Agent", style="white")
+    table.add_column("Command Directory", style="dim")
+
+    table.add_row("1", "Claude Code", ".claude/commands/")
+    table.add_row("2", "GitHub Copilot", ".github/prompts/")
+    table.add_row("3", "Both", ".claude/commands/ + .github/prompts/")
+
+    console.print(table)
+    console.print()
+
+    choice = typer.prompt("Enter your choice (1-3)", default="1")
+
+    if choice == "1":
+        return [Agent.CLAUDE]
+    elif choice == "2":
+        return [Agent.COPILOT]
+    elif choice == "3":
+        return [Agent.CLAUDE, Agent.COPILOT]
+    else:
+        console.print("[yellow]Invalid choice, defaulting to Claude[/yellow]")
+        return [Agent.CLAUDE]
+
+
+def parse_agent_string(agent_str: str) -> list[Agent]:
+    """Parse agent string into list of Agent enums.
+
+    Args:
+        agent_str: Comma-separated agent names (e.g., "claude,copilot")
+
+    Returns:
+        List of Agent enums
+
+    Raises:
+        typer.BadParameter: If invalid agent name provided
+    """
+    agents = []
+    for name in agent_str.lower().split(","):
+        name = name.strip()
+        if name == "claude":
+            agents.append(Agent.CLAUDE)
+        elif name == "copilot":
+            agents.append(Agent.COPILOT)
+        else:
+            raise typer.BadParameter(
+                f"Unknown agent: {name}. Use 'claude', 'copilot', or 'claude,copilot'"
+            )
+
+    return agents
+
+
+def validate_custom_templates(template_source: Path, yes: bool = False) -> bool:
+    """Validate custom template source and display warnings.
+
+    Args:
+        template_source: Path to custom template directory
+        yes: Skip confirmation prompts
+
+    Returns:
+        True if should continue, False to abort
+    """
+    from ..services.template_manager import TemplateManager
+
+    template_manager = TemplateManager(template_source)
+    validation = template_manager.validate_custom_source()
+
+    if not validation.get("valid", False):
+        error_msg = validation.get("error", "Invalid custom template source")
+        console.print(f"[red]Error:[/red] {error_msg}")
+        return False
+
+    warnings = validation.get("warnings", [])
+    if warnings:
+        console.print()
+        console.print(
+            Panel(
+                "\n".join(f"• {w}" for w in warnings),
+                title="[yellow]Template Warnings[/yellow]",
+                border_style="yellow",
+            )
+        )
+
+        if not yes:
+            if not typer.confirm("Continue with missing templates?", default=True):
+                return False
+
+    return True
+
+
+def run_init(
+    path: Path,
+    agents: Optional[list[Agent]] = None,
+    update: bool = False,
+    force: bool = False,
+    yes: bool = False,
+    template_source: Optional[Path] = None,
+) -> InitResult:
+    """Run the initialization process.
+
+    Args:
+        path: Project directory path
+        agents: Target agents (None to auto-detect or prompt)
+        update: Update existing project
+        force: Force overwrite without backup
+        yes: Skip confirmation prompts
+        template_source: Custom template source path
+
+    Returns:
+        InitResult with operation details
+    """
+    # Defer imports to avoid circular dependencies
+    from ..services.template_manager import TemplateManager
+    from ..services.agent_detector import AgentDetector
+
+    # Create project model
+    project = Project(path=path.resolve())
+
+    # Validate custom template source if provided
+    if template_source:
+        if not validate_custom_templates(template_source, yes):
+            return InitResult(
+                success=False,
+                project=project,
+                error_message="Custom template validation failed",
+            )
+
+    # Check if safe directory
+    if not project.is_safe_directory() and not force:
+        if not yes:
+            console.print(
+                Panel(
+                    f"[yellow]Warning:[/yellow] You are about to initialize doit in [bold]{path}[/bold]\n\n"
+                    "This is typically not recommended. Consider initializing in a project directory instead.",
+                    title="[yellow]Unsafe Directory[/yellow]",
+                    border_style="yellow",
+                )
+            )
+            if not typer.confirm("Continue anyway?", default=False):
+                return InitResult(
+                    success=False,
+                    project=project,
+                    error_message="Operation cancelled by user",
+                )
+
+    # Determine target agents
+    if agents is None:
+        detector = AgentDetector(project)
+        detected = detector.detect_agents()
+
+        if detected:
+            agents = detected
+            agent_names = ", ".join(a.display_name for a in agents)
+            console.print(f"[cyan]Auto-detected agent(s):[/cyan] {agent_names}")
+        elif yes:
+            # Default to Claude if --yes and no detection
+            agents = [Agent.CLAUDE]
+            console.print("[cyan]Defaulting to Claude Code[/cyan]")
+        else:
+            agents = prompt_agent_selection()
+
+    # Create scaffolder and initialize structure
+    scaffolder = Scaffolder(project)
+    result = scaffolder.create_doit_structure()
+
+    if not result.success:
+        return result
+
+    # Create agent directories and copy templates
+    template_manager = TemplateManager(template_source)
+
+    for agent in agents:
+        scaffolder.create_agent_directory(agent)
+
+        # Copy templates for this agent
+        copy_result = template_manager.copy_templates_for_agent(
+            agent=agent,
+            target_dir=project.command_directory(agent),
+            overwrite=update or force,
+        )
+
+        result.created_files.extend(copy_result.get("created", []))
+        result.updated_files.extend(copy_result.get("updated", []))
+        result.skipped_files.extend(copy_result.get("skipped", []))
+
+        # For Copilot agent, also create/update copilot-instructions.md
+        if agent == Agent.COPILOT:
+            copilot_instructions_path = project.path / ".github" / "copilot-instructions.md"
+            copilot_instructions_path.parent.mkdir(parents=True, exist_ok=True)
+
+            if template_manager.create_copilot_instructions(
+                target_path=copilot_instructions_path,
+                update_only=False,
+            ):
+                if copilot_instructions_path in result.created_files:
+                    pass  # Already tracked
+                elif copilot_instructions_path.exists():
+                    result.updated_files.append(copilot_instructions_path)
+                else:
+                    result.created_files.append(copilot_instructions_path)
+
+    # Update project state
+    project.initialized = True
+    project.agents = agents
+
+    return result
+
+
+def init_command(
+    path: Annotated[
+        Path,
+        typer.Argument(
+            default=...,
+            help="Project directory path (use '.' for current directory)"
+        )
+    ] = Path("."),
+    agent: AgentOption = None,
+    templates: TemplatesOption = None,
+    update: UpdateFlag = False,
+    force: ForceFlag = False,
+    yes: YesFlag = False,
+) -> None:
+    """Initialize a new doit project with bundled templates.
+
+    This command creates the .doit/ folder structure and copies command
+    templates for the specified AI agent(s).
+
+    Examples:
+        doit init .                    # Initialize in current directory
+        doit init . --agent claude     # Claude only
+        doit init . --agent copilot    # Copilot only
+        doit init . -a claude,copilot  # Both agents
+        doit init . --update           # Update existing templates
+    """
+    # Parse agent string if provided
+    agents = None
+    if agent:
+        try:
+            agents = parse_agent_string(agent)
+        except typer.BadParameter as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+
+    # Run initialization
+    result = run_init(
+        path=path,
+        agents=agents,
+        update=update,
+        force=force,
+        yes=yes,
+        template_source=templates,
+    )
+
+    # Display results
+    display_init_result(result, agents or result.project.agents or [Agent.CLAUDE])
+
+    if not result.success:
+        raise typer.Exit(1)

@@ -1,19 +1,25 @@
 [project]
 name = "doit-cli"
-version = "0.0.22"
+version = "0.0.23"
 description = "Doit CLI - A tool to bootstrap your projects for Spec-Driven Development (SDD)."
 requires-python = ">=3.11"
 dependencies = [
-    "typer",
-    "rich",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
     "httpx[socks]",
     "platformdirs",
     "readchar",
     "truststore>=0.10.4",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-tmp-files>=0.0.2",
+]
+
 [project.scripts]
-doit = "doit_cli:main"
+doit = "doit_cli.main:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -21,4 +27,13 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/doit_cli"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"templates" = "doit_cli/templates"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 

@@ -27,6 +27,48 @@
 **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
+## Architecture Overview
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.plan based on Technical Context above.
+  Shows the high-level system architecture with component layers.
+  Regenerate by running /doit.plan again.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="architecture" -->
+```mermaid
+flowchart TD
+    subgraph "Presentation"
+        UI[UI Layer]
+    end
+    subgraph "Application"
+        API[API Layer]
+        SVC[Service Layer]
+    end
+    subgraph "Data"
+        DB[(Database)]
+    end
+    UI --> API --> SVC --> DB
+```
+<!-- END:AUTO-GENERATED -->
+
+## Component Dependencies *(include if multiple services/components)*
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.plan when multiple services are defined.
+  Shows dependencies between services and components.
+  If only one service, this section should be omitted.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="component-dependencies" -->
+```mermaid
+flowchart TD
+    AUTH[Auth Service] --> USER[User Service]
+    CORE[Core Service] --> USER
+    CORE --> DATA[Data Service]
+```
+<!-- END:AUTO-GENERATED -->
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*

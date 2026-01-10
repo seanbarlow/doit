@@ -75,6 +75,50 @@
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
 
+## User Journey Visualization
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.specify based on user stories above.
+  The flowchart shows each user story as a subgraph with key actions.
+  Regenerate by running /doit.specify again.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="user-journey" -->
+```mermaid
+flowchart LR
+    subgraph "User Story 1 - [Title]"
+        US1_S[Start] --> US1_A[Action] --> US1_E[End]
+    end
+    subgraph "User Story 2 - [Title]"
+        US2_S[Start] --> US2_A[Action] --> US2_E[End]
+    end
+```
+<!-- END:AUTO-GENERATED -->
+
+## Entity Relationships *(include if Key Entities defined)*
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.specify when Key Entities are defined.
+  Shows entity relationships as an ER diagram.
+  If no entities are defined, this entire section should be omitted (not left empty).
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="entity-relationships" -->
+```mermaid
+erDiagram
+    ENTITY1 ||--o{ ENTITY2 : "relationship"
+
+    ENTITY1 {
+        string id PK
+        string name
+    }
+    ENTITY2 {
+        string id PK
+        string entity1_id FK
+    }
+```
+<!-- END:AUTO-GENERATED -->
+
 ## Requirements *(mandatory)*
 
 <!--

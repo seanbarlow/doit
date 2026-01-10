@@ -103,7 +103,7 @@ gantt
 
 **Purpose**: Establish auto-generation patterns used by all subsequent phases
 
-- [ ] T001 Document auto-generation marker pattern in .doit/docs/diagram-patterns.md
+- [X] T001 Document auto-generation marker pattern in .doit/docs/diagram-patterns.md
 
 **Pattern to document**:
 ```markdown
@@ -130,10 +130,10 @@ gantt
 
 ### Implementation for User Story 1
 
-- [ ] T002 [US1] Add User Journey Visualization section to .doit/templates/spec-template.md
-- [ ] T003 [US1] Add Entity Relationships section (conditional) to .doit/templates/spec-template.md
-- [ ] T004 [US1] Add diagram generation instructions to .doit/templates/commands/doit.specify.md
-- [ ] T005 [US1] Copy updated templates to templates/spec-template.md and templates/commands/doit.specify.md
+- [X] T002 [US1] Add User Journey Visualization section to .doit/templates/spec-template.md
+- [X] T003 [US1] Add Entity Relationships section (conditional) to .doit/templates/spec-template.md
+- [X] T004 [US1] Add diagram generation instructions to .doit/templates/commands/doit.specify.md
+- [X] T005 [US1] Copy updated templates to templates/spec-template.md and templates/commands/doit.specify.md
 
 **Section to add to spec-template.md (T002)**:
 ```markdown
@@ -169,12 +169,12 @@ flowchart LR
 
 ### Implementation for User Story 2
 
-- [ ] T006 [US2] Add Architecture Overview section to .doit/templates/plan-template.md
-- [ ] T007 [US2] Add Component Dependencies section to .doit/templates/plan-template.md
-- [ ] T008 [US2] Add ER diagram auto-generation to data-model.md workflow in .doit/templates/commands/doit.plan.md
-- [ ] T009 [US2] Add state machine detection logic to .doit/templates/commands/doit.plan.md
-- [ ] T010 [US2] Add diagram generation instructions to .doit/templates/commands/doit.plan.md
-- [ ] T011 [US2] Copy updated templates to templates/plan-template.md and templates/commands/doit.plan.md
+- [X] T006 [US2] Add Architecture Overview section to .doit/templates/plan-template.md
+- [X] T007 [US2] Add Component Dependencies section to .doit/templates/plan-template.md
+- [X] T008 [US2] Add ER diagram auto-generation to data-model.md workflow in .doit/templates/commands/doit.plan.md
+- [X] T009 [US2] Add state machine detection logic to .doit/templates/commands/doit.plan.md
+- [X] T010 [US2] Add diagram generation instructions to .doit/templates/commands/doit.plan.md
+- [X] T011 [US2] Copy updated templates to templates/plan-template.md and templates/commands/doit.plan.md
 
 **Section to add to plan-template.md (T006)**:
 ```markdown
@@ -217,11 +217,11 @@ flowchart TD
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Add Task Dependencies section to .doit/templates/tasks-template.md
-- [ ] T013 [US3] Add Phase Timeline section to .doit/templates/tasks-template.md
-- [ ] T014 [US3] Add parallel task ([P]) detection logic to .doit/templates/commands/doit.tasks.md
-- [ ] T015 [US3] Add diagram generation instructions to .doit/templates/commands/doit.tasks.md
-- [ ] T016 [US3] Copy updated templates to templates/tasks-template.md and templates/commands/doit.tasks.md
+- [X] T012 [US3] Add Task Dependencies section to .doit/templates/tasks-template.md
+- [X] T013 [US3] Add Phase Timeline section to .doit/templates/tasks-template.md
+- [X] T014 [US3] Add parallel task ([P]) detection logic to .doit/templates/commands/doit.tasks.md
+- [X] T015 [US3] Add diagram generation instructions to .doit/templates/commands/doit.tasks.md
+- [X] T016 [US3] Copy updated templates to templates/tasks-template.md and templates/commands/doit.tasks.md
 
 **Section to add to tasks-template.md (T012)**:
 ```markdown
@@ -259,9 +259,9 @@ flowchart TD
 
 ### Implementation for User Story 4
 
-- [ ] T017 [US4] Add Finding Distribution pie chart instructions to .doit/templates/commands/doit.review.md
-- [ ] T018 [US4] Add Test Results visualization instructions to .doit/templates/commands/doit.review.md
-- [ ] T019 [US4] Update review-report generation in .doit/templates/commands/doit.review.md
+- [X] T017 [US4] Add Finding Distribution pie chart instructions to .doit/templates/commands/doit.review.md
+- [X] T018 [US4] Add Test Results visualization instructions to .doit/templates/commands/doit.review.md
+- [X] T019 [US4] Update review-report generation in .doit/templates/commands/doit.review.md
 
 **Diagram to generate (T017)**:
 ```markdown
@@ -294,9 +294,9 @@ pie title Finding Distribution
 
 **Requirements**: FR-014, FR-015, FR-016
 
-- [ ] T020 Add mermaid syntax validation guidance to all command templates
-- [ ] T021 Add diagram size management instructions (split at 20+ nodes) to all command templates
-- [ ] T022 Manual test all 4 commands with sample features, verify diagrams render correctly
+- [X] T020 Add mermaid syntax validation guidance to all command templates
+- [X] T021 Add diagram size management instructions (split at 20+ nodes) to all command templates
+- [X] T022 Manual test all 4 commands with sample features, verify diagrams render correctly
 
 **Validation guidance to add (T020)**:
 ```markdown

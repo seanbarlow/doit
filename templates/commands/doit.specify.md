@@ -97,7 +97,53 @@ Given that feature description, do this:
 
 5. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
 
-6. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+6. **Generate Mermaid Visualizations** (FR-001, FR-002, FR-003):
+
+   After writing the spec content, generate visual diagrams to enhance understanding:
+
+   a. **User Journey Visualization** (FR-001):
+      - Parse all user stories from the spec (### User Story N - [Title])
+      - For each user story, extract the key action flow from acceptance scenarios
+      - Generate a flowchart with one subgraph per user story
+      - Use format: `US{N}_S[Start] --> US{N}_A[Action] --> US{N}_E[End]`
+      - Replace the placeholder in `<!-- BEGIN:AUTO-GENERATED section="user-journey" -->` markers
+
+      ```mermaid
+      flowchart LR
+          subgraph "User Story 1 - [Actual Title]"
+              US1_S[User Starts] --> US1_A[Key Action] --> US1_E[Expected Outcome]
+          end
+          subgraph "User Story 2 - [Actual Title]"
+              US2_S[User Starts] --> US2_A[Key Action] --> US2_E[Expected Outcome]
+          end
+      ```
+
+   b. **Entity Relationships** (FR-002, FR-003):
+      - Check if Key Entities section exists and has content
+      - **IF Key Entities defined**:
+        - Parse entity names and relationships from the Key Entities section
+        - Generate an ER diagram showing entities and their relationships
+        - Replace content in `<!-- BEGIN:AUTO-GENERATED section="entity-relationships" -->` markers
+      - **IF NO Key Entities defined** (FR-003):
+        - **REMOVE the entire Entity Relationships section** (from `## Entity Relationships` to before `## Requirements`)
+        - Do NOT leave an empty placeholder section
+
+      ```mermaid
+      erDiagram
+          ENTITY1 ||--o{ ENTITY2 : "relationship description"
+
+          ENTITY1 {
+              string id PK
+              string key_attribute
+          }
+      ```
+
+   c. **Diagram Validation**:
+      - Verify mermaid syntax is valid (proper diagram type, matching brackets)
+      - Check node count does not exceed 20 per diagram (split into subgraphs if needed)
+      - Ensure all entity names from Key Entities are represented
+
+7. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
    a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure with these validation items:
 
@@ -189,7 +235,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.clarify` or `/doit.plan`).
+8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.clarify` or `/doit.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 

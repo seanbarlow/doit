@@ -3,7 +3,7 @@
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.doit/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/doit.plan` command. See `.claude/commands/doit.plan.md` for the execution workflow.
 
 ## Summary
 
@@ -17,15 +17,57 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Project Type**: [single/web/mobile - determines source structure]
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+
+## Architecture Overview
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.plan based on Technical Context above.
+  Shows the high-level system architecture with component layers.
+  Regenerate by running /doit.plan again.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="architecture" -->
+```mermaid
+flowchart TD
+    subgraph "Presentation"
+        UI[UI Layer]
+    end
+    subgraph "Application"
+        API[API Layer]
+        SVC[Service Layer]
+    end
+    subgraph "Data"
+        DB[(Database)]
+    end
+    UI --> API --> SVC --> DB
+```
+<!-- END:AUTO-GENERATED -->
+
+## Component Dependencies *(include if multiple services/components)*
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.plan when multiple services are defined.
+  Shows dependencies between services and components.
+  If only one service, this section should be omitted.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="component-dependencies" -->
+```mermaid
+flowchart TD
+    AUTH[Auth Service] --> USER[User Service]
+    CORE[Core Service] --> USER
+    CORE --> DATA[Data Service]
+```
+<!-- END:AUTO-GENERATED -->
 
 ## Constitution Check
 
@@ -39,12 +81,12 @@
 
 ```text
 specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+├── plan.md              # This file (/doit.plan command output)
+├── research.md          # Phase 0 output (/doit.plan command)
+├── data-model.md        # Phase 1 output (/doit.plan command)
+├── quickstart.md        # Phase 1 output (/doit.plan command)
+├── contracts/           # Phase 1 output (/doit.plan command)
+└── tasks.md             # Phase 2 output (/doit.tasks command - NOT created by /doit.plan)
 ```
 
 ### Source Code (repository root)

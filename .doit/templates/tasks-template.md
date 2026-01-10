@@ -12,6 +12,68 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+## Task Dependencies
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.tasks based on task relationships.
+  The flowchart shows task execution order and parallel opportunities.
+  Regenerate by running /doit.tasks again.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="task-dependencies" -->
+```mermaid
+flowchart TD
+    subgraph "Phase 1: Setup"
+        T001[T001: Setup]
+    end
+
+    subgraph "Phase 2: Foundation"
+        T002[T002: Dependencies]
+        T003[T003: Core]
+    end
+
+    subgraph "Phase 3: Implementation"
+        T004[T004: Feature A]
+        T005[T005: Feature B]
+        T006[T006: Integration]
+    end
+
+    T001 --> T002 --> T003
+    T003 --> T004 & T005
+    T004 & T005 --> T006
+```
+<!-- END:AUTO-GENERATED -->
+
+## Phase Timeline
+
+<!--
+  AUTO-GENERATED: This section is populated by /doit.tasks based on phase structure.
+  The gantt chart shows estimated phase durations and dependencies.
+  Regenerate by running /doit.tasks again.
+-->
+
+<!-- BEGIN:AUTO-GENERATED section="phase-timeline" -->
+```mermaid
+gantt
+    title Implementation Phases
+    dateFormat YYYY-MM-DD
+
+    section Phase 1: Setup
+    Project initialization    :a1, 2024-01-01, 1d
+
+    section Phase 2: Foundation
+    Core infrastructure       :b1, after a1, 2d
+
+    section Phase 3: User Stories
+    User Story 1 (P1)         :c1, after b1, 2d
+    User Story 2 (P2)         :c2, after c1, 2d
+    User Story 3 (P3)         :c3, after c2, 2d
+
+    section Phase N: Polish
+    Final polish              :d1, after c3, 1d
+```
+<!-- END:AUTO-GENERATED -->
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)

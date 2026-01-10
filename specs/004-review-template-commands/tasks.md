@@ -23,9 +23,9 @@
 
 **Purpose**: Verify current state before making changes
 
-- [ ] T001 Run baseline verification: count legacy templates in templates/commands/ (expect 9)
-- [ ] T002 Verify source doit templates exist in .doit/templates/commands/ (expect 9)
-- [ ] T003 Document speckit reference count in legacy templates (expect 8 files with references)
+- [X] T001 Run baseline verification: count legacy templates in templates/commands/ (expect 9)
+- [X] T002 Verify source doit templates exist in .doit/templates/commands/ (expect 9)
+- [X] T003 Document speckit reference count in legacy templates (expect 8 files with references)
 
 **Checkpoint**: Baseline documented - ready for template cleanup
 
@@ -47,16 +47,16 @@ This feature has no foundational tasks - file operations can proceed directly af
 
 ### Implementation for User Story 1
 
-- [ ] T004 [P] [US1] Remove templates/commands/analyze.md
-- [ ] T005 [P] [US1] Remove templates/commands/checklist.md
-- [ ] T006 [P] [US1] Remove templates/commands/clarify.md
-- [ ] T007 [P] [US1] Remove templates/commands/constitution.md
-- [ ] T008 [P] [US1] Remove templates/commands/implement.md
-- [ ] T009 [P] [US1] Remove templates/commands/plan.md
-- [ ] T010 [P] [US1] Remove templates/commands/specify.md
-- [ ] T011 [P] [US1] Remove templates/commands/tasks.md
-- [ ] T012 [P] [US1] Remove templates/commands/taskstoissues.md
-- [ ] T013 [US1] Verify templates/commands/ is empty or contains no legacy files
+- [X] T004 [P] [US1] Remove templates/commands/analyze.md
+- [X] T005 [P] [US1] Remove templates/commands/checklist.md
+- [X] T006 [P] [US1] Remove templates/commands/clarify.md
+- [X] T007 [P] [US1] Remove templates/commands/constitution.md
+- [X] T008 [P] [US1] Remove templates/commands/implement.md
+- [X] T009 [P] [US1] Remove templates/commands/plan.md
+- [X] T010 [P] [US1] Remove templates/commands/specify.md
+- [X] T011 [P] [US1] Remove templates/commands/tasks.md
+- [X] T012 [P] [US1] Remove templates/commands/taskstoissues.md
+- [X] T013 [US1] Verify templates/commands/ is empty or contains no legacy files
 
 **Checkpoint**: All legacy templates removed - directory ready for doit templates
 
@@ -70,17 +70,17 @@ This feature has no foundational tasks - file operations can proceed directly af
 
 ### Implementation for User Story 2
 
-- [ ] T014 [P] [US2] Copy .doit/templates/commands/doit.checkin.md to templates/commands/
-- [ ] T015 [P] [US2] Copy .doit/templates/commands/doit.constitution.md to templates/commands/
-- [ ] T016 [P] [US2] Copy .doit/templates/commands/doit.implement.md to templates/commands/
-- [ ] T017 [P] [US2] Copy .doit/templates/commands/doit.plan.md to templates/commands/
-- [ ] T018 [P] [US2] Copy .doit/templates/commands/doit.review.md to templates/commands/
-- [ ] T019 [P] [US2] Copy .doit/templates/commands/doit.scaffold.md to templates/commands/
-- [ ] T020 [P] [US2] Copy .doit/templates/commands/doit.specify.md to templates/commands/
-- [ ] T021 [P] [US2] Copy .doit/templates/commands/doit.tasks.md to templates/commands/
-- [ ] T022 [P] [US2] Copy .doit/templates/commands/doit.test.md to templates/commands/
-- [ ] T023 [US2] Verify all 9 doit templates present in templates/commands/
-- [ ] T024 [US2] Verify file contents match source (diff -q check)
+- [X] T014 [P] [US2] Copy .doit/templates/commands/doit.checkin.md to templates/commands/
+- [X] T015 [P] [US2] Copy .doit/templates/commands/doit.constitution.md to templates/commands/
+- [X] T016 [P] [US2] Copy .doit/templates/commands/doit.implement.md to templates/commands/
+- [X] T017 [P] [US2] Copy .doit/templates/commands/doit.plan.md to templates/commands/
+- [X] T018 [P] [US2] Copy .doit/templates/commands/doit.review.md to templates/commands/
+- [X] T019 [P] [US2] Copy .doit/templates/commands/doit.scaffold.md to templates/commands/
+- [X] T020 [P] [US2] Copy .doit/templates/commands/doit.specify.md to templates/commands/
+- [X] T021 [P] [US2] Copy .doit/templates/commands/doit.tasks.md to templates/commands/
+- [X] T022 [P] [US2] Copy .doit/templates/commands/doit.test.md to templates/commands/
+- [X] T023 [US2] Verify all 9 doit templates present in templates/commands/
+- [X] T024 [US2] Verify file contents match source (diff -q check)
 
 **Checkpoint**: All doit templates copied and verified - distribution templates ready
 
@@ -94,10 +94,10 @@ This feature has no foundational tasks - file operations can proceed directly af
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Verify zero ".specify/" references in templates/commands/
-- [ ] T026 [US3] Verify zero "speckit" references in templates/commands/
-- [ ] T027 [US3] Verify all templates have valid YAML frontmatter with description field
-- [ ] T028 [US3] Verify doit.scaffold.md references correct template source paths
+- [X] T025 [US3] Verify zero ".specify/" references in templates/commands/
+- [X] T026 [US3] Verify zero "speckit" references in templates/commands/
+- [X] T027 [US3] Verify all templates have valid YAML frontmatter with description field
+- [X] T028 [US3] Verify doit.scaffold.md references correct template source paths
 
 **Checkpoint**: Template quality verified - all success criteria met
 
@@ -107,9 +107,9 @@ This feature has no foundational tasks - file operations can proceed directly af
 
 **Purpose**: Final checks and cleanup
 
-- [ ] T029 Run full quickstart.md verification suite
-- [ ] T030 Update specs/004-review-template-commands/checklists/requirements.md - mark completed items
-- [ ] T031 Commit all changes with descriptive message
+- [X] T029 Run full quickstart.md verification suite
+- [X] T030 Update specs/004-review-template-commands/checklists/requirements.md - mark completed items
+- [X] T031 Commit all changes with descriptive message
 
 ---
 

@@ -1,16 +1,12 @@
 ---
-description: Create or update the feature specification from a natural language feature description.
-handoffs: 
+description: Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation.
+handoffs:
   - label: Build Technical Plan
-    agent: speckit.plan
+    agent: doit.plan
     prompt: Create a plan for the spec. I am building with...
-  - label: Clarify Spec Requirements
-    agent: speckit.clarify
-    prompt: Clarify specification requirements
-    send: true
-scripts:
-  sh: scripts/bash/create-new-feature.sh --json "{ARGS}"
-  ps: scripts/powershell/create-new-feature.ps1 -Json "{ARGS}"
+  - label: Scaffold Project Structure
+    agent: doit.scaffold
+    prompt: Generate project structure based on constitution tech stack
 ---
 
 ## User Input
@@ -23,7 +19,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-The text the user typed after `/speckit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
@@ -57,10 +53,10 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
 
-   d. Run the script `{SCRIPT}` with the calculated number and short-name:
+   d. Run the script `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS"` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `{SCRIPT} --json --number 5 --short-name "user-auth" "Add user authentication"`
-      - PowerShell example: `{SCRIPT} -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
+      - Bash example: `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --json --number 5 --short-name "user-auth" "Add user authentication"`
+      - PowerShell example: `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
 
    **IMPORTANT**:
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number
@@ -71,7 +67,7 @@ Given that feature description, do this:
    - The JSON output will contain BRANCH_NAME and SPEC_FILE paths
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot")
 
-3. Load `templates/spec-template.md` to understand required sections.
+3. Load `.doit/templates/spec-template.md` to understand required sections.
 
 4. Follow this execution flow:
 
@@ -139,7 +135,7 @@ Given that feature description, do this:
       
       ## Notes
       
-      - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
+      - Items marked incomplete require spec updates before `/doit.clarify` or `/doit.plan`
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -193,7 +189,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.clarify` or `/doit.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
@@ -259,3 +255,145 @@ Success criteria must be:
 - "Database can handle 1000 TPS" (implementation detail, use user-facing metric)
 - "React components render efficiently" (framework-specific)
 - "Redis cache hit rate above 80%" (technology-specific)
+
+---
+
+## Integrated Ambiguity Scan (FR-015)
+
+After creating the initial spec, perform a structured ambiguity scan using this 8-category taxonomy. For each category, assess status: Clear / Partial / Missing.
+
+### Category Taxonomy
+
+1. **Functional Scope & Behavior**
+   - Core user goals & success criteria
+   - Explicit out-of-scope declarations
+   - User roles / personas differentiation
+
+2. **Domain & Data Model**
+   - Entities, attributes, relationships
+   - Identity & uniqueness rules
+   - Lifecycle/state transitions
+
+3. **Interaction & UX Flow**
+   - Critical user journeys / sequences
+   - Error/empty/loading states
+   - Accessibility or localization notes
+
+4. **Non-Functional Quality Attributes**
+   - Performance (latency, throughput targets)
+   - Scalability assumptions
+   - Security & privacy requirements
+
+5. **Integration & External Dependencies**
+   - External services/APIs
+   - Data import/export formats
+
+6. **Edge Cases & Failure Handling**
+   - Negative scenarios
+   - Conflict resolution
+
+7. **Constraints & Tradeoffs**
+   - Technical constraints
+   - Explicit tradeoffs
+
+8. **Terminology & Consistency**
+   - Canonical glossary terms
+   - Avoided synonyms
+
+### Clarification Process (FR-014)
+
+If Partial or Missing categories exist that require user input:
+
+1. Generate up to **5 clarification questions** maximum (FR-014)
+2. Each question must be answerable with:
+   - Multiple-choice (2-5 options), OR
+   - Short answer (≤5 words)
+3. Present questions sequentially, one at a time
+4. After each answer, integrate into the appropriate spec section
+5. Ensure **no [NEEDS CLARIFICATION] markers remain** in final output (FR-016)
+
+---
+
+## GitHub Issue Integration (FR-048, FR-049)
+
+After the spec is complete and validated, create GitHub issues if a remote is available.
+
+### Issue Creation Process
+
+1. **Detect GitHub Remote**:
+
+   ```bash
+   git remote get-url origin 2>/dev/null
+   ```
+
+   If no remote or not a GitHub URL, skip issue creation gracefully.
+
+2. **Create Epic Issue (FR-048)**:
+   - Title: `[Epic]: {Feature Name from spec}`
+   - Labels: `epic`
+   - Body: Summary section from spec + link to spec file
+   - Store Epic issue number for linking
+
+3. **Create Feature Issues for Each User Story (FR-049)**:
+   - Title: `[Feature]: {User Story Title}`
+   - Labels: `feature`, `priority:{P1|P2|P3}`
+   - Body: User story content + acceptance scenarios
+   - Add `Part of Epic #XXX` reference
+
+4. **Skip Flag Option**:
+   - If `--skip-issues` provided in arguments, skip GitHub issue creation
+   - Example: `/doit.doit "my feature" --skip-issues`
+
+5. **Graceful Fallback**:
+   - If `gh` CLI not available: warn and continue without issues
+   - If GitHub API fails: log error, continue with spec creation
+   - Never fail the entire command due to GitHub issues
+
+### Issue Creation Commands
+
+```bash
+# Create Epic
+gh issue create --title "[Epic]: {FEATURE_NAME}" \
+  --label "epic" \
+  --body "$(cat <<'EOF'
+## Summary
+{SPEC_SUMMARY}
+
+## Success Criteria
+{SUCCESS_CRITERIA}
+
+---
+Spec file: `{SPEC_FILE_PATH}`
+EOF
+)"
+
+# Create Feature for each user story
+gh issue create --title "[Feature]: {USER_STORY_TITLE}" \
+  --label "feature,priority:{PRIORITY}" \
+  --body "$(cat <<'EOF'
+## Description
+{USER_STORY_CONTENT}
+
+## Acceptance Scenarios
+{ACCEPTANCE_SCENARIOS}
+
+---
+Part of Epic #{EPIC_NUMBER}
+EOF
+)"
+```
+
+### Output
+
+Report created issues at the end:
+
+```markdown
+## GitHub Issues Created
+
+- Epic: #{EPIC_NUMBER} - {EPIC_TITLE}
+- Features:
+  - #{FEATURE_1_NUMBER} - {FEATURE_1_TITLE} (P1)
+  - #{FEATURE_2_NUMBER} - {FEATURE_2_TITLE} (P2)
+```
+
+If issues were skipped or failed, note the reason.

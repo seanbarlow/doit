@@ -15,9 +15,9 @@ description: "Task list template for feature implementation"
 ## Task Dependencies
 
 <!--
-  AUTO-GENERATED: This section is populated by /doit.tasks based on task relationships.
+  AUTO-GENERATED: This section is populated by /doit.taskit based on task relationships.
   The flowchart shows task execution order and parallel opportunities.
-  Regenerate by running /doit.tasks again.
+  Regenerate by running /doit.taskit again.
 -->
 
 <!-- BEGIN:AUTO-GENERATED section="task-dependencies" -->
@@ -47,9 +47,9 @@ flowchart TD
 ## Phase Timeline
 
 <!--
-  AUTO-GENERATED: This section is populated by /doit.tasks based on phase structure.
+  AUTO-GENERATED: This section is populated by /doit.taskit based on phase structure.
   The gantt chart shows estimated phase durations and dependencies.
-  Regenerate by running /doit.tasks again.
+  Regenerate by running /doit.taskit again.
 -->
 
 <!-- BEGIN:AUTO-GENERATED section="phase-timeline" -->
@@ -91,7 +91,7 @@ gantt
   ============================================================================
   IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
   
-  The /doit.tasks command MUST replace these with actual tasks based on:
+  The /doit.taskit command MUST replace these with actual tasks based on:
   - User stories from spec.md (with their priorities P1, P2, P3...)
   - Feature requirements from plan.md
   - Entities from data-model.md

@@ -41,7 +41,80 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Phase 1: Update agent context by running the agent script
    - Re-evaluate Constitution Check post-design
 
-5. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
+5. **Generate Mermaid Visualizations** (FR-004, FR-005, FR-006, FR-007):
+
+   After filling the plan content, generate visual diagrams:
+
+   a. **Architecture Overview** (FR-004):
+      - Parse Technical Context for: Language, Dependencies, Storage, Target Platform
+      - Identify architectural layers from Project Type:
+        - **single**: Presentation → Service → Data
+        - **web**: Frontend → API → Services → Database
+        - **mobile**: Mobile App → API → Services → Database
+      - Generate flowchart with subgraphs for each layer
+      - Replace content in `<!-- BEGIN:AUTO-GENERATED section="architecture" -->` markers
+
+      ```mermaid
+      flowchart TD
+          subgraph "Presentation"
+              UI[UI/CLI Layer]
+          end
+          subgraph "Application"
+              API[API/Routes]
+              SVC[Services]
+          end
+          subgraph "Data"
+              DB[(Database)]
+          end
+          UI --> API --> SVC --> DB
+      ```
+
+   b. **Component Dependencies** (FR-005):
+      - Check if multiple services/components are defined in Project Structure
+      - **IF multiple services defined**:
+        - Parse service names from structure
+        - Generate dependency flowchart showing relationships
+        - Replace content in `<!-- BEGIN:AUTO-GENERATED section="component-dependencies" -->` markers
+      - **IF single service only**:
+        - **REMOVE the entire Component Dependencies section**
+        - Do NOT leave empty placeholder
+
+   c. **Data Model ER Diagram** (FR-006):
+      - When generating data-model.md, add ER diagram at the top
+      - Parse entity definitions from the file
+      - Generate erDiagram showing all entities and relationships
+      - Insert in `<!-- BEGIN:AUTO-GENERATED section="er-diagram" -->` markers
+
+      ```mermaid
+      erDiagram
+          ENTITY1 ||--o{ ENTITY2 : "relationship"
+          ENTITY1 {
+              uuid id PK
+              string name
+          }
+      ```
+
+   d. **State Machine Detection** (FR-007):
+      - Scan entities for fields named: `status`, `state`, `stage`, `phase`
+      - For each entity with state field:
+        - Parse possible state values from field type or comments
+        - Generate stateDiagram-v2 showing transitions
+        - Add after entity definition in data-model.md
+
+      ```mermaid
+      stateDiagram-v2
+          [*] --> Initial
+          Initial --> Active : activate
+          Active --> Complete : finish
+          Complete --> [*]
+      ```
+
+   e. **Diagram Validation**:
+      - Verify mermaid syntax is valid
+      - Check node count does not exceed limits (20 for flowchart, 10 for ER)
+      - If exceeding limits, split into subgraphs by domain/layer
+
+6. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
 
 ## Phases
 

@@ -3,7 +3,7 @@
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/doit.plan` command. See `.claude/commands/doit.plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/doit.planit` command. See `.claude/commands/doit.planit.md` for the execution workflow.
 
 ## Summary
 
@@ -30,9 +30,9 @@
 ## Architecture Overview
 
 <!--
-  AUTO-GENERATED: This section is populated by /doit.plan based on Technical Context above.
+  AUTO-GENERATED: This section is populated by /doit.planit based on Technical Context above.
   Shows the high-level system architecture with component layers.
-  Regenerate by running /doit.plan again.
+  Regenerate by running /doit.planit again.
 -->
 
 <!-- BEGIN:AUTO-GENERATED section="architecture" -->
@@ -55,7 +55,7 @@ flowchart TD
 ## Component Dependencies *(include if multiple services/components)*
 
 <!--
-  AUTO-GENERATED: This section is populated by /doit.plan when multiple services are defined.
+  AUTO-GENERATED: This section is populated by /doit.planit when multiple services are defined.
   Shows dependencies between services and components.
   If only one service, this section should be omitted.
 -->
@@ -81,12 +81,12 @@ flowchart TD
 
 ```text
 specs/[###-feature]/
-├── plan.md              # This file (/doit.plan command output)
-├── research.md          # Phase 0 output (/doit.plan command)
-├── data-model.md        # Phase 1 output (/doit.plan command)
-├── quickstart.md        # Phase 1 output (/doit.plan command)
-├── contracts/           # Phase 1 output (/doit.plan command)
-└── tasks.md             # Phase 2 output (/doit.tasks command - NOT created by /doit.plan)
+├── plan.md              # This file (/doit.planit command output)
+├── research.md          # Phase 0 output (/doit.planit command)
+├── data-model.md        # Phase 1 output (/doit.planit command)
+├── quickstart.md        # Phase 1 output (/doit.planit command)
+├── contracts/           # Phase 1 output (/doit.planit command)
+└── tasks.md             # Phase 2 output (/doit.taskit command - NOT created by /doit.planit)
 ```
 
 ### Source Code (repository root)

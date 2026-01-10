@@ -55,18 +55,18 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 
 ### Step 5: Create a Technical Implementation Plan
 
-**In the chat**, use the `/doit.plan` slash command to provide your tech stack and architecture choices.
+**In the chat**, use the `/doit.planit` slash command to provide your tech stack and architecture choices.
 
 ```markdown
-/doit.plan The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
+/doit.planit The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
 ```
 
 ### Step 6: Break Down and Implement
 
-**In the chat**, use the `/doit.tasks` slash command to create an actionable task list.
+**In the chat**, use the `/doit.taskit` slash command to create an actionable task list.
 
 ```markdown
-/doit.tasks
+/doit.taskit
 ```
 
 Optionally, validate the plan with `/doit.analyze`:
@@ -75,10 +75,10 @@ Optionally, validate the plan with `/doit.analyze`:
 /doit.analyze
 ```
 
-Then, use the `/doit.implement` slash command to execute the plan.
+Then, use the `/doit.implementit` slash command to execute the plan.
 
 ```markdown
-/doit.implement
+/doit.implementit
 ```
 
 ## Detailed Example: Building Taskify
@@ -127,12 +127,12 @@ Validate the specification checklist using the `/doit.checklist` command:
 /doit.checklist
 ```
 
-### Step 5: Generate Technical Plan with `/doit.plan`
+### Step 5: Generate Technical Plan with `/doit.planit`
 
 Be specific about your tech stack and technical requirements:
 
 ```bash
-/doit.plan We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use Blazor server with drag-and-drop task boards, real-time updates. There should be a REST API created with a projects API, tasks API, and a notifications API.
+/doit.planit We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use Blazor server with drag-and-drop task boards, real-time updates. There should be a REST API created with a projects API, tasks API, and a notifications API.
 ```
 
 ### Step 6: Validate and Implement
@@ -146,7 +146,7 @@ Have your AI agent audit the implementation plan using `/doit.analyze`:
 Finally, implement the solution:
 
 ```bash
-/doit.implement
+/doit.implementit
 ```
 
 ## Key Principles

@@ -166,10 +166,10 @@ You **MUST** consider the user input before proceeding (if not empty).
       - Integration tests: X passed, Y failed
 
       ### Next Steps
-      - Run `/doit.review` for code review
-      - Run `/doit.test` for full test execution
+      - Run `/doit.reviewit` for code review
+      - Run `/doit.testit` for full test execution
       ```
 
     - Output summary to console for immediate feedback
 
-Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/doit.tasks` first to regenerate the task list.
+Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/doit.taskit` first to regenerate the task list.

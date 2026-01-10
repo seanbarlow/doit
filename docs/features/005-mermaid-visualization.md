@@ -54,10 +54,10 @@ Enhance the doit template system to automatically generate mermaid diagrams duri
 - `.doit/templates/spec-template.md` - Added User Journey and Entity Relationships sections
 - `.doit/templates/plan-template.md` - Added Architecture Overview and Component Dependencies
 - `.doit/templates/tasks-template.md` - Added Task Dependencies and Phase Timeline
-- `.doit/templates/commands/doit.specify.md` - Instructions for spec diagrams
-- `.doit/templates/commands/doit.plan.md` - Instructions for plan diagrams
-- `.doit/templates/commands/doit.tasks.md` - Instructions for task diagrams
-- `.doit/templates/commands/doit.review.md` - Instructions for review pie charts
+- `.doit/templates/commands/doit.specit.md` - Instructions for spec diagrams
+- `.doit/templates/commands/doit.planit.md` - Instructions for plan diagrams
+- `.doit/templates/commands/doit.taskit.md` - Instructions for task diagrams
+- `.doit/templates/commands/doit.reviewit.md` - Instructions for review pie charts
 - `templates/` - Distribution copies synchronized
 
 ## Testing
@@ -84,7 +84,7 @@ N/A - Template enhancement feature
 
 ### Issues Fixed During Testing
 
-1. templates/commands/doit.review.md was missing mermaid visualization instructions - fixed by re-copying from .doit/
+1. templates/commands/doit.reviewit.md was missing mermaid visualization instructions - fixed by re-copying from .doit/
 2. Nested code fences with 4 backticks didn't render properly - switched to tildes
 3. diagram-patterns.md had broken markdown rendering - fixed nested code fence style
 

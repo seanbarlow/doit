@@ -78,9 +78,9 @@
 ## User Journey Visualization
 
 <!--
-  AUTO-GENERATED: This section is populated by /doit.specify based on user stories above.
+  AUTO-GENERATED: This section is populated by /doit.specit based on user stories above.
   The flowchart shows each user story as a subgraph with key actions.
-  Regenerate by running /doit.specify again.
+  Regenerate by running /doit.specit again.
 -->
 
 <!-- BEGIN:AUTO-GENERATED section="user-journey" -->
@@ -98,7 +98,7 @@ flowchart LR
 ## Entity Relationships *(include if Key Entities defined)*
 
 <!--
-  AUTO-GENERATED: This section is populated by /doit.specify when Key Entities are defined.
+  AUTO-GENERATED: This section is populated by /doit.specit when Key Entities are defined.
   Shows entity relationships as an ER diagram.
   If no entities are defined, this entire section should be omitted (not left empty).
 -->

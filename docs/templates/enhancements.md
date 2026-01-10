@@ -50,7 +50,7 @@ Add a **User Journey Diagram** section:
 ```markdown
 ## User Journey Visualization
 
-<!-- AUTO-GENERATED: Update by running /doit.specify -->
+<!-- AUTO-GENERATED: Update by running /doit.specit -->
 
 ```mermaid
 flowchart LR
@@ -66,7 +66,7 @@ Add an **Entity Relationship Diagram** section:
 ```markdown
 ## Entity Relationships
 
-<!-- AUTO-GENERATED: Update by running /doit.specify -->
+<!-- AUTO-GENERATED: Update by running /doit.specit -->
 
 ```mermaid
 erDiagram
@@ -82,7 +82,7 @@ Add an **Architecture Diagram** section:
 ```markdown
 ## Architecture Overview
 
-<!-- AUTO-GENERATED: Update by running /doit.plan -->
+<!-- AUTO-GENERATED: Update by running /doit.planit -->
 
 ```mermaid
 flowchart TD
@@ -121,7 +121,7 @@ Add a **Task Dependency Graph**:
 ```markdown
 ## Task Dependencies
 
-<!-- AUTO-GENERATED: Update by running /doit.tasks -->
+<!-- AUTO-GENERATED: Update by running /doit.taskit -->
 
 ```mermaid
 flowchart TD
@@ -231,7 +231,7 @@ The `data-model.md` artifact is text-based and doesn't automatically generate ER
 
 ### Proposed Enhancement
 
-Add automatic ER diagram generation in `/doit.plan`:
+Add automatic ER diagram generation in `/doit.planit`:
 
 ```markdown
 ## Entity Relationship Diagram
@@ -344,7 +344,7 @@ Review reports are table-heavy and don't visualize quality metrics.
 
 ### Proposed Enhancement
 
-Add quality dashboard visualization in `/doit.review`:
+Add quality dashboard visualization in `/doit.reviewit`:
 
 ```markdown
 ## Quality Overview
@@ -544,7 +544,7 @@ quadrantChart
 
 ## Next Steps
 
-1. Create feature specification for E-001 using `/doit.specify`
+1. Create feature specification for E-001 using `/doit.specit`
 2. Implement visualization generation logic
 3. Update all templates with diagram placeholders
 4. Add documentation for diagram customization

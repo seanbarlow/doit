@@ -16,11 +16,11 @@ The doit template system provides a structured workflow for feature development,
 flowchart TD
     subgraph "Initialization"
         A[Project Start] --> B[/doit.constitution/]
-        B --> C[/doit.scaffold/]
+        B --> C[/doit.scaffoldit/]
     end
 
     subgraph "Specification Phase"
-        C --> D[/doit.specify/]
+        C --> D[/doit.specit/]
         D --> E{Clarifications?}
         E -->|Yes| F[Resolve Ambiguities]
         F --> D
@@ -28,7 +28,7 @@ flowchart TD
     end
 
     subgraph "Planning Phase"
-        G --> H[/doit.plan/]
+        G --> H[/doit.planit/]
         H --> I[research.md]
         H --> J[data-model.md]
         H --> K[contracts/]
@@ -37,21 +37,21 @@ flowchart TD
     end
 
     subgraph "Task Generation"
-        M --> N[/doit.tasks/]
+        M --> N[/doit.taskit/]
         N --> O[tasks.md]
     end
 
     subgraph "Implementation"
-        O --> P[/doit.implement/]
+        O --> P[/doit.implementit/]
         P --> Q{All Tasks Done?}
         Q -->|No| P
         Q -->|Yes| R[Implementation Complete]
     end
 
     subgraph "Quality Assurance"
-        R --> S[/doit.review/]
+        R --> S[/doit.reviewit/]
         S --> T[review-report.md]
-        T --> U[/doit.test/]
+        T --> U[/doit.testit/]
         U --> V[test-report.md]
     end
 
@@ -142,13 +142,13 @@ templates/
 └── commands/                   # Command workflow definitions
     ├── doit.checkin.md
     ├── doit.constitution.md
-    ├── doit.implement.md
-    ├── doit.plan.md
-    ├── doit.review.md
-    ├── doit.scaffold.md
-    ├── doit.specify.md
-    ├── doit.tasks.md
-    └── doit.test.md
+    ├── doit.implementit.md
+    ├── doit.planit.md
+    ├── doit.reviewit.md
+    ├── doit.scaffoldit.md
+    ├── doit.specit.md
+    ├── doit.taskit.md
+    └── doit.testit.md
 ```
 
 ## Handoff Architecture

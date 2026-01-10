@@ -6,7 +6,7 @@
 
 ## Overview
 
-When initializing a new project using the `/doit.scaffold` command, the doit command suite is now automatically generated. This feature also renamed the configuration folder from `.specify` to `.doit` for consistent naming, removed unused templates, and created command templates for scaffolding.
+When initializing a new project using the `/doit.scaffoldit` command, the doit command suite is now automatically generated. This feature also renamed the configuration folder from `.specify` to `.doit` for consistent naming, removed unused templates, and created command templates for scaffolding.
 
 ## Requirements Implemented
 
@@ -26,7 +26,7 @@ When initializing a new project using the `/doit.scaffold` command, the doit com
 2. **Reference Updates**: Updated 40+ files with `.specify` to `.doit` references
 3. **Template Cleanup**: Removed 2 unused templates (agent-file-template.md, checklist-template.md)
 4. **Command Templates**: Created 9 command templates in `.doit/templates/commands/`
-5. **Scaffold Enhancement**: Added section 8 to doit.scaffold.md for command generation
+5. **Scaffold Enhancement**: Added section 8 to doit.scaffoldit.md for command generation
 
 ### Files Changed
 
@@ -36,13 +36,13 @@ When initializing a new project using the `/doit.scaffold` command, the doit com
 **Commands Updated** (9 files):
 - `.claude/commands/doit.checkin.md`
 - `.claude/commands/doit.constitution.md`
-- `.claude/commands/doit.implement.md`
-- `.claude/commands/doit.plan.md`
-- `.claude/commands/doit.review.md`
-- `.claude/commands/doit.scaffold.md`
-- `.claude/commands/doit.specify.md`
-- `.claude/commands/doit.tasks.md`
-- `.claude/commands/doit.test.md`
+- `.claude/commands/doit.implementit.md`
+- `.claude/commands/doit.planit.md`
+- `.claude/commands/doit.reviewit.md`
+- `.claude/commands/doit.scaffoldit.md`
+- `.claude/commands/doit.specit.md`
+- `.claude/commands/doit.taskit.md`
+- `.claude/commands/doit.testit.md`
 
 **Templates Created** (9 files):
 - `.doit/templates/commands/doit.*.md` (all 9 commands)

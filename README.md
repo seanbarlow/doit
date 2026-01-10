@@ -267,6 +267,7 @@ Additional commands for enhanced quality and validation:
 | `/doit.clarify`   | Clarify underspecified areas (recommended before `/doit.planit`; formerly `/quizme`)                                                |
 | `/doit.analyze`   | Cross-artifact consistency & coverage analysis (run after `/doit.taskit`, before `/doit.implementit`)                             |
 | `/doit.checklist` | Generate custom quality checklists that validate requirements completeness, clarity, and consistency (like "unit tests for English") |
+| `/doit.documentit` | Organize, index, audit, and enhance project documentation aligned with scaffoldit conventions                                       |
 | `/doit.roadmapit` | Create or update project roadmaps with prioritized requirements, deferred items, and AI-suggested enhancements                       |
 
 ### Environment Variables

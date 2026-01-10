@@ -65,20 +65,84 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Close approved issues via GitHub API
 
 6. **Update roadmap files** (FR-039, FR-040):
+
+   #### 6.1 Get Current Feature Branch
+
+   ```bash
+   git branch --show-current
+   ```
+
+   Extract the feature pattern (e.g., `008-doit-roadmapit-command` from branch name).
+
+   #### 6.2 Check and Update roadmap.md
+
    - Check if `.doit/memory/roadmap.md` exists:
-     - If exists: Find feature entry, update status to "Completed"
-     - If not exists: Log "No roadmap.md found, skipping"
-   - Check if `.doit/memory/roadmap_completed.md` exists:
-     - If exists: Append feature entry with completion date
-     - If not exists: Create file with header and first entry
+     - If NOT exists: Log "No roadmap.md found, skipping roadmap archive"
+     - If exists:
+       1. Read the roadmap file
+       2. Search for items with matching feature branch reference `[###-feature-name]`
+          - Pattern: Items containing backtick references like `` `008-feature-name` `` or `[008-feature-name]`
+       3. For each matching item found:
+          - Extract: item text, priority (P1-P4), rationale
+          - Remove the item from its current priority section
+          - Mark as completed with `[x]` if using checkbox format
+
+   #### 6.3 Archive to completed_roadmap.md
+
+   - Check if `.doit/memory/completed_roadmap.md` exists:
+     - If NOT exists:
+       1. Copy template from `.doit/templates/completed-roadmap-template.md`
+       2. Replace `[PROJECT_NAME]` with project name
+       3. Replace `[DATE]` with current date
+       4. If template not found, create with basic structure:
+          ```markdown
+          # Completed Roadmap Items
+
+          **Project**: [Project Name]
+          **Created**: [Date]
+
+          ## Recently Completed
+
+          | Item | Original Priority | Completed Date | Feature Branch | Notes |
+          |------|-------------------|----------------|----------------|-------|
+          ```
+     - If exists: Load existing file
+
+   - For each matched roadmap item:
+     1. Add to "Recently Completed" table with:
+        - Item text (without the branch reference)
+        - Original priority (P1-P4)
+        - Completion date (today's date)
+        - Feature branch reference (`` `###-feature-name` ``)
+        - Notes (from spec.md summary if available)
+
+   - **Maintain 20-item limit** in Recently Completed:
+     1. Count items in "Recently Completed" section
+     2. If count > 20:
+        - Move oldest items (beyond 20) to Archive section
+        - Update Statistics section with new counts (P1, P2, P3, P4 totals)
+
+   #### 6.4 Write Updated Files
+
+   - Write updated roadmap.md (with completed items removed)
+   - Write updated completed_roadmap.md (with new completed items)
+
+   #### 6.5 Report Roadmap Changes
 
    ```markdown
-   # Completed Features
+   ## Roadmap Archive Summary
 
-   | Feature | Branch | Completed | PR |
-   |---------|--------|-----------|-----|
-   | [Feature Name] | [branch] | [date] | #XXX |
+   **Items Archived**: [N]
+   | Item | Original Priority |
+   |------|-------------------|
+   | [item text] | P[N] |
+
+   **Files Updated**:
+   - `.doit/memory/roadmap.md` - Removed [N] completed items
+   - `.doit/memory/completed_roadmap.md` - Added [N] items to archive
    ```
+
+   If no matching items found: Log "No matching roadmap items found for branch [branch-name]"
 
 7. **Generate feature documentation** in docs/ (FR-041):
    - Create `docs/features/[feature-name].md`:

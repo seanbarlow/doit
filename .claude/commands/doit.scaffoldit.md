@@ -276,16 +276,17 @@ Generate comprehensive `.gitignore` based on tech stack:
 Generate the doit command suite for the new project:
 
 1. Create `.claude/commands/` directory in the target project
-2. Copy all 9 doit command templates from `.doit/templates/commands/`:
+2. Copy all 10 doit command templates from `.doit/templates/commands/`:
    - `doit.checkin.md` - Feature completion and PR creation
    - `doit.constitution.md` - Project constitution management
-   - `doit.implement.md` - Task implementation execution
-   - `doit.plan.md` - Implementation planning
-   - `doit.review.md` - Code review workflow
-   - `doit.scaffold.md` - Project scaffolding
-   - `doit.specify.md` - Feature specification
-   - `doit.tasks.md` - Task generation
-   - `doit.test.md` - Test execution
+   - `doit.implementit.md` - Task implementation execution
+   - `doit.planit.md` - Implementation planning
+   - `doit.reviewit.md` - Code review workflow
+   - `doit.roadmapit.md` - Project roadmap management
+   - `doit.scaffoldit.md` - Project scaffolding
+   - `doit.specit.md` - Feature specification
+   - `doit.taskit.md` - Task generation
+   - `doit.testit.md` - Test execution
 
 This enables new projects to immediately use the full doit workflow without manual setup.
 
@@ -320,7 +321,7 @@ If the project already has files:
 After scaffolding, provide:
 
 - List of created directories and files
-- Confirmation that doit commands were generated (9 files in `.claude/commands/`)
+- Confirmation that doit commands were generated (10 files in `.claude/commands/`)
 - Next steps for the user
 - Suggested commands to run (e.g., `npm install`, `pip install -r requirements.txt`)
 - Reminder to run `/doit.specit` to create feature specifications

@@ -411,3 +411,10 @@ When adding new agents:
 ---
 
 *This documentation should be updated whenever new agents are added to maintain accuracy and completeness.*
+
+## Active Technologies
+- Markdown (templates), Bash 5.x (helper scripts if needed) + Mermaid syntax (rendered by GitHub/VS Code), Claude Code slash command system (005-mermaid-visualization)
+- N/A (file-based template system) (005-mermaid-visualization)
+
+## Recent Changes
+- 005-mermaid-visualization: Added Markdown (templates), Bash 5.x (helper scripts if needed) + Mermaid syntax (rendered by GitHub/VS Code), Claude Code slash command system

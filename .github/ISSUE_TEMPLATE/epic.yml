@@ -1,0 +1,78 @@
+name: Epic
+description: Create a new epic to group related features and user stories
+title: "[Epic]: "
+labels: ["epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Epic Definition
+        An Epic represents a large body of work that can be broken down into multiple features/user stories.
+
+  - type: input
+    id: branch-name
+    attributes:
+      label: Branch Name
+      description: The feature branch name for this epic (e.g., 001-user-authentication)
+      placeholder: "###-epic-name"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: High-level description of what this epic aims to achieve
+      placeholder: "Describe the epic's overall goal and scope..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success Criteria
+      description: How will we know when this epic is complete?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: User Stories / Features
+      description: Links to related feature issues (add as they are created)
+      placeholder: |
+        - [ ] #123 - Feature A
+        - [ ] #124 - Feature B
+    validations:
+      required: false
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of Scope
+      description: What is explicitly NOT included in this epic?
+      placeholder: "List items that are out of scope for this epic..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: part-of
+    attributes:
+      label: Part Of
+      description: Link to parent initiative or roadmap item (if applicable)
+      placeholder: "Part of #XXX or Roadmap item link"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information, links, or references
+      placeholder: "Add any other context here..."
+    validations:
+      required: false

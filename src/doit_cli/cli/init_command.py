@@ -344,6 +344,15 @@ def run_init(
     result.updated_files.extend(github_templates_result.get("updated", []))
     result.skipped_files.extend(github_templates_result.get("skipped", []))
 
+    # Copy workflow scripts to .doit/scripts/bash/
+    scripts_result = template_manager.copy_scripts(
+        target_dir=project.doit_folder / "scripts" / "bash",
+        overwrite=update or force,
+    )
+    result.created_files.extend(scripts_result.get("created", []))
+    result.updated_files.extend(scripts_result.get("updated", []))
+    result.skipped_files.extend(scripts_result.get("skipped", []))
+
     for agent in agents:
         scaffolder.create_agent_directory(agent)
 

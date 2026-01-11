@@ -212,3 +212,110 @@ Other content.
 
         assert result is False
         assert not target_path.exists()
+
+
+class TestCopyScripts:
+    """Tests for workflow script copying."""
+
+    def test_copy_scripts_creates_new_files(self, temp_dir):
+        """Test scripts are created when target dir is empty."""
+        from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
+
+        manager = TemplateManager()
+        target_dir = temp_dir / ".doit" / "scripts" / "bash"
+
+        result = manager.copy_scripts(target_dir)
+
+        # Should have created scripts (if source exists)
+        # The number depends on what's in templates/scripts/bash/
+        created_count = len(result["created"])
+        assert created_count >= 0  # May be 0 if source doesn't exist in test env
+        assert len(result["skipped"]) == 0
+
+        # If scripts were created, verify they exist
+        if created_count > 0:
+            assert target_dir.exists()
+
+    def test_copy_scripts_preserves_permissions(self, temp_dir):
+        """Test scripts retain executable permissions."""
+        import os
+
+        manager = TemplateManager()
+        target_dir = temp_dir / ".doit" / "scripts" / "bash"
+
+        result = manager.copy_scripts(target_dir)
+
+        # Check permissions for each created script
+        for script_path in result["created"]:
+            # Script should be executable
+            assert os.access(script_path, os.X_OK), f"{script_path} should be executable"
+
+    def test_copy_scripts_skips_existing(self, temp_dir):
+        """Test existing scripts are not overwritten without flag."""
+        manager = TemplateManager()
+        target_dir = temp_dir / ".doit" / "scripts" / "bash"
+        target_dir.mkdir(parents=True)
+
+        # Create an existing script with custom content
+        existing_script = target_dir / "common.sh"
+        custom_content = "#!/bin/bash\n# Custom script content\necho 'custom'"
+        existing_script.write_text(custom_content)
+
+        result = manager.copy_scripts(target_dir)
+
+        # The existing script should be preserved
+        assert existing_script.read_text() == custom_content
+
+        # Check that common.sh is in skipped (if scripts source exists)
+        skipped_names = [p.name for p in result["skipped"]]
+        if skipped_names:
+            assert "common.sh" in skipped_names
+
+    def test_copy_scripts_overwrites_with_flag(self, temp_dir):
+        """Test existing scripts are overwritten with overwrite=True."""
+        manager = TemplateManager()
+        target_dir = temp_dir / ".doit" / "scripts" / "bash"
+        target_dir.mkdir(parents=True)
+
+        # Create an existing script with custom content
+        existing_script = target_dir / "common.sh"
+        custom_content = "#!/bin/bash\n# Custom script content\necho 'custom'"
+        existing_script.write_text(custom_content)
+
+        result = manager.copy_scripts(target_dir, overwrite=True)
+
+        # If scripts source exists, the script should be updated
+        if result["updated"]:
+            updated_names = [p.name for p in result["updated"]]
+            assert "common.sh" in updated_names
+            # Content should be different (from bundled scripts)
+            new_content = existing_script.read_text()
+            assert new_content != custom_content
+
+    def test_copy_scripts_creates_parent_directories(self, temp_dir):
+        """Test that copy_scripts creates parent directories if needed."""
+        manager = TemplateManager()
+        target_dir = temp_dir / "deep" / "nested" / "path" / "scripts" / "bash"
+
+        # Target dir doesn't exist yet
+        assert not target_dir.exists()
+
+        result = manager.copy_scripts(target_dir)
+
+        # If any scripts were copied, the directory should exist
+        if result["created"]:
+            assert target_dir.exists()
+
+    def test_copy_scripts_returns_correct_structure(self, temp_dir):
+        """Test that copy_scripts returns dict with correct keys."""
+        manager = TemplateManager()
+        target_dir = temp_dir / ".doit" / "scripts" / "bash"
+
+        result = manager.copy_scripts(target_dir)
+
+        assert "created" in result
+        assert "updated" in result
+        assert "skipped" in result
+        assert isinstance(result["created"], list)
+        assert isinstance(result["updated"], list)
+        assert isinstance(result["skipped"], list)

@@ -402,3 +402,41 @@ Before creating files:
 - Use appropriate naming conventions for the tech stack (camelCase, snake_case, PascalCase)
 - Include comments in generated config files explaining key settings
 - Respect existing project structure when adding new directories
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (project scaffolded)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Project structure created!**
+
+**Recommended**: Run `/doit.specit [feature description]` to create your first feature specification.
+
+**Alternative**: Run `/doit.documentit organize` to organize any existing documentation.
+```
+
+### On Existing Project (structure already exists)
+
+If the project already has a structure:
+
+```markdown
+---
+
+## Next Steps
+
+**Project structure analyzed!**
+
+**Recommended**: Run `/doit.specit [feature description]` to start developing a new feature.
+
+**Alternative**: Run `/doit.documentit audit` to check documentation health.
+```

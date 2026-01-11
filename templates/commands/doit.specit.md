@@ -443,3 +443,57 @@ Report created issues at the end:
 ```
 
 If issues were skipped or failed, note the reason.
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (spec created)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ○ planit → ○ taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.planit` to create an implementation plan for this feature.
+```
+
+### On Success with Clarifications Needed
+
+If the spec contains [NEEDS CLARIFICATION] markers:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ○ planit → ○ taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Resolve N open questions in the spec before proceeding to planning.
+```
+
+### On Error
+
+If the command fails (e.g., branch creation failed):
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

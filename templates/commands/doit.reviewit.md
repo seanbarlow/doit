@@ -279,3 +279,61 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Present manual tests one at a time, wait for response
 - Generate review-report.md even if some tests are skipped
 - Include timestamps for audit trail
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (review approved, no critical issues)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ● reviewit → ○ checkin │
+└───────────────────────────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.checkin` to finalize and merge your changes.
+```
+
+### On Issues Found (changes requested)
+
+If the review found issues that need to be addressed:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ◐ reviewit → ○ checkin │
+└───────────────────────────────────────────────────────────────────────────────────┘
+
+**Status**: [N] critical, [M] major issues found.
+
+**Recommended**: Run `/doit.implementit` to address the review feedback.
+
+After fixing issues, run `/doit.reviewit` again to verify.
+```
+
+### On Error (missing prerequisites)
+
+If required files are missing:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: Required files for review are missing.
+
+**Recommended**: Run `/doit.implementit` to complete the implementation first.
+```

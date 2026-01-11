@@ -201,3 +201,61 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Continue generating report even if some tests fail
 - Preserve test output for debugging
 - Map requirements using FR-XXX pattern matching in test names/docstrings
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (all tests pass)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                      │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ○ checkin │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.reviewit` for a code review before finalizing.
+
+**Alternative**: Run `/doit.checkin` to merge your changes if code review is not needed.
+```
+
+### On Failure (tests fail)
+
+If some tests fail:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                      │
+│  ● specit → ● planit → ● taskit → ● implementit → ◐ testit → ○ checkin │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**Status**: N tests failed out of M total.
+
+**Recommended**: Run `/doit.implementit` to fix the failing tests.
+```
+
+### On Error (no test framework detected)
+
+If no test framework is detected:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No test framework detected in this project.
+
+**Recommended**: Add tests to your project and run `/doit.testit` again, or proceed with `/doit.reviewit` for code review.
+```

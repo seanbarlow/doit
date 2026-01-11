@@ -11,6 +11,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (file-based documentation) (006-docs-doit-migration)
 - Python 3.11+ + yper, rich, shutil (stdlib), pathlib (stdlib) (011-init-scripts-copy)
 - File system only (011-init-scripts-copy)
+- Markdown (command templates), Bash 5.x (scripts) + Claude Code slash command system, existing doit template structure (012-command-recommendations)
+- N/A (file-based templates only) (012-command-recommendations)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -30,10 +32,10 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 012-command-recommendations: Added Markdown (command templates), Bash 5.x (scripts) + Claude Code slash command system, existing doit template structure
 - 011-init-scripts-copy: Added Python 3.11+ + yper, rich, shutil (stdlib), pathlib (stdlib)
 
 - 009-doit-documentit-command: Added Markdown (command definitions), file-based storage (.doit/memory/, docs/) + Claude Code slash command system
-- 008-doit-roadmapit-command: Added Markdown (command definitions), file-based storage (.doit/memory/) + Claude Code slash command system
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

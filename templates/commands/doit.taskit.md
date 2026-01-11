@@ -221,3 +221,68 @@ Every task MUST strictly follow this format:
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (tasks generated)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ● taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.implementit` to start executing the implementation tasks.
+```
+
+### On Error (missing plan.md)
+
+If the command fails because plan.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No implementation plan found. The taskit command requires plan.md to exist.
+
+**Recommended**: Run `/doit.planit` to create an implementation plan first.
+```
+
+### On Error (missing spec.md)
+
+If the command fails because spec.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No feature specification found.
+
+**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
+```
+
+### On Error (other issues)
+
+If the command fails for another reason:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

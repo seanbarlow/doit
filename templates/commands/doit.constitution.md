@@ -133,3 +133,39 @@ Other commands can read and utilize the constitution by:
 3. Use extracted values to inform command behavior (e.g., scaffold uses tech stack, plan uses constraints)
 4. If constitution is incomplete or missing, prompt user or proceed with defaults
 ```
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (constitution created or updated)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Constitution updated successfully!**
+
+**Recommended**: Run `/doit.scaffoldit` to generate project structure based on the tech stack in your constitution.
+
+**Alternative**: Run `/doit.specit [feature description]` to create a feature specification for your first feature.
+```
+
+### On Error (validation failed)
+
+If the constitution could not be validated:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: Constitution validation failed.
+
+**Recommended**: Review the errors above and correct the constitution content.
+```

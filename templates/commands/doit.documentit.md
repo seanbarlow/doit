@@ -429,3 +429,41 @@ Before any file modification:
 - Binary files (images, PDFs) are cataloged but content is not analyzed
 - Symlinks are followed for reading but flagged in audit
 - Large files (>1MB markdown) are skipped with warning
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (documentation organized or indexed)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Documentation operation complete!**
+
+**Recommended**: Continue with your development workflow:
+- Run `/doit.specit [feature]` to create a new feature specification
+- Run `/doit.implementit` to continue implementation work
+
+**Alternative**: Run `/doit.documentit` again with a different operation (organize, index, audit, cleanup, enhance-templates).
+```
+
+### On Audit Issues Found
+
+If the audit found documentation issues:
+
+```markdown
+---
+
+## Next Steps
+
+**Documentation audit found issues.**
+
+**Recommended**: Address the issues listed above, then run `/doit.documentit audit` again to verify.
+```

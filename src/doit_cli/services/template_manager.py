@@ -33,6 +33,13 @@ WORKFLOW_SCRIPTS = [
     "update-agent-context.sh",
 ]
 
+# Memory templates to copy to .doit/memory/
+MEMORY_TEMPLATES = [
+    "constitution.md",
+    "roadmap.md",
+    "roadmap_completed.md",
+]
+
 
 class TemplateManager:
     """Service for managing and copying bundled templates."""
@@ -501,6 +508,54 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
                 continue
 
             target_path = target_dir / script_name
+
+            if target_path.exists():
+                if overwrite:
+                    shutil.copy2(source_path, target_path)
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                shutil.copy2(source_path, target_path)
+                result["created"].append(target_path)
+
+        return result
+
+    def copy_memory_templates(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy memory templates (constitution, roadmap, roadmap_completed) to target directory.
+
+        These are the starter templates for project memory used by doit commands.
+
+        Args:
+            target_dir: Destination directory (typically .doit/memory/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        source_dir = self.get_base_template_path() / "memory"
+        if not source_dir.exists():
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for template_name in MEMORY_TEMPLATES:
+            source_path = source_dir / template_name
+            if not source_path.exists():
+                continue
+
+            target_path = target_dir / template_name
 
             if target_path.exists():
                 if overwrite:

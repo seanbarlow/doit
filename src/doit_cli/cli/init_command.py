@@ -353,6 +353,15 @@ def run_init(
     result.updated_files.extend(scripts_result.get("updated", []))
     result.skipped_files.extend(scripts_result.get("skipped", []))
 
+    # Copy memory templates to .doit/memory/
+    memory_result = template_manager.copy_memory_templates(
+        target_dir=project.doit_folder / "memory",
+        overwrite=update or force,
+    )
+    result.created_files.extend(memory_result.get("created", []))
+    result.updated_files.extend(memory_result.get("updated", []))
+    result.skipped_files.extend(memory_result.get("skipped", []))
+
     for agent in agents:
         scaffolder.create_agent_directory(agent)
 

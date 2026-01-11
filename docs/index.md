@@ -15,6 +15,38 @@ Spec-Driven Development **flips the script** on traditional software development
 - [Upgrade Guide](upgrade.md)
 - [Local Development](local-development.md)
 
+<!-- BEGIN:AUTO-GENERATED section="documentation-index" -->
+
+## Features
+
+| Document | Description | Last Modified |
+| -------- | ----------- | ------------- |
+| [Scaffold Doit Commands](./features/003-scaffold-doit-commands.md) | When initializing a new project using the `/doit.scaffoldit` command... | 2026-01-10 |
+| [Review Template Commands](./features/004-review-template-commands.md) | Remove legacy doit templates from `templates/commands/`... | 2026-01-10 |
+| [Automatic Mermaid Visualization](./features/005-mermaid-visualization.md) | Enhance the doit template system to automatically generate mermaid diagrams... | 2026-01-10 |
+| [Documentation Doit Migration](./features/006-docs-doit-migration.md) | Comprehensive audit and update of all documentation... | 2026-01-10 |
+| [Doit Roadmapit Command](./features/008-doit-roadmapit-command.md) | The `/doit.roadmapit` command creates and manages project roadmaps... | 2026-01-10 |
+| [Doit Documentit Command](./features/009-doit-documentit-command.md) | Added `/doit.documentit` command for documentation management... | 2026-01-10 |
+| [Command Workflow Recommendations](./features/012-command-recommendations.md) | Enhanced all doit workflow commands to provide context-aware recommendations... | 2026-01-10 |
+| [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
+
+## Guides
+
+| Document | Description | Last Modified |
+| -------- | ----------- | ------------- |
+| [Mermaid Diagram Patterns](./guides/diagram-patterns.md) | All auto-generated diagrams use HTML comment markers to identify content... | 2026-01-10 |
+
+## Templates
+
+| Document | Description | Last Modified |
+| -------- | ----------- | ------------- |
+| [Template System Overview](./templates/index.md) | The doit template system provides a structured workflow for development... | 2026-01-10 |
+| [Command Templates](./templates/commands.md) | Command templates define the workflow logic for the doit system... | 2026-01-10 |
+| [Root Templates](./templates/root-templates.md) | Root templates define the structure and format of generated artifacts... | 2026-01-10 |
+| [Template Enhancements](./templates/enhancements.md) | Opportunities to enhance the doit template system... | 2026-01-10 |
+
+<!-- END:AUTO-GENERATED -->
+
 ## Core Philosophy
 
 Spec-Driven Development is a structured process that emphasizes:

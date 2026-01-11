@@ -77,8 +77,8 @@ class TestInitCommand:
         assert result.exit_code == 0
         command_dir = project_dir / ".claude" / "commands"
 
-        # Check for some expected template files
-        template_files = list(command_dir.glob("doit-*.md"))
+        # Check for some expected template files (doit.*.md pattern)
+        template_files = list(command_dir.glob("doit.*.md"))
         assert len(template_files) > 0
 
     def test_init_displays_success_message(self, project_dir):
@@ -168,3 +168,88 @@ class TestInitCommandAutoDetection:
         result = runner.invoke(app, ["init", str(project_dir), "--yes"])
 
         assert result.exit_code == 0
+
+
+class TestInitScriptsCopy:
+    """Tests for workflow scripts copy during init."""
+
+    def test_init_copies_scripts(self, project_dir):
+        """Test doit init copies all 5 scripts."""
+        import os
+        from doit_cli.main import app
+        from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
+
+        result = runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        assert result.exit_code == 0
+        scripts_dir = project_dir / ".doit" / "scripts" / "bash"
+        assert scripts_dir.exists()
+
+        # Check all 5 scripts exist
+        for script_name in WORKFLOW_SCRIPTS:
+            script_path = scripts_dir / script_name
+            assert script_path.exists(), f"Script {script_name} should exist"
+
+    def test_init_scripts_are_executable(self, project_dir):
+        """Test initialized scripts have execute permission."""
+        import os
+        from doit_cli.main import app
+        from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
+
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        scripts_dir = project_dir / ".doit" / "scripts" / "bash"
+        for script_name in WORKFLOW_SCRIPTS:
+            script_path = scripts_dir / script_name
+            if script_path.exists():
+                assert os.access(script_path, os.X_OK), f"{script_name} should be executable"
+
+    def test_init_scripts_not_overwritten_by_default(self, project_dir):
+        """Test existing scripts are not overwritten without flag."""
+        from doit_cli.main import app
+
+        # First init
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Modify a script
+        scripts_dir = project_dir / ".doit" / "scripts" / "bash"
+        common_sh = scripts_dir / "common.sh"
+        custom_content = "#!/bin/bash\n# Custom modification\n"
+        common_sh.write_text(custom_content)
+
+        # Second init without force/update
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Script should be preserved
+        assert common_sh.read_text() == custom_content
+
+    def test_init_scripts_overwritten_with_force(self, project_dir):
+        """Test scripts are overwritten with --force flag."""
+        from doit_cli.main import app
+
+        # First init
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Modify a script
+        scripts_dir = project_dir / ".doit" / "scripts" / "bash"
+        common_sh = scripts_dir / "common.sh"
+        custom_content = "#!/bin/bash\n# Custom modification\n"
+        common_sh.write_text(custom_content)
+
+        # Init with force
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--force", "--yes"]
+        )
+
+        # Script should be replaced (not equal to custom content)
+        assert common_sh.read_text() != custom_content

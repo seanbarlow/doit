@@ -24,6 +24,15 @@ GITHUB_ISSUE_TEMPLATES = [
     "task.yml",
 ]
 
+# Workflow scripts to copy to .doit/scripts/bash/
+WORKFLOW_SCRIPTS = [
+    "common.sh",
+    "check-prerequisites.sh",
+    "create-new-feature.sh",
+    "setup-plan.sh",
+    "update-agent-context.sh",
+]
+
 
 class TemplateManager:
     """Service for managing and copying bundled templates."""
@@ -444,6 +453,54 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
                 continue
 
             target_path = target_dir / template_name
+
+            if target_path.exists():
+                if overwrite:
+                    shutil.copy2(source_path, target_path)
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                shutil.copy2(source_path, target_path)
+                result["created"].append(target_path)
+
+        return result
+
+    def copy_scripts(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy workflow scripts to target directory.
+
+        These are bash scripts used by doit commands for workflow automation.
+
+        Args:
+            target_dir: Destination directory (typically .doit/scripts/bash/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        source_dir = self.get_base_template_path() / "scripts" / "bash"
+        if not source_dir.exists():
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for script_name in WORKFLOW_SCRIPTS:
+            source_path = source_dir / script_name
+            if not source_path.exists():
+                continue
+
+            target_path = target_dir / script_name
 
             if target_path.exists():
                 if overwrite:

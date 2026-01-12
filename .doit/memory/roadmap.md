@@ -1,6 +1,6 @@
 # Project Roadmap
 
-**Project**: Task Management App
+**Project**: DoIt
 **Last Updated**: 2026-01-10
 **Managed by**: `/doit.roadmapit`
 

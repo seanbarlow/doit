@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Linux/macOS** (or Windows; PowerShell scripts now supported without WSL)
-- AI coding agent: [Claude Code](https://www.anthropic.com/claude-code), [GitHub Copilot](https://code.visualstudio.com/), [Codebuddy CLI](https://www.codebuddy.ai/cli) or [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+- AI coding agent: [Claude Code](https://www.anthropic.com/claude-code) or [GitHub Copilot](https://code.visualstudio.com/)
 - [uv](https://docs.astral.sh/uv/) for package management
 - [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
@@ -32,9 +32,7 @@ You can proactively specify your AI agent during initialization:
 
 ```bash
 uvx doit-toolkit-cli init <project_name> --ai claude
-uvx doit-toolkit-cli init <project_name> --ai gemini
 uvx doit-toolkit-cli init <project_name> --ai copilot
-uvx doit-toolkit-cli init <project_name> --ai codebuddy
 ```
 
 ### Specify Script Type (Shell vs PowerShell)
@@ -66,9 +64,17 @@ uvx doit-toolkit-cli init <project_name> --ai claude --ignore-agent-tools
 
 After initialization, you should see the following commands available in your AI agent:
 
-- `/doit.doit` - Create specifications
-- `/doit.planit` - Generate implementation plans  
-- `/doit.taskit` - Break down into actionable tasks
+- `/doit.constitution` - Create or update project constitution
+- `/doit.scaffoldit` - Generate project folder structure and starter files
+- `/doit.documentit` - Organize and enhance project documentation
+- `/doit.specit` - Create feature specifications from descriptions
+- `/doit.planit` - Generate implementation plans
+- `/doit.taskit` - Break down plans into actionable tasks
+- `/doit.implementit` - Execute implementation tasks
+- `/doit.testit` - Run automated tests and generate reports
+- `/doit.reviewit` - Review code for quality and completeness
+- `/doit.checkin` - Finalize features and create pull requests
+- `/doit.roadmapit` - Create or update project roadmap
 
 The `.doit/scripts` directory will contain both `.sh` and `.ps1` scripts.
 

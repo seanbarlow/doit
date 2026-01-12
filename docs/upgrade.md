@@ -8,20 +8,20 @@
 
 | What to Upgrade | Command | When to Use |
 |----------------|---------|-------------|
-| **CLI Tool Only** | `uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git` | Get latest CLI features without touching project files |
-| **Project Files** | `specify init --here --force --ai <your-agent>` | Update slash commands, templates, and scripts in your project |
+| **CLI Tool Only** | `uv tool install doit-toolkit-cli --force` | Get latest CLI features without touching project files |
+| **Project Files** | `doit init --here --force --ai <your-agent>` | Update slash commands, templates, and scripts in your project |
 | **Both** | Run CLI upgrade, then project update | Recommended for major version updates |
 
 ---
 
 ## Part 1: Upgrade the CLI Tool
 
-The CLI tool (`specify`) is separate from your project files. Upgrade it to get the latest features and bug fixes.
+The CLI tool (`doit`) is separate from your project files. Upgrade it to get the latest features and bug fixes.
 
 ### If you installed with `uv tool install`
 
 ```bash
-uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
+uv tool install doit-toolkit-cli --force
 ```
 
 ### If you use one-shot `uvx` commands
@@ -29,13 +29,13 @@ uv tool install specify-cli --force --from git+https://github.com/github/spec-ki
 No upgrade needed—`uvx` always fetches the latest version. Just run your commands as normal:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai copilot
+uvx doit-toolkit-cli init --here --ai copilot
 ```
 
 ### Verify the upgrade
 
 ```bash
-specify check
+doit check
 ```
 
 This shows installed tools and confirms the CLI is working.
@@ -48,7 +48,7 @@ When Doit releases new features (like new slash commands or updated templates), 
 
 ### What gets updated?
 
-Running `specify init --here --force` will update:
+Running `doit init --here --force` will update:
 
 - ✅ **Slash command files** (`.claude/commands/`, `.github/prompts/`, etc.)
 - ✅ **Script files** (`.doit/scripts/`)
@@ -71,7 +71,7 @@ The `specs/` directory is completely excluded from template packages and will ne
 Run this inside your project directory:
 
 ```bash
-specify init --here --force --ai <your-agent>
+doit init --here --force --ai <your-agent>
 ```
 
 Replace `<your-agent>` with your AI assistant. Refer to this list of [Supported AI Agents](../README.md#-supported-ai-agents)
@@ -79,7 +79,7 @@ Replace `<your-agent>` with your AI assistant. Refer to this list of [Supported 
 **Example:**
 
 ```bash
-specify init --here --force --ai copilot
+doit init --here --force --ai copilot
 ```
 
 ### Understanding the `--force` flag
@@ -102,7 +102,7 @@ With `--force`, it skips the confirmation and proceeds immediately.
 
 ### 1. Constitution file will be overwritten
 
-**Known issue:** `specify init --here --force` currently overwrites `.doit/memory/constitution.md` with the default template, erasing any customizations you made.
+**Known issue:** `doit init --here --force` currently overwrites `.doit/memory/constitution.md` with the default template, erasing any customizations you made.
 
 **Workaround:**
 
@@ -111,7 +111,7 @@ With `--force`, it skips the confirmation and proceeds immediately.
 cp .doit/memory/constitution.md .doit/memory/constitution-backup.md
 
 # 2. Run the upgrade
-specify init --here --force --ai copilot
+doit init --here --force --ai copilot
 
 # 3. Restore your customized constitution
 mv .doit/memory/constitution-backup.md .doit/memory/constitution.md
@@ -151,7 +151,7 @@ cd .kilocode/rules/
 ls -la
 
 # Delete old versions (example filenames - yours may differ)
-rm doit.specify-old.md
+rm doit.old-command.md
 rm doit.plan-v1.md
 ```
 
@@ -165,10 +165,10 @@ Restart your IDE to refresh the command list.
 
 ```bash
 # Upgrade CLI (if using persistent install)
-uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
+uv tool install doit-toolkit-cli --force --from doit-toolkit-cli
 
 # Update project files to get new commands
-specify init --here --force --ai copilot
+doit init --here --force --ai copilot
 
 # Restore your constitution if customized
 git restore .doit/memory/constitution.md
@@ -182,10 +182,10 @@ cp .doit/memory/constitution.md /tmp/constitution-backup.md
 cp -r .doit/templates /tmp/templates-backup
 
 # 2. Upgrade CLI
-uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
+uv tool install doit-toolkit-cli --force --from doit-toolkit-cli
 
 # 3. Update project
-specify init --here --force --ai copilot
+doit init --here --force --ai copilot
 
 # 4. Restore customizations
 mv /tmp/constitution-backup.md .doit/memory/constitution.md
@@ -218,7 +218,7 @@ If you initialized your project with `--no-git`, you can still upgrade:
 cp .doit/memory/constitution.md /tmp/constitution-backup.md
 
 # Run upgrade
-specify init --here --force --ai copilot --no-git
+doit init --here --force --ai copilot --no-git
 
 # Restore customizations
 mv /tmp/constitution-backup.md .doit/memory/constitution.md
@@ -239,13 +239,13 @@ The `--no-git` flag tells Doit to **skip git repository initialization**. This i
 **During initial setup:**
 
 ```bash
-specify init my-project --ai copilot --no-git
+doit init my-project --ai copilot --no-git
 ```
 
 **During upgrade:**
 
 ```bash
-specify init --here --force --ai copilot --no-git
+doit init --here --force --ai copilot --no-git
 ```
 
 ### What `--no-git` does NOT do
@@ -260,14 +260,14 @@ It **only** skips running `git init` and creating the initial commit.
 
 If you use `--no-git`, you'll need to manage feature directories manually:
 
-**Set the `SPECIFY_FEATURE` environment variable** before using planning commands:
+**Set the `DOIT_FEATURE` environment variable** before using planning commands:
 
 ```bash
 # Bash/Zsh
-export SPECIFY_FEATURE="001-my-feature"
+export DOIT_FEATURE="001-my-feature"
 
 # PowerShell
-$env:SPECIFY_FEATURE = "001-my-feature"
+$env:DOIT_FEATURE = "001-my-feature"
 ```
 
 This tells Doit which feature directory to use when creating specs, plans, and tasks.
@@ -289,8 +289,7 @@ This tells Doit which feature directory to use when creating specs, plans, and t
 
    ```bash
    ls -la .claude/commands/      # Claude Code
-   ls -la .gemini/commands/       # Gemini
-   ls -la .cursor/commands/       # Cursor
+   ls -la .github/prompts/       # GitHub Copilot
    ```
 
 3. **Check agent-specific setup:**
@@ -323,7 +322,7 @@ Do you want to continue? [y/N]
 
 **What this means:**
 
-This warning appears when you run `specify init --here` (or `specify init .`) in a directory that already has files. It's telling you:
+This warning appears when you run `doit init --here` (or `doit init .`) in a directory that already has files. It's telling you:
 
 1. **The directory has existing content** - In the example, 25 files/folders
 2. **Files will be merged** - New template files will be added alongside your existing files
@@ -352,7 +351,7 @@ Only Doit infrastructure files:
 - **Use `--force` flag** - Skip this confirmation entirely:
 
   ```bash
-  specify init --here --force --ai copilot
+  doit init --here --force --ai copilot
   ```
 
 **When you see this warning:**
@@ -371,10 +370,10 @@ Verify the installation:
 # Check installed tools
 uv tool list
 
-# Should show specify-cli
+# Should show doit-toolkit-cli
 
 # Verify path
-which specify
+which doit
 
 # Should point to the uv tool installation directory
 ```
@@ -382,23 +381,23 @@ which specify
 If not found, reinstall:
 
 ```bash
-uv tool uninstall specify-cli
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+uv tool uninstall doit-toolkit-cli
+uv tool install doit-toolkit-cli --from doit-toolkit-cli
 ```
 
-### "Do I need to run specify every time I open my project?"
+### "Do I need to run doit every time I open my project?"
 
-**Short answer:** No, you only run `specify init` once per project (or when upgrading).
+**Short answer:** No, you only run `doit init` once per project (or when upgrading).
 
 **Explanation:**
 
-The `specify` CLI tool is used for:
+The `doit` CLI tool is used for:
 
-- **Initial setup:** `specify init` to bootstrap Doit in your project
-- **Upgrades:** `specify init --here --force` to update templates and commands
-- **Diagnostics:** `specify check` to verify tool installation
+- **Initial setup:** `doit init` to bootstrap Doit in your project
+- **Upgrades:** `doit init --here --force` to update templates and commands
+- **Diagnostics:** `doit check` to verify tool installation
 
-Once you've run `specify init`, the slash commands (like `/doit.doit`, `/doit.planit`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `specify` again.
+Once you've run `doit init`, the slash commands (like `/doit.doit`, `/doit.planit`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `doit` again.
 
 **If your agent isn't recognizing slash commands:**
 
@@ -414,11 +413,11 @@ Once you've run `specify init`, the slash commands (like `/doit.doit`, `/doit.pl
 
 2. **Restart your IDE/editor completely** (not just reload window)
 
-3. **Check you're in the correct directory** where you ran `specify init`
+3. **Check you're in the correct directory** where you ran `doit init`
 
 4. **For some agents**, you may need to reload the workspace or clear cache
 
-**Related issue:** If Copilot can't open local files or uses PowerShell commands unexpectedly, this is typically an IDE context issue, not related to `specify`. Try:
+**Related issue:** If Copilot can't open local files or uses PowerShell commands unexpectedly, this is typically an IDE context issue, not related to `doit`. Try:
 
 - Restarting VS Code
 - Checking file permissions
@@ -439,6 +438,6 @@ Doit follows semantic versioning for major releases. The CLI and project files a
 After upgrading:
 
 - **Test new slash commands:** Run `/doit.constitution` or another command to verify everything works
-- **Review release notes:** Check [GitHub Releases](https://github.com/github/spec-kit/releases) for new features and breaking changes
+- **Review release notes:** Check [GitHub Releases](https://github.com/seanbarlow/doit/releases) for new features and breaking changes
 - **Update workflows:** If new commands were added, update your team's development workflows
-- **Check documentation:** Visit [github.io/spec-kit](https://github.github.io/spec-kit/) for updated guides
+- **Check documentation:** Visit [seanbarlow.github.io/doit](https://seanbarlow.github.io/doit/) for updated guides

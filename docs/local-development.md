@@ -134,7 +134,7 @@ If you need to bypass TLS validation while experimenting:
 
 ```bash
 doit check --skip-tls
-doit init demo --skip-tls --ai gemini --ignore-agent-tools --script ps
+doit init demo --skip-tls --ai claude --ignore-agent-tools --script ps
 ```
 
 (Use only for local experimentation.)

@@ -17,6 +17,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (no database) (013-publish-pypi)
 - Bash scripts, gh CLI, Markdown (YAML for templates) + gh CLI (GitHub CLI), Gi (014-github-repo-protections)
 - N/A (GitHub API / repository settings) (014-github-repo-protections)
+- Markdown, JSON (documentation files) + None (text editing only) (015-docs-branding-cleanup)
+- N/A (file system) (015-docs-branding-cleanup)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -36,9 +38,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 015-docs-branding-cleanup: Added Markdown, JSON (documentation files) + None (text editing only)
 - 014-github-repo-protections: Added Bash scripts, gh CLI, Markdown (YAML for templates) + gh CLI (GitHub CLI), Gi
 - 013-publish-pypi: Added Python 3.11+ + hatchling (build), typer (CLI), rich (formatting)
-- 012-command-recommendations: Added Markdown (command templates), Bash 5.x (scripts) + Claude Code slash command system, existing doit template structure
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -159,6 +159,6 @@ Finally, implement the solution:
 
 ## Next Steps
 
-- Read the [complete methodology](../spec-driven.md) for in-depth guidance
-- Check out [more examples](../templates) in the repository
-- Explore the [source code on GitHub](https://github.com/github/spec-kit)
+- Read the [complete methodology](./index.md) for in-depth guidance
+- Check out [more examples](./templates/index.md) in the repository
+- Explore the [source code on GitHub](https://github.com/seanbarlow/doit)

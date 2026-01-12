@@ -1,14 +1,14 @@
 # Local Development Guide
 
-This guide shows how to iterate on the `specify` CLI locally without publishing a release or committing to `main` first.
+This guide shows how to iterate on the `doit` CLI locally without publishing a release or committing to `main` first.
 
 > Scripts now have both Bash (`.sh`) and PowerShell (`.ps1`) variants. The CLI auto-selects based on OS unless you pass `--script sh|ps`.
 
 ## 1. Clone and Switch Branches
 
 ```bash
-git clone https://github.com/github/spec-kit.git
-cd spec-kit
+git clone https://github.com/seanbarlow/doit.git
+cd doit
 # Work on a feature branch
 git checkout -b your-feature-branch
 ```
@@ -26,7 +26,7 @@ python -m src.doit_cli init demo-project --ai claude --ignore-agent-tools --scri
 If you prefer invoking the script file style (uses shebang):
 
 ```bash
-python src/specify_cli/__init__.py init demo-project --script ps
+python src/doit_cli/__init__.py init demo-project --script ps
 ```
 
 ## 3. Use Editable Install (Isolated Environment)
@@ -41,8 +41,8 @@ source .venv/bin/activate  # or on Windows PowerShell: .venv\Scripts\Activate.ps
 # Install project in editable mode
 uv pip install -e .
 
-# Now 'specify' entrypoint is available
-specify --help
+# Now 'doit' entrypoint is available
+doit --help
 ```
 
 Re-running after code edits requires no reinstall because of editable mode.
@@ -52,7 +52,7 @@ Re-running after code edits requires no reinstall because of editable mode.
 `uvx` can run from a local path (or a Git ref) to simulate user flows:
 
 ```bash
-uvx --from . specify init demo-uvx --ai copilot --ignore-agent-tools --script sh
+uvx --from . doit init demo-uvx --ai copilot --ignore-agent-tools --script sh
 ```
 
 You can also point uvx at a specific branch without merging:
@@ -60,7 +60,7 @@ You can also point uvx at a specific branch without merging:
 ```bash
 # Push your working branch first
 git push origin your-feature-branch
-uvx --from git+https://github.com/github/spec-kit.git@your-feature-branch specify init demo-branch-test --script ps
+uvx --from git+https://github.com/seanbarlow/doit.git@your-feature-branch doit init demo-branch-test --script ps
 ```
 
 ### 4a. Absolute Path uvx (Run From Anywhere)
@@ -68,23 +68,23 @@ uvx --from git+https://github.com/github/spec-kit.git@your-feature-branch specif
 If you're in another directory, use an absolute path instead of `.`:
 
 ```bash
-uvx --from /mnt/c/GitHub/spec-kit specify --help
-uvx --from /mnt/c/GitHub/spec-kit specify init demo-anywhere --ai copilot --ignore-agent-tools --script sh
+uvx --from /path/to/doit doit --help
+uvx --from /path/to/doit doit init demo-anywhere --ai copilot --ignore-agent-tools --script sh
 ```
 
 Set an environment variable for convenience:
 
 ```bash
-export SPEC_KIT_SRC=/mnt/c/GitHub/spec-kit
-uvx --from "$SPEC_KIT_SRC" specify init demo-env --ai copilot --ignore-agent-tools --script ps
+export DOIT_SRC=/path/to/doit
+uvx --from "$DOIT_SRC" doit init demo-env --ai copilot --ignore-agent-tools --script ps
 ```
 
 (Optional) Define a shell function:
 
 ```bash
-specify-dev() { uvx --from /mnt/c/GitHub/spec-kit specify "$@"; }
+doit-dev() { uvx --from /path/to/doit doit "$@"; }
 # Then
-specify-dev --help
+doit-dev --help
 ```
 
 ## 5. Testing Script Permission Logic
@@ -103,7 +103,7 @@ On Windows you will instead use the `.ps1` scripts (no chmod needed).
 Currently no enforced lint config is bundled, but you can quickly sanity check importability:
 
 ```bash
-python -c "import specify_cli; print('Import OK')"
+python -c "import doit_cli; print('Import OK')"
 ```
 
 ## 7. Build a Wheel Locally (Optional)
@@ -122,7 +122,7 @@ Install the built artifact into a fresh throwaway environment if needed.
 When testing `init --here` in a dirty directory, create a temp workspace:
 
 ```bash
-mkdir /tmp/spec-test && cd /tmp/spec-test
+mkdir /tmp/doit-test && cd /tmp/doit-test
 python -m src.doit_cli init --here --ai claude --ignore-agent-tools --script sh  # if repo copied here
 ```
 
@@ -133,8 +133,8 @@ Or copy only the modified CLI portion if you want a lighter sandbox.
 If you need to bypass TLS validation while experimenting:
 
 ```bash
-specify check --skip-tls
-specify init demo --skip-tls --ai gemini --ignore-agent-tools --script ps
+doit check --skip-tls
+doit init demo --skip-tls --ai gemini --ignore-agent-tools --script ps
 ```
 
 (Use only for local experimentation.)
@@ -144,10 +144,10 @@ specify init demo --skip-tls --ai gemini --ignore-agent-tools --script ps
 | Action | Command |
 |--------|---------|
 | Run CLI directly | `python -m src.doit_cli --help` |
-| Editable install | `uv pip install -e .` then `specify ...` |
-| Local uvx run (repo root) | `uvx --from . specify ...` |
-| Local uvx run (abs path) | `uvx --from /mnt/c/GitHub/spec-kit specify ...` |
-| Git branch uvx | `uvx --from git+URL@branch specify ...` |
+| Editable install | `uv pip install -e .` then `doit ...` |
+| Local uvx run (repo root) | `uvx --from . doit ...` |
+| Local uvx run (abs path) | `uvx --from /path/to/doit doit ...` |
+| Git branch uvx | `uvx --from git+URL@branch doit ...` |
 | Build wheel | `uv build` |
 
 ## 11. Cleaning Up

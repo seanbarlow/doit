@@ -3,30 +3,30 @@
 This guide will help you get started with Spec-Driven Development using Doit.
 
 > [!NOTE]
-> All automation scripts now provide both Bash (`.sh`) and PowerShell (`.ps1`) variants. The `specify` CLI auto-selects based on OS unless you pass `--script sh|ps`.
+> All automation scripts now provide both Bash (`.sh`) and PowerShell (`.ps1`) variants. The `doit` CLI auto-selects based on OS unless you pass `--script sh|ps`.
 
 ## The 6-Step Process
 
 > [!TIP]
 > **Context Awareness**: Doit commands automatically detect the active feature based on your current Git branch (e.g., `001-feature-name`). To switch between different specifications, simply switch Git branches.
 
-### Step 1: Install Doit
+### Step 1: Install DoIt
 
-**In your terminal**, run the `specify` CLI command to initialize your project:
+**In your terminal**, run the `doit` CLI command to initialize your project:
 
 ```bash
 # Create a new project directory
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>
+uvx doit-toolkit-cli init <PROJECT_NAME>
 
 # OR initialize in the current directory
-uvx --from git+https://github.com/github/spec-kit.git specify init .
+uvx doit-toolkit-cli init .
 ```
 
 Pick script type explicitly (optional):
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script ps  # Force PowerShell
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script sh  # Force POSIX shell
+uvx doit-toolkit-cli init <PROJECT_NAME> --script ps  # Force PowerShell
+uvx doit-toolkit-cli init <PROJECT_NAME> --script sh  # Force POSIX shell
 ```
 
 ### Step 2: Define Your Constitution

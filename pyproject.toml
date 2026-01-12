@@ -1,5 +1,5 @@
 [project]
-name = "doit-cli"
+name = "doit-toolkit-cli"
 version = "0.0.23"
 description = "Doit CLI - A tool to bootstrap your projects for Spec-Driven Development (SDD)."
 readme = "README.md"

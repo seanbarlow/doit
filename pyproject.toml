@@ -2,7 +2,25 @@
 name = "doit-cli"
 version = "0.0.23"
 description = "Doit CLI - A tool to bootstrap your projects for Spec-Driven Development (SDD)."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Sean Barlow", email = "sbarlow@barlowtech.com"}
+]
 requires-python = ">=3.11"
+keywords = ["cli", "spec-driven-development", "sdd", "ai", "development-workflow", "scaffolding"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Quality Assurance",
+]
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.0.0",
@@ -11,6 +29,12 @@ dependencies = [
     "readchar",
     "truststore>=0.10.4",
 ]
+
+[project.urls]
+Homepage = "https://github.com/vanbarlow09/doit"
+Documentation = "https://github.com/vanbarlow09/doit#readme"
+Repository = "https://github.com/vanbarlow09/doit.git"
+Issues = "https://github.com/vanbarlow09/doit/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -27,9 +51,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/doit_cli"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"templates" = "doit_cli/templates"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

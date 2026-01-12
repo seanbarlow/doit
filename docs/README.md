@@ -1,33 +1,33 @@
 # Documentation
 
-This folder contains the documentation source files for Spec Kit, built using [DocFX](https://dotnet.github.io/docfx/).
+This folder contains the documentation source files for DoIt, built using GitHub Pages with MkDocs.
 
 ## Building Locally
 
 To build the documentation locally:
 
-1. Install DocFX:
+1. Install MkDocs:
 
    ```bash
-   dotnet tool install -g docfx
+   pip install mkdocs mkdocs-material
    ```
 
-2. Build the documentation:
+2. Build and serve the documentation:
 
    ```bash
    cd docs
-   docfx docfx.json --serve
+   mkdocs serve
    ```
 
-3. Open your browser to `http://localhost:8080` to view the documentation.
+3. Open your browser to `http://localhost:8000` to view the documentation.
 
 ## Structure
 
-- `docfx.json` - DocFX configuration file
+- `mkdocs.yml` - MkDocs configuration file
 - `index.md` - Main documentation homepage
-- `toc.yml` - Table of contents configuration
 - `installation.md` - Installation guide
 - `quickstart.md` - Quick start guide
+- `local-development.md` - Local development guide
 - `_site/` - Generated documentation output (ignored by git)
 
 ## Deployment

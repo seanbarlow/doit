@@ -1,0 +1,51 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: version
+    attributes:
+      label: DoIt Version
+      description: What version of doit-toolkit-cli are you running?
+      placeholder: "0.0.23"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run `doit init ...`
+        2. See error...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, etc.
+      placeholder: |
+        - OS: macOS 14.0
+        - Python: 3.11.5
+    validations:
+      required: true

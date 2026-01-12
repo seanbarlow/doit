@@ -31,10 +31,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/vanbarlow09/doit"
-Documentation = "https://github.com/vanbarlow09/doit#readme"
-Repository = "https://github.com/vanbarlow09/doit.git"
-Issues = "https://github.com/vanbarlow09/doit/issues"
+Homepage = "https://github.com/seanbarlow/doit"
+Documentation = "https://github.com/seanbarlow/doit#readme"
+Repository = "https://github.com/seanbarlow/doit.git"
+Issues = "https://github.com/seanbarlow/doit/issues"
 
 [project.optional-dependencies]
 dev = [

@@ -1,125 +1,124 @@
-# [PROJECT_NAME] Constitution
+<!--
+SYNC IMPACT REPORT
+==================
+Version: N/A → 1.0.0 (Initial constitution)
+Modified principles: None (new)
+Added sections: All (initial creation)
+Removed sections: None
+Templates requiring updates: ✅ None (templates already compatible)
+Follow-up TODOs: None
+-->
 
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# DoIt Constitution
 
 ## Purpose & Goals
 
 ### Project Purpose
 
-[PROJECT_PURPOSE]
-<!-- Example: A CLI tool for managing feature specifications and task tracking -->
+DoIt is a spec-driven development framework that enables teams to see their architecture before they build it. It provides an opinionated, AI-powered approach to specification-driven development with auto-generated diagrams, intelligent roadmapping, and persistent memory.
 
 ### Success Criteria
 
-[SUCCESS_CRITERIA]
-<!-- Example:
-- Reduce feature specification time by 50%
-- Enable consistent task breakdown across teams
-- Support multiple AI assistants for development -->
+- Enable consistent specification and task breakdown across teams
+- Reduce architectural debt through upfront specification
+- Provide AI-powered workflow integration with Claude Code, Cursor, and other assistants
+- Maintain all project context in version-controlled markdown files
+- Auto-generate Mermaid diagrams from specifications
 
 ## Tech Stack
 
 ### Languages
 
-[PRIMARY_LANGUAGE]
-<!-- Example: Python 3.11+ (primary), TypeScript (frontend) -->
+Python 3.11+ (primary)
 
 ### Frameworks
 
-[FRAMEWORKS]
-<!-- Example: FastAPI (API), React (frontend), pytest (testing) -->
+- Typer (CLI framework)
+- pytest (testing framework)
+- Hatchling (build system)
 
 ### Libraries
 
-[KEY_LIBRARIES]
-<!-- Example: Pydantic (validation), SQLAlchemy (ORM), Rich (CLI) -->
+- Rich (terminal formatting and output)
+- httpx (HTTP client with SOCKS support)
+- platformdirs (cross-platform directories)
+- readchar (keyboard input)
+- truststore (certificate handling)
 
 ## Infrastructure
 
 ### Hosting
 
-[HOSTING_PLATFORM]
-<!-- Example: AWS ECS, Google Cloud Run, Azure Container Apps, Self-hosted -->
+PyPI (Python Package Index) - distributed as `doit-toolkit-cli`
 
 ### Cloud Provider
 
-[CLOUD_PROVIDER]
-<!-- Example: AWS, GCP, Azure, Multi-cloud, On-premises -->
+None (local CLI tool, no cloud infrastructure required)
 
 ### Database
 
-[DATABASE]
-<!-- Example: PostgreSQL (primary), Redis (cache), none -->
+None (file-based storage using markdown in `.doit/memory/`)
 
 ## Deployment
 
 ### CI/CD Pipeline
 
-[CICD_PIPELINE]
-<!-- Example: GitHub Actions, GitLab CI, Jenkins, CircleCI -->
+GitHub Actions
 
 ### Deployment Strategy
 
-[DEPLOYMENT_STRATEGY]
-<!-- Example: Blue-green, Rolling, Canary, Manual -->
+Manual release to PyPI via `hatch build` and `hatch publish`
 
 ### Environments
 
-[ENVIRONMENTS]
-<!-- Example: dev, staging, production -->
+- Development (local)
+- Production (PyPI)
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
+### I. Specification-First
 
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+Every feature MUST begin with a specification before implementation. Specifications define user stories, acceptance criteria, and success metrics. No code is written until the spec is approved.
 
-### [PRINCIPLE_2_NAME]
+### II. Persistent Memory
 
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All project context MUST be stored in version-controlled markdown files within `.doit/memory/`. This ensures team alignment, historical context, and zero external dependencies.
 
-### [PRINCIPLE_3_NAME]
+### III. Auto-Generated Diagrams
 
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+Diagrams MUST be generated automatically from specifications using Mermaid syntax. Manual diagram maintenance is prohibited - diagrams are derived artifacts.
 
-### [PRINCIPLE_4_NAME]
+### IV. Opinionated Workflow
 
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+The framework enforces a specific workflow: constitution → specit → planit → taskit → implementit → testit → reviewit → checkin. Deviations require explicit justification.
 
-### [PRINCIPLE_5_NAME]
+### V. AI-Native Design
 
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+All commands MUST be designed to work with AI coding assistants via slash commands. Human-readable markdown is the universal interface.
 
-## [SECTION_2_NAME]
+## Quality Standards
 
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+All code MUST include tests. The test suite uses pytest and MUST pass before any release. Code coverage is tracked but not enforced with a hard minimum.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Development Workflow
 
-## [SECTION_3_NAME]
-
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. Create feature branch from `main`
+2. Run `/doit.specit` to create specification
+3. Run `/doit.planit` for technical design
+4. Run `/doit.taskit` for task breakdown
+5. Implement with `/doit.implementit`
+6. Review with `/doit.reviewit`
+7. Check in with `/doit.checkin`
 
 ## Governance
 
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution supersedes all other development practices for this project. Amendments require:
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+1. A specification documenting the change rationale
+2. Team review and approval
+3. Version bump following semantic versioning
+4. Migration plan for breaking changes
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+All pull requests MUST verify compliance with these principles.
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-13 | **Last Amended**: 2026-01-13

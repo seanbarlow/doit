@@ -1,12 +1,12 @@
 # Project Roadmap
 
-**Project**: Task Management App
-**Last Updated**: 2026-01-10
+**Project**: [PROJECT_NAME]
+**Last Updated**: [DATE]
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
 
-A simple, intuitive task management app that helps individuals organize their work, track progress, and stay productive.
+[PROJECT_VISION]
 
 ---
 
@@ -16,52 +16,29 @@ A simple, intuitive task management app that helps individuals organize their wo
 
 <!-- Items that are essential for minimum viable product or blocking other work -->
 
-- [ ] Create and manage tasks with titles and descriptions
-  - **Rationale**: Core functionality - users must be able to create tasks to use the app
-
-- [ ] Mark tasks as complete/incomplete
-  - **Rationale**: Essential for tracking progress and productivity
+- [ ] [P1_ITEM_1] `[feature-branch-reference]`
+  - **Rationale**: [Why this is critical]
 
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Organize tasks into lists or categories
-  - **Rationale**: Helps users group related tasks and stay organized
-
-- [ ] Set due dates and reminders
-  - **Rationale**: Critical for time-sensitive task management
-
-- [ ] Filter and search tasks
-  - **Rationale**: Improves usability as task list grows
-
-- [ ] Task priority levels
-  - **Rationale**: Allows users to distinguish between urgent and non-urgent tasks within each list
-
-- [ ] Subtasks / Checklists
-  - **Rationale**: Enables breaking down complex tasks into smaller, manageable steps
-
-- [ ] Tags and labels for tasks
-  - **Rationale**: Enables better organization - complements lists/categories feature (promoted from P3)
+- [ ] [P2_ITEM_1] `[feature-branch-reference]`
+  - **Rationale**: [Why this is high priority]
 
 ### P3 - Medium Priority (Valuable)
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [ ] Recurring tasks
-  - **Rationale**: Automates repetitive task creation
-
-- [ ] Notes and attachments
-  - **Rationale**: Provides context for tasks beyond title/description
-
-- [ ] Mobile app sync
-  - **Rationale**: Enables access across devices - users can manage tasks from phone and desktop
+- [ ] [P3_ITEM_1] `[feature-branch-reference]`
+  - **Rationale**: [Why this is medium priority]
 
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
 
-<!-- No P4 items currently -->
+- [ ] [P4_ITEM_1] `[feature-branch-reference]`
+  - **Rationale**: [Why this is low priority]
 
 ---
 
@@ -69,9 +46,9 @@ A simple, intuitive task management app that helps individuals organize their wo
 
 <!-- Items that were considered but intentionally deferred with reason -->
 
-| Item                      | Original Priority | Deferred Date | Reason                            |
-|---------------------------|-------------------|---------------|-----------------------------------|
-| Dark mode / Theme support | P4                | 2026-01-10    | Focus on core functionality first |
+| Item | Original Priority | Deferred Date | Reason |
+|------|-------------------|---------------|--------|
+| [DEFERRED_ITEM] | [P1-P4] | [DATE] | [REASON] |
 
 ---
 

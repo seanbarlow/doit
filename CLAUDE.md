@@ -48,7 +48,6 @@ Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow s
 
 ## Recent Changes
 - 021-copilot-agent-fix: Added Markdown (YAML frontmatter) + None (text files only)
-- 021-copilot-agent-fix: Added Markdown (YAML frontmatter) + None (text files only)
 - 020-constitution-improvements: Added Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent)
 
 

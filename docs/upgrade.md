@@ -397,7 +397,7 @@ The `doit` CLI tool is used for:
 - **Upgrades:** `doit init --here --force` to update templates and commands
 - **Diagnostics:** `doit check` to verify tool installation
 
-Once you've run `doit init`, the slash commands (like `/doit.doit`, `/doit.planit`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `doit` again.
+Once you've run `doit init`, the slash commands (like `/doit.specit`, `/doit.planit`, etc.) are **permanently installed** in your project's agent folder (`.claude/`, `.github/prompts/`, etc.). Your AI assistant reads these command files directly—no need to run `doit` again.
 
 **If your agent isn't recognizing slash commands:**
 
@@ -437,7 +437,7 @@ Doit follows semantic versioning for major releases. The CLI and project files a
 
 After upgrading:
 
-- **Test new slash commands:** Run `/doit.constitution` or another command to verify everything works
+- **Test new slash commands:** Run `/doit.specit` or another command to verify everything works
 - **Review release notes:** Check [GitHub Releases](https://github.com/seanbarlow/doit/releases) for new features and breaking changes
 - **Update workflows:** If new commands were added, update your team's development workflows
 - **Check documentation:** Visit [seanbarlow.github.io/doit](https://seanbarlow.github.io/doit/) for updated guides

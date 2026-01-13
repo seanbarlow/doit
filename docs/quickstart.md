@@ -1,14 +1,14 @@
 # Quick Start Guide
 
-This guide will help you get started with Spec-Driven Development using Doit.
+This guide will help you get started with Spec-Driven Development using DoIt.
 
 > [!NOTE]
-> All automation scripts now provide both Bash (`.sh`) and PowerShell (`.ps1`) variants. The `doit` CLI auto-selects based on OS unless you pass `--script sh|ps`.
+> All automation scripts provide both Bash (`.sh`) and PowerShell (`.ps1`) variants. The `doit` CLI auto-selects based on OS unless you pass `--script sh|ps`.
 
-## The 6-Step Process
+## The DoIt Workflow
 
 > [!TIP]
-> **Context Awareness**: Doit commands automatically detect the active feature based on your current Git branch (e.g., `001-feature-name`). To switch between different specifications, simply switch Git branches.
+> **Context Awareness**: DoIt commands automatically detect the active feature based on your current Git branch (e.g., `001-feature-name`). To switch between different specifications, simply switch Git branches.
 
 ### Step 1: Install DoIt
 
@@ -31,61 +31,98 @@ uvx doit-toolkit-cli init <PROJECT_NAME> --script sh  # Force POSIX shell
 
 ### Step 2: Define Your Constitution
 
-**In your AI Agent's chat interface**, use the `/doit.constitution` slash command to establish the core rules and principles for your project. You should provide your project's specific principles as arguments.
+**In your AI Agent's chat interface**, use the `/doit.constitution` slash command to establish the core rules and principles for your project.
 
 ```markdown
 /doit.constitution This project follows a "Library-First" approach. All features must be implemented as standalone libraries first. We use TDD strictly. We prefer functional programming patterns.
 ```
 
-### Step 3: Create the Spec
+### Step 3: Scaffold Your Project (Greenfield Only)
 
-**In the chat**, use the `/doit.doit` slash command to describe what you want to build. Focus on the **what** and **why**, not the tech stack.
+For new projects, use `/doit.scaffoldit` to generate the initial project structure:
 
 ```markdown
-/doit.doit Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
+/doit.scaffoldit
 ```
 
-### Step 4: Refine the Spec
+This creates the folder structure and starter files based on your constitution.
 
-**In the chat**, use the `/doit.clarify` slash command to identify and resolve ambiguities in your specification. You can provide specific focus areas as arguments.
+### Step 4: Create a Feature Specification
 
-```bash
-/doit.clarify Focus on security and performance requirements.
+**In the chat**, use the `/doit.specit` slash command to describe what you want to build. Focus on the **what** and **why**, not the tech stack.
+
+```markdown
+/doit.specit Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping. Within each album, photos are previewed in a tile-like interface.
 ```
+
+The specit command will:
+
+- Create a feature branch
+- Ask clarifying questions to resolve ambiguities
+- Generate a complete specification document
 
 ### Step 5: Create a Technical Implementation Plan
 
-**In the chat**, use the `/doit.planit` slash command to provide your tech stack and architecture choices.
+**In the chat**, use the `/doit.planit` slash command to generate a technical implementation plan:
 
 ```markdown
-/doit.planit The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
+/doit.planit
 ```
 
-### Step 6: Break Down and Implement
+This creates an implementation plan with architecture decisions, component contracts, and technical approach.
 
-**In the chat**, use the `/doit.taskit` slash command to create an actionable task list.
+### Step 6: Generate Implementation Tasks
+
+**In the chat**, use the `/doit.taskit` slash command to create an actionable task list:
 
 ```markdown
 /doit.taskit
 ```
 
-Optionally, validate the plan with `/doit.analyze`:
+### Step 7: Implement the Feature
 
-```markdown
-/doit.analyze
-```
-
-Then, use the `/doit.implementit` slash command to execute the plan.
+Use the `/doit.implementit` slash command to execute the tasks:
 
 ```markdown
 /doit.implementit
 ```
 
+This iterates through each task, implementing code and marking tasks complete.
+
+### Step 8: Review Your Implementation
+
+Use the `/doit.reviewit` slash command to review the implemented code:
+
+```markdown
+/doit.reviewit
+```
+
+This checks code against the specification and identifies any issues.
+
+### Step 9: Complete the Feature
+
+Use the `/doit.checkin` slash command to finalize the feature:
+
+```markdown
+/doit.checkin
+```
+
+This closes GitHub issues, creates a commit, and optionally opens a pull request.
+
+---
+
 ## Detailed Example: Building Taskify
 
 Here's a complete example of building a team productivity platform:
 
-### Step 1: Define Constitution
+### Step 1: Initialize Project
+
+```bash
+uvx doit-toolkit-cli init taskify --ai claude
+cd taskify
+```
+
+### Step 2: Define Constitution
 
 Initialize the project's constitution to set ground rules:
 
@@ -93,72 +130,92 @@ Initialize the project's constitution to set ground rules:
 /doit.constitution Taskify is a "Security-First" application. All user inputs must be validated. We use a microservices architecture. Code must be fully documented.
 ```
 
-### Step 2: Define Requirements with `/doit.doit`
+### Step 3: Scaffold the Project
 
-```text
-Develop Taskify, a team productivity platform. It should allow users to create projects, add team members,
-assign tasks, comment and move tasks between boards in Kanban style. In this initial phase for this feature,
-let's call it "Create Taskify," let's have multiple users but the users will be declared ahead of time, predefined.
-I want five users in two different categories, one product manager and four engineers. Let's create three
-different sample projects. Let's have the standard Kanban columns for the status of each task, such as "To Do,"
-"In Progress," "In Review," and "Done." There will be no login for this application as this is just the very
-first testing thing to ensure that our basic features are set up.
+```markdown
+/doit.scaffoldit
 ```
 
-### Step 3: Refine the Specification
+### Step 4: Create Feature Specification with `/doit.specit`
 
-Use the `/doit.clarify` command to interactively resolve any ambiguities in your specification. You can also provide specific details you want to ensure are included.
-
-```bash
-/doit.clarify I want to clarify the task card details. For each task in the UI for a task card, you should be able to change the current status of the task between the different columns in the Kanban work board. You should be able to leave an unlimited number of comments for a particular card. You should be able to, from that task card, assign one of the valid users.
+```markdown
+/doit.specit Develop Taskify, a team productivity platform. It should allow users to create projects, add team members, assign tasks, comment and move tasks between boards in Kanban style. Users will be predefined (5 users: one product manager and four engineers). Create three sample projects with standard Kanban columns: "To Do," "In Progress," "In Review," and "Done." No login required for this initial testing phase.
 ```
 
-You can continue to refine the spec with more details using `/doit.clarify`:
+The AI will ask clarifying questions like:
 
-```bash
-/doit.clarify When you first launch Taskify, it's going to give you a list of the five users to pick from. There will be no password required. When you click on a user, you go into the main view, which displays the list of projects. When you click on a project, you open the Kanban board for that project. You're going to see the columns. You'll be able to drag and drop cards back and forth between different columns. You will see any cards that are assigned to you, the currently logged in user, in a different color from all the other ones, so you can quickly see yours. You can edit any comments that you make, but you can't edit comments that other people made. You can delete any comments that you made, but you can't delete comments anybody else made.
+- "How should task cards display user assignments?"
+- "Should comments be editable by the commenter only?"
+- "What colors should indicate different task states?"
+
+Answer these questions to refine the specification.
+
+### Step 5: Generate Implementation Plan with `/doit.planit`
+
+```markdown
+/doit.planit
 ```
 
-### Step 4: Validate the Spec
+The plan will include:
 
-Validate the specification checklist using the `/doit.checklist` command:
+- Architecture decisions
+- Component interfaces
+- Data models
+- API contracts
 
-```bash
-/doit.checklist
+### Step 6: Create Tasks with `/doit.taskit`
+
+```markdown
+/doit.taskit
 ```
 
-### Step 5: Generate Technical Plan with `/doit.planit`
+### Step 7: Implement with `/doit.implementit`
 
-Be specific about your tech stack and technical requirements:
-
-```bash
-/doit.planit We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use Blazor server with drag-and-drop task boards, real-time updates. There should be a REST API created with a projects API, tasks API, and a notifications API.
-```
-
-### Step 6: Validate and Implement
-
-Have your AI agent audit the implementation plan using `/doit.analyze`:
-
-```bash
-/doit.analyze
-```
-
-Finally, implement the solution:
-
-```bash
+```markdown
 /doit.implementit
 ```
+
+### Step 8: Review with `/doit.reviewit`
+
+```markdown
+/doit.reviewit
+```
+
+### Step 9: Finalize with `/doit.checkin`
+
+```markdown
+/doit.checkin
+```
+
+---
+
+## Quick Command Reference
+
+| Command | Purpose | When to Use |
+| ------- | ------- | ----------- |
+| `doit init` | Initialize DoIt in a project | Once per project |
+| `/doit.constitution` | Define project principles | After init, or to update |
+| `/doit.scaffoldit` | Generate project structure | Greenfield projects only |
+| `/doit.specit` | Create feature specification | Start of each feature |
+| `/doit.planit` | Generate implementation plan | After spec is approved |
+| `/doit.taskit` | Create actionable tasks | After plan is approved |
+| `/doit.implementit` | Execute tasks | During development |
+| `/doit.reviewit` | Review implementation | After implementation |
+| `/doit.testit` | Run automated tests | Before/after changes |
+| `/doit.checkin` | Finalize feature | When feature is complete |
+| `/doit.roadmapit` | Manage project backlog | Anytime |
+| `/doit.documentit` | Organize documentation | As needed |
 
 ## Key Principles
 
 - **Be explicit** about what you're building and why
 - **Don't focus on tech stack** during specification phase
 - **Iterate and refine** your specifications before implementation
-- **Validate** the plan before coding begins
 - **Let the AI agent handle** the implementation details
 
 ## Next Steps
 
+- Follow the [Greenfield Tutorial](./tutorials/01-greenfield-tutorial.md) for a complete walkthrough
+- Follow the [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) to add DoIt to existing code
 - Read the [complete methodology](./index.md) for in-depth guidance
-- Check out [more examples](./templates/index.md) in the repository
 - Explore the [source code on GitHub](https://github.com/seanbarlow/doit)

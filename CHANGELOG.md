@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-01-13
+
+### Fixed
+
+- **GitHub Copilot prompt files**: Replaced deprecated `mode: agent` with `agent: true` (#139)
+  - Updated all 11 prompt files in `/templates/prompts/`
+  - Ensures compatibility with VS Code 1.106+ and current GitHub Copilot specification
+  - Eliminates deprecation warnings when using DoIt prompts
+
+### Added
+
+- **Constitution command improvements** (#131)
+  - Dotfile exclusion: Excludes dotfiles and dotfolders when scanning for context
+  - Greenfield detection: Detects empty/new projects and provides interactive questioning
+
+- **Comprehensive tutorials** (#111, #112, #113)
+  - Added DoIt workflow tutorials with step-by-step guides
+  - Updated quickstart and upgrade guides with correct commands
+
 ## [0.1.3] - 2026-01-13
 
 ### Added

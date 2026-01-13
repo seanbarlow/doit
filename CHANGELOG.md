@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-01-13
+
+### Added
+
+- Implemented Gitflow-inspired branching strategy with `develop` as default branch (#75)
+  - `develop` is now the default branch for feature integration
+  - `main` reserved for production-ready releases
+  - Updated CONTRIBUTING.md with new branching workflow
+  - Added release process documentation for maintainers
+
 ### Fixed
 
 - Roadmap templates now contain placeholder syntax instead of sample data (#56)

@@ -19,6 +19,7 @@ Thank you for considering contributing to DoIt! We appreciate your interest in m
 # Then clone your fork
 git clone https://github.com/YOUR-USERNAME/doit.git
 cd doit
+# You'll be on the 'develop' branch by default
 ```
 
 ### 2. Set Up Development Environment
@@ -37,7 +38,7 @@ pip install -e ".[dev]"
 We use numbered feature branches for tracking:
 
 ```bash
-git checkout -b ###-feature-name
+git checkout -b ###-feature-name develop
 ```
 
 Branch naming convention:
@@ -264,7 +265,7 @@ Who benefits? What problems does it solve?
 
 ## Pull Request Process
 
-1. **Create Branch** - From latest `main` using numbered convention
+1. **Create Branch** - From latest `develop` using numbered convention
 2. **Make Changes** - Include tests where applicable
 3. **Run Tests** - `pytest` passes locally
 4. **Commit** - Follow conventional commits
@@ -290,6 +291,40 @@ Brief description of changes.
 ## Related Issues
 Closes #123
 ```
+
+## Release Process (Maintainers)
+
+This project uses a two-branch workflow:
+
+- **`develop`** - Default branch for feature integration
+- **`main`** - Production-ready releases only
+
+### Releasing to Production
+
+1. Ensure all desired features are merged to `develop`
+2. Create a PR from `develop` to `main`:
+
+   ```bash
+   gh pr create --base main --head develop --title "Release vX.Y.Z"
+   ```
+
+3. Review and merge the PR
+4. Tag the release:
+
+   ```bash
+   git checkout main
+   git pull origin main
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+
+### Hotfix Process
+
+For urgent production fixes:
+
+1. Branch from `main`: `git checkout -b hotfix-description main`
+2. Make the fix and create PR to `main`
+3. After merging to `main`, also merge or cherry-pick to `develop`
 
 ## Project Structure
 

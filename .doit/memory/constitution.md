@@ -1,14 +1,3 @@
-<!--
-SYNC IMPACT REPORT
-==================
-Version: N/A → 1.0.0 (Initial constitution)
-Modified principles: None (new)
-Added sections: All (initial creation)
-Removed sections: None
-Templates requiring updates: ✅ None (templates already compatible)
-Follow-up TODOs: None
--->
-
 # DoIt Constitution
 
 ## Purpose & Goals

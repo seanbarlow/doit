@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Execute automated tests and generate test reports with requirement mapping
 ---
 

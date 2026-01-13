@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Finalize feature implementation, close issues, update roadmaps, and create pull request
 ---
 

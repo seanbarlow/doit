@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Organize, index, audit, and enhance project documentation
 ---
 

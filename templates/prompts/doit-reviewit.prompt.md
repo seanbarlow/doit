@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Review implemented code for quality and completeness against specifications
 ---
 

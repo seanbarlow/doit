@@ -86,7 +86,7 @@ gantt
 
 **Purpose**: Understand current command structure before modifications
 
-- [ ] T001 Read and analyze current command template at `.claude/commands/doit.constitution.md` (#118)
+- [x] T001 Read and analyze current command template at `.claude/commands/doit.constitution.md` (#118)
 
 ---
 
@@ -98,14 +98,14 @@ gantt
 
 ### Implementation for User Story 1
 
-- [ ] T002 [US1] Add dotfile/dotfolder exclusion rules section to command template in `.claude/commands/doit.constitution.md` (#119)
+- [x] T002 [US1] Add dotfile/dotfolder exclusion rules section to command template in `.claude/commands/doit.constitution.md` (#119)
   - Specify directories to exclude: `.git`, `.doit`, `.vscode`, `.idea`, `.env`, `.config`, `.cache`, `.npm`, `.yarn`
   - Specify files to exclude: any path starting with `.`
 
-- [ ] T003 [US1] Add exception rule for reading `.doit/memory/constitution.md` as target file in `.claude/commands/doit.constitution.md` (#120)
+- [x] T003 [US1] Add exception rule for reading `.doit/memory/constitution.md` as target file in `.claude/commands/doit.constitution.md` (#120)
   - Ensure this file can still be read/written despite dotfolder exclusion
 
-- [ ] T004 [US1] Document excluded patterns in command template in `.claude/commands/doit.constitution.md` (#121)
+- [x] T004 [US1] Document excluded patterns in command template in `.claude/commands/doit.constitution.md` (#121)
   - Add clear list of what is excluded and why
   - Note that `node_modules` should also be excluded (non-dotfolder but irrelevant)
 
@@ -121,16 +121,16 @@ gantt
 
 ### Implementation for User Story 2
 
-- [ ] T005 [US2] Add source file extension list to command template in `.claude/commands/doit.constitution.md` (#122)
+- [x] T005 [US2] Add source file extension list to command template in `.claude/commands/doit.constitution.md` (#122)
   - Include: `.py`, `.js`, `.ts`, `.jsx`, `.tsx`, `.java`, `.go`, `.rs`, `.rb`, `.php`, `.cs`, `.cpp`, `.c`, `.h`, `.swift`, `.kt`, `.scala`, `.clj`, `.ex`, `.exs`
   - Exclude from count: `.md`, `.json`, `.yaml`, `.yml`, `Makefile`, `Dockerfile`
 
-- [ ] T006 [US2] Add greenfield detection logic to command template in `.claude/commands/doit.constitution.md` (#123)
+- [x] T006 [US2] Add greenfield detection logic to command template in `.claude/commands/doit.constitution.md` (#123)
   - After dotfile filtering, count files with source extensions
   - If count == 0: project is greenfield
   - If count > 0: proceed with normal inference mode
 
-- [ ] T007 [US2] Add greenfield detection message to command template in `.claude/commands/doit.constitution.md` (#124)
+- [x] T007 [US2] Add greenfield detection message to command template in `.claude/commands/doit.constitution.md` (#124)
   - Display: "Detected greenfield project - entering interactive mode"
   - Add branching logic to route to interactive questioning
 
@@ -146,7 +146,7 @@ gantt
 
 ### Implementation for User Story 3
 
-- [ ] T008 [US3] Add question sequence to command template in `.claude/commands/doit.constitution.md` (#125)
+- [x] T008 [US3] Add question sequence to command template in `.claude/commands/doit.constitution.md` (#125)
   - Q1: Project purpose and goals (mandatory) -> maps to [PROJECT_PURPOSE], [SUCCESS_CRITERIA]
   - Q2: Primary programming language (mandatory) -> maps to [PRIMARY_LANGUAGE]
   - Q3: Frameworks (optional, Enter to skip) -> maps to [FRAMEWORKS]
@@ -155,17 +155,17 @@ gantt
   - Q6: Database choice including "none" (optional) -> maps to [DATABASE]
   - Q7: CI/CD preference (optional) -> maps to [CICD_PIPELINE]
 
-- [ ] T009 [US3] Add skip/optional logic for questions in `.claude/commands/doit.constitution.md` (#126)
+- [x] T009 [US3] Add skip/optional logic for questions in `.claude/commands/doit.constitution.md` (#126)
   - Allow users to skip optional questions by pressing Enter or typing "skip"
   - Mark which questions are mandatory vs optional
 
-- [ ] T010 [US3] Add argument pre-fill logic to command template in `.claude/commands/doit.constitution.md` (#127)
+- [x] T010 [US3] Add argument pre-fill logic to command template in `.claude/commands/doit.constitution.md` (#127)
   - Parse arguments provided with `/doit.constitution` command
   - Match keywords to categories (language, framework, database, hosting, CI/CD)
   - Skip questions where arguments provide answers
   - Example: `/doit.constitution Python FastAPI PostgreSQL` skips Q2, Q3, Q6
 
-- [ ] T011 [US3] Add constitution generation from answers in `.claude/commands/doit.constitution.md` (#128)
+- [x] T011 [US3] Add constitution generation from answers in `.claude/commands/doit.constitution.md` (#128)
   - Map all answers to corresponding template placeholders
   - Set RATIFICATION_DATE to current date
   - Set initial version to 1.0.0
@@ -179,14 +179,14 @@ gantt
 
 **Purpose**: Verify implementation against success criteria
 
-- [ ] T012 Manual testing following quickstart.md checklist (#129)
+- [x] T012 Manual testing following quickstart.md checklist (#129)
   - MT-001: Test dotfile exclusion with `.git`, `.vscode`, `.idea` folders
   - MT-002: Test greenfield detection on empty project
   - MT-003: Test existing project detection
   - MT-004: Test argument pre-fill
   - MT-005: Test complete interactive flow
 
-- [ ] T013 [P] Update any related documentation in docs/ if needed (#130)
+- [x] T013 [P] Update any related documentation in docs/ if needed (#130)
 
 ---
 

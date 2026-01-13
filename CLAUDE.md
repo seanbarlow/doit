@@ -26,6 +26,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (file system - docs directory) (019-doit-tutorials)
 - Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent) (020-constitution-improvements)
 - N/A (file system - reads project directories) (020-constitution-improvements)
+- Markdown (YAML frontmatter) + None (text files only) (021-copilot-agent-fix)
+- N/A (no database involved) (021-copilot-agent-fix)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -45,9 +47,8 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 021-copilot-agent-fix: Added Markdown (YAML frontmatter) + None (text files only)
 - 020-constitution-improvements: Added Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent)
-- 019-doit-tutorials: Added Markdown (documentation), Mermaid (diagrams) + None (documentation only)
-- 017-roadmap-template-cleanup: Added Markdown (file content only - no code changes) + None (file system operations only)
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Generate implementation plan from feature specification
 ---
 

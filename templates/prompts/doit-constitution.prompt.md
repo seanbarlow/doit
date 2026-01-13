@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Create or update the project constitution from interactive or provided principle inputs
 ---
 

@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Create or update the project roadmap with prioritized requirements and AI-suggested enhancements
 ---
 

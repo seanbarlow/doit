@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Create or update feature specification from natural language description
 ---
 

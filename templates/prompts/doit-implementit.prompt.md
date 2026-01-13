@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Execute implementation tasks from tasks.md
 ---
 

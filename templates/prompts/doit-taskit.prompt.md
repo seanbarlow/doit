@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Generate actionable implementation tasks from design documents
 ---
 

@@ -12,6 +12,16 @@
     - name: Upgrade
       href: upgrade.md
 
+# Tutorials
+- name: Tutorials
+  items:
+    - name: Overview
+      href: tutorials/index.md
+    - name: Greenfield Project
+      href: tutorials/01-greenfield-tutorial.md
+    - name: Existing Project
+      href: tutorials/02-existing-project-tutorial.md
+
 # Development workflows
 - name: Development
   items:

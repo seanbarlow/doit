@@ -24,6 +24,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - Markdown (file content only - no code changes) + None (file system operations only) (017-roadmap-template-cleanup)
 - Markdown (documentation), Mermaid (diagrams) + None (documentation only) (019-doit-tutorials)
 - N/A (file system - docs directory) (019-doit-tutorials)
+- Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent) (020-constitution-improvements)
+- N/A (file system - reads project directories) (020-constitution-improvements)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -43,9 +45,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 020-constitution-improvements: Added Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent)
 - 019-doit-tutorials: Added Markdown (documentation), Mermaid (diagrams) + None (documentation only)
 - 017-roadmap-template-cleanup: Added Markdown (file content only - no code changes) + None (file system operations only)
-- 016-scripts-cleanup: Added Bash 5.x, PowerShell 7.x + Standard Unix utilities (grep, sed, diff, cp), Git CLI
 
 
 <!-- MANUAL ADDITIONS START -->

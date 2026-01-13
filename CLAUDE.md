@@ -21,6 +21,7 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (file system) (015-docs-branding-cleanup)
 - Bash 5.x, PowerShell 7.x + Standard Unix utilities (grep, sed, diff, cp), Git CLI (016-scripts-cleanup)
 - N/A (file system only) (016-scripts-cleanup)
+- Markdown (file content only - no code changes) + None (file system operations only) (017-roadmap-template-cleanup)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -40,9 +41,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 017-roadmap-template-cleanup: Added Markdown (file content only - no code changes) + None (file system operations only)
 - 016-scripts-cleanup: Added Bash 5.x, PowerShell 7.x + Standard Unix utilities (grep, sed, diff, cp), Git CLI
 - 015-docs-branding-cleanup: Added Markdown, JSON (documentation files) + None (text editing only)
-- 014-github-repo-protections: Added Bash scripts, gh CLI, Markdown (YAML for templates) + gh CLI (GitHub CLI), Gi
 
 
 <!-- MANUAL ADDITIONS START -->

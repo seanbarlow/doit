@@ -1,12 +1,50 @@
-# Completed Features
+# Completed Roadmap Items
 
-| Feature | Branch | Completed | PR |
-|---------|--------|-----------|-----|
-| Update Doit Templates | 002-update-doit-templates | 2026-01-09 | - |
-| Scaffold Doit Commands | 003-scaffold-doit-commands | 2026-01-10 | - |
-| Review Template Commands | 004-review-template-commands | 2026-01-10 | - |
-| Automatic Mermaid Visualization | 005-mermaid-visualization | 2026-01-10 | - |
-| Documentation Doit Migration | 006-docs-doit-migration | 2026-01-10 | - |
-| Doit CLI Rename | 007-007-doit-cli-rename | 2026-01-10 | - |
-| Doit Roadmapit Command | 008-doit-roadmapit-command | 2026-01-10 | - |
-| Doit Documentit Command | 009-doit-documentit-command | 2026-01-10 | - |
+**Project**: [PROJECT_NAME]
+**Created**: [DATE]
+**Purpose**: Historical record of completed roadmap items for AI context and project history
+
+---
+
+## Recently Completed
+
+<!-- Last 20 completed items - older items are archived below -->
+
+| Item | Original Priority | Completed Date | Feature Branch | Notes |
+|------|-------------------|----------------|----------------|-------|
+| [COMPLETED_ITEM] | [P1-P4] | [DATE] | `[###-feature-name]` | [NOTES] |
+
+---
+
+## Archive
+
+<!-- Older completed items (beyond 20 most recent) -->
+
+<details>
+<summary>Archived Items (click to expand)</summary>
+
+| Item | Original Priority | Completed Date | Feature Branch |
+|------|-------------------|----------------|----------------|
+<!-- Older items will be moved here automatically -->
+
+</details>
+
+---
+
+## Statistics
+
+- **Total Items Completed**: [COUNT]
+- **P1 Items Completed**: [P1_COUNT]
+- **P2 Items Completed**: [P2_COUNT]
+- **P3 Items Completed**: [P3_COUNT]
+- **P4 Items Completed**: [P4_COUNT]
+
+---
+
+## Notes
+
+- This file is maintained automatically by `/doit.checkin` when features complete
+- Items are matched by feature branch reference `[###-feature-name]`
+- Only the 20 most recent items are kept in "Recently Completed"
+- Older items are moved to the Archive section
+- Use this history to understand project evolution and past decisions

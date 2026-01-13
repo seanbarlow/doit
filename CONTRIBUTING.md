@@ -2,7 +2,7 @@
 
 Thank you for considering contributing to DoIt! We appreciate your interest in making this project better. This document provides guidelines and instructions for contributing.
 
-## 🎯 Our Values
+## Our Values
 
 - **Specification First** - Everything starts with clear specifications
 - **Quality Over Speed** - Well-tested code matters more than fast code
@@ -10,7 +10,7 @@ Thank you for considering contributing to DoIt! We appreciate your interest in m
 - **Documentation** - Clear docs are as important as clear code
 - **Accessibility** - Our tools should work for everyone
 
-## 🚀 Quick Start for Contributors
+## Quick Start for Contributors
 
 ### 1. Fork and Clone
 
@@ -25,31 +25,38 @@ cd doit
 
 ```bash
 # Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install in development mode
+# Install in development mode with dev dependencies
 pip install -e ".[dev]"
-
-# Install pre-commit hooks
-pre-commit install
 ```
 
 ### 3. Create a Feature Branch
 
+We use numbered feature branches for tracking:
+
 ```bash
-git checkout -b feature/your-feature-name
+git checkout -b ###-feature-name
 ```
 
-Follow our branch naming convention:
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation updates
-- `refactor/` - Code refactoring
-- `test/` - Test improvements
-- `chore/` - Maintenance tasks
+Branch naming convention:
 
-## 📝 Development Workflow
+- `###-feature-name` - Numbered feature branches (e.g., `017-roadmap-template-cleanup`)
+- Numbers are sequential and help track features in the project
+
+## Development Workflow
+
+### Using DoIt Commands (Spec-Driven Development)
+
+This project uses spec-driven development with the `/doit.*` slash commands in Claude Code:
+
+1. **`/doit.specit`** - Create a feature specification from a description
+2. **`/doit.planit`** - Generate an implementation plan from the spec
+3. **`/doit.taskit`** - Create actionable tasks from the plan
+4. **`/doit.implementit`** - Execute the implementation tasks
+5. **`/doit.reviewit`** - Review the implementation against requirements
+6. **`/doit.checkin`** - Finalize the feature, close issues, create PR
 
 ### Running Tests
 
@@ -57,47 +64,32 @@ Follow our branch naming convention:
 # Run all tests
 pytest
 
-# Run with coverage
-pytest --cov=src/
+# Run with verbose output
+pytest -v
 
 # Run specific test file
-pytest tests/test_specit.py
+pytest tests/unit/test_example.py
 
-# Run in watch mode
-ptw
+# Run specific test
+pytest tests/unit/test_example.py::test_function_name
 ```
 
-### Code Quality Checks
+### Code Quality
+
+We recommend using `ruff` for linting and formatting:
 
 ```bash
-# Format code
-black src/ tests/
+# Install ruff
+pip install ruff
 
 # Check code style
-flake8 src/ tests/
+ruff check src/
 
-# Type checking
-mypy src/
-
-# Linting
-pylint src/
-
-# All checks (same as CI)
-make check
+# Format code
+ruff format src/
 ```
 
-### Building Documentation
-
-```bash
-# Build docs locally
-cd docs/
-sphinx-build -b html . _build/
-
-# View in browser
-open _build/index.html
-```
-
-## 📋 Commit Guidelines
+## Commit Guidelines
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -128,104 +120,80 @@ refactor(core): extract common diagram logic
 - **feat** - A new feature
 - **fix** - A bug fix
 - **docs** - Documentation changes
-- **style** - Code style changes (formatting, missing semicolons, etc.)
+- **style** - Code style changes (formatting, etc.)
 - **refactor** - Code refactoring without feature changes
 - **perf** - Performance improvements
 - **test** - Adding or updating tests
 - **chore** - Build process, dependencies, tooling
 
-## 🧪 Testing Requirements
+### Co-Author Attribution
 
-All contributions should include tests:
+When working with AI assistants, include co-author attribution:
 
-```python
-# tests/commands/test_specit.py
-import pytest
-from doit.commands.specit import SpecIt
+```
+feat(feature): description
 
-def test_specit_basic():
-    """Test basic spec creation."""
-    cmd = SpecIt()
-    result = cmd.run(spec="A task management app")
-    
-    assert result.success
-    assert result.diagram_type == "user_journey"
-    assert "task" in result.spec_file.lower()
-
-def test_specit_with_entities():
-    """Test spec with entity extraction."""
-    cmd = SpecIt()
-    result = cmd.run(
-        spec="Users manage projects containing tasks",
-        extract_entities=True
-    )
-    
-    assert len(result.entities) == 3  # Users, Projects, Tasks
-    assert "relationships" in result.output
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
-**Coverage Requirements:**
-- Minimum 80% overall coverage
-- 100% for critical paths (command execution, memory system)
-- All public APIs must have tests
+## Testing Requirements
 
-## 📚 Documentation
+All contributions should include tests when applicable:
+
+```python
+# tests/unit/test_example.py
+import pytest
+from doit_cli.example import example_function
+
+def test_example_basic():
+    """Test basic functionality."""
+    result = example_function("input")
+    assert result is not None
+```
+
+**Guidelines:**
+
+- Add tests for new functionality
+- Maintain or improve existing coverage
+- Critical paths should have thorough test coverage
+
+## Documentation
 
 ### Code Documentation
 
+We use Google-style docstrings:
+
 ```python
-def planit(specification: str, ai_agent: Optional[str] = None) -> ArchitecturePlan:
-    """
-    Create a technical architecture plan from a specification.
-    
-    Auto-generates architecture diagram showing system components, 
-    boundaries, and dependencies. Suggests component breakdown and 
-    identifies potential issues.
-    
+def example_function(param: str) -> dict:
+    """Brief description of the function.
+
     Args:
-        specification: The project specification to plan
-        ai_agent: Optional AI agent to use for enhancement suggestions
-        
+        param: Description of the parameter
+
     Returns:
-        ArchitecturePlan object containing:
-            - diagram (Mermaid): Architecture diagram
-            - components: Identified components
-            - dependencies: Component relationships
-            - suggestions: AI enhancement suggestions
-            
+        Description of return value
+
     Raises:
-        SpecificationError: If spec is invalid
-        ArchitectureError: If architecture can't be determined
-        
-    Examples:
-        >>> plan = planit("REST API with microservices")
-        >>> print(plan.diagram)
-        >>> for comp in plan.components:
-        ...     print(f"{comp.name}: {comp.description}")
+        ValueError: When param is invalid
     """
 ```
-
-### Docstring Style
-
-We use Google-style docstrings. See [Google Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
 
 ### Comments
 
 ```python
 # For complex logic, explain the WHY, not the WHAT
-# The specification can auto-generate entity relationships by parsing
-# noun phrases, but we need semantic understanding to catch implicit
-# relationships (e.g., "User logs in" implies User <-> Auth Service)
-relationships = extract_semantic_relationships(spec)
+# Example: We cache this result because the operation is expensive
+# and the data rarely changes during a session
+cached_result = expensive_operation()
 ```
 
-## 🐛 Bug Reports
+## Bug Reports
 
 Found a bug? Please report it!
 
 ### Before Reporting
 
-1. Check [existing issues](https://github.com/doit-toolkit/doit/issues)
+1. Check [existing issues](https://github.com/seanbarlow/doit/issues)
 2. Test with the latest version
 3. Verify it's a DoIt bug, not a configuration issue
 
@@ -239,7 +207,7 @@ A clear description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Run command: `doit specit "..."`
+1. Run command: `doit init`
 2. Observe: ...
 3. Expected: ...
 
@@ -253,14 +221,14 @@ Steps to reproduce the behavior:
 Any other context about the problem.
 ```
 
-## 💡 Feature Requests
+## Feature Requests
 
 Have an idea for a new feature?
 
 ### Before Requesting
 
-1. Check [existing discussions](https://github.com/doit-toolkit/doit/discussions)
-2. Verify it aligns with [project roadmap](./ROADMAP.md)
+1. Check [existing issues](https://github.com/seanbarlow/doit/issues)
+2. Review the project roadmap in `.doit/memory/roadmap.md`
 3. Consider the scope and maintenance burden
 
 ### When Requesting
@@ -277,171 +245,100 @@ Other possible approaches.
 
 **Why should DoIt have this feature?**
 Who benefits? What problems does it solve?
-
-**Examples**
-Show usage examples.
 ```
 
-## 🔍 Code Review Process
+## Code Review Process
 
-1. **Automated Checks** - CI/CD runs tests, coverage, linting
+1. **Automated Checks** - CI runs tests
 2. **Peer Review** - At least one maintainer reviews code
 3. **Feedback** - Changes requested or approved
 4. **Merge** - Approved PRs are merged to main
 
 ### What We Look For
 
-- ✅ Tests included and passing
-- ✅ Documentation updated
-- ✅ Code follows style guidelines
-- ✅ Commit messages are clear
-- ✅ No breaking changes (or justified)
-- ✅ Performance acceptable
-- ✅ Security considered
+- Tests included and passing
+- Documentation updated (if applicable)
+- Code follows project conventions
+- Commit messages are clear
+- No breaking changes (or justified)
 
-### Helpful Review Comments
+## Pull Request Process
 
-When reviewing others' code:
-
-```
-# Good
-"This would be clearer as a generator since we iterate multiple times"
-
-# Bad
-"This is wrong"
-
----
-
-# Good
-"Have you considered caching this result? It might be slow for large specs"
-
-# Bad
-"This is inefficient"
-```
-
-## 📦 Pull Request Process
-
-1. **Create Branch** - From latest `main`
-2. **Make Changes** - Include tests and docs
+1. **Create Branch** - From latest `main` using numbered convention
+2. **Make Changes** - Include tests where applicable
 3. **Run Tests** - `pytest` passes locally
 4. **Commit** - Follow conventional commits
 5. **Push** - To your fork
-6. **Create PR** - Use the template (auto-filled)
+6. **Create PR** - Include description of changes
 7. **Address Review** - Respond to feedback
 8. **Merge** - Maintainer merges when approved
 
 ### PR Template
 
 ```markdown
-## Description
+## Summary
 Brief description of changes.
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+## Changes
+- Change 1
+- Change 2
+
+## Testing
+- [ ] Tests added/updated
+- [ ] All tests pass
 
 ## Related Issues
 Closes #123
-
-## Testing
-Describe testing done.
-
-## Checklist
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] No breaking changes
-- [ ] Code follows style guidelines
-- [ ] All tests pass
 ```
 
-## 🎯 Priority Areas for Contributions
+## Project Structure
 
-Looking for where to start? These areas need help:
+```
+doit/
+├── src/doit_cli/       # Main package source
+├── tests/              # Test files
+│   ├── unit/           # Unit tests
+│   └── integration/    # Integration tests
+├── templates/          # Template files for doit init
+├── .doit/              # DoIt configuration and templates
+│   ├── memory/         # Project memory (roadmap, constitution)
+│   ├── templates/      # Reference templates
+│   └── scripts/        # Helper scripts
+├── docs/               # Documentation
+│   └── features/       # Feature documentation
+└── specs/              # Feature specifications (gitignored)
+```
 
-### High Priority
+## Priority Areas for Contributions
 
-- **Diagram Enhancements** - New diagram types, better layout algorithms
-- **AI Integration** - Additional agent support (Claude, Llama, etc.)
-- **Performance** - Optimize for large projects (10k+ items)
-- **Windows Support** - Better Windows compatibility
-
-### Medium Priority
-
-- **Documentation** - Expand guides, add more examples
-- **Error Messages** - Make error messages more helpful
-- **Plugin System** - Allow custom commands
-- **Integrations** - GitHub, GitLab, Jira, Linear, etc.
+Looking for where to start?
 
 ### Good for First-Time Contributors
 
 - Documentation improvements
 - Test coverage expansion
 - Bug fixes with clear reproduction steps
-- Code style improvements
-- Small feature requests
+- Template improvements
 
-## 💬 Communication
+### Higher Priority
 
-### Before Starting Major Work
+- New `/doit.*` command enhancements
+- Better error messages
+- Cross-platform compatibility (Windows)
 
-For significant features or changes, please open a discussion first:
+## Getting Help
 
-```
-1. Create GitHub Issue or Discussion
-2. Describe the change you want to make
-3. Wait for maintainer feedback
-4. Start implementation after discussion
-```
+- **Questions & Issues** - [GitHub Issues](https://github.com/seanbarlow/doit/issues)
+- **Discussions** - [GitHub Discussions](https://github.com/seanbarlow/doit/discussions)
 
-This prevents duplicate work and ensures alignment.
-
-### Getting Help
-
-- **Questions** - [GitHub Discussions](https://github.com/doit-toolkit/doit/discussions)
-- **Chat** - [Discord Community](https://discord.gg/doit)
-- **Issues** - [GitHub Issues](https://github.com/doit-toolkit/doit/issues)
-
-## 📖 Resources
-
-- **[Architecture Guide](./docs/architecture.md)** - How DoIt works internally
-- **[Code Structure](./docs/code-structure.md)** - Where to find things
-- **[Adding Commands](./docs/adding-commands.md)** - How to add new commands
-- **[Testing Guide](./docs/testing-guide.md)** - How to write tests
-
-## 🎓 Learning Path for Contributors
-
-1. **Read** the main README and ARCHITECTURE
-2. **Explore** the codebase structure
-3. **Run** existing tests to understand patterns
-4. **Pick** a small issue and make a PR
-5. **Get** feedback and learn
-6. **Grow** to larger contributions
-
-## 🎖️ Recognition
-
-Contributors are recognized in:
-
-- **README.md** - All contributors listed
-- **CHANGELOG.md** - Feature/fix attributions
-- **Release Notes** - Special thanks to major contributors
-- **Website** - Contributors page on doit-toolkit.dev
-
-## ⚖️ Code of Conduct
+## Code of Conduct
 
 This project is committed to creating an inclusive, welcoming environment. See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
-## 📝 License
+## License
 
 By contributing, you agree that your contributions will be licensed under the same MIT license as the project.
 
-## ❓ Questions?
-
-- Ask in [GitHub Discussions](https://github.com/doit-toolkit/doit/discussions)
-- Chat in [Discord](https://discord.gg/doit)
-- Email [contributors@doit-toolkit.dev](mailto:contributors@doit-toolkit.dev)
-
 ---
 
-**Thank you for contributing to DoIt! 🙏**
+**Thank you for contributing to DoIt!**

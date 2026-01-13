@@ -10,3 +10,4 @@
 | Doit CLI Rename | 007-007-doit-cli-rename | 2026-01-10 | - |
 | Doit Roadmapit Command | 008-doit-roadmapit-command | 2026-01-10 | - |
 | Doit Documentit Command | 009-doit-documentit-command | 2026-01-10 | - |
+| Roadmap Template Cleanup | 017-roadmap-template-cleanup | 2026-01-13 | - |

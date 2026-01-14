@@ -1,10 +1,10 @@
-# DoIt Constitution
+# Do-It Constitution
 
 ## Purpose & Goals
 
 ### Project Purpose
 
-DoIt is a spec-driven development framework that enables teams to see their architecture before they build it. It provides an opinionated, AI-powered approach to specification-driven development with auto-generated diagrams, intelligent roadmapping, and persistent memory.
+Do-It is a spec-driven development framework that enables teams to see their architecture before they build it. It provides an opinionated, AI-powered approach to specification-driven development with auto-generated diagrams, intelligent roadmapping, and persistent memory.
 
 ### Success Criteria
 

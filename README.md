@@ -1,4 +1,11 @@
-# DoIt - Spec-Driven Development Framework
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="media/doit-logo-white.svg">
+    <img src="media/doit-logo-full-color.svg" alt="Do-It Framework Logo" width="200">
+  </picture>
+</div>
+
+# Do-It - Spec-Driven Development Framework
 
 <div align="center">
 
@@ -7,7 +14,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/doit-toolkit-cli.svg)](https://pypi.org/project/doit-toolkit-cli/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-**See your architecture before you build it.** DoIt is an opinionated, AI-powered framework for specification-driven development. Define specifications, auto-generate diagrams, create roadmaps, and build with confidence.
+**See your architecture before you build it.** Do-It is an opinionated, AI-powered framework for specification-driven development. Define specifications, auto-generate diagrams, create roadmaps, and build with confidence.
 
 [Quick Start](#quick-start) | [Documentation](https://github.com/seanbarlow/doit/tree/main/docs) | [Contributing](#contributing)
 
@@ -26,7 +33,7 @@
 - **Team-Focused** - Quality gates, code reviews, and collaborative workflows built-in
 - **Living Docs** - Automatically organized and indexed project documentation
 
-## The Problem DoIt Solves
+## The Problem Do-It Solves
 
 Most projects fail not from technical debt, but from **architectural debt** - decisions made early without full context. Teams struggle with:
 
@@ -37,7 +44,7 @@ Most projects fail not from technical debt, but from **architectural debt** - de
 - Teams working from different understandings of the same system
 - Manual diagram creation that becomes a chore
 
-**DoIt solves this by making specification and decision-making the foundation of development.**
+**Do-It solves this by making specification and decision-making the foundation of development.**
 
 ## Quick Start
 
@@ -70,9 +77,9 @@ This creates the `.doit/` folder structure with:
 - `templates/` - Spec, plan, and task templates
 - `scripts/` - Automation scripts (bash and PowerShell)
 
-### The DoIt Workflow (AI Agent Slash Commands)
+### The Do-It Workflow (AI Agent Slash Commands)
 
-DoIt provides slash commands for AI coding assistants like Claude Code:
+Do-It provides slash commands for AI coding assistants like Claude Code:
 
 ```markdown
 # 1. Define your project principles
@@ -124,7 +131,7 @@ DoIt provides slash commands for AI coding assistants like Claude Code:
 ```
 your-project/
 ├── README.md                    # Your project README
-├── .doit/                       # DoIt configuration (version control!)
+├── .doit/                       # Do-It configuration (version control!)
 │   ├── memory/
 │   │   ├── constitution.md      # Project principles
 │   │   ├── tech-stack.md        # Technology choices
@@ -149,7 +156,7 @@ your-project/
 
 ## Auto-Generated Diagrams
 
-DoIt automatically generates these diagram types from your specifications:
+Do-It automatically generates these diagram types from your specifications:
 
 - **User Journey** - How users interact with your system
 - **Architecture** - System components and boundaries
@@ -184,7 +191,7 @@ Because these files are in git:
 
 ## Documentation
 
-- [Installation Guide](docs/installation.md) - Getting started with DoIt
+- [Installation Guide](docs/installation.md) - Getting started with Do-It
 - [Quick Start Guide](docs/quickstart.md) - 5-minute tutorial
 - [Template System](docs/templates/index.md) - Understanding templates
 - [Command Reference](docs/templates/commands.md) - All slash commands explained
@@ -213,7 +220,7 @@ pytest
 
 ## License
 
-DoIt is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
+Do-It is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
 
 ## Reporting Issues
 
@@ -223,7 +230,7 @@ Found a bug? Have a feature request?
 - **[Discussions](https://github.com/seanbarlow/doit/discussions)** - Questions and ideas
 
 Please include:
-- DoIt version (`doit --version`)
+- Do-It version (`doit --version`)
 - Python version (`python --version`)
 - Operating system
 - Steps to reproduce (for bugs)
@@ -247,7 +254,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 
 <div align="center">
 
-Made with care by the DoIt community
+Made with care by the Do-It community
 
 [Star us on GitHub](https://github.com/seanbarlow/doit)
 

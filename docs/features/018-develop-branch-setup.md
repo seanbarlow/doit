@@ -6,7 +6,7 @@
 
 ## Overview
 
-Implemented a Gitflow-inspired branching strategy for the DoIt project by creating a `develop` branch as the default integration branch. The `main` branch is now reserved for production-ready releases, while `develop` serves as the primary target for feature branch merges.
+Implemented a Gitflow-inspired branching strategy for the Do-It project by creating a `develop` branch as the default integration branch. The `main` branch is now reserved for production-ready releases, while `develop` serves as the primary target for feature branch merges.
 
 ## Requirements Implemented
 

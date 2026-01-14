@@ -54,11 +54,11 @@ Please include as much of the following information as possible:
 5. **Disclosure**: We'll coordinate disclosure timing with you
 6. **Credit**: We'll credit you in the security advisory (unless you prefer anonymity)
 
-## Security Considerations for DoIt
+## Security Considerations for Do-It
 
-### What DoIt Does
+### What Do-It Does
 
-DoIt is a CLI tool that:
+Do-It is a CLI tool that:
 
 - Reads and writes files in the project directory
 - Copies templates to initialize projects
@@ -68,7 +68,7 @@ DoIt is a CLI tool that:
 
 #### File System Operations
 
-- DoIt operates within the current working directory
+- Do-It operates within the current working directory
 - Template files are copied from the package installation
 - No network requests are made by default
 
@@ -115,4 +115,4 @@ We thank the security researchers who have responsibly disclosed vulnerabilities
 
 ---
 
-Thank you for helping keep DoIt and its users safe!
+Thank you for helping keep Do-It and its users safe!

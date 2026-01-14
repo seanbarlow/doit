@@ -1,6 +1,6 @@
-# Contributing to DoIt
+# Contributing to Do-It
 
-Thank you for considering contributing to DoIt! We appreciate your interest in making this project better. This document provides guidelines and instructions for contributing.
+Thank you for considering contributing to Do-It! We appreciate your interest in making this project better. This document provides guidelines and instructions for contributing.
 
 ## Our Values
 
@@ -48,7 +48,7 @@ Branch naming convention:
 
 ## Development Workflow
 
-### Using DoIt Commands (Spec-Driven Development)
+### Using Do-It Commands (Spec-Driven Development)
 
 This project uses spec-driven development with the `/doit.*` slash commands in Claude Code:
 
@@ -196,7 +196,7 @@ Found a bug? Please report it!
 
 1. Check [existing issues](https://github.com/seanbarlow/doit/issues)
 2. Test with the latest version
-3. Verify it's a DoIt bug, not a configuration issue
+3. Verify it's a Do-It bug, not a configuration issue
 
 ### When Reporting
 
@@ -213,7 +213,7 @@ Steps to reproduce the behavior:
 3. Expected: ...
 
 **Environment**
-- DoIt version: `doit --version`
+- Do-It version: `doit --version`
 - Python version: `python --version`
 - OS: Windows/Mac/Linux
 - Shell: bash/zsh/powershell
@@ -244,7 +244,7 @@ How should it work?
 **Describe alternatives you've considered**
 Other possible approaches.
 
-**Why should DoIt have this feature?**
+**Why should Do-It have this feature?**
 Who benefits? What problems does it solve?
 ```
 
@@ -335,7 +335,7 @@ doit/
 │   ├── unit/           # Unit tests
 │   └── integration/    # Integration tests
 ├── templates/          # Template files for doit init
-├── .doit/              # DoIt configuration and templates
+├── .doit/              # Do-It configuration and templates
 │   ├── memory/         # Project memory (roadmap, constitution)
 │   ├── templates/      # Reference templates
 │   └── scripts/        # Helper scripts
@@ -376,4 +376,4 @@ By contributing, you agree that your contributions will be licensed under the sa
 
 ---
 
-**Thank you for contributing to DoIt!**
+**Thank you for contributing to Do-It!**

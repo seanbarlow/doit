@@ -1,7 +1,7 @@
 # Project Roadmap
 
-**Project**: DoIt
-**Last Updated**: 2026-01-10
+**Project**: Do-It
+**Last Updated**: 2026-01-14
 **Managed by**: `/doit.roadmapit`
 
 ## Vision

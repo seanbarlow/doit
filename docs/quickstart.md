@@ -1,16 +1,16 @@
 # Quick Start Guide
 
-This guide will help you get started with Spec-Driven Development using DoIt.
+This guide will help you get started with Spec-Driven Development using Do-It.
 
 > [!NOTE]
 > All automation scripts provide both Bash (`.sh`) and PowerShell (`.ps1`) variants. The `doit` CLI auto-selects based on OS unless you pass `--script sh|ps`.
 
-## The DoIt Workflow
+## The Do-It Workflow
 
 > [!TIP]
-> **Context Awareness**: DoIt commands automatically detect the active feature based on your current Git branch (e.g., `001-feature-name`). To switch between different specifications, simply switch Git branches.
+> **Context Awareness**: Do-It commands automatically detect the active feature based on your current Git branch (e.g., `001-feature-name`). To switch between different specifications, simply switch Git branches.
 
-### Step 1: Install DoIt
+### Step 1: Install Do-It
 
 **In your terminal**, run the `doit` CLI command to initialize your project:
 
@@ -193,7 +193,7 @@ The plan will include:
 
 | Command | Purpose | When to Use |
 | ------- | ------- | ----------- |
-| `doit init` | Initialize DoIt in a project | Once per project |
+| `doit init` | Initialize Do-It in a project | Once per project |
 | `/doit.constitution` | Define project principles | After init, or to update |
 | `/doit.scaffoldit` | Generate project structure | Greenfield projects only |
 | `/doit.specit` | Create feature specification | Start of each feature |
@@ -216,6 +216,6 @@ The plan will include:
 ## Next Steps
 
 - Follow the [Greenfield Tutorial](./tutorials/01-greenfield-tutorial.md) for a complete walkthrough
-- Follow the [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) to add DoIt to existing code
+- Follow the [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) to add Do-It to existing code
 - Read the [complete methodology](./index.md) for in-depth guidance
 - Explore the [source code on GitHub](https://github.com/seanbarlow/doit)

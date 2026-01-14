@@ -1,4 +1,8 @@
-# DoIt
+<div align="center">
+  <img src="../media/doit-logo-full-color.svg" alt="Do-It Framework Logo" width="200">
+</div>
+
+# Do-It
 
 *Build high-quality software faster.*
 

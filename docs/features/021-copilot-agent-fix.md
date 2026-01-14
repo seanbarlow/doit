@@ -6,7 +6,7 @@
 
 ## Overview
 
-Updated DoIt's GitHub Copilot prompt files (`.prompt.md`) to use the current (non-deprecated) YAML frontmatter specification. Changed the deprecated `mode: agent` attribute to `agent: true` across all prompt files, ensuring compatibility with VS Code 1.106+ and the current GitHub Copilot prompt file specification.
+Updated Do-It's GitHub Copilot prompt files (`.prompt.md`) to use the current (non-deprecated) YAML frontmatter specification. Changed the deprecated `mode: agent` attribute to `agent: true` across all prompt files, ensuring compatibility with VS Code 1.106+ and the current GitHub Copilot prompt file specification.
 
 ## Requirements Implemented
 

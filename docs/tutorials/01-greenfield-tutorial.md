@@ -1,6 +1,6 @@
-# Tutorial 1: Building a Greenfield Project with DoIt
+# Tutorial 1: Building a Greenfield Project with Do-It
 
-Learn the complete DoIt spec-driven development workflow by building a TaskFlow CLI application from scratch.
+Learn the complete Do-It spec-driven development workflow by building a TaskFlow CLI application from scratch.
 
 ## What You'll Build
 
@@ -10,9 +10,9 @@ Learn the complete DoIt spec-driven development workflow by building a TaskFlow 
 - Store tasks in a local JSON file
 
 By the end of this tutorial, you'll have:
-- A fully initialized DoIt project
+- A fully initialized Do-It project
 - A project constitution defining your development principles
-- A complete feature implemented using the DoIt workflow
+- A complete feature implemented using the Do-It workflow
 - GitHub issues and a pull request (optional)
 
 ## Time Estimate
@@ -29,9 +29,9 @@ By the end of this tutorial, you'll have:
 | Implementation | 30 min |
 | Review & Completion | 10 min |
 
-## DoIt Workflow Overview
+## Do-It Workflow Overview
 
-This tutorial follows the complete DoIt spec-driven development workflow:
+This tutorial follows the complete Do-It spec-driven development workflow:
 
 ```mermaid
 flowchart LR
@@ -91,9 +91,9 @@ Before starting, ensure you have:
 
 ## Section 1: Installation
 
-### Step 1.1: Install DoIt CLI
+### Step 1.1: Install Do-It CLI
 
-Open your terminal and install DoIt using pip:
+Open your terminal and install Do-It using pip:
 
 ```bash
 pip install doit-cli
@@ -101,7 +101,7 @@ pip install doit-cli
 
 ### Step 1.2: Verify Installation
 
-Confirm DoIt is installed correctly:
+Confirm Do-It is installed correctly:
 
 ```bash
 doit --version
@@ -115,17 +115,17 @@ doit-cli version 0.1.3
 
 ### Step 1.3: Verify Claude Code
 
-Ensure Claude Code is available in your IDE. DoIt's slash commands (like `/doit.specit`) run inside Claude Code.
+Ensure Claude Code is available in your IDE. Do-It's slash commands (like `/doit.specit`) run inside Claude Code.
 
 > **Tip**: If you're using VS Code, install the Claude Code extension from the marketplace.
 
-**Checkpoint**: DoIt CLI installed and Claude Code ready.
+**Checkpoint**: Do-It CLI installed and Claude Code ready.
 
 ---
 
 ## Section 2: Project Initialization
 
-Let's create a new project and initialize DoIt.
+Let's create a new project and initialize Do-It.
 
 ### Step 2.1: Create Project Directory
 
@@ -137,7 +137,7 @@ git init
 
 ### Step 2.2: Run doit init
 
-Initialize DoIt in your project:
+Initialize Do-It in your project:
 
 ```bash
 doit init
@@ -148,7 +148,7 @@ You'll see an interactive prompt:
 ```text
 $ doit init
 
-Welcome to DoIt! Let's set up your project.
+Welcome to Do-It! Let's set up your project.
 
 Project name [taskflow-cli]: taskflow-cli
 Project description: A command-line task management application
@@ -157,13 +157,13 @@ Project type (cli/web/api/library) [cli]: cli
 Use GitHub integration? [Y/n]: Y
 GitHub repository URL (leave blank to create later):
 
-Creating DoIt configuration...
+Creating Do-It configuration...
 ✓ Created .doit/ directory
 ✓ Created .doit/constitution.md (template)
 ✓ Created .doit/roadmap.md (template)
 ✓ Initialized specs/ directory
 
-DoIt initialized successfully!
+Do-It initialized successfully!
 
 Next steps:
   1. Run /doit.constitution to define your project principles
@@ -172,7 +172,7 @@ Next steps:
 
 ### Step 2.3: Review Created Files
 
-Check what DoIt created:
+Check what Do-It created:
 
 ```bash
 ls -la .doit/
@@ -182,13 +182,13 @@ ls -la .doit/
 .doit/
 ├── constitution.md    # Project principles (template)
 ├── roadmap.md         # Project roadmap (template)
-└── templates/         # DoIt templates
+└── templates/         # Do-It templates
     ├── spec-template.md
     ├── plan-template.md
     └── ...
 ```
 
-**Checkpoint**: DoIt initialized with configuration files created.
+**Checkpoint**: Do-It initialized with configuration files created.
 
 ---
 
@@ -414,7 +414,7 @@ Commands:
 
 ## Section 5: Feature Specification
 
-Now let's add a new feature using the DoIt spec-driven workflow. We'll add **task priority levels**.
+Now let's add a new feature using the Do-It spec-driven workflow. We'll add **task priority levels**.
 
 ### Step 5.1: Run /doit.specit
 
@@ -1110,7 +1110,7 @@ Feature 001-task-priority is ready for merge!
 - Files changed: 7
 ```
 
-> **Without GitHub**: If you're not using GitHub integration, DoIt will still create commits and provide instructions for manual PR creation.
+> **Without GitHub**: If you're not using GitHub integration, Do-It will still create commits and provide instructions for manual PR creation.
 
 **Checkpoint**: Feature complete with PR ready for merge.
 
@@ -1118,7 +1118,7 @@ Feature 001-task-priority is ready for merge!
 
 ## Section 11: Bonus - Running Tests
 
-DoIt can help you run and manage tests.
+Do-It can help you run and manage tests.
 
 ### Step 11.1: Run /doit.testit
 
@@ -1149,7 +1149,7 @@ All tests passing!
 
 ## Section 12: Bonus - Managing the Roadmap
 
-DoIt helps you track features and plan future work.
+Do-It helps you track features and plan future work.
 
 ### Step 12.1: Run /doit.roadmapit
 
@@ -1190,7 +1190,7 @@ Roadmap saved to .doit/roadmap.md
 
 ## Section 13: Summary
 
-Congratulations! You've completed your first feature using the DoIt workflow.
+Congratulations! You've completed your first feature using the Do-It workflow.
 
 ### What You Accomplished
 
@@ -1204,7 +1204,7 @@ Congratulations! You've completed your first feature using the DoIt workflow.
 8. **Reviewed** the code with `/doit.reviewit`
 9. **Completed** the feature with `/doit.checkin`
 
-### The DoIt Workflow
+### The Do-It Workflow
 
 ```mermaid
 flowchart LR
@@ -1230,17 +1230,17 @@ flowchart LR
 - **Try another feature**: Run `/doit.specit` with a new idea
 - **Explore existing projects**: See [Tutorial 2: Existing Project](02-existing-project-tutorial.md)
 - **Customize templates**: Check `.doit/templates/` for customization options
-- **Read the docs**: Visit the [DoIt Documentation](../index.md)
+- **Read the docs**: Visit the [Do-It Documentation](../index.md)
 
 ### Troubleshooting Tips
 
 | Problem | Solution |
 |---------|----------|
-| Command not found | Ensure DoIt is installed: `pip install doit-cli` |
+| Command not found | Ensure Do-It is installed: `pip install doit-cli` |
 | Slash command doesn't work | Make sure you're in Claude Code, not terminal |
 | GitHub issues not created | Check `--skip-issues` flag or GitHub authentication |
 | Tests failing | Run `/doit.testit` to see detailed output |
 
 ---
 
-**You've completed Tutorial 1!** You now know how to use DoIt for greenfield projects.
+**You've completed Tutorial 1!** You now know how to use Do-It for greenfield projects.

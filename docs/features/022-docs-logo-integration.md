@@ -2,7 +2,7 @@
 
 **Completed**: 2026-01-14
 **Branch**: `022-docs-logo-integration`
-**PR**: Pending
+**PR**: #147
 
 ## Overview
 

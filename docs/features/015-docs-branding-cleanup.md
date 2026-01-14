@@ -6,17 +6,17 @@
 
 ## Overview
 
-Clean up all documentation files to remove legacy "Spec Kit" and "specify" branding references, replacing them with correct "DoIt" and "doit" branding. Updated all AI agent references to reflect the officially supported agents: Claude and GitHub Copilot only (removing references to Gemini, Codebuddy, and other unsupported agents).
+Clean up all documentation files to remove legacy "Spec Kit" and "specify" branding references, replacing them with correct "Do-It" and "doit" branding. Updated all AI agent references to reflect the officially supported agents: Claude and GitHub Copilot only (removing references to Gemini, Codebuddy, and other unsupported agents).
 
 ## Requirements Implemented
 
 | ID | Description | Status |
 |----|-------------|--------|
-| FR-001 | Replace "Spec Kit" with "DoIt" (proper noun) | Done |
+| FR-001 | Replace "Spec Kit" with "Do-It" (proper noun) | Done |
 | FR-002 | Replace "spec-kit" with "doit" in package/repo names | Done |
 | FR-003 | Replace "specify" CLI command with "doit" | Done |
 | FR-004 | Replace "specify-cli" with "doit-toolkit-cli" in package names | Done |
-| FR-005 | Update docfx.json metadata to reference "DoIt" | Done |
+| FR-005 | Update docfx.json metadata to reference "Do-It" | Done |
 | FR-006 | Replace "github.com/github/spec-kit" with "github.com/seanbarlow/doit" | Done |
 | FR-007 | Replace "github.github.io/spec-kit" with "seanbarlow.github.io/doit" | Done |
 | FR-008 | Update docfx.json `_gitContribute.repo` URL | Done |
@@ -70,7 +70,7 @@ N/A - Documentation-only feature
 |------|--------|
 | MT-001: Commands in upgrade.md use correct CLI names | PASS |
 | MT-002: Zero results for "spec-kit" or "Spec Kit" | PASS |
-| MT-003: docfx.json references "DoIt" and correct GitHub URLs | PASS |
+| MT-003: docfx.json references "Do-It" and correct GitHub URLs | PASS |
 | MT-004: Zero results for "github/spec-kit" | PASS |
 | MT-005: installation.md shows only Claude and GitHub Copilot | PASS |
 | MT-006: Zero results for "gemini" | PASS |

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .doit-block-dark { fill: #0d9488; stroke: #06543a; stroke-width: 2; }
+      .doit-block-mid { fill: #14b8a6; stroke: #0d7377; stroke-width: 2; }
+      .doit-block-light { fill: #2dd4c0; stroke: #0d9488; stroke-width: 2; }
+      .doit-checkmark { stroke: white; stroke-width: 3; stroke-linecap: round; fill: none; }
+      .doit-connector { stroke: #0d9488; stroke-width: 1; stroke-dasharray: 2,2; opacity: 0.4; }
+    </style>
+  </defs>
+  
+  <!-- Primary Logo (Full Color) -->
+  <g id="doit-logo-full">
+    <!-- Left block (darker teal) -->
+    <rect x="50" y="65" width="40" height="40" class="doit-block-dark" rx="3"/>
+    
+    <!-- Bottom block (medium teal) -->
+    <rect x="65" y="100" width="40" height="40" class="doit-block-mid" rx="3"/>
+    
+    <!-- Right block (lighter teal with checkmark) -->
+    <rect x="105" y="70" width="40" height="40" class="doit-block-light" rx="3"/>
+    
+    <!-- Checkmark on right block -->
+    <g class="doit-checkmark">
+      <polyline points="115,90 125,100 140,80"/>
+    </g>
+    
+    <!-- Subtle connecting lines -->
+    <line x1="90" y1="85" x2="105" y2="85" class="doit-connector"/>
+  </g>
+</svg>

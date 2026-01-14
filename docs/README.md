@@ -1,6 +1,6 @@
 # Documentation
 
-This folder contains the documentation source files for DoIt, built using GitHub Pages with MkDocs.
+This folder contains the documentation source files for Do-It, built using GitHub Pages with MkDocs.
 
 ## Building Locally
 

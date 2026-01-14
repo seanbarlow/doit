@@ -1,6 +1,6 @@
 # Support
 
-Looking for help with DoIt? This document will guide you to the right resources.
+Looking for help with Do-It? This document will guide you to the right resources.
 
 ## Documentation
 
@@ -51,7 +51,7 @@ When reporting an issue, please include:
 
 ```markdown
 **Environment**
-- DoIt version: (run `doit --version`)
+- Do-It version: (run `doit --version`)
 - Python version: (run `python --version`)
 - Operating system:
 
@@ -108,11 +108,11 @@ This is an open source project maintained by volunteers. Please be patient.
 
 ## Commercial Support
 
-There is no commercial support available for DoIt at this time. The project is maintained as open source.
+There is no commercial support available for Do-It at this time. The project is maintained as open source.
 
 ## Contributing
 
-The best way to support DoIt is to contribute! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+The best way to support Do-It is to contribute! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 - How to set up a development environment
 - Coding guidelines
@@ -124,4 +124,4 @@ Please be respectful in all interactions. See [CODE_OF_CONDUCT.md](CODE_OF_CONDU
 
 ---
 
-Thank you for using DoIt!
+Thank you for using Do-It!

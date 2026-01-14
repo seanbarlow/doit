@@ -1,13 +1,13 @@
-# Tutorial 2: Adding DoIt to an Existing Project
+# Tutorial 2: Adding Do-It to an Existing Project
 
-Learn how to integrate DoIt into an existing codebase and add new features using spec-driven development.
+Learn how to integrate Do-It into an existing codebase and add new features using spec-driven development.
 
 ## What You'll Learn
 
 This tutorial shows you how to:
-- Add DoIt to a project that already has code
+- Add Do-It to a project that already has code
 - Create a constitution that reflects your existing patterns
-- Use the DoIt workflow alongside your current development process
+- Use the Do-It workflow alongside your current development process
 - Know which commands to skip or adapt for existing projects
 
 **Sample Project**: We'll use a Weather API (Flask/FastAPI) as our example, but the concepts apply to any existing project.
@@ -70,7 +70,7 @@ flowchart TD
 Before starting, ensure you have:
 
 - [ ] **An existing project** (or clone the sample Weather API)
-- [ ] **DoIt CLI installed** (`pip install doit-cli`)
+- [ ] **Do-It CLI installed** (`pip install doit-cli`)
 - [ ] **Git initialized** in your project (`git status` works)
 - [ ] **Claude Code** or compatible AI IDE
 
@@ -106,24 +106,24 @@ weather-api/
 
 ## Section 1: Preparing Your Project
 
-Before adding DoIt, let's prepare your existing codebase.
+Before adding Do-It, let's prepare your existing codebase.
 
 ### Step 1.1: Create a Backup (Recommended)
 
-While DoIt doesn't modify your existing code during initialization, it's good practice to have a clean state:
+While Do-It doesn't modify your existing code during initialization, it's good practice to have a clean state:
 
 ```bash
 git status  # Ensure working directory is clean
 git stash   # Or commit any pending changes
 ```
 
-### Step 1.2: Understand What DoIt Will Add
+### Step 1.2: Understand What Do-It Will Add
 
-DoIt will create these new files/directories:
+Do-It will create these new files/directories:
 
 ```text
 your-project/
-├── .doit/                 # NEW: DoIt configuration
+├── .doit/                 # NEW: Do-It configuration
 │   ├── constitution.md    # Project principles
 │   ├── roadmap.md         # Feature roadmap
 │   └── templates/         # Spec templates
@@ -131,7 +131,7 @@ your-project/
 └── (your existing files remain unchanged)
 ```
 
-> **Important**: DoIt never modifies your existing source code during initialization. It only adds new directories for specifications and configuration.
+> **Important**: Do-It never modifies your existing source code during initialization. It only adds new directories for specifications and configuration.
 
 ### Step 1.3: Review Your Project Structure
 
@@ -150,7 +150,7 @@ You'll use this information when setting up the constitution.
 
 ## Section 2: Initialization
 
-Now let's initialize DoIt in your existing project.
+Now let's initialize Do-It in your existing project.
 
 ### Step 2.1: Run doit init
 
@@ -165,7 +165,7 @@ You'll see prompts tailored for existing projects:
 ```text
 $ doit init
 
-Welcome to DoIt! Let's set up your project.
+Welcome to Do-It! Let's set up your project.
 
 I detected this is an existing project with:
 - Python source code in src/weather/
@@ -179,13 +179,13 @@ Project type (cli/web/api/library) [api]: api
 Use GitHub integration? [Y/n]: Y
 GitHub repository URL: https://github.com/myorg/weather-api
 
-Creating DoIt configuration...
+Creating Do-It configuration...
 ✓ Created .doit/ directory
 ✓ Created .doit/constitution.md (template)
 ✓ Created .doit/roadmap.md (template)
 ✓ Initialized specs/ directory
 
-DoIt initialized successfully!
+Do-It initialized successfully!
 
 Since this is an existing project, your next steps are:
   1. Run /doit.constitution to document your existing patterns
@@ -195,7 +195,7 @@ Since this is an existing project, your next steps are:
 
 ### Step 2.2: Key Difference - Skip Scaffolding
 
-Notice that DoIt recognizes this is an existing project and suggests **skipping** `/doit.scaffoldit`. This is because:
+Notice that Do-It recognizes this is an existing project and suggests **skipping** `/doit.scaffoldit`. This is because:
 
 - You already have a project structure
 - Scaffolding would create conflicting files
@@ -203,7 +203,7 @@ Notice that DoIt recognizes this is an existing project and suggests **skipping*
 
 > **When to use scaffoldit on existing projects**: Only if you want to add a new, independent module that doesn't exist yet (e.g., adding a new microservice to a monorepo).
 
-**Checkpoint**: DoIt initialized without modifying existing code.
+**Checkpoint**: Do-It initialized without modifying existing code.
 
 ---
 
@@ -324,7 +324,7 @@ src/weather/
 - **Tests**: pytest in tests/ directory
 ```
 
-> **Key Insight**: The constitution documents what IS, not what SHOULD BE. This helps DoIt generate code that matches your existing patterns.
+> **Key Insight**: The constitution documents what IS, not what SHOULD BE. This helps Do-It generate code that matches your existing patterns.
 
 **Checkpoint**: Constitution created reflecting existing project patterns.
 
@@ -332,7 +332,7 @@ src/weather/
 
 ## Section 4: Adding a New Feature
 
-Now let's add a feature using the DoIt workflow. We'll add **weather alerts** to our API.
+Now let's add a feature using the Do-It workflow. We'll add **weather alerts** to our API.
 
 ### Step 4.1: Run /doit.specit
 
@@ -636,7 +636,7 @@ Feature complete!
 
 ## Section 5: Key Differences from Greenfield
 
-Here's what's different when using DoIt with existing projects:
+Here's what's different when using Do-It with existing projects:
 
 ### Commands to Skip
 
@@ -662,7 +662,7 @@ Here's what's different when using DoIt with existing projects:
 
 ### Pattern Matching
 
-DoIt will analyze your existing code to ensure new features:
+Do-It will analyze your existing code to ensure new features:
 - Follow your established file organization
 - Use your existing naming conventions
 - Match your code style and formatting
@@ -684,11 +684,11 @@ Only use `/doit.scaffoldit` if you're adding a completely new, independent compo
 
 ## Section 6: Common Scenarios
 
-### Scenario 1: Different Structure Than DoIt Expects
+### Scenario 1: Different Structure Than Do-It Expects
 
 **Problem**: Your project uses `app/` instead of `src/`.
 
-**Solution**: DoIt detects your actual structure:
+**Solution**: Do-It detects your actual structure:
 
 ```text
 $ /doit.constitution
@@ -701,7 +701,7 @@ I'll update the constitution to reflect this.
 
 **Problem**: Your project doesn't have tests yet.
 
-**Solution**: DoIt will ask if you want to add testing:
+**Solution**: Do-It will ask if you want to add testing:
 
 ```text
 $ /doit.constitution
@@ -723,7 +723,7 @@ Your choice: A
 ```text
 $ doit init --service backend
 
-Initializing DoIt for backend/ service only.
+Initializing Do-It for backend/ service only.
 Other services (frontend/, mobile/) will be unaffected.
 ```
 
@@ -751,15 +751,15 @@ Other services (frontend/, mobile/) will be unaffected.
 
 ### What You Accomplished
 
-1. **Prepared** your existing project for DoIt integration
-2. **Initialized** DoIt without modifying existing code
+1. **Prepared** your existing project for Do-It integration
+2. **Initialized** Do-It without modifying existing code
 3. **Created** a constitution documenting your patterns
 4. **Added** a new feature using spec-driven development
 5. **Verified** the new code matches existing patterns
 
 ### Key Takeaways
 
-1. **DoIt adapts to you** - It documents your patterns, not prescribes new ones
+1. **Do-It adapts to you** - It documents your patterns, not prescribes new ones
 2. **Skip scaffoldit** - Your structure already exists
 3. **Constitution reflects reality** - Document what IS, not what SHOULD BE
 4. **Pattern matching** - New code follows your existing conventions
@@ -794,17 +794,17 @@ flowchart TB
 
 | Problem | Solution |
 |---------|----------|
-| DoIt creates wrong file structure | Update constitution with correct paths |
+| Do-It creates wrong file structure | Update constitution with correct paths |
 | Generated code doesn't match style | Review constitution quality standards |
 | Can't skip scaffoldit | Use `doit init --skip-scaffold` flag |
 | Existing tests break | Check test configuration in constitution |
 
 ---
 
-**You've completed Tutorial 2!** You now know how to integrate DoIt into existing projects.
+**You've completed Tutorial 2!** You now know how to integrate Do-It into existing projects.
 
 ## Related Resources
 
 - [Tutorial 1: Greenfield Project](01-greenfield-tutorial.md)
-- [DoIt Documentation](../index.md)
+- [Do-It Documentation](../index.md)
 - [Command Reference](../quickstart.md)

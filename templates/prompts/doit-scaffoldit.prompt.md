@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: true
 description: Generate project folder structure and starter files based on tech stack
 ---
 

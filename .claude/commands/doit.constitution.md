@@ -28,7 +28,7 @@ Follow this execution flow:
 
 1. **Directories to EXCLUDE** (any path starting with `.`):
    - `.git` - Git version control
-   - `.doit` - DoIt configuration (EXCEPTION: `.doit/memory/constitution.md` is the target file)
+   - `.doit` - Do-It configuration (EXCEPTION: `.doit/memory/constitution.md` is the target file)
    - `.vscode` - VS Code settings
    - `.idea` - JetBrains IDE settings
    - `.env` - Environment variable files

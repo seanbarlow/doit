@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-15 (added template context injection)
+**Last Updated**: 2026-01-15
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -27,11 +27,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Eliminates duplicate templates, simplifies maintenance
   - **Feature**: `[024-unified-templates]`
 
-- [ ] Template context injection (command-level integration)
-  - **Rationale**: Add instructions to command templates to load project context via `doit context show`, completing the context injection workflow
-  - **Related**: `[026-ai-context-injection]` infrastructure
-  - **Approach**: Modify templates to include "Load project context" step that calls CLI before executing
-
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
@@ -51,6 +46,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Automatic Mermaid diagram generation from specs
   - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
+
+- [x] AI context injection for commands
+  - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
+  - **Feature**: `[026-ai-context-injection]`, `[027-template-context-injection]`
 
 - [ ] Spec status dashboard command (`doit status`)
   - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits

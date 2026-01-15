@@ -8,11 +8,27 @@ Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json --require-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
 
-2. **Load review context** (FR-023):
+2. **Load review context**:
    - **REQUIRED**: Read spec.md for requirements and acceptance criteria
    - **REQUIRED**: Read plan.md for technical decisions and architecture
    - **REQUIRED**: Read tasks.md for implementation details and file paths
@@ -25,7 +41,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Build list of files to review
    - Group files by category: models, services, endpoints, tests, config
 
-4. **Execute code review** against requirements (FR-024):
+4. **Execute code review** against requirements:
    - For each implemented file:
      - Read file contents
      - Compare against relevant spec requirements
@@ -65,7 +81,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Recommendations: [list]
    ```
 
-6. **Extract manual test items** from spec.md (FR-025):
+6. **Extract manual test items** from spec.md:
    - Parse acceptance criteria/scenarios from spec
    - Extract testable items that require manual verification
    - Items typically marked as "Given/When/Then" or acceptance criteria
@@ -75,7 +91,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Expected outcome
      - Prerequisites (if any)
 
-7. **Present manual tests sequentially** (FR-026):
+7. **Present manual tests sequentially**:
    - For each manual test:
 
      ```text
@@ -101,7 +117,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Wait for user response before proceeding to next test
    - Track results in memory
 
-8. **Track test progress** (FR-026):
+8. **Track test progress**:
    - Maintain running tally:
 
      ```text
@@ -114,7 +130,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Display after each test completion
 
-9. **Collect sign-off** (FR-027):
+9. **Collect sign-off**:
    - After all manual tests complete, present summary:
 
      ```text
@@ -191,7 +207,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
     After collecting all review data, generate visual quality dashboards:
 
-    a. **Finding Distribution Pie Chart** (FR-011):
+    a. **Finding Distribution Pie Chart**:
        - Count findings by severity (Critical, Major, Minor, Info)
        - Generate pie chart showing distribution
        - Add to review-report.md in Quality Overview section
@@ -220,7 +236,7 @@ You **MUST** consider the user input before proceeding (if not empty).
        <!-- END:AUTO-GENERATED -->
        ~~~
 
-    b. **Test Results Visualization** (FR-012):
+    b. **Test Results Visualization**:
        - Count test results by status (Passed, Failed, Skipped, Blocked)
        - Generate pie chart showing test outcomes
        - Add to review-report.md in Manual Testing Summary section
@@ -268,3 +284,61 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Present manual tests one at a time, wait for response
 - Generate review-report.md even if some tests are skipped
 - Include timestamps for audit trail
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (review approved, no critical issues)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ● reviewit → ○ checkin │
+└───────────────────────────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.checkin` to finalize and merge your changes.
+```
+
+### On Issues Found (changes requested)
+
+If the review found issues that need to be addressed:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ◐ reviewit → ○ checkin │
+└───────────────────────────────────────────────────────────────────────────────────┘
+
+**Status**: [N] critical, [M] major issues found.
+
+**Recommended**: Run `/doit.implementit` to address the review feedback.
+
+After fixing issues, run `/doit.reviewit` again to verify.
+```
+
+### On Error (missing prerequisites)
+
+If required files are missing:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: Required files for review are missing.
+
+**Recommended**: Run `/doit.implementit` to complete the implementation first.
+```

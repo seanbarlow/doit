@@ -62,7 +62,7 @@ uvx doit-toolkit-cli init <project_name> --ai claude --ignore-agent-tools
 
 ## Verification
 
-After initialization, you should see the following commands available in your AI agent:
+After initialization, you should see the following slash commands available in your AI agent:
 
 - `/doit.constitution` - Create or update project constitution
 - `/doit.scaffoldit` - Generate project folder structure and starter files
@@ -75,6 +75,21 @@ After initialization, you should see the following commands available in your AI
 - `/doit.reviewit` - Review code for quality and completeness
 - `/doit.checkin` - Finalize features and create pull requests
 - `/doit.roadmapit` - Create or update project roadmap
+
+You can also verify CLI commands work by running:
+
+```bash
+doit --help
+```
+
+This should show available CLI commands including:
+
+- `doit init` - Initialize Do-It in a project
+- `doit verify` - Verify project structure
+- `doit sync-prompts` - Sync templates to AI agents
+- `doit context show` - Display loaded project context
+- `doit hooks install` - Install git hooks for workflow enforcement
+- `doit hooks validate` - Validate branch meets requirements
 
 The `.doit/scripts` directory will contain both `.sh` and `.ps1` scripts.
 

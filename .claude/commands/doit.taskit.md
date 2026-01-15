@@ -19,6 +19,22 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
@@ -56,7 +72,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    After generating the task list, create visual diagrams to show execution order and timelines:
 
-   a. **Task Dependencies Flowchart** (FR-008):
+   a. **Task Dependencies Flowchart**:
       - Parse all generated tasks and their dependencies
       - Identify parallel tasks (marked with [P])
       - Group tasks by phase using subgraphs
@@ -86,7 +102,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           T004 & T005 --> T006
       ```
 
-   b. **Phase Timeline Gantt Chart** (FR-009):
+   b. **Phase Timeline Gantt Chart**:
       - Extract phases and their task counts
       - Estimate duration based on task complexity (1 task ≈ 0.5-1 day)
       - Generate gantt chart showing phase timeline
@@ -114,7 +130,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           Cross-cutting concerns    :e1, after d1, 1d
       ```
 
-   c. **Parallel Task Detection** (FR-010):
+   c. **Parallel Task Detection**:
       - Scan all tasks for [P] markers
       - Group consecutive parallel tasks for diagram optimization
       - In flowchart: Connect parallel tasks with `&` syntax
@@ -134,8 +150,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
-7. **GitHub Issue Integration** (FR-050):
-   - Check for `--skip-issues` in $ARGUMENTS - if present, skip issue creation (FR-021)
+7. **GitHub Issue Integration**:
+   - Check for `--skip-issues` in $ARGUMENTS - if present, skip issue creation
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found and not skipped:
      - For each generated task, create a GitHub Task issue using the task.yml template
@@ -143,7 +159,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Link Task issues to parent Feature using "Part of Feature #XXX" in body
      - Add phase label (e.g., "Phase 3 - Core Implementation")
      - Add effort estimate if extractable from task description
-   - If GitHub unavailable or API fails: Log warning and continue without issues (FR-022)
+   - If GitHub unavailable or API fails: Log warning and continue without issues
    - Report: Number of issues created, any linking errors
 
 Context for task generation: $ARGUMENTS
@@ -221,3 +237,68 @@ Every task MUST strictly follow this format:
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (tasks generated)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ● taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.implementit` to start executing the implementation tasks.
+```
+
+### On Error (missing plan.md)
+
+If the command fails because plan.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No implementation plan found. The taskit command requires plan.md to exist.
+
+**Recommended**: Run `/doit.planit` to create an implementation plan first.
+```
+
+### On Error (missing spec.md)
+
+If the command fails because spec.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No feature specification found.
+
+**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
+```
+
+### On Error (other issues)
+
+If the command fails for another reason:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

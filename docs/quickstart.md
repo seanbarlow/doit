@@ -191,9 +191,25 @@ The plan will include:
 
 ## Quick Command Reference
 
+### CLI Commands (Terminal)
+
+Run these commands in your terminal:
+
 | Command | Purpose | When to Use |
 | ------- | ------- | ----------- |
 | `doit init` | Initialize Do-It in a project | Once per project |
+| `doit verify` | Verify project structure | After init or to troubleshoot |
+| `doit sync-prompts` | Sync templates to AI agents | After template updates |
+| `doit context show` | Display loaded project context | Debug context injection |
+| `doit hooks install` | Install git hooks for workflow | Once per repo clone |
+| `doit hooks validate` | Validate branch meets requirements | Before commit/push |
+
+### Slash Commands (AI Agent)
+
+Run these commands in your AI coding assistant (Claude Code, Copilot, etc.):
+
+| Command | Purpose | When to Use |
+| ------- | ------- | ----------- |
 | `/doit.constitution` | Define project principles | After init, or to update |
 | `/doit.scaffoldit` | Generate project structure | Greenfield projects only |
 | `/doit.specit` | Create feature specification | Start of each feature |
@@ -205,6 +221,92 @@ The plan will include:
 | `/doit.checkin` | Finalize feature | When feature is complete |
 | `/doit.roadmapit` | Manage project backlog | Anytime |
 | `/doit.documentit` | Organize documentation | As needed |
+
+## Project Context
+
+Do-It automatically loads project context before executing slash commands, providing AI assistants with your project's principles, priorities, and current work.
+
+### View Loaded Context
+
+Use the `doit context show` command to see what context is available:
+
+```bash
+# View context summary
+doit context show
+
+# View full context in YAML format
+doit context show --format yaml
+```
+
+### What Gets Loaded
+
+| Context Source | Description | When Loaded |
+| -------------- | ----------- | ----------- |
+| `constitution.md` | Project principles and tech stack | Always |
+| `roadmap.md` | Current priorities (P1-P4 items) | Always |
+| Current spec | Feature specification for active branch | When on feature branch |
+| Related specs | Specifications matching keywords | As relevant |
+
+### Configure Context
+
+The context system uses `.doit/context.yaml` for configuration:
+
+```yaml
+# .doit/context.yaml
+max_related_specs: 3      # Maximum related specs to include
+include_roadmap: true     # Include roadmap priorities
+include_constitution: true # Include project principles
+```
+
+Context injection ensures AI assistants understand your project's constraints, goals, and current priorities without manual copy-pasting.
+
+## Workflow Enforcement (Optional)
+
+Do-It can enforce spec-first development using Git hooks, ensuring code changes are always backed by specifications.
+
+### Install Hooks
+
+```bash
+# Install pre-commit and pre-push hooks
+doit hooks install
+
+# Remove installed hooks
+doit hooks uninstall
+```
+
+### What Hooks Validate
+
+| Hook | Validates | When |
+| ---- | --------- | ---- |
+| pre-commit | Feature branch has spec.md | Before each commit |
+| pre-commit | Spec status is not "Draft" for code changes | Before each commit |
+| pre-push | Required artifacts exist (spec.md, plan.md, tasks.md) | Before push |
+
+### Configure Hooks
+
+Customize validation in `.doit/hooks.yaml`:
+
+```yaml
+# .doit/hooks.yaml
+protected_branches:
+  - main
+  - develop
+require_spec: true
+require_plan: true
+require_tasks: true
+allow_draft_commits: false  # Block commits with Draft specs
+```
+
+### Bypass (Emergency)
+
+For emergency fixes, bypass hooks with `--no-verify`:
+
+```bash
+git commit --no-verify -m "hotfix: critical production issue"
+```
+
+> [!WARNING]
+> Use `--no-verify` sparingly. Bypassed commits should be retroactively documented.
 
 ## Key Principles
 

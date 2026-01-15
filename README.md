@@ -110,21 +110,38 @@ Do-It provides slash commands for AI coding assistants like Claude Code:
 /doit.checkin
 ```
 
-## The 11 Commands
+## Commands
+
+### Slash Commands (AI Agent)
+
+Run these in your AI coding assistant (Claude Code, Copilot, etc.):
 
 | Command | Purpose | Output |
 |---------|---------|--------|
-| **constitution** | Document project principles | constitution.md |
-| **specit** | Define user stories and features | User journey diagrams, spec.md |
-| **planit** | Create technical architecture | Architecture diagram, plan.md |
-| **taskit** | Break down into tasks | Task dependencies, timeline, tasks.md |
-| **implementit** | Implement features | Executes task queue with AI |
-| **testit** | Quality assurance | Test results, coverage reports |
-| **reviewit** | Team code review | Review findings, review-report.md |
-| **roadmapit** | Manage priorities | roadmap.md with P1-P4 items |
-| **documentit** | Organize documentation | Organized docs/, index.md |
-| **scaffoldit** | Bootstrap new projects | .doit/ structure, templates |
-| **checkin** | Archive completed work | PR creation, issue closing |
+| **/doit.constitution** | Document project principles | constitution.md |
+| **/doit.specit** | Define user stories and features | User journey diagrams, spec.md |
+| **/doit.planit** | Create technical architecture | Architecture diagram, plan.md |
+| **/doit.taskit** | Break down into tasks | Task dependencies, timeline, tasks.md |
+| **/doit.implementit** | Implement features | Executes task queue with AI |
+| **/doit.testit** | Quality assurance | Test results, coverage reports |
+| **/doit.reviewit** | Team code review | Review findings, review-report.md |
+| **/doit.roadmapit** | Manage priorities | roadmap.md with P1-P4 items |
+| **/doit.documentit** | Organize documentation | Organized docs/, index.md |
+| **/doit.scaffoldit** | Bootstrap new projects | .doit/ structure, templates |
+| **/doit.checkin** | Archive completed work | PR creation, issue closing |
+
+### CLI Commands (Terminal)
+
+Run these in your terminal:
+
+| Command | Purpose |
+|---------|---------|
+| `doit init` | Initialize Do-It in a project |
+| `doit verify` | Verify project structure |
+| `doit sync-prompts` | Sync templates to AI agents |
+| `doit context show` | Display loaded project context |
+| `doit hooks install` | Install git hooks for workflow enforcement |
+| `doit hooks validate` | Validate branch meets requirements |
 
 ## Project Structure
 
@@ -238,7 +255,7 @@ Please include:
 
 ## Status
 
-- **Current Version:** 0.0.23
+- **Current Version:** 0.1.4
 - **Python Support:** 3.11, 3.12
 - **Status:** Beta
 - **Last Updated:** January 2026

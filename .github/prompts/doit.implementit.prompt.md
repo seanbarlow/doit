@@ -8,12 +8,28 @@ Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 1. Run `.doit/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
-   - Check for `--skip-checklist` in the user's input - if present, skip checklist verification (FR-033)
+   - Check for `--skip-checklist` in the user's input - if present, skip checklist verification
    - If not skipped, scan all checklist files in the checklists/ directory
    - For each checklist, count:
      - Total items: All lines matching `- [ ]` or `- [X]` or `- [x]`
@@ -131,7 +147,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Confirm the implementation follows the technical plan
    - Report final status with summary of completed work
 
-10. **Generate Completion Summary Report** (FR-036):
+10. **Generate Completion Summary Report**:
     - Create a summary showing:
 
       ```text
@@ -162,3 +178,77 @@ You **MUST** consider the user input before proceeding (if not empty).
     - Output summary to console for immediate feedback
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/doit.taskit` first to regenerate the task list.
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (all tasks complete)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ● taskit → ● implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.testit` to verify your implementation with tests.
+
+**Alternative**: Run `/doit.reviewit` to request a code review.
+```
+
+### On Partial Completion (tasks remaining)
+
+If some tasks are still incomplete:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ● taskit → ◐ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Status**: N tasks remaining out of M total.
+
+**Recommended**: Continue with `/doit.implementit` to complete remaining tasks.
+
+**Alternative**: Run `/doit.testit` for partial verification of completed work.
+```
+
+### On Error (missing tasks.md)
+
+If the command fails because tasks.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No task list found. The implementit command requires tasks.md to exist.
+
+**Recommended**: Run `/doit.taskit` to generate implementation tasks from the plan.
+```
+
+### On Error (other issues)
+
+If the command fails for another reason:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

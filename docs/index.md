@@ -32,6 +32,17 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Doit Roadmapit Command](./features/008-doit-roadmapit-command.md) | The `/doit.roadmapit` command creates and manages project roadmaps... | 2026-01-10 |
 | [Doit Documentit Command](./features/009-doit-documentit-command.md) | Added `/doit.documentit` command for documentation management... | 2026-01-10 |
 | [Command Workflow Recommendations](./features/012-command-recommendations.md) | Enhanced all doit workflow commands to provide context-aware recommendations... | 2026-01-10 |
+| [Documentation Branding Cleanup](./features/015-docs-branding-cleanup.md) | Clean up documentation to remove legacy branding references... | 2026-01-12 |
+| [Scripts Cleanup](./features/016-scripts-cleanup.md) | Cleaned up Bash and PowerShell scripts to support only Claude and Copilot... | 2026-01-12 |
+| [Roadmap Template Cleanup](./features/017-roadmap-template-cleanup.md) | Updated roadmap templates to contain placeholder syntax... | 2026-01-13 |
+| [Develop Branch Setup](./features/018-develop-branch-setup.md) | Implemented Gitflow-inspired branching strategy with develop branch... | 2026-01-13 |
+| [Constitution Improvements](./features/020-constitution-improvements.md) | Improved `/doit.constitution` with dotfile exclusion and greenfield detection... | 2026-01-13 |
+| [Copilot Prompt File Fix](./features/021-copilot-agent-fix.md) | Updated Copilot prompt files to use `agent: true` specification... | 2026-01-13 |
+| [Documentation Logo Integration](./features/022-docs-logo-integration.md) | Integrated Do-It framework logos into README and documentation... | 2026-01-14 |
+| [Unified Template Management](./features/024-unified-templates.md) | Consolidated command templates into single source of truth... | 2026-01-15 |
+| [Git Hooks Workflow](./features/025-git-hooks-workflow.md) | Git hook integration for spec-driven workflow enforcement... | 2026-01-15 |
+| [AI Context Injection](./features/026-ai-context-injection.md) | Automatic project context loading for AI assistant commands... | 2026-01-15 |
+| [Template Context Injection](./features/027-template-context-injection.md) | Integrated context loading into all 11 doit command templates... | 2026-01-15 |
 | [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
 
 ## Guides
@@ -39,6 +50,14 @@ Spec-Driven Development **flips the script** on traditional software development
 | Document | Description | Last Modified |
 | -------- | ----------- | ------------- |
 | [Mermaid Diagram Patterns](./guides/diagram-patterns.md) | All auto-generated diagrams use HTML comment markers to identify content... | 2026-01-10 |
+
+## Tutorials
+
+| Document | Description | Last Modified |
+| -------- | ----------- | ------------- |
+| [Tutorial Index](./tutorials/index.md) | Overview of Do-It tutorials and learning paths... | 2026-01-14 |
+| [Greenfield Tutorial](./tutorials/01-greenfield-tutorial.md) | Building a new project from scratch with Do-It... | 2026-01-14 |
+| [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) | Adding Do-It to an existing codebase... | 2026-01-14 |
 
 ## Templates
 

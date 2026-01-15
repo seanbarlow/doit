@@ -12,8 +12,10 @@
 
 | Item                                                               | Original Priority | Completed Date | Feature Branch               | Notes                                    |
 |--------------------------------------------------------------------|-------------------|----------------|------------------------------|------------------------------------------|
+| AI context injection for commands                                  | P2                | 2026-01-15     | `[026-ai-context-injection]` | Auto-load project context for AI commands |
 | Core workflow commands (specit, planit, taskit, etc.)              | P1                | 2026-01-13     | -                            | Foundation of the CLI                    |
 | Multi-agent prompt synchronization (`sync-prompts` command)        | P1                | 2026-01-15     | `[023-copilot-prompts-sync]` | Enables consistent prompts across agents |
+| Unified template management (single source of truth)               | P1                | 2026-01-15     | `[024-unified-templates]`    | Eliminates duplicate templates           |
 | Git hook integration for workflow enforcement                      | P2                | 2026-01-15     | `[025-git-hooks-workflow]`   | Pre-commit/push hooks enforce spec-first |
 
 ---
@@ -35,9 +37,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 3
-- **P1 Items Completed**: 2
-- **P2 Items Completed**: 1
+- **Total Items Completed**: 5
+- **P1 Items Completed**: 3
+- **P2 Items Completed**: 2
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

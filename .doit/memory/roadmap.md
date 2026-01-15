@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-15
+**Last Updated**: 2026-01-15 (added template context injection)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -27,6 +27,11 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Eliminates duplicate templates, simplifies maintenance
   - **Feature**: `[024-unified-templates]`
 
+- [ ] Template context injection (command-level integration)
+  - **Rationale**: Add instructions to command templates to load project context via `doit context show`, completing the context injection workflow
+  - **Related**: `[026-ai-context-injection]` infrastructure
+  - **Approach**: Modify templates to include "Load project context" step that calls CLI before executing
+
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
@@ -47,8 +52,8 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Automatic Mermaid diagram generation from specs
   - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
 
-- [ ] AI context injection for commands
-  - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
+- [ ] Spec status dashboard command (`doit status`)
+  - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits
 
 ### P3 - Medium Priority (Valuable)
 
@@ -68,6 +73,15 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Workflow checkpoint validation
   - **Rationale**: Validate each workflow step completes successfully before allowing the next step (enforces opinionated workflow)
+
+- [ ] Hook configuration wizard
+  - **Rationale**: Interactive wizard for customizing git hook validation rules (exempt branches, require artifacts)
+
+- [ ] Hook bypass report in CI/CD
+  - **Rationale**: Surface bypass events in GitHub Actions as PR check for team visibility into workflow compliance
+
+- [ ] Template diff on version updates
+  - **Rationale**: Show diff view when unified templates are updated to help users understand changes
 
 ### P4 - Low Priority (Nice to Have)
 

@@ -1215,25 +1215,17 @@ def init(
     steps_lines.append(f"{step_num}. Start using slash commands with your AI agent:")
 
     steps_lines.append("   2.1 [cyan]/doit.constitution[/] - Establish project principles")
-    steps_lines.append("   2.2 [cyan]/doit.doit[/] - Create baseline specification")
-    steps_lines.append("   2.3 [cyan]/doit.plan[/] - Create implementation plan")
-    steps_lines.append("   2.4 [cyan]/doit.tasks[/] - Generate actionable tasks")
-    steps_lines.append("   2.5 [cyan]/doit.implement[/] - Execute implementation")
+    steps_lines.append("   2.2 [cyan]/doit.specit[/] - Create feature specification")
+    steps_lines.append("   2.3 [cyan]/doit.planit[/] - Create implementation plan")
+    steps_lines.append("   2.4 [cyan]/doit.taskit[/] - Generate actionable tasks")
+    steps_lines.append("   2.5 [cyan]/doit.implementit[/] - Execute implementation")
+    steps_lines.append("   2.6 [cyan]/doit.testit[/] - Run tests")
+    steps_lines.append("   2.7 [cyan]/doit.reviewit[/] - Review code")
+    steps_lines.append("   2.8 [cyan]/doit.checkin[/] - Finalize and create PR")
 
     steps_panel = Panel("\n".join(steps_lines), title="Next Steps", border_style="cyan", padding=(1,2))
     console.print()
     console.print(steps_panel)
-
-    enhancement_lines = [
-        "Optional commands that you can use for your specs [bright_black](improve quality & confidence)[/bright_black]",
-        "",
-        f"○ [cyan]/doit.clarify[/] [bright_black](optional)[/bright_black] - Ask structured questions to de-risk ambiguous areas before planning (run before [cyan]/doit.plan[/] if used)",
-        f"○ [cyan]/doit.analyze[/] [bright_black](optional)[/bright_black] - Cross-artifact consistency & alignment report (after [cyan]/doit.tasks[/], before [cyan]/doit.implement[/])",
-        f"○ [cyan]/doit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate requirements completeness, clarity, and consistency (after [cyan]/doit.plan[/])"
-    ]
-    enhancements_panel = Panel("\n".join(enhancement_lines), title="Enhancement Commands", border_style="cyan", padding=(1,2))
-    console.print()
-    console.print(enhancements_panel)
 
 @app.command()
 def check():

@@ -181,7 +181,7 @@ Given that feature description, do this:
       
       ## Notes
       
-      - Items marked incomplete require spec updates before `/doit.clarify` or `/doit.planit`
+      - Items marked incomplete require spec updates before `/doit.planit`
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -235,7 +235,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.clarify` or `/doit.planit`).
+8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.planit`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 

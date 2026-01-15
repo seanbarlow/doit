@@ -12,7 +12,7 @@ class Scaffolder:
     """Service for creating doit project directory structure."""
 
     # Subdirectories to create under .doit/
-    DOIT_SUBDIRS = ["memory", "templates", "scripts"]
+    DOIT_SUBDIRS = ["memory", "templates", "scripts", "config", "logs"]
 
     def __init__(self, project: Project):
         self.project = project

@@ -19,6 +19,22 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.

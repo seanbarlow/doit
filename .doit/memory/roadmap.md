@@ -47,8 +47,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Automatic Mermaid diagram generation from specs
   - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
 
-- [ ] AI context injection for commands
+- [x] AI context injection for commands
   - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
+  - **Feature**: `[027-template-context-injection]`
 
 ### P3 - Medium Priority (Valuable)
 

@@ -17,6 +17,22 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 This command creates or updates the project roadmap at `.doit/memory/roadmap.md`. The roadmap captures high-level requirements prioritized by business value, deferred items, and project vision.
@@ -312,3 +328,41 @@ Output a summary of changes:
 - Use feature branch references `[###-feature-name]` for traceability
 - Maintain maximum 3-5 P1 items (truly critical only)
 - Back up malformed roadmaps before recreating
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (roadmap created or updated)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Roadmap updated!**
+
+**Recommended**: Run `/doit.specit [top priority item]` to create a specification for your highest priority feature.
+
+**Alternative**: Run `/doit.roadmapit add [item]` to add more items to the roadmap.
+```
+
+### On Item Added
+
+If a new item was added to the roadmap:
+
+```markdown
+---
+
+## Next Steps
+
+**Item added to roadmap!**
+
+**Recommended**: Run `/doit.specit [item description]` to create a specification for this item.
+
+**Alternative**: Run `/doit.roadmapit reprioritize` to review and adjust priorities.
+```

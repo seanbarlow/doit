@@ -8,6 +8,22 @@ Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
@@ -18,7 +34,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read review-report.md for code review status
    - **IF EXISTS**: Read test-report.md for test status
 
-3. **Retrieve GitHub issues for feature** (FR-037):
+3. **Retrieve GitHub issues for feature**:
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found:
      - Search for Epic issue matching feature branch name
@@ -52,7 +68,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      | #BBB | Task 2 | OPEN |
      ```
 
-5. **Handle incomplete issues** (FR-038):
+5. **Handle incomplete issues**:
    - If any issues are still open but tasks show complete:
      - List the incomplete issues
      - Ask: "The following issues are still open. Do you want to close them? (yes/no/select)"
@@ -142,7 +158,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    If no matching items found: Log "No matching roadmap items found for branch [branch-name]"
 
-7. **Generate feature documentation** in docs/ (FR-041):
+7. **Generate feature documentation** in docs/:
    - Create `docs/features/[feature-name].md`:
 
      ```markdown
@@ -176,7 +192,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Tasks: #AAA, #BBB, ...
      ```
 
-8. **Prepare git commit** (FR-042):
+8. **Prepare git commit**:
    - Stage all changes: `git add -A`
    - Generate commit message from feature context:
 
@@ -196,9 +212,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Execute commit: `git commit -m "[message]"`
 
-9. **Create pull request** (FR-043):
+9. **Create pull request**:
    - Determine target branch:
-     - Check the user's input for `--target [branch]` flag (FR-044)
+     - Check the user's input for `--target [branch]` flag
      - If not specified, check for `develop` branch
      - If no `develop`, use `main` or `master`
    - Check for gh CLI:
@@ -283,3 +299,63 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Generate documentation even if GitHub unavailable
 - Provide manual fallbacks for all GitHub operations
 - Include issue references in commit message for auto-linking
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (PR merged or ready to merge)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                    │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ● reviewit → ● checkin  │
+└───────────────────────────────────────────────────────────────────────────────────────┘
+
+**Status**: Feature complete! 🎉
+
+**Recommended**: Run `/doit.roadmapit` to update the project roadmap with this completion.
+
+**Alternative**: Run `/doit.specit [next feature]` to start the next feature development.
+```
+
+### On Partial Success (PR created, pending merge)
+
+If the PR was created but not yet merged:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                    │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ● reviewit → ◐ checkin  │
+└───────────────────────────────────────────────────────────────────────────────────────┘
+
+**Status**: PR created and awaiting merge.
+
+**Next**: Merge the PR when ready, then run `/doit.roadmapit` to update the project roadmap.
+```
+
+### On Error (issues incomplete)
+
+If some issues or tasks are still incomplete:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: Some tasks or issues are still open.
+
+**Recommended**: Complete the outstanding tasks with `/doit.implementit`, or use `--force` flag to proceed anyway.
+```

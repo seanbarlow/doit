@@ -17,6 +17,22 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 You are managing project documentation. This command supports multiple operations:
@@ -118,7 +134,7 @@ Create a report showing proposed changes:
 Proceed with migration? (y/n)
 ```
 
-### 2.4 Execute Migration (FR-008)
+### 2.4 Execute Migration
 
 **IMPORTANT**: Only proceed after user confirmation.
 
@@ -213,7 +229,7 @@ Index Updated:
 
 ## Step 4: Audit Documentation Health (FR-020 to FR-024)
 
-### 4.1 Check for Broken Links (FR-020)
+### 4.1 Check for Broken Links
 
 Parse all markdown files in docs/ for internal links:
 
@@ -227,13 +243,13 @@ Link patterns to check:
 
 For each link, verify the target file exists.
 
-### 4.2 Check for Missing Headers (FR-021)
+### 4.2 Check for Missing Headers
 
 For each markdown file:
 - Check if file starts with `# ` heading
 - Flag files without proper title headers
 
-### 4.3 Check Documentation Coverage (FR-022)
+### 4.3 Check Documentation Coverage
 
 Cross-reference completed features with documentation:
 
@@ -292,7 +308,7 @@ Cross-reference completed features with documentation:
 
 ## Step 5: Cleanup Redundant Documentation (FR-025 to FR-028)
 
-### 5.1 Find Potential Duplicates (FR-025)
+### 5.1 Find Potential Duplicates
 
 Compare files for similarity:
 
@@ -304,7 +320,7 @@ Duplicate detection methods:
 4. Same filename in different directories
 ```
 
-### 5.2 Find Orphaned Files (FR-026)
+### 5.2 Find Orphaned Files
 
 Track all internal links across documentation:
 
@@ -379,7 +395,7 @@ For each command file, check:
 | doit.planit.md | ✅ | ❌ | ✅ | ✅ | 75% |
 ```
 
-### 6.3 Generate Improvement Suggestions (FR-031)
+### 6.3 Generate Improvement Suggestions
 
 For each file with missing elements:
 
@@ -405,7 +421,7 @@ Suggested addition:
 **Accept this suggestion? (y/n)**
 ```
 
-### 6.4 Apply Enhancements (FR-032)
+### 6.4 Apply Enhancements
 
 For accepted suggestions:
 1. Read current file content
@@ -429,3 +445,41 @@ Before any file modification:
 - Binary files (images, PDFs) are cataloged but content is not analyzed
 - Symlinks are followed for reading but flagged in audit
 - Large files (>1MB markdown) are skipped with warning
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (documentation organized or indexed)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Documentation operation complete!**
+
+**Recommended**: Continue with your development workflow:
+- Run `/doit.specit [feature]` to create a new feature specification
+- Run `/doit.implementit` to continue implementation work
+
+**Alternative**: Run `/doit.documentit` again with a different operation (organize, index, audit, cleanup, enhance-templates).
+```
+
+### On Audit Issues Found
+
+If the audit found documentation issues:
+
+```markdown
+---
+
+## Next Steps
+
+**Documentation audit found issues.**
+
+**Recommended**: Address the issues listed above, then run `/doit.documentit audit` again to verify.
+```

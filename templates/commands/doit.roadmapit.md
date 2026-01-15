@@ -17,6 +17,22 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 This command creates or updates the project roadmap at `.doit/memory/roadmap.md`. The roadmap captures high-level requirements prioritized by business value, deferred items, and project vision.

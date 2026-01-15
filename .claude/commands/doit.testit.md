@@ -19,6 +19,22 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
@@ -29,7 +45,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read plan.md for test strategy and coverage goals
    - **IF EXISTS**: Read contracts/ for API test expectations
 
-3. **Detect test framework** (FR-028):
+3. **Detect test framework**:
    - Check for test configuration files:
      - **Python**: pytest.ini, pyproject.toml [tool.pytest], setup.cfg, conftest.py
      - **JavaScript/TypeScript**: jest.config.js/ts, vitest.config.js/ts, mocha.opts, .mocharc.*
@@ -59,7 +75,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Test duration
    - Capture any coverage reports if generated
 
-5. **Generate test report** (FR-029):
+5. **Generate test report**:
 
    ```text
    ## Automated Test Results
@@ -87,7 +103,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    | src/module.py | 85% |
    ```
 
-6. **Map tests to requirements** (FR-030):
+6. **Map tests to requirements**:
    - Parse test names and docstrings for FR-XXX references
    - Match tests to requirements from spec.md
    - Generate requirement coverage matrix:
@@ -104,7 +120,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Calculate coverage percentage: (covered requirements / total requirements) * 100
 
-7. **Generate manual testing checklist** (FR-031):
+7. **Generate manual testing checklist**:
    - Extract acceptance criteria from spec.md that cannot be automated
    - Create checklist format:
 
@@ -124,7 +140,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - [ ] MT-006: Verify recovery from server timeout
      ```
 
-8. **Record manual test results** (FR-032):
+8. **Record manual test results**:
    - If $ARGUMENTS contains `--manual`:
      - Present each manual test item
      - Ask for PASS/FAIL/SKIP result
@@ -201,3 +217,61 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Continue generating report even if some tests fail
 - Preserve test output for debugging
 - Map requirements using FR-XXX pattern matching in test names/docstrings
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (all tests pass)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                      │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ○ checkin │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.reviewit` for a code review before finalizing.
+
+**Alternative**: Run `/doit.checkin` to merge your changes if code review is not needed.
+```
+
+### On Failure (tests fail)
+
+If some tests fail:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                      │
+│  ● specit → ● planit → ● taskit → ● implementit → ◐ testit → ○ checkin │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**Status**: N tests failed out of M total.
+
+**Recommended**: Run `/doit.implementit` to fix the failing tests.
+```
+
+### On Error (no test framework detected)
+
+If no test framework is detected:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No test framework detected in this project.
+
+**Recommended**: Add tests to your project and run `/doit.testit` again, or proceed with `/doit.reviewit` for code review.
+```

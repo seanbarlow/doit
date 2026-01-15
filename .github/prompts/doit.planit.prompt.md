@@ -8,13 +8,35 @@ Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Load Project Context
+
+Before proceeding, load the project context to inform your responses:
+
+```bash
+doit context show
+```
+
+**If the command fails or doit is not installed**: Continue without context, but note that alignment with project principles cannot be verified.
+
+**Use loaded context to**:
+
+- Reference constitution principles when making decisions
+- Consider roadmap priorities
+- Identify connections to related specifications
+
+**For this command specifically**:
+
+- Use tech stack from constitution as baseline for architecture
+- Flag any technology choices that deviate from constitution
+- Reference related specifications for integration points
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/setup-plan.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load context**: Read FEATURE_SPEC and `.doit/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 
-3. **Extract Constitution Tech Stack** (FR-018):
+3. **Extract Constitution Tech Stack**:
    - Read Tech Stack section from constitution.md
    - Extract: PRIMARY_LANGUAGE, FRAMEWORKS, KEY_LIBRARIES
    - Read Infrastructure section: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
@@ -35,7 +57,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    After filling the plan content, generate visual diagrams:
 
-   a. **Architecture Overview** (FR-004):
+   a. **Architecture Overview**:
       - Parse Technical Context for: Language, Dependencies, Storage, Target Platform
       - Identify architectural layers from Project Type:
         - **single**: Presentation → Service → Data
@@ -59,7 +81,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           UI --> API --> SVC --> DB
       ```
 
-   b. **Component Dependencies** (FR-005):
+   b. **Component Dependencies**:
       - Check if multiple services/components are defined in Project Structure
       - **IF multiple services defined**:
         - Parse service names from structure
@@ -69,7 +91,7 @@ You **MUST** consider the user input before proceeding (if not empty).
         - **REMOVE the entire Component Dependencies section**
         - Do NOT leave empty placeholder
 
-   c. **Data Model ER Diagram** (FR-006):
+   c. **Data Model ER Diagram**:
       - When generating data-model.md, add ER diagram at the top
       - Parse entity definitions from the file
       - Generate erDiagram showing all entities and relationships
@@ -84,7 +106,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           }
       ```
 
-   d. **State Machine Detection** (FR-007):
+   d. **State Machine Detection**:
       - Scan entities for fields named: `status`, `state`, `stage`, `phase`
       - For each entity with state field:
         - Parse possible state values from field type or comments
@@ -158,3 +180,73 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 - Use absolute paths
 - ERROR on gate failures or unresolved clarifications
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (plan and artifacts created)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ○ taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.taskit` to create implementation tasks from this plan.
+```
+
+### On Success with Existing Tasks
+
+If `tasks.md` already exists in the specs directory:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ● taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.implementit` to begin executing the existing tasks.
+
+**Alternative**: Run `/doit.taskit` to regenerate tasks based on the updated plan.
+```
+
+### On Error (missing spec.md)
+
+If the command fails because spec.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No feature specification found. The planit command requires spec.md to exist.
+
+**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
+```
+
+### On Error (other issues)
+
+If the command fails for another reason:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

@@ -362,6 +362,15 @@ def run_init(
     result.updated_files.extend(memory_result.get("updated", []))
     result.skipped_files.extend(memory_result.get("skipped", []))
 
+    # Copy config templates to .doit/config/
+    config_result = template_manager.copy_config_templates(
+        target_dir=project.doit_folder / "config",
+        overwrite=update or force,
+    )
+    result.created_files.extend(config_result.get("created", []))
+    result.updated_files.extend(config_result.get("updated", []))
+    result.skipped_files.extend(config_result.get("skipped", []))
+
     for agent in agents:
         scaffolder.create_agent_directory(agent)
 

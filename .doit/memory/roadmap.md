@@ -49,7 +49,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [x] AI context injection for commands
   - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
-  - **Feature**: `[027-template-context-injection]`
+  - **Feature**: `[026-ai-context-injection]`, `[027-template-context-injection]`
+
+- [ ] Spec status dashboard command (`doit status`)
+  - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits
 
 ### P3 - Medium Priority (Valuable)
 
@@ -69,6 +72,15 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Workflow checkpoint validation
   - **Rationale**: Validate each workflow step completes successfully before allowing the next step (enforces opinionated workflow)
+
+- [ ] Hook configuration wizard
+  - **Rationale**: Interactive wizard for customizing git hook validation rules (exempt branches, require artifacts)
+
+- [ ] Hook bypass report in CI/CD
+  - **Rationale**: Surface bypass events in GitHub Actions as PR check for team visibility into workflow compliance
+
+- [ ] Template diff on version updates
+  - **Rationale**: Show diff view when unified templates are updated to help users understand changes
 
 ### P4 - Low Priority (Nice to Have)
 

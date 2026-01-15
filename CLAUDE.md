@@ -34,6 +34,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based (markdown templates in `templates/commands/`) (024-unified-templates)
 - Python 3.11+ (per constitution) + Typer (CLI), Rich (output), PyYAML (configuration) (025-git-hooks-workflow)
 - File-based - `.doit/config/hooks.yaml` for configuration, `.doit/logs/hook-bypasses.log` for audit (025-git-hooks-workflow)
+- Python 3.11+ (per constitution) + Typer, Rich, PyYAML (for configuration) (026-ai-context-injection)
+- File-based (markdown in `.doit/memory/`) (026-ai-context-injection)
 - Markdown (command templates are markdown files) + None (template modifications only) (027-template-context-injection)
 - N/A (file-based templates in `templates/commands/`) (027-template-context-injection)
 
@@ -56,6 +58,7 @@ Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow s
 
 ## Recent Changes
 - 027-template-context-injection: Added Markdown (command templates are markdown files) + None (template modifications only)
+- 026-ai-context-injection: Added Python 3.11+ (per constitution) + Typer, Rich, PyYAML (for configuration)
 - 025-git-hooks-workflow: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output), PyYAML (configuration)
 - 024-unified-templates: Added Python 3.11+ (per constitution) + Typer, Rich, pytest (per constitution)
 

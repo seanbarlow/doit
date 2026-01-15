@@ -4,6 +4,13 @@ from .agent import Agent
 from .project import Project
 from .template import Template
 from .results import InitResult, VerifyResult, VerifyCheck, VerifyStatus
+from .context_config import (
+    ContextConfig,
+    SourceConfig,
+    CommandOverride,
+    ContextSource,
+    LoadedContext,
+)
 
 __all__ = [
     "Agent",
@@ -13,4 +20,9 @@ __all__ = [
     "VerifyResult",
     "VerifyCheck",
     "VerifyStatus",
+    "ContextConfig",
+    "SourceConfig",
+    "CommandOverride",
+    "ContextSource",
+    "LoadedContext",
 ]

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Unified Template Management** (#171)
+  - Single source of truth: All doit command templates now live in `templates/commands/`
+  - Copilot prompts are generated dynamically via transformation during `doit init`
+  - Removed duplicate `templates/prompts/` directory (11 files)
+  - Maintainers edit one file; changes apply to both Claude Code and GitHub Copilot
+
+### Added
+
+- `Agent.needs_transformation` property for determining which agents require template transformation
+- `TemplateManager._transform_and_write_templates()` for on-demand prompt generation
+- 29 new unit tests for unified template functionality
+
 ## [0.1.4] - 2026-01-13
 
 ### Fixed

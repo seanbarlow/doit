@@ -29,12 +29,22 @@ class Agent(str, Enum):
 
     @property
     def template_directory(self) -> str:
-        """Relative path within bundled templates."""
-        directories = {
-            Agent.CLAUDE: "commands",
-            Agent.COPILOT: "prompts",
-        }
-        return directories[self]
+        """Relative path within bundled templates.
+
+        All agents now use commands/ as the single source of truth.
+        Copilot prompts are generated dynamically via transformation.
+        """
+        return "commands"
+
+    @property
+    def needs_transformation(self) -> bool:
+        """Whether templates need transformation for this agent.
+
+        Returns:
+            True for Copilot (requires transformation from command format),
+            False for Claude (direct copy).
+        """
+        return self == Agent.COPILOT
 
     @property
     def file_extension(self) -> str:

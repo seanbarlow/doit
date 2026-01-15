@@ -23,8 +23,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Enables consistent prompt files across Claude, Copilot, and other AI agents
   - **Feature**: `[023-copilot-prompts-sync]`
 
-- [ ] Unified template management (single source of truth for commands)
+- [x] Unified template management (single source of truth for commands)
   - **Rationale**: Eliminates duplicate templates, simplifies maintenance
+  - **Feature**: `[024-unified-templates]`
 
 ### P2 - High Priority (Significant Business Value)
 

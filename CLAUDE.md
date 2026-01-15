@@ -32,6 +32,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based (markdown files in `.github/prompts/`) (023-copilot-prompts-sync)
 - Python 3.11+ (per constitution) + Typer, Rich, pytest (per constitution) (024-unified-templates)
 - File-based (markdown templates in `templates/commands/`) (024-unified-templates)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (output), PyYAML (configuration) (025-git-hooks-workflow)
+- File-based - `.doit/config/hooks.yaml` for configuration, `.doit/logs/hook-bypasses.log` for audi (025-git-hooks-workflow)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -51,9 +53,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 025-git-hooks-workflow: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output), PyYAML (configuration)
 - 024-unified-templates: Added Python 3.11+ (per constitution) + Typer, Rich, pytest (per constitution)
 - 023-copilot-prompts-sync: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), pathlib (file operations)
-- 021-copilot-agent-fix: Added Markdown (YAML frontmatter) + None (text files only)
 
 
 <!-- MANUAL ADDITIONS START -->

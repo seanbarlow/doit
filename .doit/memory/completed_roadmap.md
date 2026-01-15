@@ -10,10 +10,11 @@
 
 <!-- Last 20 completed items - older items are archived below -->
 
-| Item                                                               | Original Priority | Completed Date | Feature Branch              | Notes                                   |
-|--------------------------------------------------------------------|-------------------|----------------|-----------------------------|-----------------------------------------|
-| Core workflow commands (specit, planit, taskit, etc.)              | P1                | 2026-01-13     | -                           | Foundation of the CLI                   |
-| Multi-agent prompt synchronization (`sync-prompts` command)        | P1                | 2026-01-15     | `[023-copilot-prompts-sync]`| Enables consistent prompts across agents|
+| Item                                                               | Original Priority | Completed Date | Feature Branch               | Notes                                    |
+|--------------------------------------------------------------------|-------------------|----------------|------------------------------|------------------------------------------|
+| Core workflow commands (specit, planit, taskit, etc.)              | P1                | 2026-01-13     | -                            | Foundation of the CLI                    |
+| Multi-agent prompt synchronization (`sync-prompts` command)        | P1                | 2026-01-15     | `[023-copilot-prompts-sync]` | Enables consistent prompts across agents |
+| Git hook integration for workflow enforcement                      | P2                | 2026-01-15     | `[025-git-hooks-workflow]`   | Pre-commit/push hooks enforce spec-first |
 
 ---
 
@@ -34,9 +35,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 2
+- **Total Items Completed**: 3
 - **P1 Items Completed**: 2
-- **P2 Items Completed**: 0
+- **P2 Items Completed**: 1
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

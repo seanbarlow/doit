@@ -2,7 +2,7 @@
 
 **Completed**: 2026-01-15
 **Branch**: `024-unified-templates`
-**PR**: TBD
+**PR**: #189
 
 ## Overview
 

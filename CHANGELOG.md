@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-01-15
+
 ### Changed
 
 - **Unified Template Management** (#171)
@@ -17,18 +19,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **GitHub Copilot Prompts Synchronization** (#023)
+  - `doit sync-prompts` command to generate Copilot prompt files from command templates
+  - `doit sync-prompts --check` to detect drift between templates and prompts
+  - Automatic YAML frontmatter stripping and $ARGUMENTS placeholder handling
+  - Selective synchronization support for individual commands
+
 - **Git Hooks Workflow Enforcement** (#025)
   - `doit hooks install` and `doit hooks uninstall` commands for managing Git hooks
   - Pre-commit hook validates feature branches have spec.md
   - Pre-push hook validates required artifacts (spec.md, plan.md, tasks.md)
-  - Configurable via `.doit/hooks.yaml`
+  - Configurable via `.doit/config/hooks.yaml`
   - Bypass with `--no-verify` for emergency fixes
 
 - **AI Context Injection** (#026)
   - Automatic loading of constitution.md and roadmap.md for all commands
   - `doit context show` command to display loaded context
+  - `doit context status` command to show configuration and file availability
   - Feature branch detection loads current spec automatically
   - Related spec discovery based on keyword matching
+  - Configurable via `.doit/config/context.yaml`
 
 - **Template Context Injection** (#027)
   - All 11 doit command templates now include context loading step
@@ -36,8 +46,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Context loading positioned before main logic in all templates
   - Graceful handling of missing context files
 
+- **Documentation and Tutorial Refresh** (#028)
+  - Updated quickstart.md with CLI commands table and context injection documentation
+  - Updated README.md with separate CLI and slash command sections
+  - Regenerated feature index with all 19+ features
+  - Added workflow enforcement documentation
+  - Updated tutorials with context injection and sync-prompts mentions
+
 - `Agent.needs_transformation` property for determining which agents require template transformation
 - `TemplateManager._transform_and_write_templates()` for on-demand prompt generation
+- 15 integration tests for context injection
 - 29 new unit tests for unified template functionality
 
 ## [0.1.4] - 2026-01-13

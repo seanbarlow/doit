@@ -28,6 +28,14 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (file system - reads project directories) (020-constitution-improvements)
 - Markdown (YAML frontmatter) + None (text files only) (021-copilot-agent-fix)
 - N/A (no database involved) (021-copilot-agent-fix)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), pathlib (file operations) (023-copilot-prompts-sync)
+- File-based (markdown files in `.github/prompts/`) (023-copilot-prompts-sync)
+- Python 3.11+ (per constitution) + Typer, Rich, pytest (per constitution) (024-unified-templates)
+- File-based (markdown templates in `templates/commands/`) (024-unified-templates)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (output), PyYAML (configuration) (025-git-hooks-workflow)
+- File-based - `.doit/config/hooks.yaml` for configuration, `.doit/logs/hook-bypasses.log` for audit (025-git-hooks-workflow)
+- Python 3.11+ (per constitution) + Typer, Rich, PyYAML (for configuration) (026-ai-context-injection)
+- File-based (markdown in `.doit/memory/`) (026-ai-context-injection)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -47,8 +55,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
-- 021-copilot-agent-fix: Added Markdown (YAML frontmatter) + None (text files only)
-- 020-constitution-improvements: Added Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent)
+- 026-ai-context-injection: Added Python 3.11+ (per constitution) + Typer, Rich, PyYAML (for configuration)
+- 025-git-hooks-workflow: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output), PyYAML (configuration)
+- 024-unified-templates: Added Python 3.11+ (per constitution) + Typer, Rich, pytest (per constitution)
 
 
 <!-- MANUAL ADDITIONS START -->

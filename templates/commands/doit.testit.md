@@ -29,7 +29,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read plan.md for test strategy and coverage goals
    - **IF EXISTS**: Read contracts/ for API test expectations
 
-3. **Detect test framework** (FR-028):
+3. **Detect test framework**:
    - Check for test configuration files:
      - **Python**: pytest.ini, pyproject.toml [tool.pytest], setup.cfg, conftest.py
      - **JavaScript/TypeScript**: jest.config.js/ts, vitest.config.js/ts, mocha.opts, .mocharc.*
@@ -59,7 +59,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Test duration
    - Capture any coverage reports if generated
 
-5. **Generate test report** (FR-029):
+5. **Generate test report**:
 
    ```text
    ## Automated Test Results
@@ -87,7 +87,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    | src/module.py | 85% |
    ```
 
-6. **Map tests to requirements** (FR-030):
+6. **Map tests to requirements**:
    - Parse test names and docstrings for FR-XXX references
    - Match tests to requirements from spec.md
    - Generate requirement coverage matrix:
@@ -104,7 +104,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Calculate coverage percentage: (covered requirements / total requirements) * 100
 
-7. **Generate manual testing checklist** (FR-031):
+7. **Generate manual testing checklist**:
    - Extract acceptance criteria from spec.md that cannot be automated
    - Create checklist format:
 
@@ -124,7 +124,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - [ ] MT-006: Verify recovery from server timeout
      ```
 
-8. **Record manual test results** (FR-032):
+8. **Record manual test results**:
    - If $ARGUMENTS contains `--manual`:
      - Present each manual test item
      - Ask for PASS/FAIL/SKIP result

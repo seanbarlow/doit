@@ -26,7 +26,7 @@ You are generating a project folder structure based on the tech stack defined in
 
 Follow this execution flow:
 
-### 1. Load Constitution (FR-056)
+### 1. Load Constitution
 
 Read `.doit/memory/constitution.md` and extract:
 
@@ -36,7 +36,7 @@ Read `.doit/memory/constitution.md` and extract:
 
 If constitution doesn't exist or has incomplete tech stack info, proceed to step 2.
 
-### 2. Tech Stack Clarification (FR-057)
+### 2. Tech Stack Clarification
 
 If tech stack is not fully defined, prompt the user:
 
@@ -49,7 +49,7 @@ If tech stack is not fully defined, prompt the user:
 
 Based on detected/provided tech stack, generate the appropriate folder structure:
 
-#### React/TypeScript Frontend (FR-055)
+#### React/TypeScript Frontend
 
 ```text
 src/
@@ -74,7 +74,7 @@ tests/
 └── .gitkeep
 ```
 
-#### .NET/C# Backend (FR-056)
+#### .NET/C# Backend
 
 ```text
 src/
@@ -96,7 +96,7 @@ tests/
     └── .gitkeep
 ```
 
-#### Node.js/Express Backend (FR-057)
+#### Node.js/Express Backend
 
 ```text
 src/
@@ -117,7 +117,7 @@ tests/
 └── .gitkeep
 ```
 
-#### Python/FastAPI Backend (FR-058)
+#### Python/FastAPI Backend
 
 ```text
 src/
@@ -142,7 +142,7 @@ tests/
     └── .gitkeep
 ```
 
-#### Go Backend (FR-059)
+#### Go Backend
 
 ```text
 cmd/
@@ -164,7 +164,7 @@ tests/
 └── .gitkeep
 ```
 
-#### Vue.js Frontend (FR-060)
+#### Vue.js Frontend
 
 ```text
 src/
@@ -188,7 +188,7 @@ tests/
 └── .gitkeep
 ```
 
-#### Angular Frontend (FR-061)
+#### Angular Frontend
 
 ```text
 src/
@@ -210,7 +210,7 @@ tests/
 └── .gitkeep
 ```
 
-#### Java/Spring Boot Backend (FR-062)
+#### Java/Spring Boot Backend
 
 ```text
 src/
@@ -234,7 +234,7 @@ src/
         └── .gitkeep
 ```
 
-### 4. Config File Generation (FR-059)
+### 4. Config File Generation
 
 Generate appropriate config files based on tech stack:
 
@@ -249,7 +249,7 @@ Generate appropriate config files based on tech stack:
 | Angular | `angular.json`, `package.json`, `tsconfig.json` |
 | Java | `pom.xml` or `build.gradle`, `application.yml` |
 
-### 5. Starter Files Generation (FR-060)
+### 5. Starter Files Generation
 
 Create minimal starter files:
 
@@ -257,7 +257,7 @@ Create minimal starter files:
 - `.editorconfig` for consistent coding styles
 - Appropriate `.gitkeep` files in empty directories
 
-### 6. Docker Support (FR-061)
+### 6. Docker Support
 
 If containerization is required (from constitution or user input):
 
@@ -265,7 +265,7 @@ If containerization is required (from constitution or user input):
 - Create `docker-compose.yml` for local development
 - Create `.dockerignore`
 
-### 7. .gitignore Generation (FR-062)
+### 7. .gitignore Generation
 
 Generate comprehensive `.gitignore` based on tech stack:
 
@@ -274,7 +274,7 @@ Generate comprehensive `.gitignore` based on tech stack:
 - Environment files (.env, .env.local)
 - Build artifacts (dist, build, target)
 
-### 8. Doit Commands Generation (FR-066)
+### 8. Doit Commands Generation
 
 Generate the doit command suite for the new project:
 
@@ -294,7 +294,7 @@ Generate the doit command suite for the new project:
 
 This enables new projects to immediately use the full doit workflow without manual setup.
 
-### 9. Multi-Stack Support (FR-063)
+### 9. Multi-Stack Support
 
 For full-stack projects (frontend + backend), create:
 

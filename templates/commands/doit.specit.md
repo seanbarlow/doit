@@ -101,7 +101,7 @@ Given that feature description, do this:
 
    After writing the spec content, generate visual diagrams to enhance understanding:
 
-   a. **User Journey Visualization** (FR-001):
+   a. **User Journey Visualization**:
       - Parse all user stories from the spec (### User Story N - [Title])
       - For each user story, extract the key action flow from acceptance scenarios
       - Generate a flowchart with one subgraph per user story
@@ -124,7 +124,7 @@ Given that feature description, do this:
         - Parse entity names and relationships from the Key Entities section
         - Generate an ER diagram showing entities and their relationships
         - Replace content in `<!-- BEGIN:AUTO-GENERATED section="entity-relationships" -->` markers
-      - **IF NO Key Entities defined** (FR-003):
+      - **IF NO Key Entities defined**:
         - **REMOVE the entire Entity Relationships section** (from `## Entity Relationships` to before `## Requirements`)
         - Do NOT leave an empty placeholder section
 
@@ -181,7 +181,7 @@ Given that feature description, do this:
       
       ## Notes
       
-      - Items marked incomplete require spec updates before `/doit.clarify` or `/doit.planit`
+      - Items marked incomplete require spec updates before `/doit.planit`
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -235,7 +235,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.clarify` or `/doit.planit`).
+8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/doit.planit`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
@@ -304,7 +304,7 @@ Success criteria must be:
 
 ---
 
-## Integrated Ambiguity Scan (FR-015)
+## Integrated Ambiguity Scan
 
 After creating the initial spec, perform a structured ambiguity scan using this 8-category taxonomy. For each category, assess status: Clear / Partial / Missing.
 
@@ -346,17 +346,17 @@ After creating the initial spec, perform a structured ambiguity scan using this 
    - Canonical glossary terms
    - Avoided synonyms
 
-### Clarification Process (FR-014)
+### Clarification Process
 
 If Partial or Missing categories exist that require user input:
 
-1. Generate up to **5 clarification questions** maximum (FR-014)
+1. Generate up to **5 clarification questions** maximum
 2. Each question must be answerable with:
    - Multiple-choice (2-5 options), OR
    - Short answer (≤5 words)
 3. Present questions sequentially, one at a time
 4. After each answer, integrate into the appropriate spec section
-5. Ensure **no [NEEDS CLARIFICATION] markers remain** in final output (FR-016)
+5. Ensure **no [NEEDS CLARIFICATION] markers remain** in final output
 
 ---
 
@@ -374,13 +374,13 @@ After the spec is complete and validated, create GitHub issues if a remote is av
 
    If no remote or not a GitHub URL, skip issue creation gracefully.
 
-2. **Create Epic Issue (FR-048)**:
+2. **Create Epic Issue**:
    - Title: `[Epic]: {Feature Name from spec}`
    - Labels: `epic`
    - Body: Summary section from spec + link to spec file
    - Store Epic issue number for linking
 
-3. **Create Feature Issues for Each User Story (FR-049)**:
+3. **Create Feature Issues for Each User Story**:
    - Title: `[Feature]: {User Story Title}`
    - Labels: `feature`, `priority:{P1|P2|P3}`
    - Body: User story content + acceptance scenarios

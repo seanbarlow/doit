@@ -118,10 +118,13 @@ class TestValidator:
         assert "copilot-instructions" in result.message.lower()
 
     def test_check_copilot_instructions_exists(self, copilot_project):
-        """Test check when copilot-instructions.md exists."""
-        # Create copilot-instructions file
+        """Test check when copilot-instructions.md exists with doit section."""
+        # Create copilot-instructions file with DOIT INSTRUCTIONS section
         github_dir = copilot_project.path / ".github"
-        (github_dir / "copilot-instructions.md").write_text("# Instructions\n")
+        (github_dir / "copilot-instructions.md").write_text(
+            "# Instructions\n\n<!-- DOIT INSTRUCTIONS START -->\n"
+            "## Doit Workflow\n<!-- DOIT INSTRUCTIONS END -->\n"
+        )
 
         validator = Validator(copilot_project)
 

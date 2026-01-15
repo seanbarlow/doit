@@ -23,7 +23,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json --require-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
 
-2. **Load review context** (FR-023):
+2. **Load review context**:
    - **REQUIRED**: Read spec.md for requirements and acceptance criteria
    - **REQUIRED**: Read plan.md for technical decisions and architecture
    - **REQUIRED**: Read tasks.md for implementation details and file paths
@@ -36,7 +36,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Build list of files to review
    - Group files by category: models, services, endpoints, tests, config
 
-4. **Execute code review** against requirements (FR-024):
+4. **Execute code review** against requirements:
    - For each implemented file:
      - Read file contents
      - Compare against relevant spec requirements
@@ -76,7 +76,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Recommendations: [list]
    ```
 
-6. **Extract manual test items** from spec.md (FR-025):
+6. **Extract manual test items** from spec.md:
    - Parse acceptance criteria/scenarios from spec
    - Extract testable items that require manual verification
    - Items typically marked as "Given/When/Then" or acceptance criteria
@@ -86,7 +86,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Expected outcome
      - Prerequisites (if any)
 
-7. **Present manual tests sequentially** (FR-026):
+7. **Present manual tests sequentially**:
    - For each manual test:
 
      ```text
@@ -112,7 +112,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Wait for user response before proceeding to next test
    - Track results in memory
 
-8. **Track test progress** (FR-026):
+8. **Track test progress**:
    - Maintain running tally:
 
      ```text
@@ -125,7 +125,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Display after each test completion
 
-9. **Collect sign-off** (FR-027):
+9. **Collect sign-off**:
    - After all manual tests complete, present summary:
 
      ```text
@@ -202,7 +202,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
     After collecting all review data, generate visual quality dashboards:
 
-    a. **Finding Distribution Pie Chart** (FR-011):
+    a. **Finding Distribution Pie Chart**:
        - Count findings by severity (Critical, Major, Minor, Info)
        - Generate pie chart showing distribution
        - Add to review-report.md in Quality Overview section
@@ -231,7 +231,7 @@ You **MUST** consider the user input before proceeding (if not empty).
        <!-- END:AUTO-GENERATED -->
        ~~~
 
-    b. **Test Results Visualization** (FR-012):
+    b. **Test Results Visualization**:
        - Count test results by status (Passed, Failed, Skipped, Blocked)
        - Generate pie chart showing test outcomes
        - Add to review-report.md in Manual Testing Summary section

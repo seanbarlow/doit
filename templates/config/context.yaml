@@ -1,0 +1,134 @@
+# Context Configuration
+# ====================
+# This file configures automatic context injection for doit commands.
+# Project context (constitution, roadmap, specs) is automatically loaded
+# and provided to AI agents when running doit commands.
+#
+# Location: .doit/config/context.yaml
+# Documentation: https://github.com/your-org/doit/blob/main/docs/context-injection.md
+
+# Schema version (required, must be 1)
+version: 1
+
+# ---------------------------------------------------------------------------
+# Global Settings
+# ---------------------------------------------------------------------------
+
+# Master toggle - set to false to disable all context loading
+enabled: true
+
+# Maximum tokens per individual source
+# Sources exceeding this limit will be intelligently truncated
+# Default: 4000 (suitable for most AI model context windows)
+max_tokens_per_source: 4000
+
+# Maximum total tokens across all sources combined
+# Must be >= max_tokens_per_source
+# Default: 16000 (allows constitution + roadmap + spec + related specs)
+total_max_tokens: 16000
+
+# ---------------------------------------------------------------------------
+# Source Configuration
+# ---------------------------------------------------------------------------
+# Each source has:
+#   - enabled: Whether to load this source (default: true)
+#   - priority: Loading order, lower = higher priority (default: varies)
+#   - max_count: For multi-item sources like related_specs (default: 1)
+#
+# Available sources:
+#   - constitution: Project principles from .doit/memory/constitution.md
+#   - roadmap: Project roadmap from .doit/memory/roadmap.md
+#   - current_spec: Feature spec based on current git branch
+#   - related_specs: Similar specs found via content matching
+
+sources:
+  # Project constitution - core principles and architecture decisions
+  # Always loaded first as it provides essential context
+  constitution:
+    enabled: true
+    priority: 1
+
+  # Project roadmap - current priorities and upcoming work
+  # Helps AI understand project direction
+  roadmap:
+    enabled: true
+    priority: 2
+
+  # Current feature specification - detected from git branch
+  # Example: branch "026-ai-context" loads specs/026-ai-context/spec.md
+  current_spec:
+    enabled: true
+    priority: 3
+
+  # Related specifications - found via content similarity
+  # Provides context from similar features
+  related_specs:
+    enabled: true
+    priority: 4
+    # Maximum number of related specs to include
+    max_count: 3
+
+# ---------------------------------------------------------------------------
+# Per-Command Overrides
+# ---------------------------------------------------------------------------
+# Override source settings for specific doit commands.
+# Useful when certain commands need different context.
+#
+# Available commands: specit, planit, taskit, implementit, testit,
+#                     reviewit, checkin, roadmapit, constitution, etc.
+
+commands:
+  # specit: Creating new feature specs
+  # Disable related_specs since we're creating something new
+  specit:
+    sources:
+      related_specs:
+        enabled: false
+
+  # roadmapit: Updating project roadmap
+  # Disable current_spec as roadmap is project-wide
+  roadmapit:
+    sources:
+      current_spec:
+        enabled: false
+
+  # constitution: Updating project principles
+  # Only need current constitution for reference
+  constitution:
+    sources:
+      roadmap:
+        enabled: false
+      current_spec:
+        enabled: false
+      related_specs:
+        enabled: false
+
+# ---------------------------------------------------------------------------
+# Example: Minimal Configuration
+# ---------------------------------------------------------------------------
+# To use all defaults, your file can be as simple as:
+#
+#   version: 1
+#   enabled: true
+#
+# The system will use sensible defaults for all other settings.
+
+# ---------------------------------------------------------------------------
+# Example: Disable Context Loading
+# ---------------------------------------------------------------------------
+# To completely disable context injection:
+#
+#   version: 1
+#   enabled: false
+
+# ---------------------------------------------------------------------------
+# Example: Reduce Token Usage
+# ---------------------------------------------------------------------------
+# For smaller context windows or faster response times:
+#
+#   version: 1
+#   max_tokens_per_source: 2000
+#   total_max_tokens: 8000
+#   sources:
+#     related_specs:
+#       max_count: 1

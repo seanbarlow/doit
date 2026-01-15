@@ -24,7 +24,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 2. **Load context**: Read FEATURE_SPEC and `.doit/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 
-3. **Extract Constitution Tech Stack** (FR-018):
+3. **Extract Constitution Tech Stack**:
    - Read Tech Stack section from constitution.md
    - Extract: PRIMARY_LANGUAGE, FRAMEWORKS, KEY_LIBRARIES
    - Read Infrastructure section: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
@@ -45,7 +45,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    After filling the plan content, generate visual diagrams:
 
-   a. **Architecture Overview** (FR-004):
+   a. **Architecture Overview**:
       - Parse Technical Context for: Language, Dependencies, Storage, Target Platform
       - Identify architectural layers from Project Type:
         - **single**: Presentation → Service → Data
@@ -69,7 +69,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           UI --> API --> SVC --> DB
       ```
 
-   b. **Component Dependencies** (FR-005):
+   b. **Component Dependencies**:
       - Check if multiple services/components are defined in Project Structure
       - **IF multiple services defined**:
         - Parse service names from structure
@@ -79,7 +79,7 @@ You **MUST** consider the user input before proceeding (if not empty).
         - **REMOVE the entire Component Dependencies section**
         - Do NOT leave empty placeholder
 
-   c. **Data Model ER Diagram** (FR-006):
+   c. **Data Model ER Diagram**:
       - When generating data-model.md, add ER diagram at the top
       - Parse entity definitions from the file
       - Generate erDiagram showing all entities and relationships
@@ -94,7 +94,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           }
       ```
 
-   d. **State Machine Detection** (FR-007):
+   d. **State Machine Detection**:
       - Scan entities for fields named: `status`, `state`, `stage`, `phase`
       - For each entity with state field:
         - Parse possible state values from field type or comments

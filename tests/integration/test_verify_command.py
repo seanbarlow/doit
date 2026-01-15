@@ -77,7 +77,8 @@ class TestVerifyCommand:
         try:
             output_json = json.loads(result.output)
             assert "checks" in output_json
-            assert "passed" in output_json
+            assert "status" in output_json
+            assert "summary" in output_json
         except json.JSONDecodeError:
             pytest.fail(f"Output is not valid JSON: {result.output}")
 
@@ -92,8 +93,14 @@ class TestVerifyCommand:
         output = json.loads(result.output)
 
         # Check expected fields
-        assert "passed" in output
-        assert isinstance(output["passed"], bool)
+        assert "status" in output
+        assert isinstance(output["status"], str)
+        assert output["status"] in ["passed", "failed"]
+
+        assert "summary" in output
+        assert isinstance(output["summary"], dict)
+        assert "passed" in output["summary"]
+        assert "failed" in output["summary"]
 
         assert "checks" in output
         assert isinstance(output["checks"], list)

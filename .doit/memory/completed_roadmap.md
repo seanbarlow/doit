@@ -18,6 +18,7 @@
 | Git hook integration for workflow enforcement                      | P2                | 2026-01-15     | `[025-git-hooks-workflow]`           | Pre-commit/push hooks enforce spec-first  |
 | AI context injection CLI (`doit context` command)                  | P2                | 2026-01-15     | `[026-ai-context-injection]`         | Auto-load project context for AI commands |
 | AI context injection for templates                                 | P2                | 2026-01-15     | `[027-template-context-injection]`   | Auto-inject context into command templates|
+| Documentation and tutorial refresh                                 | P2                | 2026-01-15     | `[028-docs-tutorial-refresh]`        | Updated all docs for features 023-027     |
 
 ---
 
@@ -38,9 +39,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 6
+- **Total Items Completed**: 7
 - **P1 Items Completed**: 3
-- **P2 Items Completed**: 3
+- **P2 Items Completed**: 4
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

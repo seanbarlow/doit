@@ -32,12 +32,17 @@ class TestTemplateManager:
         assert "commands" in str(path)
 
     def test_get_template_source_path_copilot(self):
-        """Test getting template source path for Copilot."""
+        """Test getting template source path for Copilot.
+
+        Note: With unified templates (024-unified-templates), both agents
+        now use 'commands' as their source directory.
+        """
         manager = TemplateManager()
 
         path = manager.get_template_source_path(Agent.COPILOT)
 
-        assert "prompts" in str(path)
+        # Copilot now uses commands/ as source (single source of truth)
+        assert "commands" in str(path)
 
     def test_get_template_source_path_custom(self, temp_dir):
         """Test getting template source path with custom source."""
@@ -319,3 +324,134 @@ class TestCopyScripts:
         assert isinstance(result["created"], list)
         assert isinstance(result["updated"], list)
         assert isinstance(result["skipped"], list)
+
+
+class TestUnifiedTemplates:
+    """Tests for unified template management (024-unified-templates).
+
+    Both Claude and Copilot now use templates/commands/ as the single source.
+    Copilot prompts are transformed on-the-fly during copy.
+    """
+
+    def test_both_agents_use_same_source_directory(self):
+        """Test both agents read from the same source directory."""
+        manager = TemplateManager()
+
+        claude_path = manager.get_template_source_path(Agent.CLAUDE)
+        copilot_path = manager.get_template_source_path(Agent.COPILOT)
+
+        # Both should point to commands/
+        assert claude_path == copilot_path
+        assert "commands" in str(claude_path)
+
+    def test_get_command_templates_returns_templates(self):
+        """Test _get_command_templates returns templates from commands/."""
+        manager = TemplateManager()
+
+        templates = manager._get_command_templates()
+
+        assert isinstance(templates, list)
+        # Should have some templates if commands/ exists
+        assert len(templates) > 0
+
+    def test_get_command_templates_parses_as_claude_format(self):
+        """Test _get_command_templates parses all files as Claude format."""
+        manager = TemplateManager()
+
+        templates = manager._get_command_templates()
+
+        for template in templates:
+            # Template names should be extracted correctly
+            assert template.name in DOIT_COMMANDS or template.name.startswith("doit")
+            # Filenames should have Claude format
+            assert template.target_filename.startswith("doit.")
+            assert template.target_filename.endswith(".md")
+            assert ".prompt." not in template.target_filename
+
+    def test_copy_templates_claude_direct_copy(self, temp_dir):
+        """Test Claude templates are copied directly without transformation."""
+        manager = TemplateManager()
+        target_dir = temp_dir / "claude_output"
+        target_dir.mkdir()
+
+        result = manager.copy_templates_for_agent(Agent.CLAUDE, target_dir)
+
+        # Should have created files
+        assert len(result["created"]) > 0
+
+        # Files should have Claude naming convention
+        for path in result["created"]:
+            assert path.name.startswith("doit.")
+            assert path.name.endswith(".md")
+            assert ".prompt." not in path.name
+
+    def test_copy_templates_copilot_transforms(self, temp_dir):
+        """Test Copilot templates are transformed during copy."""
+        manager = TemplateManager()
+        target_dir = temp_dir / "copilot_output"
+        target_dir.mkdir()
+
+        result = manager.copy_templates_for_agent(Agent.COPILOT, target_dir)
+
+        # Should have created files
+        assert len(result["created"]) > 0
+
+        # Files should have Copilot naming convention
+        for path in result["created"]:
+            assert path.name.startswith("doit-")
+            assert path.name.endswith(".prompt.md")
+
+    def test_copilot_templates_are_transformed(self, temp_dir):
+        """Test Copilot templates have YAML frontmatter removed."""
+        manager = TemplateManager()
+        target_dir = temp_dir / "copilot_output"
+        target_dir.mkdir()
+
+        manager.copy_templates_for_agent(Agent.COPILOT, target_dir)
+
+        # Check content of generated files
+        for prompt_file in target_dir.iterdir():
+            if prompt_file.is_file():
+                content = prompt_file.read_text()
+                # YAML frontmatter should be removed
+                assert not content.startswith("---")
+                # $ARGUMENTS should be replaced
+                assert "$ARGUMENTS" not in content
+
+    def test_claude_templates_preserve_yaml(self, temp_dir):
+        """Test Claude templates preserve YAML frontmatter."""
+        manager = TemplateManager()
+        target_dir = temp_dir / "claude_output"
+        target_dir.mkdir()
+
+        manager.copy_templates_for_agent(Agent.CLAUDE, target_dir)
+
+        # Check content of generated files
+        yaml_found = False
+        for command_file in target_dir.iterdir():
+            if command_file.is_file():
+                content = command_file.read_text()
+                # At least some should have YAML frontmatter
+                if content.startswith("---"):
+                    yaml_found = True
+                    break
+
+        assert yaml_found, "Expected at least one Claude template with YAML frontmatter"
+
+    def test_transform_and_write_generates_correct_filenames(self, temp_dir):
+        """Test _transform_and_write_templates generates correct filenames."""
+        manager = TemplateManager()
+        target_dir = temp_dir / "transform_test"
+        target_dir.mkdir()
+
+        templates = manager._get_command_templates()
+        result = manager._transform_and_write_templates(templates, target_dir)
+
+        # Each created file should match doit-{name}.prompt.md pattern
+        for path in result["created"]:
+            filename = path.name
+            assert filename.startswith("doit-")
+            assert filename.endswith(".prompt.md")
+            # Extract name and verify it's valid
+            name = filename.replace("doit-", "").replace(".prompt.md", "")
+            assert name in DOIT_COMMANDS

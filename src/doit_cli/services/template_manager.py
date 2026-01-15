@@ -7,6 +7,8 @@ import shutil
 
 from ..models.agent import Agent
 from ..models.template import Template, DOIT_COMMANDS
+from ..models.sync_models import CommandTemplate
+from .prompt_transformer import PromptTransformer
 
 
 # Workflow templates to copy to .doit/templates/
@@ -231,16 +233,43 @@ class TemplateManager:
 
         return warnings
 
-    def copy_templates_for_agent(
+    def _get_command_templates(self) -> list[Template]:
+        """Get all command templates from the unified source directory.
+
+        Always reads from commands/ directory and parses as Claude format,
+        since that's the canonical source for all agents.
+
+        Returns:
+            List of Template objects with names extracted from source files.
+        """
+        source_dir = self.get_base_template_path() / "commands"
+
+        if not source_dir.exists():
+            return []
+
+        templates = []
+        for file_path in source_dir.iterdir():
+            if file_path.is_file() and file_path.suffix == ".md":
+                try:
+                    # Always parse as Claude format since source is commands/
+                    template = Template.from_file(file_path, Agent.CLAUDE)
+                    templates.append(template)
+                except Exception:
+                    # Skip files that can't be parsed
+                    continue
+
+        return templates
+
+    def _transform_and_write_templates(
         self,
-        agent: Agent,
+        templates: list[Template],
         target_dir: Path,
         overwrite: bool = False,
     ) -> dict:
-        """Copy templates for an agent to target directory.
+        """Transform command templates to Copilot prompt format and write them.
 
         Args:
-            agent: Target agent
+            templates: List of source templates (in Claude/command format)
             target_dir: Destination directory
             overwrite: Whether to overwrite existing files
 
@@ -253,7 +282,65 @@ class TemplateManager:
             "skipped": [],
         }
 
-        templates = self.get_bundled_templates(agent)
+        transformer = PromptTransformer()
+
+        for template in templates:
+            # Create CommandTemplate for the transformer
+            command_template = CommandTemplate.from_path(template.source_path)
+
+            # Transform the content
+            transformed_content = transformer.transform(command_template)
+
+            # Generate Copilot filename: doit-{name}.prompt.md
+            target_filename = f"doit-{template.name}.prompt.md"
+            target_path = target_dir / target_filename
+
+            if target_path.exists():
+                if overwrite:
+                    target_path.write_text(transformed_content, encoding="utf-8")
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                target_path.write_text(transformed_content, encoding="utf-8")
+                result["created"].append(target_path)
+
+        return result
+
+    def copy_templates_for_agent(
+        self,
+        agent: Agent,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy templates for an agent to target directory.
+
+        For Claude: Direct copy from commands/ directory.
+        For Copilot: Transform command templates to prompt format.
+
+        Args:
+            agent: Target agent
+            target_dir: Destination directory
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        # Get templates from unified source (commands/)
+        templates = self._get_command_templates()
+
+        if agent.needs_transformation:
+            # Copilot: Transform command templates to prompt format
+            return self._transform_and_write_templates(
+                templates, target_dir, overwrite
+            )
+
+        # Claude: Direct copy with correct filename
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
 
         for template in templates:
             target_path = target_dir / template.target_filename

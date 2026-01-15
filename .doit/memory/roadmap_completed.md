@@ -13,6 +13,8 @@
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
 | Unified template management (single source of truth for commands) | P1 | 2026-01-15 | `024-unified-templates` | Eliminates duplicate templates, simplifies maintenance |
+| Multi-agent prompt synchronization (`sync-prompts` command) | P1 | 2026-01-13 | `023-copilot-prompts-sync` | Enables consistent prompt files across Claude, Copilot, and other AI agents |
+| Core workflow commands (specit, planit, taskit, implementit, testit, reviewit, checkin) | P1 | 2026-01-10 | - | Complete spec-driven development workflow - foundation of the CLI |
 
 ---
 
@@ -33,8 +35,8 @@
 
 ## Statistics
 
-- **Total Items Completed**: 1
-- **P1 Items Completed**: 1
+- **Total Items Completed**: 3
+- **P1 Items Completed**: 3
 - **P2 Items Completed**: 0
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0

@@ -18,7 +18,7 @@ Follow this execution flow:
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
    **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
 
-2. **Section-by-Section Update Mode** (FR-011):
+2. **Section-by-Section Update Mode**:
    If user input specifies a particular section to update (e.g., "update tech stack" or "change deployment"), focus on that section only while preserving other sections. Supported section keywords:
    - "purpose" / "goals" → Purpose & Goals section
    - "tech" / "stack" / "language" → Tech Stack section
@@ -32,7 +32,7 @@ Follow this execution flow:
 3. **Guided Prompts for New Placeholders**:
    When collecting values for the following placeholders, use these prompts if values not provided:
 
-   **Purpose & Goals (FR-004):**
+   **Purpose & Goals:**
    - [PROJECT_PURPOSE]: "What is the main purpose of this project? What problem does it solve?"
    - [SUCCESS_CRITERIA]: "What are the key success metrics or criteria for this project?"
 
@@ -46,7 +46,7 @@ Follow this execution flow:
    - [CLOUD_PROVIDER]: "Which cloud provider? (AWS, GCP, Azure, multi-cloud, on-premises)"
    - [DATABASE]: "What database(s) will you use? (e.g., PostgreSQL, MongoDB, none)"
 
-   **Deployment (FR-009):**
+   **Deployment:**
    - [CICD_PIPELINE]: "What CI/CD system? (e.g., GitHub Actions, GitLab CI, Jenkins)"
    - [DEPLOYMENT_STRATEGY]: "What deployment strategy? (blue-green, rolling, canary, manual)"
    - [ENVIRONMENTS]: "What environments? (e.g., dev, staging, production)"
@@ -108,7 +108,7 @@ If critical info missing (e.g., ratification date truly unknown), insert `TODO(<
 
 Do not create a new template; always operate on the existing `.doit/memory/constitution.md` file.
 
-## Constitution Reading Utility (FR-013)
+## Constitution Reading Utility
 
 Other commands can read and utilize the constitution by:
 

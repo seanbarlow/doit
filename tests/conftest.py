@@ -44,9 +44,9 @@ def claude_project(initialized_project):
     scaffolder = Scaffolder(initialized_project)
     scaffolder.create_agent_directory(Agent.CLAUDE)
 
-    # Create sample command file
+    # Create sample command file (Claude uses doit.*.md naming convention)
     command_dir = initialized_project.command_directory(Agent.CLAUDE)
-    sample_file = command_dir / "doit-specit.md"
+    sample_file = command_dir / "doit.specit.md"
     sample_file.write_text("# Test template\n")
 
     return initialized_project

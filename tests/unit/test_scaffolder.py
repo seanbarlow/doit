@@ -79,9 +79,10 @@ class TestScaffolder:
         assert scaffolder.should_preserve(constitution_file)
 
     def test_should_not_preserve_doit_templates(self, claude_project):
-        """Test that doit-prefixed templates are not preserved."""
+        """Test that doit-managed templates are not preserved."""
         command_dir = claude_project.command_directory(Agent.CLAUDE)
-        doit_file = command_dir / "doit-specit.md"
+        # Claude uses doit.*.md naming convention
+        doit_file = command_dir / "doit.specit.md"
 
         scaffolder = Scaffolder(claude_project)
 
@@ -90,14 +91,15 @@ class TestScaffolder:
     def test_get_files_to_update_claude(self, claude_project):
         """Test getting updatable files for Claude agent."""
         command_dir = claude_project.command_directory(Agent.CLAUDE)
-        (command_dir / "doit-planit.md").write_text("# Plan\n")
+        # Claude uses doit.*.md naming convention
+        (command_dir / "doit.planit.md").write_text("# Plan\n")
         (command_dir / "custom-command.md").write_text("# Custom\n")
 
         scaffolder = Scaffolder(claude_project)
         files_to_update = scaffolder.get_files_to_update(Agent.CLAUDE)
 
-        # Should include doit-prefixed files only
+        # Should include doit-managed files only (doit.*.md pattern for Claude)
         file_names = [f.name for f in files_to_update]
-        assert "doit-specit.md" in file_names
-        assert "doit-planit.md" in file_names
+        assert "doit.specit.md" in file_names
+        assert "doit.planit.md" in file_names
         assert "custom-command.md" not in file_names

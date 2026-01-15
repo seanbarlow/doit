@@ -18,7 +18,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read review-report.md for code review status
    - **IF EXISTS**: Read test-report.md for test status
 
-3. **Retrieve GitHub issues for feature** (FR-037):
+3. **Retrieve GitHub issues for feature**:
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found:
      - Search for Epic issue matching feature branch name
@@ -52,7 +52,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      | #BBB | Task 2 | OPEN |
      ```
 
-5. **Handle incomplete issues** (FR-038):
+5. **Handle incomplete issues**:
    - If any issues are still open but tasks show complete:
      - List the incomplete issues
      - Ask: "The following issues are still open. Do you want to close them? (yes/no/select)"
@@ -142,7 +142,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    If no matching items found: Log "No matching roadmap items found for branch [branch-name]"
 
-7. **Generate feature documentation** in docs/ (FR-041):
+7. **Generate feature documentation** in docs/:
    - Create `docs/features/[feature-name].md`:
 
      ```markdown
@@ -176,7 +176,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Tasks: #AAA, #BBB, ...
      ```
 
-8. **Prepare git commit** (FR-042):
+8. **Prepare git commit**:
    - Stage all changes: `git add -A`
    - Generate commit message from feature context:
 
@@ -196,9 +196,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Execute commit: `git commit -m "[message]"`
 
-9. **Create pull request** (FR-043):
+9. **Create pull request**:
    - Determine target branch:
-     - Check the user's input for `--target [branch]` flag (FR-044)
+     - Check the user's input for `--target [branch]` flag
      - If not specified, check for `develop` branch
      - If no `develop`, use `main` or `master`
    - Check for gh CLI:

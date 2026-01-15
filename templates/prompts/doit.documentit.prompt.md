@@ -109,7 +109,7 @@ Create a report showing proposed changes:
 Proceed with migration? (y/n)
 ```
 
-### 2.4 Execute Migration (FR-008)
+### 2.4 Execute Migration
 
 **IMPORTANT**: Only proceed after user confirmation.
 
@@ -204,7 +204,7 @@ Index Updated:
 
 ## Step 4: Audit Documentation Health (FR-020 to FR-024)
 
-### 4.1 Check for Broken Links (FR-020)
+### 4.1 Check for Broken Links
 
 Parse all markdown files in docs/ for internal links:
 
@@ -218,13 +218,13 @@ Link patterns to check:
 
 For each link, verify the target file exists.
 
-### 4.2 Check for Missing Headers (FR-021)
+### 4.2 Check for Missing Headers
 
 For each markdown file:
 - Check if file starts with `# ` heading
 - Flag files without proper title headers
 
-### 4.3 Check Documentation Coverage (FR-022)
+### 4.3 Check Documentation Coverage
 
 Cross-reference completed features with documentation:
 
@@ -283,7 +283,7 @@ Cross-reference completed features with documentation:
 
 ## Step 5: Cleanup Redundant Documentation (FR-025 to FR-028)
 
-### 5.1 Find Potential Duplicates (FR-025)
+### 5.1 Find Potential Duplicates
 
 Compare files for similarity:
 
@@ -295,7 +295,7 @@ Duplicate detection methods:
 4. Same filename in different directories
 ```
 
-### 5.2 Find Orphaned Files (FR-026)
+### 5.2 Find Orphaned Files
 
 Track all internal links across documentation:
 
@@ -370,7 +370,7 @@ For each command file, check:
 | doit.planit.md | ✅ | ❌ | ✅ | ✅ | 75% |
 ```
 
-### 6.3 Generate Improvement Suggestions (FR-031)
+### 6.3 Generate Improvement Suggestions
 
 For each file with missing elements:
 
@@ -396,7 +396,7 @@ Suggested addition:
 **Accept this suggestion? (y/n)**
 ```
 
-### 6.4 Apply Enhancements (FR-032)
+### 6.4 Apply Enhancements
 
 For accepted suggestions:
 1. Read current file content

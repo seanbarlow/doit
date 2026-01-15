@@ -61,6 +61,22 @@ class AgentDetector:
 
         return copilot_instructions.exists() or copilot_prompts.exists()
 
+    def has_claude(self) -> bool:
+        """Check if project has Claude agent configured.
+
+        Returns:
+            True if Claude is configured
+        """
+        return self._has_claude_setup()
+
+    def has_copilot(self) -> bool:
+        """Check if project has Copilot agent configured.
+
+        Returns:
+            True if Copilot is configured
+        """
+        return self._has_copilot_setup()
+
     def detect_primary_agent(self) -> Optional[Agent]:
         """Detect the primary (most likely) agent for this project.
 

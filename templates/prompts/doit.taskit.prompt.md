@@ -45,7 +45,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    After generating the task list, create visual diagrams to show execution order and timelines:
 
-   a. **Task Dependencies Flowchart** (FR-008):
+   a. **Task Dependencies Flowchart**:
       - Parse all generated tasks and their dependencies
       - Identify parallel tasks (marked with [P])
       - Group tasks by phase using subgraphs
@@ -75,7 +75,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           T004 & T005 --> T006
       ```
 
-   b. **Phase Timeline Gantt Chart** (FR-009):
+   b. **Phase Timeline Gantt Chart**:
       - Extract phases and their task counts
       - Estimate duration based on task complexity (1 task ≈ 0.5-1 day)
       - Generate gantt chart showing phase timeline
@@ -103,7 +103,7 @@ You **MUST** consider the user input before proceeding (if not empty).
           Cross-cutting concerns    :e1, after d1, 1d
       ```
 
-   c. **Parallel Task Detection** (FR-010):
+   c. **Parallel Task Detection**:
       - Scan all tasks for [P] markers
       - Group consecutive parallel tasks for diagram optimization
       - In flowchart: Connect parallel tasks with `&` syntax
@@ -123,8 +123,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
-7. **GitHub Issue Integration** (FR-050):
-   - Check for `--skip-issues` in the user's input - if present, skip issue creation (FR-021)
+7. **GitHub Issue Integration**:
+   - Check for `--skip-issues` in the user's input - if present, skip issue creation
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found and not skipped:
      - For each generated task, create a GitHub Task issue using the task.yml template
@@ -132,7 +132,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Link Task issues to parent Feature using "Part of Feature #XXX" in body
      - Add phase label (e.g., "Phase 3 - Core Implementation")
      - Add effort estimate if extractable from task description
-   - If GitHub unavailable or API fails: Log warning and continue without issues (FR-022)
+   - If GitHub unavailable or API fails: Log warning and continue without issues
    - Report: Number of issues created, any linking errors
 
 Context for task generation: the user's input

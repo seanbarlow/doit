@@ -193,7 +193,17 @@ Since this is an existing project, your next steps are:
   3. Run /doit.specit when you're ready to add a feature
 ```
 
-### Step 2.2: Key Difference - Skip Scaffolding
+### Step 2.2: Multi-Agent Setup (Optional)
+
+If you're using multiple AI agents (both Claude Code and GitHub Copilot), run:
+
+```bash
+doit sync-prompts
+```
+
+This ensures all your AI assistants have the same command templates.
+
+### Step 2.3: Key Difference - Skip Scaffolding
 
 Notice that Do-It recognizes this is an existing project and suggests **skipping** `/doit.scaffoldit`. This is because:
 
@@ -325,6 +335,8 @@ src/weather/
 ```
 
 > **Key Insight**: The constitution documents what IS, not what SHOULD BE. This helps Do-It generate code that matches your existing patterns.
+
+> **Context Awareness**: Once your constitution is created, all subsequent Do-It commands automatically load it as context. Run `doit context show` to see what context is available to AI assistants.
 
 **Checkpoint**: Constitution created reflecting existing project patterns.
 

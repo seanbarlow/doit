@@ -17,6 +17,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Git Hooks Workflow Enforcement** (#025)
+  - `doit hooks install` and `doit hooks uninstall` commands for managing Git hooks
+  - Pre-commit hook validates feature branches have spec.md
+  - Pre-push hook validates required artifacts (spec.md, plan.md, tasks.md)
+  - Configurable via `.doit/hooks.yaml`
+  - Bypass with `--no-verify` for emergency fixes
+
+- **AI Context Injection** (#026)
+  - Automatic loading of constitution.md and roadmap.md for all commands
+  - `doit context show` command to display loaded context
+  - Feature branch detection loads current spec automatically
+  - Related spec discovery based on keyword matching
+
+- **Template Context Injection** (#027)
+  - All 11 doit command templates now include context loading step
+  - AI assistants automatically receive project context before executing commands
+  - Context loading positioned before main logic in all templates
+  - Graceful handling of missing context files
+
 - `Agent.needs_transformation` property for determining which agents require template transformation
 - `TemplateManager._transform_and_write_templates()` for on-demand prompt generation
 - 29 new unit tests for unified template functionality

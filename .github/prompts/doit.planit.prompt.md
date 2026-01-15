@@ -1,0 +1,160 @@
+# Doit Planit
+
+Execute the implementation planning workflow using the plan template to generate design artifacts.
+
+## User Input
+
+Consider any arguments or options the user provides.
+
+You **MUST** consider the user input before proceeding (if not empty).
+
+## Outline
+
+1. **Setup**: Run `.doit/scripts/bash/setup-plan.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+
+2. **Load context**: Read FEATURE_SPEC and `.doit/memory/constitution.md`. Load IMPL_PLAN template (already copied).
+
+3. **Extract Constitution Tech Stack** (FR-018):
+   - Read Tech Stack section from constitution.md
+   - Extract: PRIMARY_LANGUAGE, FRAMEWORKS, KEY_LIBRARIES
+   - Read Infrastructure section: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
+   - Read Deployment section: CICD_PIPELINE, DEPLOYMENT_STRATEGY
+   - Store these values for architecture alignment validation
+
+4. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
+   - Fill Technical Context using constitution tech stack as baseline
+   - Flag any tech choices that deviate from constitution (require justification)
+   - Fill Constitution Check section from constitution
+   - Evaluate gates (ERROR if violations unjustified or tech stack misalignment)
+   - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
+   - Phase 1: Generate data-model.md, contracts/, quickstart.md
+   - Phase 1: Update agent context by running the agent script
+   - Re-evaluate Constitution Check post-design
+
+5. **Generate Mermaid Visualizations** (FR-004, FR-005, FR-006, FR-007):
+
+   After filling the plan content, generate visual diagrams:
+
+   a. **Architecture Overview** (FR-004):
+      - Parse Technical Context for: Language, Dependencies, Storage, Target Platform
+      - Identify architectural layers from Project Type:
+        - **single**: Presentation → Service → Data
+        - **web**: Frontend → API → Services → Database
+        - **mobile**: Mobile App → API → Services → Database
+      - Generate flowchart with subgraphs for each layer
+      - Replace content in `<!-- BEGIN:AUTO-GENERATED section="architecture" -->` markers
+
+      ```mermaid
+      flowchart TD
+          subgraph "Presentation"
+              UI[UI/CLI Layer]
+          end
+          subgraph "Application"
+              API[API/Routes]
+              SVC[Services]
+          end
+          subgraph "Data"
+              DB[(Database)]
+          end
+          UI --> API --> SVC --> DB
+      ```
+
+   b. **Component Dependencies** (FR-005):
+      - Check if multiple services/components are defined in Project Structure
+      - **IF multiple services defined**:
+        - Parse service names from structure
+        - Generate dependency flowchart showing relationships
+        - Replace content in `<!-- BEGIN:AUTO-GENERATED section="component-dependencies" -->` markers
+      - **IF single service only**:
+        - **REMOVE the entire Component Dependencies section**
+        - Do NOT leave empty placeholder
+
+   c. **Data Model ER Diagram** (FR-006):
+      - When generating data-model.md, add ER diagram at the top
+      - Parse entity definitions from the file
+      - Generate erDiagram showing all entities and relationships
+      - Insert in `<!-- BEGIN:AUTO-GENERATED section="er-diagram" -->` markers
+
+      ```mermaid
+      erDiagram
+          ENTITY1 ||--o{ ENTITY2 : "relationship"
+          ENTITY1 {
+              uuid id PK
+              string name
+          }
+      ```
+
+   d. **State Machine Detection** (FR-007):
+      - Scan entities for fields named: `status`, `state`, `stage`, `phase`
+      - For each entity with state field:
+        - Parse possible state values from field type or comments
+        - Generate stateDiagram-v2 showing transitions
+        - Add after entity definition in data-model.md
+
+      ```mermaid
+      stateDiagram-v2
+          [*] --> Initial
+          Initial --> Active : activate
+          Active --> Complete : finish
+          Complete --> [*]
+      ```
+
+   e. **Diagram Validation**:
+      - Verify mermaid syntax is valid
+      - Check node count does not exceed limits (20 for flowchart, 10 for ER)
+      - If exceeding limits, split into subgraphs by domain/layer
+
+6. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
+
+## Phases
+
+### Phase 0: Outline & Research
+
+1. **Extract unknowns from Technical Context** above:
+   - For each NEEDS CLARIFICATION → research task
+   - For each dependency → best practices task
+   - For each integration → patterns task
+
+2. **Generate and dispatch research agents**:
+
+   ```text
+   For each unknown in Technical Context:
+     Task: "Research {unknown} for {feature context}"
+   For each technology choice:
+     Task: "Find best practices for {tech} in {domain}"
+   ```
+
+3. **Consolidate findings** in `research.md` using format:
+   - Decision: [what was chosen]
+   - Rationale: [why chosen]
+   - Alternatives considered: [what else evaluated]
+
+**Output**: research.md with all NEEDS CLARIFICATION resolved
+
+### Phase 1: Design & Contracts
+
+**Prerequisites:** `research.md` complete
+
+1. **Extract entities from feature spec** → `data-model.md`:
+   - Entity name, fields, relationships
+   - Validation rules from requirements
+   - State transitions if applicable
+
+2. **Generate API contracts** from functional requirements:
+   - For each user action → endpoint
+   - Use standard REST/GraphQL patterns
+   - Output OpenAPI/GraphQL schema to `/contracts/`
+
+3. **Agent context update**:
+   - Run `.doit/scripts/bash/update-agent-context.sh claude`
+   - These scripts detect which AI agent is in use
+   - Update the appropriate agent-specific context file
+   - Add only new technology from current plan
+   - Preserve manual additions between markers
+
+**Output**: data-model.md, /contracts/*, quickstart.md, agent-specific file
+
+## Key rules
+
+- Use absolute paths
+- ERROR on gate failures or unresolved clarifications

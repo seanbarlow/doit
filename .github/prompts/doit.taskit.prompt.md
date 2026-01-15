@@ -1,21 +1,10 @@
----
-description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
-handoffs: 
-  - label: Analyze For Consistency
-    agent: doit.analyze
-    prompt: Run a project analysis for consistency
-    send: true
-  - label: Implement Project
-    agent: doit.implement
-    prompt: Start the implementation in phases
-    send: true
----
+# Doit Taskit
+
+Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -135,7 +124,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
 7. **GitHub Issue Integration** (FR-050):
-   - Check for `--skip-issues` in $ARGUMENTS - if present, skip issue creation (FR-021)
+   - Check for `--skip-issues` in the user's input - if present, skip issue creation (FR-021)
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found and not skipped:
      - For each generated task, create a GitHub Task issue using the task.yml template
@@ -146,7 +135,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - If GitHub unavailable or API fails: Log warning and continue without issues (FR-022)
    - Report: Number of issues created, any linking errors
 
-Context for task generation: $ARGUMENTS
+Context for task generation: the user's input
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
 

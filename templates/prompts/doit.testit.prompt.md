@@ -1,21 +1,10 @@
----
-description: Execute automated tests and generate test reports with requirement mapping
-handoffs:
-  - label: Check In
-    agent: doit.checkin
-    prompt: Finalize feature and create pull request
-    send: true
-  - label: Review Again
-    agent: doit.review
-    prompt: Re-review code after test fixes
-    send: true
----
+# Doit Testit
+
+Execute automated tests and generate test reports with requirement mapping
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -125,7 +114,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      ```
 
 8. **Record manual test results** (FR-032):
-   - If $ARGUMENTS contains `--manual`:
+   - If the user's input contains `--manual`:
      - Present each manual test item
      - Ask for PASS/FAIL/SKIP result
      - Record notes for failed tests
@@ -201,3 +190,61 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Continue generating report even if some tests fail
 - Preserve test output for debugging
 - Map requirements using FR-XXX pattern matching in test names/docstrings
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (all tests pass)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                      │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ○ checkin │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.reviewit` for a code review before finalizing.
+
+**Alternative**: Run `/doit.checkin` to merge your changes if code review is not needed.
+```
+
+### On Failure (tests fail)
+
+If some tests fail:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                      │
+│  ● specit → ● planit → ● taskit → ● implementit → ◐ testit → ○ checkin │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**Status**: N tests failed out of M total.
+
+**Recommended**: Run `/doit.implementit` to fix the failing tests.
+```
+
+### On Error (no test framework detected)
+
+If no test framework is detected:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No test framework detected in this project.
+
+**Recommended**: Add tests to your project and run `/doit.testit` again, or proceed with `/doit.reviewit` for code review.
+```

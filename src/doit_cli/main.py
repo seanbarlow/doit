@@ -3,6 +3,7 @@
 import typer
 
 from .cli.init_command import init_command
+from .cli.sync_prompts_command import sync_prompts_command
 from .cli.verify_command import verify_command
 
 
@@ -15,6 +16,7 @@ app = typer.Typer(
 
 # Register commands
 app.command(name="init")(init_command)
+app.command(name="sync-prompts")(sync_prompts_command)
 app.command(name="verify")(verify_command)
 
 

@@ -1,20 +1,10 @@
----
-description: Execute the implementation planning workflow using the plan template to generate design artifacts.
-handoffs: 
-  - label: Create Tasks
-    agent: doit.tasks
-    prompt: Break the plan into tasks
-    send: true
-  - label: Create Checklist
-    agent: doit.checklist
-    prompt: Create a checklist for the following domain...
----
+# Doit Planit
+
+Execute the implementation planning workflow using the plan template to generate design artifacts.
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -168,3 +158,73 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 - Use absolute paths
 - ERROR on gate failures or unresolved clarifications
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (plan and artifacts created)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ○ taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.taskit` to create implementation tasks from this plan.
+```
+
+### On Success with Existing Tasks
+
+If `tasks.md` already exists in the specs directory:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ● planit → ● taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.implementit` to begin executing the existing tasks.
+
+**Alternative**: Run `/doit.taskit` to regenerate tasks based on the updated plan.
+```
+
+### On Error (missing spec.md)
+
+If the command fails because spec.md is not found:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: No feature specification found. The planit command requires spec.md to exist.
+
+**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
+```
+
+### On Error (other issues)
+
+If the command fails for another reason:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

@@ -1,16 +1,10 @@
----
-description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
-handoffs: 
-  - label: Build Specification
-    agent: doit.doit
-    prompt: Implement the feature specification based on the updated constitution. I want to build...
----
+# Doit Constitution
+
+Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 

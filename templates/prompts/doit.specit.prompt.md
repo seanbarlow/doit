@@ -1,25 +1,16 @@
----
-description: Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation.
-handoffs:
-  - label: Build Technical Plan
-    agent: doit.plan
-    prompt: Create a plan for the spec. I am building with...
-  - label: Scaffold Project Structure
-    agent: doit.scaffold
-    prompt: Generate project structure based on constitution tech stack
----
+# Doit Specit
+
+Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation.
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `the user's input` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
@@ -53,10 +44,10 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
 
-   d. Run the script `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS"` with the calculated number and short-name:
+   d. Run the script `.doit/scripts/bash/create-new-feature.sh --json "the user's input"` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --json --number 5 --short-name "user-auth" "Add user authentication"`
-      - PowerShell example: `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
+      - Bash example: `.doit/scripts/bash/create-new-feature.sh --json "the user's input" --json --number 5 --short-name "user-auth" "Add user authentication"`
+      - PowerShell example: `.doit/scripts/bash/create-new-feature.sh --json "the user's input" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
 
    **IMPORTANT**:
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number
@@ -443,3 +434,57 @@ Report created issues at the end:
 ```
 
 If issues were skipped or failed, note the reason.
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (spec created)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ○ planit → ○ taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Run `/doit.planit` to create an implementation plan for this feature.
+```
+
+### On Success with Clarifications Needed
+
+If the spec contains [NEEDS CLARIFICATION] markers:
+
+```markdown
+---
+
+## Next Steps
+
+┌─────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                          │
+│  ● specit → ○ planit → ○ taskit → ○ implementit → ○ checkin │
+└─────────────────────────────────────────────────────────────┘
+
+**Recommended**: Resolve N open questions in the spec before proceeding to planning.
+```
+
+### On Error
+
+If the command fails (e.g., branch creation failed):
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: [Brief description of what went wrong]
+
+**Recommended**: [Specific recovery action based on the error]
+```

@@ -1,12 +1,10 @@
----
-description: Finalize feature implementation, close issues, update roadmaps, and create pull request
----
+# Doit Checkin
+
+Finalize feature implementation, close issues, update roadmaps, and create pull request
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -200,7 +198,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 9. **Create pull request** (FR-043):
    - Determine target branch:
-     - Check $ARGUMENTS for `--target [branch]` flag (FR-044)
+     - Check the user's input for `--target [branch]` flag (FR-044)
      - If not specified, check for `develop` branch
      - If no `develop`, use `main` or `master`
    - Check for gh CLI:
@@ -285,3 +283,63 @@ You **MUST** consider the user input before proceeding (if not empty).
 - Generate documentation even if GitHub unavailable
 - Provide manual fallbacks for all GitHub operations
 - Include issue references in commit message for auto-linking
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (PR merged or ready to merge)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                    │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ● reviewit → ● checkin  │
+└───────────────────────────────────────────────────────────────────────────────────────┘
+
+**Status**: Feature complete! 🎉
+
+**Recommended**: Run `/doit.roadmapit` to update the project roadmap with this completion.
+
+**Alternative**: Run `/doit.specit [next feature]` to start the next feature development.
+```
+
+### On Partial Success (PR created, pending merge)
+
+If the PR was created but not yet merged:
+
+```markdown
+---
+
+## Next Steps
+
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                                                    │
+│  ● specit → ● planit → ● taskit → ● implementit → ● testit → ● reviewit → ◐ checkin  │
+└───────────────────────────────────────────────────────────────────────────────────────┘
+
+**Status**: PR created and awaiting merge.
+
+**Next**: Merge the PR when ready, then run `/doit.roadmapit` to update the project roadmap.
+```
+
+### On Error (issues incomplete)
+
+If some issues or tasks are still incomplete:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: Some tasks or issues are still open.
+
+**Recommended**: Complete the outstanding tasks with `/doit.implementit`, or use `--force` flag to proceed anyway.
+```

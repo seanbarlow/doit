@@ -17,7 +17,7 @@ Thank you for considering contributing to Do-It! We appreciate your interest in 
 ```bash
 # Fork the repository on GitHub
 # Then clone your fork
-git clone https://github.com/YOUR-USERNAME/doit.git
+git clone https://github.com/seanbarlow/doit.git
 cd doit
 # You'll be on the 'develop' branch by default
 ```

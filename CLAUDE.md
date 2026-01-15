@@ -28,6 +28,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (file system - reads project directories) (020-constitution-improvements)
 - Markdown (YAML frontmatter) + None (text files only) (021-copilot-agent-fix)
 - N/A (no database involved) (021-copilot-agent-fix)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), pathlib (file operations) (023-copilot-prompts-sync)
+- File-based (markdown files in `.github/prompts/`) (023-copilot-prompts-sync)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -47,6 +49,7 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 023-copilot-prompts-sync: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), pathlib (file operations)
 - 021-copilot-agent-fix: Added Markdown (YAML frontmatter) + None (text files only)
 - 020-constitution-improvements: Added Markdown (command templates), Claude Code slash command system + None (template-based execution by AI agent)
 

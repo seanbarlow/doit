@@ -1,15 +1,10 @@
----
-agent: true
-description: Review implemented code for quality and completeness against specifications
----
+# Doit Reviewit
 
-# Doit Reviewit - Code Reviewer
+Review implemented code for quality and completeness against specifications
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -144,7 +139,7 @@ You **MUST** consider the user input before proceeding (if not empty).
     # Review Report: [Feature Name]
 
     **Date**: [timestamp]
-    **Reviewer**: [Agent]
+    **Reviewer**: [Claude]
     **Branch**: [current branch]
 
     ## Code Review Summary
@@ -188,7 +183,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
     ## Next Steps
 
-    - Run `#doit-testit` for automated test execution
+    - Run `/doit.testit` for automated test execution
     - Address any CRITICAL or MAJOR findings before merge
     ```
 
@@ -199,6 +194,7 @@ You **MUST** consider the user input before proceeding (if not empty).
     a. **Finding Distribution Pie Chart** (FR-011):
        - Count findings by severity (Critical, Major, Minor, Info)
        - Generate pie chart showing distribution
+       - Add to review-report.md in Quality Overview section
 
        ```mermaid
        pie title Finding Distribution
@@ -208,9 +204,26 @@ You **MUST** consider the user input before proceeding (if not empty).
            "Info" : 3
        ```
 
+       Insert using auto-generated markers:
+
+       ~~~markdown
+       ## Quality Overview
+
+       <!-- BEGIN:AUTO-GENERATED section="finding-distribution" -->
+       ```mermaid
+       pie title Finding Distribution
+           "Critical" : [count]
+           "Major" : [count]
+           "Minor" : [count]
+           "Info" : [count]
+       ```
+       <!-- END:AUTO-GENERATED -->
+       ~~~
+
     b. **Test Results Visualization** (FR-012):
        - Count test results by status (Passed, Failed, Skipped, Blocked)
        - Generate pie chart showing test outcomes
+       - Add to review-report.md in Manual Testing Summary section
 
        ```mermaid
        pie title Test Results
@@ -219,6 +232,32 @@ You **MUST** consider the user input before proceeding (if not empty).
            "Skipped" : 2
            "Blocked" : 0
        ```
+
+       Insert using auto-generated markers:
+
+       ~~~markdown
+       ## Test Results Overview
+
+       <!-- BEGIN:AUTO-GENERATED section="test-results" -->
+       ```mermaid
+       pie title Test Results
+           "Passed" : [count]
+           "Failed" : [count]
+           "Skipped" : [count]
+           "Blocked" : [count]
+       ```
+       <!-- END:AUTO-GENERATED -->
+       ~~~
+
+    c. **Conditional Generation**:
+       - If no findings: Show "No Issues Found" message instead of empty pie chart
+       - If no manual tests: Omit Test Results visualization entirely
+       - If all tests pass: Use green-themed success message
+
+    d. **Diagram Validation**:
+       - Verify mermaid syntax is valid
+       - Ensure all counts are non-negative integers
+       - Check that pie chart values sum to total count
 
 12. **Report**: Output path to review-report.md and summary of findings
 

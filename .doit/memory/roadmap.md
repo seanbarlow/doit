@@ -1,12 +1,12 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-14
+**Last Updated**: 2026-01-15
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
 
-A simple, intuitive task management app that helps individuals organize their work, track progress, and stay productive.
+An AI-assisted spec-driven development CLI that streamlines the software development lifecycle through intelligent automation, from requirements gathering through implementation and testing.
 
 ---
 
@@ -16,52 +16,66 @@ A simple, intuitive task management app that helps individuals organize their wo
 
 <!-- Items that are essential for minimum viable product or blocking other work -->
 
-- [ ] Create and manage tasks with titles and descriptions
-  - **Rationale**: Core functionality - users must be able to create tasks to use the app
+- [x] Core workflow commands (specit, planit, taskit, implementit, testit, reviewit, checkin)
+  - **Rationale**: Complete spec-driven development workflow - foundation of the CLI
 
-- [ ] Mark tasks as complete/incomplete
-  - **Rationale**: Essential for tracking progress and productivity
+- [x] Multi-agent prompt synchronization (`sync-prompts` command)
+  - **Rationale**: Enables consistent prompt files across Claude, Copilot, and other AI agents
+  - **Feature**: `[023-copilot-prompts-sync]`
+
+- [ ] Unified template management (single source of truth for commands)
+  - **Rationale**: Eliminates duplicate templates, simplifies maintenance
 
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Organize tasks into lists or categories
-  - **Rationale**: Helps users group related tasks and stay organized
+- [ ] Interactive guided workflows with validation
+  - **Rationale**: Improves user experience by guiding through each command step-by-step
 
-- [ ] Set due dates and reminders
-  - **Rationale**: Critical for time-sensitive task management
+- [ ] Spec validation and linting
+  - **Rationale**: Catches specification errors before implementation, enforces quality standards
 
-- [ ] Filter and search tasks
-  - **Rationale**: Improves usability as task list grows
+- [ ] Git hook integration for workflow enforcement
+  - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks
 
-- [ ] Task priority levels
-  - **Rationale**: Allows users to distinguish between urgent and non-urgent tasks within each list
+- [ ] Cross-reference support between specs and tasks
+  - **Rationale**: Maintains traceability from requirements through implementation
 
-- [ ] Subtasks / Checklists
-  - **Rationale**: Enables breaking down complex tasks into smaller, manageable steps
+- [ ] Automatic Mermaid diagram generation from specs
+  - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
 
-- [ ] Tags and labels for tasks
-  - **Rationale**: Enables better organization - complements lists/categories feature (promoted from P3)
+- [ ] AI context injection for commands
+  - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
 
 ### P3 - Medium Priority (Valuable)
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [ ] Recurring tasks
-  - **Rationale**: Automates repetitive task creation
+- [ ] Spec analytics and metrics dashboard
+  - **Rationale**: Provides insights on spec completion, cycle times, and team velocity
 
-- [ ] Notes and attachments
-  - **Rationale**: Provides context for tasks beyond title/description
+- [ ] Template versioning and update notifications
+  - **Rationale**: Alerts users when command templates have newer versions available
 
-- [ ] Mobile app sync
-  - **Rationale**: Enables access across devices - users can manage tasks from phone and desktop
+- [ ] VS Code extension for doit commands
+  - **Rationale**: Integrates workflow commands directly into the IDE
+
+- [ ] Memory search and query across project context
+  - **Rationale**: Enables finding relevant context in constitution, roadmap, completed specs
+
+- [ ] Workflow checkpoint validation
+  - **Rationale**: Validate each workflow step completes successfully before allowing the next step (enforces opinionated workflow)
 
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
 
-<!-- No P4 items currently -->
+- [ ] Web dashboard for project visualization
+  - **Rationale**: Visual representation of project architecture and progress
+
+- [ ] Team collaboration features (shared memory, notifications)
+  - **Rationale**: Enables multi-developer workflows with shared context
 
 ---
 
@@ -69,9 +83,9 @@ A simple, intuitive task management app that helps individuals organize their wo
 
 <!-- Items that were considered but intentionally deferred with reason -->
 
-| Item                      | Original Priority | Deferred Date | Reason                            |
-|---------------------------|-------------------|---------------|-----------------------------------|
-| Dark mode / Theme support | P4                | 2026-01-10    | Focus on core functionality first |
+| Item                         | Original Priority | Deferred Date | Reason                                       |
+|------------------------------|-------------------|---------------|----------------------------------------------|
+| Task management app features | P1-P3             | 2026-01-15    | Vision pivot to spec-driven development CLI  |
 
 ---
 

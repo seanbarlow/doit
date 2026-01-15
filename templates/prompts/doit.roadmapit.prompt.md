@@ -1,15 +1,10 @@
----
-agent: true
-description: Create or update the project roadmap with prioritized requirements and AI-suggested enhancements
----
+# Doit Roadmapit
 
-# Doit Roadmapit - Roadmap Manager
+Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements.
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -19,15 +14,15 @@ This command creates or updates the project roadmap at `.doit/memory/roadmap.md`
 
 ### 1. Parse Command Arguments
 
-Extract the operation and details from `$ARGUMENTS`:
+Extract the operation and details from `the user's input`:
 
 | Pattern | Operation | Example |
 |---------|-----------|---------|
-| `create [vision]` | Create new roadmap | `#doit-roadmapit create a task management app` |
-| `add [item]` | Add item to roadmap | `#doit-roadmapit add user authentication` |
-| `defer [item]` | Move item to deferred | `#doit-roadmapit defer social login` |
-| `reprioritize` | Review and change priorities | `#doit-roadmapit reprioritize` |
-| (empty or `update`) | Interactive update | `#doit-roadmapit` |
+| `create [vision]` | Create new roadmap | `/doit.roadmapit create a task management app` |
+| `add [item]` | Add item to roadmap | `/doit.roadmapit add user authentication` |
+| `defer [item]` | Move item to deferred | `/doit.roadmapit defer social login` |
+| `reprioritize` | Review and change priorities | `/doit.roadmapit reprioritize` |
+| (empty or `update`) | Interactive update | `/doit.roadmapit` |
 
 If no arguments provided or unrecognized pattern, proceed to step 2 for detection.
 
@@ -60,28 +55,53 @@ Present questions to establish roadmap foundation. Use the user's input (if prov
 
 **Question 1: Project Vision**
 > What is the primary goal or vision for this project?
+>
+> Based on your input "[USER_INPUT]", I understand the project is about [INTERPRETATION].
+>
+> Please confirm or provide a more detailed vision statement.
 
 **Question 2: Initial Priority Items**
 > What are the most critical features or requirements for your MVP?
+>
+> Suggested based on your description:
+> - [SUGGESTION_1]
+> - [SUGGESTION_2]
+>
+> Which of these are correct? What would you add or change?
 
 **Question 3: Known Constraints**
 > Are there any constraints or limitations to consider?
+>
+> Options:
+> A. Timeline constraints (specific deadline)
+> B. Technical constraints (must use specific tech)
+> C. Resource constraints (limited team/budget)
+> D. No significant constraints
+> E. Custom (please specify)
 
 #### 3.4 Build Roadmap Structure
 
 Using the gathered information, create the roadmap:
 
 1. Load template from `.doit/templates/roadmap-template.md`
-2. Replace placeholders with project information
-3. Populate priority sections based on user's answers:
+2. Replace `[PROJECT_NAME]` with project name from constitution or package metadata
+3. Replace `[DATE]` with current date
+4. Replace `[PROJECT_VISION]` with the confirmed vision statement
+5. Populate priority sections based on user's answers:
    - Add confirmed critical items to P1
    - Add important but not blocking items to P2
    - Add nice-to-have items to P3/P4
-4. Leave Deferred Items empty for new roadmaps
+6. Leave Deferred Items empty for new roadmaps
 
 #### 3.5 Write Roadmap
 
 Write the populated roadmap to `.doit/memory/roadmap.md`
+
+#### 3.6 Offer Enhancement Suggestions
+
+After creating the roadmap, proceed to Step 6 (AI Suggestions).
+
+---
 
 ### 4. Update Workflow (Existing Roadmap)
 
@@ -136,7 +156,10 @@ Based on the parsed operation from Step 1:
 **Reprioritize Operation (`reprioritize`)**:
 1. List all active items with current priorities
 2. Ask: "Which items need priority changes?"
-3. For each item to change, get new priority and rationale
+3. For each item to change:
+   - Show current priority
+   - Ask for new priority (P1/P2/P3/P4)
+   - Ask for rationale for the change
 4. Update items in their new sections
 
 **Interactive Update (no specific operation)**:
@@ -145,14 +168,62 @@ Based on the parsed operation from Step 1:
    - B. Defer an item
    - C. Reprioritize items
    - D. Update the vision statement
-   - E. Mark an item as complete
+   - E. Mark an item as complete (moves to completed_roadmap.md)
 2. Execute the selected operation
 
-### 5. AI Enhancement Suggestions
+#### 4.4 Preserve Unmodified Content
+
+When updating the roadmap:
+
+- Keep all items not explicitly changed
+- Maintain existing rationales unless updated
+- Preserve feature branch references
+- Update only the `Last Updated` date
+
+#### 4.5 Write Updated Roadmap
+
+Write the modified roadmap back to `.doit/memory/roadmap.md`
+
+#### 4.6 Offer Enhancement Suggestions
+
+After updating, proceed to Step 6 (AI Suggestions).
+
+---
+
+### 5. Handle Edge Cases
+
+#### 5.1 Malformed Roadmap
+
+If existing roadmap cannot be parsed:
+
+1. Create backup: `mv .doit/memory/roadmap.md .doit/memory/roadmap.md.bak`
+2. Notify user: "The existing roadmap appears to be malformed. A backup has been created."
+3. Try to extract any readable content
+4. Offer to create fresh roadmap incorporating salvaged content
+
+#### 5.2 Item Not Found (for defer/update)
+
+If specified item cannot be found:
+
+1. List all current items in a table
+2. Ask user to select from the list or provide exact item text
+3. Use fuzzy matching to suggest closest matches
+
+#### 5.3 Conflicting Priorities
+
+If user assigns multiple P1 items:
+
+1. Show warning: "You have [N] P1 items. P1 should be reserved for truly critical items."
+2. Ask: "Would you like to compare these items to determine which is most critical?"
+3. If yes, present pairwise comparison for each P1 item
+
+---
+
+### 6. AI Enhancement Suggestions
 
 After any create or update operation, analyze the roadmap and project context to suggest enhancements.
 
-#### 5.1 Gather Context
+#### 6.1 Gather Context
 
 Read additional context if available:
 
@@ -160,7 +231,7 @@ Read additional context if available:
 - `.doit/memory/completed_roadmap.md` - Past completed items
 - Current roadmap items and gaps
 
-#### 5.2 Generate Suggestions
+#### 6.2 Generate Suggestions
 
 Based on context, generate 2-5 complementary feature suggestions:
 
@@ -185,7 +256,15 @@ Based on your roadmap and project context, here are some features you might cons
 - Type "modify [N]" to customize a suggestion before adding
 ```
 
-### 6. Completion Report
+#### 6.3 Handle Suggestion Response
+
+- If user selects suggestions: Add them to the appropriate priority sections
+- If user modifies: Apply customizations then add
+- If user skips: Complete without changes
+
+---
+
+### 7. Completion Report
 
 Output a summary of changes:
 
@@ -209,10 +288,12 @@ Output a summary of changes:
 | Deferred | [N] |
 
 ### Next Steps
-- Run `#doit-specit` to create specs for top priority items
-- Run `#doit-roadmapit` again to continue updating
+- Run `/doit.specit` to create specs for top priority items
+- Run `/doit.roadmapit` again to continue updating
 - Review completed items in `.doit/memory/completed_roadmap.md`
 ```
+
+---
 
 ## Key Rules
 
@@ -222,3 +303,41 @@ Output a summary of changes:
 - Use feature branch references `[###-feature-name]` for traceability
 - Maintain maximum 3-5 P1 items (truly critical only)
 - Back up malformed roadmaps before recreating
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (roadmap created or updated)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Roadmap updated!**
+
+**Recommended**: Run `/doit.specit [top priority item]` to create a specification for your highest priority feature.
+
+**Alternative**: Run `/doit.roadmapit add [item]` to add more items to the roadmap.
+```
+
+### On Item Added
+
+If a new item was added to the roadmap:
+
+```markdown
+---
+
+## Next Steps
+
+**Item added to roadmap!**
+
+**Recommended**: Run `/doit.specit [item description]` to create a specification for this item.
+
+**Alternative**: Run `/doit.roadmapit reprioritize` to review and adjust priorities.
+```

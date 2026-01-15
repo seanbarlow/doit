@@ -1,15 +1,10 @@
----
-agent: true
-description: Execute automated tests and generate test reports with requirement mapping
----
+# Doit Testit
 
-# Doit Testit - Test Executor
+Execute automated tests and generate test reports with requirement mapping
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -119,7 +114,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      ```
 
 8. **Record manual test results** (FR-032):
-   - If $ARGUMENTS contains `--manual`:
+   - If the user's input contains `--manual`:
      - Present each manual test item
      - Ask for PASS/FAIL/SKIP result
      - Record notes for failed tests
@@ -179,7 +174,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Fix any failing tests
    - Complete manual testing if not done
-   - Run `#doit-checkin` when all tests pass
+   - Run `/doit.checkin` when all tests pass
    ```
 
 10. **Report**: Output path to test-report.md and summary:

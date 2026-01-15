@@ -1,15 +1,10 @@
----
-agent: true
-description: Create or update the project constitution from interactive or provided principle inputs
----
+# Doit Constitution
 
-# Doit Constitution - Project Principles Manager
+Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+Consider any arguments or options the user provides.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -69,36 +64,36 @@ Follow this execution flow:
 5. Draft the updated constitution content:
    - Replace every placeholder with concrete text (no bracketed tokens left except intentionally retained template slots that the project has chosen not to define yet—explicitly justify any left).
    - Preserve heading hierarchy and comments can be removed once replaced unless they still add clarifying guidance.
-   - Ensure each Principle section: succinct name line, paragraph (or bullet list) capturing non-negotiable rules, explicit rationale if not obvious.
+   - Ensure each Principle section: succinct name line, paragraph (or bullet list) capturing non‑negotiable rules, explicit rationale if not obvious.
    - Ensure Governance section lists amendment procedure, versioning policy, and compliance review expectations.
 
 6. Consistency propagation checklist (convert prior checklist into active validations):
    - Read `.doit/templates/plan-template.md` and ensure any "Constitution Check" or rules align with updated principles.
    - Read `.doit/templates/spec-template.md` for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
-   - Read `.doit/templates/tasks-template.md` and ensure task categorization reflects new or removed principle-driven task types.
-   - Read each command file in `.doit/templates/commands/*.md` to verify no outdated references remain.
-   - Read any runtime guidance docs (e.g., `README.md`, `docs/quickstart.md`). Update references to principles changed.
+   - Read `.doit/templates/tasks-template.md` and ensure task categorization reflects new or removed principle-driven task types (e.g., observability, versioning, testing discipline).
+   - Read each command file in `.doit/templates/commands/*.md` (including this one) to verify no outdated references (agent-specific names like CLAUDE only) remain when generic guidance is required.
+   - Read any runtime guidance docs (e.g., `README.md`, `docs/quickstart.md`, or agent-specific guidance files if present). Update references to principles changed.
 
 7. Produce a Sync Impact Report (prepend as an HTML comment at top of the constitution file after update):
    - Version change: old → new
    - List of modified principles (old title → new title if renamed)
    - Added sections
    - Removed sections
-   - Templates requiring updates (marked as updated or pending) with file paths
+   - Templates requiring updates (✅ updated / ⚠ pending) with file paths
    - Follow-up TODOs if any placeholders intentionally deferred.
 
 8. Validation before final output:
    - No remaining unexplained bracket tokens.
    - Version line matches report.
    - Dates ISO format YYYY-MM-DD.
-   - Principles are declarative, testable, and free of vague language.
+   - Principles are declarative, testable, and free of vague language ("should" → replace with MUST/SHOULD rationale where appropriate).
 
 9. Write the completed constitution back to `.doit/memory/constitution.md` (overwrite).
 
 10. Output a final summary to the user with:
     - New version and bump rationale.
     - Any files flagged for manual follow-up.
-    - Suggested commit message.
+    - Suggested commit message (e.g., `docs: amend constitution to vX.Y.Z (principle additions + governance update)`).
 
 Formatting & Style Requirements:
 
@@ -129,6 +124,42 @@ Other commands can read and utilize the constitution by:
 # At the start of any command that needs project context:
 1. Check if `.doit/memory/constitution.md` exists
 2. If exists, read and parse relevant sections
-3. Use extracted values to inform command behavior
+3. Use extracted values to inform command behavior (e.g., scaffold uses tech stack, plan uses constraints)
 4. If constitution is incomplete or missing, prompt user or proceed with defaults
+```
+
+---
+
+## Next Steps
+
+After completing this command, display a recommendation section based on the outcome:
+
+### On Success (constitution created or updated)
+
+Display the following at the end of your output:
+
+```markdown
+---
+
+## Next Steps
+
+**Constitution updated successfully!**
+
+**Recommended**: Run `/doit.scaffoldit` to generate project structure based on the tech stack in your constitution.
+
+**Alternative**: Run `/doit.specit [feature description]` to create a feature specification for your first feature.
+```
+
+### On Error (validation failed)
+
+If the constitution could not be validated:
+
+```markdown
+---
+
+## Next Steps
+
+**Issue**: Constitution validation failed.
+
+**Recommended**: Review the errors above and correct the constitution content.
 ```

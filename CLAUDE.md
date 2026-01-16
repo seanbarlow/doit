@@ -41,6 +41,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - N/A (Markdown documentation only) (028-docs-tutorial-refresh)
 - Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), PyYAML (custom rules configuration) (029-spec-validation-linting)
 - File-based (markdown specs in `specs/` directory) (029-spec-validation-linting)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting) (032-status-dashboard)
+- File-based (reads `specs/` directory and spec.md files) (032-status-dashboard)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -60,9 +62,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 032-status-dashboard: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting)
 - 029-spec-validation-linting: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), PyYAML (custom rules configuration)
 - 028-docs-tutorial-refresh: Added N/A (Markdown documentation only)
-- 027-template-context-injection: Added Markdown (command templates are markdown files) + None (template modifications only)
 
 
 <!-- MANUAL ADDITIONS START -->

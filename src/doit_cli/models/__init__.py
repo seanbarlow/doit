@@ -21,6 +21,11 @@ from .validation_models import (
     CustomRule,
     ValidationConfig,
 )
+from .status_models import (
+    SpecState,
+    SpecStatus,
+    StatusReport,
+)
 
 __all__ = [
     "Agent",
@@ -43,4 +48,7 @@ __all__ = [
     "RuleOverride",
     "CustomRule",
     "ValidationConfig",
+    "SpecState",
+    "SpecStatus",
+    "StatusReport",
 ]

@@ -31,8 +31,13 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Interactive guided workflows with validation
+- [x] Interactive guided workflows with validation
   - **Rationale**: Improves user experience by guiding through each command step-by-step
+  - **Feature**: `[030-guided-workflows]`
+
+- [x] Init command workflow integration
+  - **Rationale**: Update init command to use workflow system, expand documentation
+  - **Feature**: `[031-init-workflow-integration]`
 
 - [x] Spec validation and linting
   - **Rationale**: Catches specification errors before implementation, enforces quality standards
@@ -52,8 +57,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
   - **Feature**: `[026-ai-context-injection]`, `[027-template-context-injection]`
 
-- [ ] Spec status dashboard command (`doit status`)
+- [x] Spec status dashboard command (`doit status`)
   - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits
+  - **Feature**: `[032-status-dashboard]`
 
 ### P3 - Medium Priority (Valuable)
 

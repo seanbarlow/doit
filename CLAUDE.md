@@ -47,6 +47,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based (`.doit/state/` for workflow state, `.doit/memory/` for project context) (031-init-workflow-integration)
 - Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting) (032-status-dashboard)
 - File-based (reads `specs/` directory and spec.md files) (032-status-dashboard)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), httpx (GitHub API) (034-fixit-workflow)
+- File-based markdown in `.doit/memory/` and feature directory (034-fixit-workflow)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -66,9 +68,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 034-fixit-workflow: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), httpx (GitHub API)
 - 033-spec-task-crossrefs: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 032-status-dashboard: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting)
-- 031-init-workflow-integration: Added Python 3.11+ (from constitution) + Typer (CLI), Rich (terminal UI), pytest (testing)
 
 
 <!-- MANUAL ADDITIONS START -->

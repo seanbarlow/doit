@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 from doit_cli.services.hook_validator import HookValidator, ValidationResult
-from doit_cli.models.hook_config import HookConfig
+from doit_cli.models.hook_config import HookConfig, HookRule
 
 
 class TestValidationResult:
@@ -240,7 +240,15 @@ class TestPreCommitValidation:
         spec_dir.mkdir(parents=True)
         (spec_dir / "spec.md").write_text("# Spec\n\n**Status**: In Progress")
 
-        validator = HookValidator(project_root=tmp_path)
+        # Disable spec quality validation for this test (testing status check only)
+        config = HookConfig(
+            pre_commit=HookRule(
+                enabled=True,
+                require_spec=True,
+                validate_spec=False,  # Disable quality validation for this test
+            )
+        )
+        validator = HookValidator(project_root=tmp_path, config=config)
 
         with patch.object(validator, "get_current_branch", return_value="025-feature"):
             with patch.object(validator, "get_staged_files", return_value=["src/main.py"]):

@@ -11,6 +11,16 @@ from .context_config import (
     ContextSource,
     LoadedContext,
 )
+from .validation_models import (
+    Severity,
+    ValidationStatus,
+    ValidationRule,
+    ValidationIssue,
+    ValidationResult,
+    RuleOverride,
+    CustomRule,
+    ValidationConfig,
+)
 
 __all__ = [
     "Agent",
@@ -25,4 +35,12 @@ __all__ = [
     "CommandOverride",
     "ContextSource",
     "LoadedContext",
+    "Severity",
+    "ValidationStatus",
+    "ValidationRule",
+    "ValidationIssue",
+    "ValidationResult",
+    "RuleOverride",
+    "CustomRule",
+    "ValidationConfig",
 ]

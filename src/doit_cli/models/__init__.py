@@ -47,6 +47,19 @@ from .crossref_models import (
     RequirementCoverage,
     CoverageReport,
 )
+from .diagram_models import (
+    DiagramType,
+    Cardinality,
+    AcceptanceScenario,
+    ParsedUserStory,
+    EntityAttribute,
+    EntityRelationship,
+    ParsedEntity,
+    DiagramSection,
+    ValidationResult as DiagramValidationResult,
+    GeneratedDiagram,
+    DiagramResult,
+)
 
 __all__ = [
     "Agent",
@@ -92,4 +105,16 @@ __all__ = [
     "CrossReference",
     "RequirementCoverage",
     "CoverageReport",
+    # Diagram models
+    "DiagramType",
+    "Cardinality",
+    "AcceptanceScenario",
+    "ParsedUserStory",
+    "EntityAttribute",
+    "EntityRelationship",
+    "ParsedEntity",
+    "DiagramSection",
+    "DiagramValidationResult",
+    "GeneratedDiagram",
+    "DiagramResult",
 ]

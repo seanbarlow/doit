@@ -55,8 +55,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Maintains traceability from requirements through implementation
   - **Feature**: `[033-spec-task-crossrefs]`
 
-- [ ] Automatic Mermaid diagram generation from specs
+- [x] Automatic Mermaid diagram generation from specs
   - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
+  - **Feature**: `[035-auto-mermaid-diagrams]` ✅ COMPLETED 2026-01-16
 
 - [x] AI context injection for commands
   - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution

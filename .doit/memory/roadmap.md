@@ -31,11 +31,13 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Interactive guided workflows with validation
+- [x] Interactive guided workflows with validation
   - **Rationale**: Improves user experience by guiding through each command step-by-step
+  - **Feature**: `[030-guided-workflows]`
 
-- [ ] Spec validation and linting
+- [x] Spec validation and linting
   - **Rationale**: Catches specification errors before implementation, enforces quality standards
+  - **Feature**: `[029-spec-validation-linting]`
 
 - [x] Git hook integration for workflow enforcement
   - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks

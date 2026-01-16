@@ -10,11 +10,15 @@
 
 <!-- Last 20 completed items - older items are archived below -->
 
-| Item | Original Priority | Completed Date | Feature Branch | Notes |
-|------|-------------------|----------------|----------------|-------|
-| Unified template management (single source of truth for commands) | P1 | 2026-01-15 | `024-unified-templates` | Eliminates duplicate templates, simplifies maintenance |
-| Multi-agent prompt synchronization (`sync-prompts` command) | P1 | 2026-01-13 | `023-copilot-prompts-sync` | Enables consistent prompt files across Claude, Copilot, and other AI agents |
-| Core workflow commands (specit, planit, taskit, implementit, testit, reviewit, checkin) | P1 | 2026-01-10 | - | Complete spec-driven development workflow - foundation of the CLI |
+| Item                                                               | Original Priority | Completed Date | Feature Branch                       | Notes                                     |
+|--------------------------------------------------------------------|-------------------|----------------|--------------------------------------|-------------------------------------------|
+| Core workflow commands (specit, planit, taskit, etc.)              | P1                | 2026-01-13     | -                                    | Foundation of the CLI                     |
+| Multi-agent prompt synchronization (`sync-prompts` command)        | P1                | 2026-01-15     | `[023-copilot-prompts-sync]`         | Enables consistent prompts across agents  |
+| Unified template management (single source of truth)               | P1                | 2026-01-15     | `[024-unified-templates]`            | Eliminates duplicate templates            |
+| Git hook integration for workflow enforcement                      | P2                | 2026-01-15     | `[025-git-hooks-workflow]`           | Pre-commit/push hooks enforce spec-first  |
+| AI context injection CLI (`doit context` command)                  | P2                | 2026-01-15     | `[026-ai-context-injection]`         | Auto-load project context for AI commands |
+| AI context injection for templates                                 | P2                | 2026-01-15     | `[027-template-context-injection]`   | Auto-inject context into command templates|
+| Documentation and tutorial refresh                                 | P2                | 2026-01-15     | `[028-docs-tutorial-refresh]`        | Updated all docs for features 023-027     |
 
 ---
 
@@ -35,9 +39,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 3
+- **Total Items Completed**: 7
 - **P1 Items Completed**: 3
-- **P2 Items Completed**: 0
+- **P2 Items Completed**: 4
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

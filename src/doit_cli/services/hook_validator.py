@@ -319,7 +319,65 @@ class HookValidator:
                     f"Allowed statuses: {', '.join(allowed)}\n\nTo fix: Update spec.md status to 'In Progress' before committing code",
                 )
 
+        # Run spec validation if enabled
+        if self.config.pre_commit.validate_spec:
+            validation_result = self._validate_spec_quality(spec_path)
+            if not validation_result.success:
+                return validation_result
+
         return ValidationResult(True, "Pre-commit validation passed")
+
+    def _validate_spec_quality(self, spec_path: Path) -> ValidationResult:
+        """Validate spec quality using validation rules.
+
+        Args:
+            spec_path: Path to the spec.md file.
+
+        Returns:
+            ValidationResult with success status and messages.
+        """
+        try:
+            from .validation_service import ValidationService
+
+            service = ValidationService()
+            result = service.validate_file(spec_path)
+
+            threshold = self.config.pre_commit.validate_spec_threshold
+
+            if result.error_count > 0:
+                # Format issues summary
+                issues_summary = []
+                for issue in result.issues:
+                    if issue.severity.value == "error":
+                        issues_summary.append(f"  - {issue.message}")
+
+                return ValidationResult(
+                    False,
+                    f"Specification validation failed with {result.error_count} error(s)\n\n"
+                    + "\n".join(issues_summary[:5])  # Show first 5 errors
+                    + (f"\n  ... and {result.error_count - 5} more" if result.error_count > 5 else ""),
+                    f"Quality score: {result.quality_score}/100 (threshold: {threshold})\n\n"
+                    f"To fix: Run `doit validate {spec_path}` to see all issues\n\n"
+                    "Or bypass with: git commit --no-verify (not recommended)",
+                )
+
+            if result.quality_score < threshold:
+                return ValidationResult(
+                    False,
+                    f"Specification quality score ({result.quality_score}) below threshold ({threshold})",
+                    f"Warnings: {result.warning_count}\n\n"
+                    f"To fix: Run `doit validate {spec_path}` to see issues and improve the spec\n\n"
+                    "Or bypass with: git commit --no-verify (not recommended)",
+                )
+
+        except ImportError:
+            # ValidationService not available - skip validation
+            pass
+        except Exception as e:
+            # Log error but don't block commit for validation failures
+            pass
+
+        return ValidationResult(True, "Spec validation passed")
 
     def validate_pre_push(self) -> ValidationResult:
         """Validate pre-push hook requirements.

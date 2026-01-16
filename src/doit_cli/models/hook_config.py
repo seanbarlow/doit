@@ -15,6 +15,8 @@ class HookRule:
     require_spec: bool = True
     require_plan: bool = True
     require_tasks: bool = False
+    validate_spec: bool = True  # Run spec validation rules
+    validate_spec_threshold: int = 70  # Minimum quality score to pass
     allowed_statuses: list[str] = field(
         default_factory=lambda: ["In Progress", "Complete", "Approved"]
     )

@@ -1,0 +1,93 @@
+# Git Hooks Configuration for doit
+# Place this file at .doit/config/hooks.yaml to customize hook behavior
+#
+# For more information, see: https://github.com/yourusername/doit#git-hooks
+
+version: 1
+
+# Pre-commit hook configuration
+pre_commit:
+  # Enable/disable the pre-commit hook
+  enabled: true
+
+  # Require spec.md to exist for feature branches
+  require_spec: true
+
+  # Require plan.md to exist (set to false for pre-commit, true for pre-push)
+  require_plan: false
+
+  # Require tasks.md to exist
+  require_tasks: false
+
+  # Run spec validation rules before commit
+  validate_spec: true
+
+  # Minimum quality score required (0-100)
+  # Commits will be blocked if spec score is below this threshold
+  validate_spec_threshold: 70
+
+  # Allowed spec statuses for code commits
+  # Commits will be blocked if spec status is not in this list
+  allowed_statuses:
+    - In Progress
+    - Complete
+    - Approved
+
+  # Branches exempt from validation (supports glob patterns)
+  exempt_branches:
+    - main
+    - develop
+    - master
+    - "release/*"
+    - "hotfix/*"
+
+  # File paths exempt from validation (supports glob patterns)
+  exempt_paths:
+    - "*.md"
+    - "docs/**"
+    - ".github/**"
+    - "README.md"
+    - "CHANGELOG.md"
+
+# Pre-push hook configuration
+pre_push:
+  # Enable/disable the pre-push hook
+  enabled: true
+
+  # Require spec.md before push
+  require_spec: true
+
+  # Require plan.md before push
+  require_plan: true
+
+  # Require tasks.md before push
+  require_tasks: false
+
+  # Run spec validation before push
+  validate_spec: true
+
+  # Higher threshold for push (encourage higher quality)
+  validate_spec_threshold: 80
+
+  # Allowed spec statuses for push
+  allowed_statuses:
+    - In Progress
+    - Complete
+    - Approved
+
+  # Branches exempt from push validation
+  exempt_branches:
+    - main
+    - develop
+    - master
+
+# Logging configuration
+logging:
+  # Enable hook logging
+  enabled: true
+
+  # Log bypass events (when --no-verify is used)
+  log_bypasses: true
+
+  # Path to bypass log file
+  log_path: .doit/logs/hook-bypasses.log

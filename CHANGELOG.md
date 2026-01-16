@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-01-15
+
+### Fixed
+
+- **sync-prompts command not finding templates** - Fixed `doit sync-prompts` failing with "command not found in templates folder" when used in end-user projects. The command now correctly falls back to bundled package templates when project templates don't exist.
+
 ## [0.1.5] - 2026-01-15
 
 ### Changed

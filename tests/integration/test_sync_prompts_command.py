@@ -13,12 +13,14 @@ runner = CliRunner()
 class TestSyncPromptsCommand:
     """Integration tests for the sync-prompts CLI command."""
 
-    def test_sync_prompts_no_templates(self, temp_dir):
-        """Test sync-prompts with no templates directory."""
+    def test_sync_prompts_uses_package_templates(self, temp_dir):
+        """Test sync-prompts uses package templates when project templates don't exist."""
         result = runner.invoke(app, ["sync-prompts", "--path", str(temp_dir)])
 
-        assert result.exit_code == 1
-        assert "No command templates found" in result.stdout or "Error" in result.stdout
+        # Should succeed using bundled package templates
+        assert result.exit_code == 0
+        # Should have synced the bundled templates (at least some of the 11 commands)
+        assert "synced" in result.stdout.lower() or "CREATED" in result.stdout
 
     def test_sync_prompts_creates_files(self, temp_dir):
         """Test sync-prompts creates prompt files."""

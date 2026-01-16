@@ -1,5 +1,6 @@
 """Service to read and scan doit command templates."""
 
+import importlib.resources
 from pathlib import Path
 
 from ..models.sync_models import CommandTemplate
@@ -8,11 +9,12 @@ from ..models.sync_models import CommandTemplate
 class TemplateReader:
     """Reads command templates from bundled or project templates directory.
 
-    Supports two template locations:
-    - Bundled: src/doit_cli/templates/commands/ (for the CLI repo itself)
-    - Project: .doit/templates/commands/ (for end-user projects)
+    Supports three template locations (checked in order):
+    1. CLI repo development: src/doit_cli/templates/commands/
+    2. Installed package: via importlib.resources (doit_cli.templates.commands)
+    3. Project templates: .doit/templates/commands/ (for end-user projects)
 
-    When running in the CLI repo, bundled templates are used as source of truth.
+    When running from an installed package, bundled templates are used.
     """
 
     BUNDLED_TEMPLATES_DIR = "src/doit_cli/templates/commands"
@@ -29,18 +31,63 @@ class TemplateReader:
         self.templates_dir = self._resolve_templates_directory()
 
     def _resolve_templates_directory(self) -> Path:
-        """Resolve the templates directory, preferring bundled over project.
+        """Resolve the templates directory.
+
+        Priority order:
+        1. Project templates (.doit/templates/commands/) - allows customization
+        2. CLI repo development (src/doit_cli/templates/commands/)
+        3. Installed package templates (via importlib.resources)
 
         Returns:
             Path to the templates directory to use.
         """
-        # First, check for bundled templates (CLI repo development)
+        # First, check for project templates (allows customization)
+        project_dir = self.project_root / self.PROJECT_TEMPLATES_DIR
+        if project_dir.exists() and any(project_dir.glob(self.COMMAND_PATTERN)):
+            return project_dir
+
+        # Second, check for CLI repo development templates
         bundled_dir = self.project_root / self.BUNDLED_TEMPLATES_DIR
         if bundled_dir.exists() and any(bundled_dir.glob(self.COMMAND_PATTERN)):
             return bundled_dir
 
-        # Fall back to project templates (end-user projects)
-        return self.project_root / self.PROJECT_TEMPLATES_DIR
+        # Third, try to find templates from installed package
+        package_templates = self._get_package_templates_directory()
+        if package_templates and package_templates.exists():
+            if any(package_templates.glob(self.COMMAND_PATTERN)):
+                return package_templates
+
+        # Fall back to project templates path (will be empty/not exist)
+        return project_dir
+
+    def _get_package_templates_directory(self) -> Path | None:
+        """Get the templates directory from the installed package.
+
+        Returns:
+            Path to bundled templates directory, or None if not found.
+        """
+        try:
+            # Use importlib.resources to find package templates
+            # Get the actual path from the package location
+            pkg_files = importlib.resources.files("doit_cli")
+            templates_path = pkg_files.joinpath("templates/commands")
+
+            # Check if it's a real path we can use
+            if hasattr(templates_path, "_path"):
+                # Direct filesystem path (editable install or source)
+                return Path(templates_path._path)
+
+            # Try to get path via traversable
+            # For installed packages, get the actual location
+            import doit_cli
+            pkg_location = Path(doit_cli.__file__).parent
+            templates_dir = pkg_location / "templates" / "commands"
+            if templates_dir.exists():
+                return templates_dir
+
+            return None
+        except (ImportError, TypeError, AttributeError, FileNotFoundError):
+            return None
 
     def get_templates_directory(self) -> Path:
         """Get the templates directory path."""

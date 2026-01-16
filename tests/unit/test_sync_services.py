@@ -18,17 +18,22 @@ from doit_cli.services.drift_detector import DriftDetector
 class TestTemplateReader:
     """Tests for TemplateReader service."""
 
-    def test_scan_templates_empty_dir(self, temp_dir):
-        """Test scanning an empty directory."""
+    def test_scan_templates_empty_dir_uses_package(self, temp_dir):
+        """Test scanning empty directory falls back to package templates."""
         reader = TemplateReader(project_root=temp_dir)
         templates = reader.scan_templates()
-        assert templates == []
+        # Should find bundled package templates
+        assert len(templates) > 0
+        # Should have standard doit commands
+        names = [t.name for t in templates]
+        assert "doit.checkin" in names or "doit.specit" in names
 
-    def test_scan_templates_missing_dir(self, temp_dir):
-        """Test scanning when templates directory doesn't exist."""
+    def test_scan_templates_missing_dir_uses_package(self, temp_dir):
+        """Test scanning missing directory falls back to package templates."""
         reader = TemplateReader(project_root=temp_dir)
         templates = reader.scan_templates()
-        assert templates == []
+        # Should find bundled package templates
+        assert len(templates) > 0
 
     def test_scan_templates_finds_commands(self, temp_dir):
         """Test scanning finds command templates."""

@@ -1,7 +1,8 @@
 # Spec Validation and Linting
 
-**Status**: In Progress
+**Completed**: 2026-01-15
 **Branch**: 029-spec-validation-linting
+**PR**: #277
 
 ## Overview
 
@@ -109,3 +110,8 @@ pre_commit:
 - `src/doit_cli/models/validation_models.py` - Data models
 - `src/doit_cli/rules/builtin_rules.py` - Built-in validation rules
 - `templates/config/validation-rules.yaml` - Configuration template
+
+## Related Issues
+
+- Epic: #272
+- Features: #273, #274, #275, #276

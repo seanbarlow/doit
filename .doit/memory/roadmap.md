@@ -36,6 +36,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Spec validation and linting
   - **Rationale**: Catches specification errors before implementation, enforces quality standards
+  - **Feature**: `[029-spec-validation-linting]`
 
 - [x] Git hook integration for workflow enforcement
   - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks

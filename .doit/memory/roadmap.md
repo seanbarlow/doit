@@ -27,6 +27,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Eliminates duplicate templates, simplifies maintenance
   - **Feature**: `[024-unified-templates]`
 
+- [x] Bug-fix workflow command (`doit.fixit`)
+  - **Rationale**: Provides structured bug-fix process integrated with GitHub issues - investigation plan, AI-assisted root cause analysis, fix planning, reuses existing reviewit/testit commands
+  - **Feature**: `[034-fixit-workflow]` ✅ COMPLETED 2026-01-16
+
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->

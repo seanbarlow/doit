@@ -12,6 +12,7 @@ DOIT_COMMANDS = [
     "checkin",
     "constitution",
     "documentit",
+    "fixit",
     "implementit",
     "planit",
     "reviewit",

@@ -239,3 +239,117 @@ class StateManager:
             raise StateCorruptionError(
                 filepath, f"Failed to load: {e}"
             )
+
+    # =========================================================================
+    # Fixit Workflow State Methods (T013)
+    # =========================================================================
+
+    def save_fixit_state(self, state_data: dict, issue_id: int) -> Path:
+        """Save fixit workflow state to file.
+
+        Args:
+            state_data: Dictionary containing workflow state
+            issue_id: GitHub issue number
+
+        Returns:
+            Path to saved state file
+        """
+        self._ensure_state_dir()
+
+        filename = f"fixit-{issue_id}.json"
+        filepath = self.state_dir / filename
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(state_data, f, indent=2)
+
+        return filepath
+
+    def load_fixit_state(self, issue_id: int) -> dict | None:
+        """Load fixit workflow state for an issue.
+
+        Args:
+            issue_id: GitHub issue number
+
+        Returns:
+            State dictionary if found, None otherwise
+        """
+        if not self.state_dir.exists():
+            return None
+
+        filename = f"fixit-{issue_id}.json"
+        filepath = self.state_dir / filename
+
+        if not filepath.exists():
+            return None
+
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError):
+            return None
+
+    def delete_fixit_state(self, issue_id: int) -> bool:
+        """Delete fixit workflow state for an issue.
+
+        Args:
+            issue_id: GitHub issue number
+
+        Returns:
+            True if deleted, False if not found
+        """
+        filename = f"fixit-{issue_id}.json"
+        filepath = self.state_dir / filename
+
+        if filepath.exists():
+            filepath.unlink()
+            return True
+        return False
+
+    def list_fixit_states(self) -> list[tuple[int, dict]]:
+        """List all fixit workflow states.
+
+        Returns:
+            List of (issue_id, state_data) tuples
+        """
+        if not self.state_dir.exists():
+            return []
+
+        states: list[tuple[int, dict]] = []
+
+        for filepath in self.state_dir.glob("fixit-*.json"):
+            try:
+                # Extract issue ID from filename
+                issue_id_str = filepath.stem.replace("fixit-", "")
+                issue_id = int(issue_id_str)
+
+                with open(filepath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                states.append((issue_id, data))
+            except (ValueError, json.JSONDecodeError, OSError):
+                continue
+
+        return states
+
+    def get_active_fixit_workflow(self) -> tuple[int, dict] | None:
+        """Get the currently active fixit workflow (most recent non-completed).
+
+        Returns:
+            Tuple of (issue_id, state_data) for active workflow, or None
+        """
+        states = self.list_fixit_states()
+
+        # Filter for non-completed/cancelled workflows
+        active_states = [
+            (issue_id, data) for issue_id, data in states
+            if data.get("workflow", {}).get("phase") not in ["completed", "cancelled"]
+        ]
+
+        if not active_states:
+            return None
+
+        # Return most recently updated
+        active_states.sort(
+            key=lambda x: x[1].get("workflow", {}).get("updated_at", ""),
+            reverse=True
+        )
+        return active_states[0]

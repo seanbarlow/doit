@@ -2,7 +2,7 @@
 
 **Feature Branch**: `029-spec-validation-linting`
 **Created**: 2026-01-15
-**Status**: Draft
+**Status**: In Progress
 **Input**: User description: "Spec validation and linting - Rationale: Catches specification errors before implementation, enforces quality standards"
 
 ## User Scenarios & Testing *(mandatory)*

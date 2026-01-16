@@ -125,9 +125,9 @@ gantt
 
 **Purpose**: Project initialization and directory structure
 
-- [ ] T001 Create rules/ directory structure at src/doit_cli/rules/
-- [ ] T002 Add PyYAML dependency to pyproject.toml
-- [ ] T003 [P] Create __init__.py files for rules/ module
+- [x] T001 Create rules/ directory structure at src/doit_cli/rules/
+- [x] T002 Add PyYAML dependency to pyproject.toml
+- [x] T003 [P] Create __init__.py files for rules/ module
 
 ---
 
@@ -137,12 +137,12 @@ gantt
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Create ValidationRule dataclass in src/doit_cli/models/validation_models.py
-- [ ] T005 [P] Create ValidationResult dataclass in src/doit_cli/models/validation_models.py
-- [ ] T006 [P] Create ValidationIssue dataclass in src/doit_cli/models/validation_models.py
-- [ ] T007 Implement builtin_rules.py with 10 default rules in src/doit_cli/rules/builtin_rules.py
-- [ ] T008 Implement RuleEngine service in src/doit_cli/services/rule_engine.py
-- [ ] T009 Implement ScoreCalculator service in src/doit_cli/services/score_calculator.py
+- [x] T004 [P] Create ValidationRule dataclass in src/doit_cli/models/validation_models.py
+- [x] T005 [P] Create ValidationResult dataclass in src/doit_cli/models/validation_models.py
+- [x] T006 [P] Create ValidationIssue dataclass in src/doit_cli/models/validation_models.py
+- [x] T007 Implement builtin_rules.py with 10 default rules in src/doit_cli/rules/builtin_rules.py
+- [x] T008 Implement RuleEngine service in src/doit_cli/services/rule_engine.py
+- [x] T009 Implement ScoreCalculator service in src/doit_cli/services/score_calculator.py
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -156,14 +156,14 @@ gantt
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implement ValidationService orchestration in src/doit_cli/services/validation_service.py
-- [ ] T011 [US1] Implement ReportGenerator for human-readable output in src/doit_cli/services/report_generator.py
-- [ ] T012 [US1] Create validate_command.py CLI command in src/doit_cli/cli/validate_command.py
-- [ ] T013 [US1] Register validate command in src/doit_cli/cli/main.py
-- [ ] T014 [P] [US1] Create test fixtures (valid and invalid specs) in tests/fixtures/sample_specs/
-- [ ] T015 [P] [US1] Add unit tests for validation models in tests/unit/test_validation_models.py
-- [ ] T016 [P] [US1] Add unit tests for RuleEngine and ScoreCalculator in tests/unit/test_rule_engine.py and tests/unit/test_score_calculator.py
-- [ ] T017 [US1] Add integration test for validate command in tests/integration/test_validate_command.py
+- [x] T010 [US1] Implement ValidationService orchestration in src/doit_cli/services/validation_service.py
+- [x] T011 [US1] Implement ReportGenerator for human-readable output in src/doit_cli/services/report_generator.py
+- [x] T012 [US1] Create validate_command.py CLI command in src/doit_cli/cli/validate_command.py
+- [x] T013 [US1] Register validate command in src/doit_cli/cli/main.py
+- [x] T014 [P] [US1] Create test fixtures (valid and invalid specs) in tests/fixtures/sample_specs/
+- [x] T015 [P] [US1] Add unit tests for validation models in tests/unit/test_validation_models.py
+- [x] T016 [P] [US1] Add unit tests for RuleEngine and ScoreCalculator in tests/unit/test_rule_engine.py and tests/unit/test_score_calculator.py
+- [x] T017 [US1] Add integration test for validate command in tests/integration/test_validate_command.py
 
 **Checkpoint**: User Story 1 complete - `doit validate <path>` works for single files
 

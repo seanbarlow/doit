@@ -175,11 +175,18 @@ class WorkflowEngine:
 
         return state, response
 
-    def run(self, workflow: Workflow) -> dict:
+    def run(
+        self,
+        workflow: Workflow,
+        initial_responses: dict[str, str] | None = None,
+    ) -> dict:
         """Run a complete workflow from start to finish.
 
         Args:
             workflow: Workflow to execute
+            initial_responses: Optional pre-populated responses to skip steps.
+                Maps step_id -> value. Steps with initial responses will be
+                skipped and use the provided value.
 
         Returns:
             Dictionary of step_id -> response value
@@ -196,6 +203,15 @@ class WorkflowEngine:
         # Sort steps by order
         steps = sorted(workflow.steps, key=lambda s: s.order)
 
+        # Pre-populate state with initial responses (Fix MT-007)
+        if initial_responses:
+            for step_id, value in initial_responses.items():
+                state.responses[step_id] = StepResponse(
+                    step_id=step_id,
+                    value=value,
+                    skipped=False,
+                )
+
         try:
             while state.current_step < len(steps):
                 if self._interrupted:
@@ -203,6 +219,14 @@ class WorkflowEngine:
                     raise KeyboardInterrupt
 
                 step = steps[state.current_step]
+
+                # Skip steps that already have responses (Fix MT-007)
+                if step.id in state.responses:
+                    self.console.print(
+                        f"[dim]Skipping {step.name} (provided via CLI)[/dim]"
+                    )
+                    state.current_step += 1
+                    continue
 
                 try:
                     state, response = self.execute_step(state, step)

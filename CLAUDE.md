@@ -45,6 +45,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based JSON in `.doit/state/` for workflow state persistence (030-guided-workflows)
 - Python 3.11+ (from constitution) + Typer (CLI), Rich (terminal UI), pytest (testing) (031-init-workflow-integration)
 - File-based (`.doit/state/` for workflow state, `.doit/memory/` for project context) (031-init-workflow-integration)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting) (032-status-dashboard)
+- File-based (reads `specs/` directory and spec.md files) (032-status-dashboard)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -64,9 +66,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 032-status-dashboard: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting)
 - 031-init-workflow-integration: Added Python 3.11+ (from constitution) + Typer (CLI), Rich (terminal UI), pytest (testing)
 - 030-guided-workflows: Added Python 3.11+ + Typer (CLI), Rich (terminal formatting/progress), readchar (keyboard input)
-- 029-spec-validation-linting: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), PyYAML (custom rules configuration)
 
 
 <!-- MANUAL ADDITIONS START -->

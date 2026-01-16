@@ -57,8 +57,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
   - **Feature**: `[026-ai-context-injection]`, `[027-template-context-injection]`
 
-- [ ] Spec status dashboard command (`doit status`)
+- [x] Spec status dashboard command (`doit status`)
   - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits
+  - **Feature**: `[032-status-dashboard]`
 
 ### P3 - Medium Priority (Valuable)
 

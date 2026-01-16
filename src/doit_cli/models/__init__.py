@@ -33,6 +33,11 @@ from .workflow_models import (
     NavigationCommand,
     StateCorruptionError,
 )
+from .status_models import (
+    SpecState,
+    SpecStatus,
+    StatusReport,
+)
 
 __all__ = [
     "Agent",
@@ -66,4 +71,8 @@ __all__ = [
     "WorkflowValidationError",
     "NavigationCommand",
     "StateCorruptionError",
+    # Status models
+    "SpecState",
+    "SpecStatus",
+    "StatusReport",
 ]

@@ -13,4 +13,6 @@ if ! command -v doit &> /dev/null; then
 fi
 
 # Run pre-push validation
-exec doit hooks validate pre-push "$@"
+# Note: Git passes remote name and URL as arguments, and ref info via stdin.
+# The doit validate command only needs the hook type, not git's arguments.
+exec doit hooks validate pre-push

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Pre-push hook fails with extra arguments** (#374) - Fixed pre-push and pre-commit hook templates incorrectly passing `"$@"` to `doit hooks validate`, which only expects a single `hook_type` argument. Git passes remote name and URL as CLI arguments to pre-push hooks, causing validation to fail with "Got unexpected extra arguments".
+
 ## [0.1.6] - 2026-01-15
 
 ### Fixed

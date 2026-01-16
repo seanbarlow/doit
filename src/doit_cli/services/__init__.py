@@ -19,6 +19,8 @@ from .input_validator import (
 )
 from .workflow_engine import WorkflowEngine
 from .state_manager import StateManager
+from .spec_scanner import SpecScanner, NotADoitProjectError, SpecNotFoundError
+from .status_reporter import StatusReporter
 
 __all__ = [
     "AgentDetector",
@@ -43,4 +45,9 @@ __all__ = [
     "WorkflowEngine",
     # State management
     "StateManager",
+    # Status dashboard
+    "SpecScanner",
+    "NotADoitProjectError",
+    "SpecNotFoundError",
+    "StatusReporter",
 ]

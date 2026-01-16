@@ -6,6 +6,8 @@ from .context_loader import ContextLoader, estimate_tokens, truncate_content
 from .scaffolder import Scaffolder
 from .template_manager import TemplateManager
 from .validator import Validator
+from .spec_scanner import SpecScanner, NotADoitProjectError, SpecNotFoundError
+from .status_reporter import StatusReporter
 
 __all__ = [
     "AgentDetector",
@@ -16,4 +18,8 @@ __all__ = [
     "Validator",
     "estimate_tokens",
     "truncate_content",
+    "SpecScanner",
+    "NotADoitProjectError",
+    "SpecNotFoundError",
+    "StatusReporter",
 ]

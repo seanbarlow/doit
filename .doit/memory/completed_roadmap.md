@@ -12,6 +12,9 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` | Rich/JSON/Markdown output, filtering by status/blocking/recent, validation integration |
+| Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
+| Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
 | Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` | Validate command with 10 rules, quality scoring, pre-commit hooks, custom rules |
 
 ---
@@ -33,9 +36,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 1
+- **Total Items Completed**: 4
 - **P1 Items Completed**: 0
-- **P2 Items Completed**: 1
+- **P2 Items Completed**: 4
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

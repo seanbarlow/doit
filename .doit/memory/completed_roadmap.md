@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
 | Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
 | Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
 | Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` | Rich/JSON/Markdown output, filtering by status/blocking/recent, validation integration |
@@ -38,9 +39,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 6
+- **Total Items Completed**: 7
 - **P1 Items Completed**: 1
-- **P2 Items Completed**: 5
+- **P2 Items Completed**: 6
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

@@ -25,6 +25,14 @@ from .requirement_parser import RequirementParser
 from .task_parser import TaskParser
 from .coverage_calculator import CoverageCalculator
 from .crossref_service import CrossReferenceService
+from .diagram_service import DiagramService
+from .section_parser import SectionParser
+from .user_story_parser import UserStoryParser
+from .entity_parser import EntityParser
+from .user_journey_generator import UserJourneyGenerator
+from .er_diagram_generator import ERDiagramGenerator
+from .mermaid_validator import MermaidValidator
+from .architecture_generator import ArchitectureGenerator
 
 __all__ = [
     "AgentDetector",
@@ -59,4 +67,13 @@ __all__ = [
     "TaskParser",
     "CoverageCalculator",
     "CrossReferenceService",
+    # Diagram services
+    "DiagramService",
+    "SectionParser",
+    "UserStoryParser",
+    "EntityParser",
+    "UserJourneyGenerator",
+    "ERDiagramGenerator",
+    "MermaidValidator",
+    "ArchitectureGenerator",
 ]

@@ -177,10 +177,10 @@ gantt
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Add spec-validation hook type definition in src/doit_cli/hooks/hook_types.py
-- [ ] T019 [US2] Update hook_runner.py to support spec-validation type in src/doit_cli/services/hook_runner.py
-- [ ] T020 [US2] Update hooks.yaml schema to support spec-validation configuration
-- [ ] T021 [US2] Add integration test for pre-commit hook behavior in tests/integration/test_spec_validation_hook.py
+- [x] T018 [US2] Add validate_spec and validate_spec_threshold to HookRule in src/doit_cli/models/hook_config.py
+- [x] T019 [US2] Add _validate_spec_quality method to HookValidator in src/doit_cli/services/hook_validator.py
+- [x] T020 [US2] Create hooks.yaml template with spec validation configuration in templates/config/hooks.yaml
+- [x] T021 [US2] Add integration test for pre-commit hook behavior in tests/integration/test_spec_validation_hook.py
 
 **Checkpoint**: User Story 2 complete - pre-commit hook validates specs automatically
 

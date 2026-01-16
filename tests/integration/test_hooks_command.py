@@ -183,11 +183,34 @@ class TestHooksValidationIntegration:
 
     def test_validation_passes_with_spec(self, feature_branch_repo: Path):
         """Test validation passes on feature branch with valid spec."""
-        # Create specs directory and spec.md
+        # Create specs directory and spec.md with all required sections
         spec_dir = feature_branch_repo / "specs" / "025-test-feature"
         spec_dir.mkdir(parents=True)
         spec_file = spec_dir / "spec.md"
-        spec_file.write_text("# Test Feature\n\n**Status**: In Progress\n\n## Summary")
+        spec_content = """# Feature: Test Feature
+
+**Status**: In Progress
+**Feature Branch**: `025-test-feature`
+
+## User Scenarios
+
+### User Story 1: Basic Test
+
+As a user, I want to test the feature.
+
+- **Given** I have setup **When** I perform action **Then** I see result
+
+## Requirements
+
+- **FR-001**: First requirement
+- **FR-002**: Second requirement
+
+## Success Criteria
+
+- **SC-001**: First criterion
+- **SC-002**: Second criterion
+"""
+        spec_file.write_text(spec_content)
 
         # Add a code file
         code_file = feature_branch_repo / "main.py"

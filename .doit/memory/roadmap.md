@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-15
+**Last Updated**: 2026-01-16
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -34,9 +34,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Interactive guided workflows with validation
   - **Rationale**: Improves user experience by guiding through each command step-by-step
 
-- [ ] Spec validation and linting
+- [~] Spec validation and linting *(MVP Complete - US1 done, US2-4 pending)*
   - **Rationale**: Catches specification errors before implementation, enforces quality standards
   - **Feature**: `[029-spec-validation-linting]`
+  - **Progress**: `doit validate` command working with 10 rules, quality scoring, JSON output
 
 - [x] Git hook integration for workflow enforcement
   - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks

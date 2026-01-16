@@ -13,4 +13,5 @@ if ! command -v doit &> /dev/null; then
 fi
 
 # Run pre-commit validation
-exec doit hooks validate pre-commit "$@"
+# Note: The doit validate command only needs the hook type, not shell arguments.
+exec doit hooks validate pre-commit

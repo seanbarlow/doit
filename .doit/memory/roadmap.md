@@ -47,8 +47,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks
   - **Feature**: `[025-git-hooks-workflow]`
 
-- [ ] Cross-reference support between specs and tasks
+- [x] Cross-reference support between specs and tasks
   - **Rationale**: Maintains traceability from requirements through implementation
+  - **Feature**: `[033-spec-task-crossrefs]`
 
 - [ ] Automatic Mermaid diagram generation from specs
   - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications

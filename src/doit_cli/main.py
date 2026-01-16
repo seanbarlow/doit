@@ -9,6 +9,7 @@ from .cli.status_command import status_command
 from .cli.sync_prompts_command import sync_prompts_command
 from .cli.validate_command import validate_command
 from .cli.verify_command import verify_command
+from .cli.xref_command import xref_app
 
 
 # Create a new typer app for the refactored commands
@@ -28,6 +29,7 @@ app.command(name="verify")(verify_command)
 # Register subcommand groups
 app.add_typer(context_app, name="context")
 app.add_typer(hooks_app, name="hooks")
+app.add_typer(xref_app, name="xref")
 
 
 def main():

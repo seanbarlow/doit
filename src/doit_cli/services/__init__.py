@@ -21,6 +21,10 @@ from .workflow_engine import WorkflowEngine
 from .state_manager import StateManager
 from .spec_scanner import SpecScanner, NotADoitProjectError, SpecNotFoundError
 from .status_reporter import StatusReporter
+from .requirement_parser import RequirementParser
+from .task_parser import TaskParser
+from .coverage_calculator import CoverageCalculator
+from .crossref_service import CrossReferenceService
 
 __all__ = [
     "AgentDetector",
@@ -50,4 +54,9 @@ __all__ = [
     "NotADoitProjectError",
     "SpecNotFoundError",
     "StatusReporter",
+    # Cross-reference services
+    "RequirementParser",
+    "TaskParser",
+    "CoverageCalculator",
+    "CrossReferenceService",
 ]

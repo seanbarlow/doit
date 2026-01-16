@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
 | Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` | Rich/JSON/Markdown output, filtering by status/blocking/recent, validation integration |
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
@@ -36,9 +37,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 4
+- **Total Items Completed**: 5
 - **P1 Items Completed**: 0
-- **P2 Items Completed**: 4
+- **P2 Items Completed**: 5
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

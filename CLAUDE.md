@@ -66,9 +66,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 033-spec-task-crossrefs: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 032-status-dashboard: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting)
 - 031-init-workflow-integration: Added Python 3.11+ (from constitution) + Typer (CLI), Rich (terminal UI), pytest (testing)
-- 030-guided-workflows: Added Python 3.11+ + Typer (CLI), Rich (terminal formatting/progress), readchar (keyboard input)
 
 
 <!-- MANUAL ADDITIONS START -->

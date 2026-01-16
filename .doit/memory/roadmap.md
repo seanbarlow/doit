@@ -35,7 +35,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Improves user experience by guiding through each command step-by-step
   - **Feature**: `[030-guided-workflows]`
 
-- [ ] Init command workflow integration
+- [x] Init command workflow integration
   - **Rationale**: Update init command to use workflow system, expand documentation
   - **Feature**: `[031-init-workflow-integration]`
 

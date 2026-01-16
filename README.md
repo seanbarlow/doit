@@ -27,6 +27,7 @@
 - **Specification-Driven** - Define what you're building before you build it
 - **Auto-Generated Diagrams** - Automatic Mermaid diagrams from specs (user journeys, architecture, ER models, task dependencies, timelines)
 - **Intelligent Roadmapping** - Prioritized roadmaps with P1-P4 system and vision tracking
+- **Guided Workflows** - Step-by-step interactive initialization with progress tracking, back navigation, and state recovery
 - **Persistent Memory** - All project context stored in version-controlled `.doit/memory/` folder
 - **Opinionated Approach** - Best practices built-in; strong opinions that reduce decision fatigue
 - **AI-Powered** - Works with Claude Code, Cursor, and other AI coding assistants via slash commands
@@ -212,6 +213,8 @@ Because these files are in git:
 - [Quick Start Guide](docs/quickstart.md) - 5-minute tutorial
 - [Template System](docs/templates/index.md) - Understanding templates
 - [Command Reference](docs/templates/commands.md) - All slash commands explained
+- [Workflow System Guide](docs/guides/workflow-system-guide.md) - Interactive workflow architecture
+- [Creating Workflows Tutorial](docs/tutorials/creating-workflows.md) - Build custom workflows
 
 ## Contributing
 

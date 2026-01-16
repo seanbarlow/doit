@@ -170,15 +170,15 @@ gantt
 
 ### T01: Create Feature Branch
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Epic #321
 - **Depends On**: None
 
 **Description**: Create the feature branch for init workflow integration.
 
 **Acceptance Criteria**:
-- [ ] Branch `031-init-workflow-integration` created from main
-- [ ] Branch pushed to remote
+- [X] Branch `031-init-workflow-integration` created from main
+- [X] Branch pushed to remote
 
 **Files**: None (git operations only)
 
@@ -186,17 +186,17 @@ gantt
 
 ### T02: Verify Feature 030 Available
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Epic #321
 - **Depends On**: T01
 
 **Description**: Verify that Feature 030 (Guided Workflows) code is available on main branch.
 
 **Acceptance Criteria**:
-- [ ] `WorkflowEngine` class exists in `src/doit_cli/services/workflow_engine.py`
-- [ ] `StateManager` class exists in `src/doit_cli/services/state_manager.py`
-- [ ] `Workflow` and `WorkflowStep` dataclasses exist in `src/doit_cli/models/workflow_models.py`
-- [ ] All imports resolve without error
+- [X] `WorkflowEngine` class exists in `src/doit_cli/services/workflow_engine.py`
+- [X] `StateManager` class exists in `src/doit_cli/services/state_manager.py`
+- [X] `Workflow` and `WorkflowStep` dataclasses exist in `src/doit_cli/models/workflow_models.py`
+- [X] All imports resolve without error
 
 **Files**:
 - `src/doit_cli/services/workflow_engine.py` (verify exists)
@@ -209,7 +209,7 @@ gantt
 
 ### T03: Create InitWorkflow Factory Function
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T02
 - **Contract**: [init-workflow.md](./contracts/init-workflow.md)
@@ -217,11 +217,11 @@ gantt
 **Description**: Create the `create_init_workflow(path)` factory function that returns the InitWorkflow definition with 3 steps.
 
 **Acceptance Criteria**:
-- [ ] Function `create_init_workflow(path: Path) -> Workflow` created
-- [ ] Returns workflow with id="init-workflow"
-- [ ] Contains 3 steps: select-agent, confirm-path, custom-templates
-- [ ] Step order is 0, 1, 2
-- [ ] Agent selection has options: claude, copilot, both
+- [X] Function `create_init_workflow(path: Path) -> Workflow` created
+- [X] Returns workflow with id="init-workflow"
+- [X] Contains 3 steps: select-agent, confirm-path, custom-templates
+- [X] Step order is 0, 1, 2
+- [X] Agent selection has options: claude, copilot, both
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -259,17 +259,17 @@ def create_init_workflow(path: Path) -> Workflow:
 
 ### T04: Add Workflow Imports to init_command.py
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T02
 
 **Description**: Add necessary imports for workflow integration.
 
 **Acceptance Criteria**:
-- [ ] Import `Workflow`, `WorkflowStep` from workflow_models
-- [ ] Import `WorkflowEngine` from workflow_engine
-- [ ] Import `StateManager` from state_manager
-- [ ] No import errors when module loads
+- [X] Import `Workflow`, `WorkflowStep` from workflow_models
+- [X] Import `WorkflowEngine` from workflow_engine
+- [X] Import `StateManager` from state_manager
+- [X] No import errors when module loads
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -278,17 +278,17 @@ def create_init_workflow(path: Path) -> Workflow:
 
 ### T05: Create Test Scaffolding
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T02
 
 **Description**: Create test file structure for init workflow tests.
 
 **Acceptance Criteria**:
-- [ ] `tests/unit/test_init_workflow.py` created with TestCreateInitWorkflow class
-- [ ] `tests/integration/test_init_workflow_integration.py` created with TestInitWorkflowIntegration class
-- [ ] Basic test imports working
-- [ ] pytest discovers new test files
+- [X] `tests/unit/test_init_workflow.py` created with TestCreateInitWorkflow class
+- [X] `tests/integration/test_init_workflow_integration.py` created with TestInitWorkflowIntegration class
+- [X] Basic test imports working
+- [X] pytest discovers new test files
 
 **Files**:
 - `tests/unit/test_init_workflow.py` (create)
@@ -302,7 +302,7 @@ def create_init_workflow(path: Path) -> Workflow:
 
 ### T06: Implement Three Workflow Steps
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T03
 - **Requirements**: FR-001, FR-002, FR-003, FR-004
@@ -310,11 +310,11 @@ def create_init_workflow(path: Path) -> Workflow:
 **Description**: Implement all three workflow steps with proper configuration.
 
 **Acceptance Criteria**:
-- [ ] Step 1 (select-agent): Choice validator with claude/copilot/both options
-- [ ] Step 2 (confirm-path): Includes actual path in prompt text
-- [ ] Step 3 (custom-templates): Optional step with PathExistsValidator
-- [ ] All steps have unique IDs
-- [ ] All steps have sequential order (0, 1, 2)
+- [X] Step 1 (select-agent): Choice validator with claude/copilot/both options
+- [X] Step 2 (confirm-path): Includes actual path in prompt text
+- [X] Step 3 (custom-templates): Optional step with PathExistsValidator
+- [X] All steps have unique IDs
+- [X] All steps have sequential order (0, 1, 2)
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -323,7 +323,7 @@ def create_init_workflow(path: Path) -> Workflow:
 
 ### T07: Integrate WorkflowEngine into init_command
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T04, T06
 - **Requirements**: FR-005
@@ -331,10 +331,10 @@ def create_init_workflow(path: Path) -> Workflow:
 **Description**: Modify init_command to use WorkflowEngine for interactive mode.
 
 **Acceptance Criteria**:
-- [ ] WorkflowEngine instantiated with console and StateManager
-- [ ] `engine.run(workflow)` called for interactive mode
-- [ ] Responses dict returned from engine
-- [ ] KeyboardInterrupt caught and exits with code 130
+- [X] WorkflowEngine instantiated with console and StateManager
+- [X] `engine.run(workflow)` called for interactive mode
+- [X] Responses dict returned from engine
+- [X] KeyboardInterrupt caught and exits with code 130
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -356,7 +356,7 @@ except KeyboardInterrupt:
 
 ### T08: Map Workflow Responses to Init Parameters
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T07
 - **Requirements**: FR-006
@@ -364,10 +364,10 @@ except KeyboardInterrupt:
 **Description**: Convert workflow responses dict to init function parameters.
 
 **Acceptance Criteria**:
-- [ ] `select-agent` response mapped to agents list via `parse_agent_string()`
-- [ ] `confirm-path` = "no" causes graceful abort with exit code 0
-- [ ] `custom-templates` response mapped to template_source Path (or None if empty)
-- [ ] Init function called with mapped parameters
+- [X] `select-agent` response mapped to agents list via `parse_agent_string()`
+- [X] `confirm-path` = "no" causes graceful abort with exit code 0
+- [X] `custom-templates` response mapped to template_source Path (or None if empty)
+- [X] Init function called with mapped parameters
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -376,7 +376,7 @@ except KeyboardInterrupt:
 
 ### T09: Handle Workflow Cancellation
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T08
 - **Requirements**: FR-007
@@ -384,10 +384,10 @@ except KeyboardInterrupt:
 **Description**: Handle user cancellation during workflow (confirm-path = "no").
 
 **Acceptance Criteria**:
-- [ ] When confirm-path is "no", display yellow cancellation message
-- [ ] Exit with code 0 (not error)
-- [ ] No init operations performed
-- [ ] State cleaned up
+- [X] When confirm-path is "no", display yellow cancellation message
+- [X] Exit with code 0 (not error)
+- [X] No init operations performed
+- [X] State cleaned up
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -396,7 +396,7 @@ except KeyboardInterrupt:
 
 ### T10: Unit Tests for InitWorkflow
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T05, T09
 - **Contract**: Testing Contract in [init-workflow.md](./contracts/init-workflow.md)
@@ -404,12 +404,12 @@ except KeyboardInterrupt:
 **Description**: Implement unit tests for the InitWorkflow factory and response mapping.
 
 **Acceptance Criteria**:
-- [ ] `test_workflow_has_three_steps` passes
-- [ ] `test_step_order_is_sequential` passes
-- [ ] `test_agent_selection_has_valid_options` passes
-- [ ] `test_optional_step_has_default` passes
-- [ ] `test_path_included_in_confirm_prompt` passes
-- [ ] All tests in `tests/unit/test_init_workflow.py` pass
+- [X] `test_workflow_has_three_steps` passes
+- [X] `test_step_order_is_sequential` passes
+- [X] `test_agent_selection_has_valid_options` passes
+- [X] `test_optional_step_has_default` passes
+- [X] `test_path_included_in_confirm_prompt` passes
+- [X] All tests in `tests/unit/test_init_workflow.py` pass
 
 **Files**:
 - `tests/unit/test_init_workflow.py` (modify)
@@ -422,7 +422,7 @@ except KeyboardInterrupt:
 
 ### T11: Bypass Workflow When --yes Flag Set
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T07
 - **Requirements**: FR-008
@@ -430,10 +430,10 @@ except KeyboardInterrupt:
 **Description**: Skip WorkflowEngine entirely when --yes flag is provided.
 
 **Acceptance Criteria**:
-- [ ] `if yes:` check at start of init_command
-- [ ] WorkflowEngine NOT instantiated when yes=True
-- [ ] Direct call to `run_init()` with defaults
-- [ ] No prompts displayed
+- [X] `if yes:` check at start of init_command
+- [X] WorkflowEngine NOT instantiated when yes=True
+- [X] Direct call to `run_init()` with defaults
+- [X] No prompts displayed
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -442,7 +442,7 @@ except KeyboardInterrupt:
 
 ### T12: Use Defaults and Auto-Detection for Non-Interactive
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T11
 - **Requirements**: FR-009, FR-010
@@ -450,10 +450,10 @@ except KeyboardInterrupt:
 **Description**: Implement default value logic for non-interactive mode.
 
 **Acceptance Criteria**:
-- [ ] Agent defaults to CLI arg if provided, else auto-detected, else Claude
-- [ ] Path confirmation implicit (always yes)
-- [ ] Templates from CLI arg if provided, else bundled
-- [ ] Performance: completes in <2 seconds
+- [X] Agent defaults to CLI arg if provided, else auto-detected, else Claude
+- [X] Path confirmation implicit (always yes)
+- [X] Templates from CLI arg if provided, else bundled
+- [X] Performance: completes in <2 seconds
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify)
@@ -462,17 +462,17 @@ except KeyboardInterrupt:
 
 ### T13: Non-Interactive Mode Tests
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #322
 - **Depends On**: T12
 
 **Description**: Add tests for non-interactive mode behavior.
 
 **Acceptance Criteria**:
-- [ ] `test_non_interactive_skips_prompts` passes
-- [ ] `test_non_interactive_uses_defaults` passes
-- [ ] `test_non_interactive_respects_cli_args` passes
-- [ ] No workflow step output in non-interactive tests
+- [X] `test_non_interactive_skips_prompts` passes
+- [X] `test_non_interactive_uses_defaults` passes
+- [X] `test_non_interactive_respects_cli_args` passes
+- [X] No workflow step output in non-interactive tests
 
 **Files**:
 - `tests/integration/test_init_workflow_integration.py` (modify)
@@ -485,7 +485,7 @@ except KeyboardInterrupt:
 
 ### T14: Add Step Counter to Progress Display
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T07
 - **Requirements**: FR-011
@@ -493,9 +493,9 @@ except KeyboardInterrupt:
 **Description**: Display "Step X/Y" during workflow execution.
 
 **Acceptance Criteria**:
-- [ ] Progress shows "Step 1/3", "Step 2/3", "Step 3/3"
-- [ ] Counter updates as steps complete
-- [ ] Uses ProgressDisplay from Feature 030
+- [X] Progress shows "Step 1/3", "Step 2/3", "Step 3/3"
+- [X] Counter updates as steps complete
+- [X] Uses ProgressDisplay from Feature 030
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (modify - verify ProgressDisplay usage)
@@ -504,7 +504,7 @@ except KeyboardInterrupt:
 
 ### T15: Show Navigation Hints
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T14
 - **Requirements**: FR-012
@@ -512,10 +512,10 @@ except KeyboardInterrupt:
 **Description**: Display navigation hints (back, skip, quit) during prompts.
 
 **Acceptance Criteria**:
-- [ ] "Type 'back' to return to previous step" shown
-- [ ] "Type 'skip' to use default" shown for optional steps
-- [ ] "Press Ctrl+C to cancel" shown
-- [ ] Hints styled with dim/muted color
+- [X] "Type 'back' to return to previous step" shown
+- [X] "Type 'skip' to use default" shown for optional steps
+- [X] "Press Ctrl+C to cancel" shown
+- [X] Hints styled with dim/muted color
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (verify)
@@ -524,7 +524,7 @@ except KeyboardInterrupt:
 
 ### T16: Display Step Names in Progress
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T15
 - **Requirements**: FR-013
@@ -532,9 +532,9 @@ except KeyboardInterrupt:
 **Description**: Show step name alongside counter.
 
 **Acceptance Criteria**:
-- [ ] Progress shows "Step 1/3: Select AI Agent"
-- [ ] Step name from WorkflowStep.name field
-- [ ] Consistent formatting across all steps
+- [X] Progress shows "Step 1/3: Select AI Agent"
+- [X] Step name from WorkflowStep.name field
+- [X] Consistent formatting across all steps
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (verify)
@@ -543,16 +543,16 @@ except KeyboardInterrupt:
 
 ### T17: Progress Display Tests
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T16
 
 **Description**: Test progress display output.
 
 **Acceptance Criteria**:
-- [ ] `test_progress_shows_step_counter` passes
-- [ ] `test_progress_shows_step_name` passes
-- [ ] `test_navigation_hints_displayed` passes
+- [X] `test_progress_shows_step_counter` passes
+- [X] `test_progress_shows_step_name` passes
+- [X] `test_navigation_hints_displayed` passes
 
 **Files**:
 - `tests/integration/test_init_workflow_integration.py` (modify)
@@ -565,7 +565,7 @@ except KeyboardInterrupt:
 
 ### T18: Create Workflow System Guide
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #324
 - **Depends On**: T10, T13
 - **Requirements**: FR-014, FR-015
@@ -573,10 +573,10 @@ except KeyboardInterrupt:
 **Description**: Create comprehensive guide for the workflow system.
 
 **Acceptance Criteria**:
-- [ ] `docs/guides/workflow-system-guide.md` created
-- [ ] Architecture overview with Mermaid diagram
-- [ ] Core components documented (WorkflowEngine, StateManager, InteractivePrompt)
-- [ ] ~1200 words of content
+- [X] `docs/guides/workflow-system-guide.md` created
+- [X] Architecture overview with Mermaid diagram
+- [X] Core components documented (WorkflowEngine, StateManager, InteractivePrompt)
+- [X] ~1200 words of content
 
 **Files**:
 - `docs/guides/workflow-system-guide.md` (create)
@@ -585,7 +585,7 @@ except KeyboardInterrupt:
 
 ### T19: Create Workflow Tutorial
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #324
 - **Depends On**: T18
 - **Requirements**: FR-016
@@ -593,10 +593,10 @@ except KeyboardInterrupt:
 **Description**: Create step-by-step tutorial for creating custom workflows.
 
 **Acceptance Criteria**:
-- [ ] `docs/tutorials/creating-workflows.md` created
-- [ ] Step-by-step instructions with code examples
-- [ ] Working example workflow included
-- [ ] ~600 words of content
+- [X] `docs/tutorials/creating-workflows.md` created
+- [X] Step-by-step instructions with code examples
+- [X] Working example workflow included
+- [X] ~600 words of content
 
 **Files**:
 - `docs/tutorials/creating-workflows.md` (create)
@@ -605,7 +605,7 @@ except KeyboardInterrupt:
 
 ### T20: Add API Reference Documentation
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #324
 - **Depends On**: T19
 - **Requirements**: FR-017
@@ -613,10 +613,10 @@ except KeyboardInterrupt:
 **Description**: Document public APIs for workflow system.
 
 **Acceptance Criteria**:
-- [ ] API reference section in workflow guide
-- [ ] All public methods documented with signatures
-- [ ] Example usage for each method
-- [ ] Type hints documented
+- [X] API reference section in workflow guide
+- [X] All public methods documented with signatures
+- [X] Example usage for each method
+- [X] Type hints documented
 
 **Files**:
 - `docs/guides/workflow-system-guide.md` (modify)
@@ -625,7 +625,7 @@ except KeyboardInterrupt:
 
 ### T21: Update README with Workflow Info
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #324
 - **Depends On**: T20
 - **Requirements**: FR-019
@@ -633,9 +633,9 @@ except KeyboardInterrupt:
 **Description**: Add workflow system mention to main README.
 
 **Acceptance Criteria**:
-- [ ] README mentions guided workflow system
-- [ ] Link to full documentation
-- [ ] Brief feature highlights
+- [X] README mentions guided workflow system
+- [X] Link to full documentation
+- [X] Brief feature highlights
 
 **Files**:
 - `README.md` (modify)
@@ -648,7 +648,7 @@ except KeyboardInterrupt:
 
 ### T22: Save State on Interrupt
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T07
 - **Requirements**: FR-011 (state aspect)
@@ -656,10 +656,10 @@ except KeyboardInterrupt:
 **Description**: Ensure state is saved when user interrupts with Ctrl+C.
 
 **Acceptance Criteria**:
-- [ ] StateManager.save() called on SIGINT
-- [ ] State file created at `.doit/state/init_{timestamp}.json`
-- [ ] Current step and responses preserved
-- [ ] Message shown: "Progress saved. Run again to resume."
+- [X] StateManager.save() called on SIGINT
+- [X] State file created at `.doit/state/init_{timestamp}.json`
+- [X] Current step and responses preserved
+- [X] Message shown: "Progress saved. Run again to resume."
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (verify)
@@ -668,17 +668,17 @@ except KeyboardInterrupt:
 
 ### T23: Prompt Resume on Restart
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T22
 
 **Description**: Detect saved state and offer to resume.
 
 **Acceptance Criteria**:
-- [ ] StateManager.load() called at workflow start
-- [ ] If interrupted state found, prompt "Resume from step X?"
-- [ ] If yes, continue from saved step
-- [ ] If no, start fresh (delete old state)
+- [X] StateManager.load() called at workflow start
+- [X] If interrupted state found, prompt "Resume from step X?"
+- [X] If yes, continue from saved step
+- [X] If no, start fresh (delete old state)
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (verify WorkflowEngine handles this)
@@ -687,16 +687,16 @@ except KeyboardInterrupt:
 
 ### T24: Clean State on Complete
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T23
 
 **Description**: Delete state file when workflow completes successfully.
 
 **Acceptance Criteria**:
-- [ ] StateManager.delete() called on successful completion
-- [ ] No state files remain after successful init
-- [ ] State preserved only for interrupted workflows
+- [X] StateManager.delete() called on successful completion
+- [X] No state files remain after successful init
+- [X] State preserved only for interrupted workflows
 
 **Files**:
 - `src/doit_cli/cli/init_command.py` (verify)
@@ -705,16 +705,16 @@ except KeyboardInterrupt:
 
 ### T25: State Recovery Tests
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Feature #323
 - **Depends On**: T24
 
 **Description**: Test state persistence and recovery.
 
 **Acceptance Criteria**:
-- [ ] `test_interrupt_saves_state` passes
-- [ ] `test_resume_continues_from_saved_step` passes
-- [ ] `test_complete_cleans_state` passes
+- [X] `test_interrupt_saves_state` passes
+- [X] `test_resume_continues_from_saved_step` passes
+- [X] `test_complete_cleans_state` passes
 
 **Files**:
 - `tests/integration/test_init_workflow_integration.py` (modify)
@@ -725,16 +725,16 @@ except KeyboardInterrupt:
 
 ### T26: Integration Tests
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Epic #321
 - **Depends On**: T17, T21, T25
 
 **Description**: Run full integration test suite.
 
 **Acceptance Criteria**:
-- [ ] All tests in `tests/integration/test_init_workflow_integration.py` pass
-- [ ] No regressions in existing init tests
-- [ ] Test coverage meets project standards
+- [X] All tests in `tests/integration/test_init_workflow_integration.py` pass
+- [X] No regressions in existing init tests
+- [X] Test coverage meets project standards
 
 **Files**:
 - `tests/integration/test_init_workflow_integration.py` (verify)
@@ -743,18 +743,18 @@ except KeyboardInterrupt:
 
 ### T27: Manual Testing
 
-- **Status**: [ ] Not Started
+- **Status**: [X] Complete
 - **Parent**: Epic #321
 - **Depends On**: T26
 
 **Description**: Perform manual testing of all user scenarios.
 
 **Acceptance Criteria**:
-- [ ] `doit init .` shows step progress
-- [ ] User can type "back" to return to previous step
-- [ ] `doit init . --yes` completes without prompts
-- [ ] Ctrl+C saves state, next run offers resume
-- [ ] All agents (claude, copilot, both) work correctly
+- [X] `doit init .` shows step progress
+- [X] User can type "back" to return to previous step
+- [X] `doit init . --yes` completes without prompts
+- [X] Ctrl+C saves state, next run offers resume
+- [X] All agents (claude, copilot, both) work correctly
 
 **Files**: None (manual testing)
 
@@ -762,16 +762,16 @@ except KeyboardInterrupt:
 
 ### T28: Final Review and PR
 
-- **Status**: [ ] Not Started
+- **Status**: [~] In Progress
 - **Parent**: Epic #321
 - **Depends On**: T27
 
 **Description**: Final code review and PR creation.
 
 **Acceptance Criteria**:
-- [ ] Code passes linting (`ruff check .`)
-- [ ] All tests pass (`pytest`)
-- [ ] Documentation complete
+- [X] Code passes linting (`ruff check .`)
+- [X] All tests pass (`pytest`)
+- [X] Documentation complete
 - [ ] PR created with summary
 - [ ] Run `/doit.reviewit` for code review
 

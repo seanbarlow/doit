@@ -12,7 +12,10 @@ from rich.tree import Tree
 from ..models.agent import Agent
 from ..models.project import Project
 from ..models.results import InitResult
+from ..models.workflow_models import Workflow, WorkflowStep
 from ..services.scaffolder import Scaffolder
+from ..services.state_manager import StateManager
+from ..services.workflow_engine import WorkflowEngine
 
 
 console = Console()
@@ -57,6 +60,100 @@ YesFlag = Annotated[
         help="Skip confirmation prompts"
     )
 ]
+
+
+# =============================================================================
+# InitWorkflow Factory (Feature 031)
+# =============================================================================
+
+
+def create_init_workflow(path: Path) -> Workflow:
+    """Create the init workflow definition.
+
+    Args:
+        path: Target project directory path
+
+    Returns:
+        Workflow instance configured for init command
+
+    Example:
+        workflow = create_init_workflow(Path("."))
+        responses = engine.run(workflow)
+    """
+    return Workflow(
+        id="init-workflow",
+        command_name="init",
+        description="Initialize a new doit project",
+        interactive=True,
+        steps=[
+            WorkflowStep(
+                id="select-agent",
+                name="Select AI Agent",
+                prompt_text="Which AI agent(s) do you want to initialize for?",
+                required=True,
+                order=0,
+                validation_type="ChoiceValidator",
+                default_value="claude",
+                options={
+                    "claude": "Claude Code",
+                    "copilot": "GitHub Copilot",
+                    "both": "Both agents",
+                },
+            ),
+            WorkflowStep(
+                id="confirm-path",
+                name="Confirm Project Path",
+                prompt_text=f"Initialize doit in '{path}'?",
+                required=True,
+                order=1,
+                validation_type=None,
+                default_value="yes",
+                options={"yes": "Confirm", "no": "Cancel"},
+            ),
+            WorkflowStep(
+                id="custom-templates",
+                name="Custom Templates",
+                prompt_text="Custom template directory (leave empty for default)",
+                required=False,
+                order=2,
+                validation_type="PathExistsValidator",
+                default_value="",
+            ),
+        ],
+    )
+
+
+def map_workflow_responses(responses: dict) -> tuple[list[Agent], Optional[Path]]:
+    """Map workflow responses to init parameters.
+
+    Args:
+        responses: Dict from WorkflowEngine.run()
+
+    Returns:
+        Tuple of (agents list, template_source path or None)
+
+    Raises:
+        typer.Exit: If confirm-path is "no"
+    """
+    # Check confirmation
+    if responses.get("confirm-path") == "no":
+        console.print("[yellow]Initialization cancelled.[/yellow]")
+        raise typer.Exit(0)
+
+    # Parse agent selection
+    agent_str = responses.get("select-agent", "claude")
+    if agent_str == "both":
+        agents = [Agent.CLAUDE, Agent.COPILOT]
+    elif agent_str == "copilot":
+        agents = [Agent.COPILOT]
+    else:
+        agents = [Agent.CLAUDE]
+
+    # Parse template path
+    template_str = responses.get("custom-templates", "")
+    template_source = Path(template_str) if template_str else None
+
+    return agents, template_source
 
 
 def display_init_result(result: InitResult, agents: list[Agent]) -> None:
@@ -433,8 +530,9 @@ def init_command(
         doit init . --agent copilot    # Copilot only
         doit init . -a claude,copilot  # Both agents
         doit init . --update           # Update existing templates
+        doit init . --yes              # Non-interactive mode
     """
-    # Parse agent string if provided
+    # Parse agent string if provided via CLI
     agents = None
     if agent:
         try:
@@ -443,18 +541,71 @@ def init_command(
             console.print(f"[red]Error:[/red] {e}")
             raise typer.Exit(1)
 
-    # Run initialization
+    # Non-interactive mode: bypass workflow entirely (FR-003, FR-008)
+    if yes:
+        result = run_init(
+            path=path,
+            agents=agents,
+            update=update,
+            force=force,
+            yes=True,
+            template_source=templates,
+        )
+        display_init_result(result, agents or result.project.agents or [Agent.CLAUDE])
+        if not result.success:
+            raise typer.Exit(1)
+        return
+
+    # Interactive mode: use workflow engine (FR-001, FR-002, FR-005)
+    workflow = create_init_workflow(path)
+
+    # Fix MT-005: Use target path for state directory, not cwd
+    state_dir = path.resolve() / ".doit" / "state"
+    engine = WorkflowEngine(
+        console=console,
+        state_manager=StateManager(state_dir=state_dir),
+    )
+
+    # Fix MT-007: Pre-populate responses for CLI-provided values
+    initial_responses: dict[str, str] = {}
+    if agents:
+        # Map agents to workflow response value
+        if len(agents) == 2:
+            initial_responses["select-agent"] = "both"
+        elif Agent.COPILOT in agents:
+            initial_responses["select-agent"] = "copilot"
+        else:
+            initial_responses["select-agent"] = "claude"
+    if templates:
+        initial_responses["custom-templates"] = str(templates)
+
+    try:
+        responses = engine.run(workflow, initial_responses=initial_responses)
+    except KeyboardInterrupt:
+        # State is saved by workflow engine (FR-007)
+        raise typer.Exit(130)
+
+    # Map workflow responses to init parameters (FR-006)
+    workflow_agents, template_source = map_workflow_responses(responses)
+
+    # Use CLI-provided agents if specified, else use workflow selection
+    final_agents = agents if agents else workflow_agents
+
+    # Use CLI-provided templates if specified, else use workflow selection
+    final_templates = templates if templates else template_source
+
+    # Execute init with collected parameters
     result = run_init(
         path=path,
-        agents=agents,
+        agents=final_agents,
         update=update,
         force=force,
-        yes=yes,
-        template_source=templates,
+        yes=False,
+        template_source=final_templates,
     )
 
     # Display results
-    display_init_result(result, agents or result.project.agents or [Agent.CLAUDE])
+    display_init_result(result, final_agents or result.project.agents or [Agent.CLAUDE])
 
     if not result.success:
         raise typer.Exit(1)

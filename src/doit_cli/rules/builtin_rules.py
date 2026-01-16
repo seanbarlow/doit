@@ -1,5 +1,7 @@
 """Built-in validation rules for spec files."""
 
+from dataclasses import replace
+
 from ..models.validation_models import Severity, ValidationRule
 
 # Default validation rules
@@ -97,8 +99,9 @@ def get_builtin_rules() -> list[ValidationRule]:
 
     Returns:
         List of ValidationRule objects with default configuration.
+        Each call returns fresh copies to prevent mutation issues.
     """
-    return BUILTIN_RULES.copy()
+    return [replace(rule) for rule in BUILTIN_RULES]
 
 
 def get_rule_by_id(rule_id: str) -> ValidationRule | None:

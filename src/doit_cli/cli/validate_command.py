@@ -58,6 +58,11 @@ def validate_command(
     - Acceptance scenario format (Given/When/Then)
     - Clarity markers ([NEEDS CLARIFICATION], TODO)
 
+    Custom rules can be configured via .doit/validation-rules.yaml:
+    - disabled_rules: List of rule IDs to skip
+    - overrides: Change severity of specific rules
+    - custom_rules: Add project-specific pattern checks
+
     Examples:
         doit validate                        # Validate current spec
         doit validate specs/001-feature/     # Validate specific spec directory

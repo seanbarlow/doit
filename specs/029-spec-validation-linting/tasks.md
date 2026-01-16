@@ -194,12 +194,12 @@ gantt
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Add --all flag and --format option to validate command in src/doit_cli/cli/validate_command.py
-- [ ] T023 [US3] Add validate_all() method to ValidationService in src/doit_cli/services/validation_service.py
-- [ ] T024 [US3] Add get_summary() method for batch result statistics in src/doit_cli/services/validation_service.py
-- [ ] T025 [US3] Update ReportGenerator for summary table output in src/doit_cli/services/report_generator.py
-- [ ] T026 [US3] Add JSON output format support to ReportGenerator in src/doit_cli/services/report_generator.py
-- [ ] T027 [US3] Add integration tests for batch validation in tests/integration/test_validate_command.py
+- [x] T022 [US3] Add --all flag and --format option to validate command in src/doit_cli/cli/validate_command.py *(completed in MVP)*
+- [x] T023 [US3] Add validate_all() method to ValidationService in src/doit_cli/services/validation_service.py *(completed in MVP)*
+- [x] T024 [US3] Add get_summary() method for batch result statistics in src/doit_cli/services/validation_service.py *(completed in MVP)*
+- [x] T025 [US3] Update ReportGenerator for summary table output in src/doit_cli/services/report_generator.py *(completed in MVP)*
+- [x] T026 [US3] Add JSON output format support to ReportGenerator in src/doit_cli/services/report_generator.py *(completed in MVP)*
+- [x] T027 [US3] Add integration tests for batch validation in tests/integration/test_validate_command.py *(completed in MVP)*
 
 **Checkpoint**: User Story 3 complete - batch validation and JSON output work
 
@@ -213,12 +213,12 @@ gantt
 
 ### Implementation for User Story 4
 
-- [ ] T028 [US4] Create ValidationConfig dataclass in src/doit_cli/models/validation_models.py
-- [ ] T029 [US4] Implement config loading from .doit/validation-rules.yaml in src/doit_cli/services/config_loader.py
-- [ ] T030 [US4] Add custom rule parsing and merging with defaults in src/doit_cli/services/rule_engine.py
-- [ ] T031 [US4] Support rule overrides and disabling in src/doit_cli/services/rule_engine.py
-- [ ] T032 [US4] Add unit and integration tests for custom rules in tests/unit/test_custom_rules.py
-- [ ] T033 [US4] Update CLI help with custom rules documentation in src/doit_cli/cli/validate_command.py
+- [x] T028 [US4] Create ValidationConfig, RuleOverride, CustomRule dataclasses in src/doit_cli/models/validation_models.py
+- [x] T029 [US4] Implement ConfigLoader in src/doit_cli/services/config_loader.py (loads .doit/validation-rules.yaml)
+- [x] T030 [US4] Add custom rule parsing in RuleEngine._load_rules() with template at templates/config/validation-rules.yaml
+- [x] T031 [US4] Support rule overrides, disabled rules, and custom rules in src/doit_cli/services/rule_engine.py
+- [x] T032 [US4] Add comprehensive unit tests in tests/unit/test_custom_rules.py (ConfigLoader, RuleEngine, ValidationService)
+- [x] T033 [US4] Update CLI help with custom rules documentation in src/doit_cli/cli/validate_command.py
 
 **Checkpoint**: User Story 4 complete - custom rules work via YAML configuration
 

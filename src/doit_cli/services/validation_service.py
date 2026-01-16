@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..models.validation_models import ValidationConfig, ValidationResult
+from .config_loader import load_validation_config
 from .rule_engine import RuleEngine
 from .score_calculator import ScoreCalculator
 
@@ -28,9 +29,10 @@ class ValidationService:
         Args:
             project_root: Root directory for spec discovery. Defaults to cwd.
             config: Validation configuration. Uses defaults if None.
+                    If None, attempts to load from .doit/validation-rules.yaml.
         """
         self.project_root = project_root or Path.cwd()
-        self.config = config or ValidationConfig.default()
+        self.config = config or load_validation_config(self.project_root)
         self.rule_engine = RuleEngine(config=self.config)
         self.score_calculator = ScoreCalculator()
 

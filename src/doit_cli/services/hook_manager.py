@@ -13,7 +13,7 @@ from importlib import resources
 class HookManager:
     """Manages Git hook installation, backup, and restoration."""
 
-    HOOK_NAMES = ["pre-commit", "pre-push", "post-commit"]
+    HOOK_NAMES = ["pre-commit", "pre-push", "post-commit", "post-merge"]
     BACKUP_DIR = ".doit/backups/hooks"
     MANIFEST_FILE = "manifest.json"
 

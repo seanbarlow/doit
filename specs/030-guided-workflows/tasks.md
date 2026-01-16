@@ -108,8 +108,8 @@ gantt
 
 **Purpose**: Create project structure for guided workflows feature
 
-- [ ] T001 Create prompts/ directory and services/ structure in src/doit_cli/ per plan.md
-- [ ] T002 [P] Add __init__.py files to new directories (src/doit_cli/prompts/__init__.py)
+- [x] T001 Create prompts/ directory and services/ structure in src/doit_cli/ per plan.md
+- [x] T002 [P] Add __init__.py files to new directories (src/doit_cli/prompts/__init__.py)
 
 ---
 
@@ -119,9 +119,9 @@ gantt
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Create Workflow and WorkflowStep dataclasses in src/doit_cli/models/workflow_models.py
-- [ ] T004 [P] Create WorkflowState and StepResponse dataclasses in src/doit_cli/models/workflow_models.py
-- [ ] T005 [P] Create exception hierarchy (WorkflowError, ValidationError, NavigationCommand, StateCorruptionError) in src/doit_cli/models/workflow_models.py
+- [x] T003 Create Workflow and WorkflowStep dataclasses in src/doit_cli/models/workflow_models.py
+- [x] T004 [P] Create WorkflowState and StepResponse dataclasses in src/doit_cli/models/workflow_models.py
+- [x] T005 [P] Create exception hierarchy (WorkflowError, ValidationError, NavigationCommand, StateCorruptionError) in src/doit_cli/models/workflow_models.py
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -140,17 +140,17 @@ gantt
 
 ### Tests for User Story 1+2
 
-- [ ] T006 [P] [US1] Create unit tests for InteractivePrompt in tests/unit/test_interactive_prompt.py
-- [ ] T007 [P] [US2] Create unit tests for InputValidator in tests/unit/test_input_validator.py
+- [x] T006 [P] [US1] Create unit tests for InteractivePrompt in tests/unit/test_interactive_prompt.py
+- [x] T007 [P] [US2] Create unit tests for InputValidator in tests/unit/test_input_validator.py
 
 ### Implementation for User Story 1+2
 
-- [ ] T008 [US1] Implement InteractivePrompt class in src/doit_cli/prompts/interactive.py (prompt, prompt_choice, prompt_confirm methods)
-- [ ] T009 [US2] Implement InputValidator base class and built-in validators in src/doit_cli/services/input_validator.py (RequiredValidator, PathExistsValidator, ChoiceValidator, PatternValidator)
-- [ ] T010 [US1] Implement WorkflowEngine.start() and execute_step() in src/doit_cli/services/workflow_engine.py
-- [ ] T011 [US1] Add back/skip navigation handling in WorkflowEngine in src/doit_cli/services/workflow_engine.py
-- [ ] T012 [US2] Integrate real-time validation feedback in InteractivePrompt in src/doit_cli/prompts/interactive.py
-- [ ] T013 [US1] Create unit tests for WorkflowEngine in tests/unit/test_workflow_engine.py
+- [x] T008 [US1] Implement InteractivePrompt class in src/doit_cli/prompts/interactive.py (prompt, prompt_choice, prompt_confirm methods)
+- [x] T009 [US2] Implement InputValidator base class and built-in validators in src/doit_cli/services/input_validator.py (RequiredValidator, PathExistsValidator, ChoiceValidator, PatternValidator)
+- [x] T010 [US1] Implement WorkflowEngine.start() and execute_step() in src/doit_cli/services/workflow_engine.py
+- [x] T011 [US1] Add back/skip navigation handling in WorkflowEngine in src/doit_cli/services/workflow_engine.py
+- [x] T012 [US2] Integrate real-time validation feedback in InteractivePrompt in src/doit_cli/prompts/interactive.py
+- [x] T013 [US1] Create unit tests for WorkflowEngine in tests/unit/test_workflow_engine.py
 
 **Checkpoint**: User Story 1+2 complete - guided workflows with validation functional
 
@@ -167,13 +167,13 @@ gantt
 
 ### Tests for User Story 3
 
-- [ ] T014 [P] [US3] Create unit tests for ProgressDisplay in tests/unit/test_progress_display.py
+- [x] T014 [P] [US3] Create unit tests for ProgressDisplay in tests/unit/test_progress_display.py
 
 ### Implementation for User Story 3
 
-- [ ] T015 [US3] Implement ProgressDisplay class in src/doit_cli/prompts/interactive.py (show_step, mark_complete, mark_skipped, show_error methods)
-- [ ] T016 [US3] Integrate ProgressDisplay with WorkflowEngine in src/doit_cli/services/workflow_engine.py
-- [ ] T017 [US3] Add step counter and completion percentage to progress output in src/doit_cli/prompts/interactive.py
+- [x] T015 [US3] Implement ProgressDisplay class in src/doit_cli/prompts/interactive.py (show_step, mark_complete, mark_skipped, show_error methods)
+- [x] T016 [US3] Integrate ProgressDisplay with WorkflowEngine in src/doit_cli/services/workflow_engine.py
+- [x] T017 [US3] Add step counter and completion percentage to progress output in src/doit_cli/prompts/interactive.py
 
 **Checkpoint**: User Story 3 complete - progress visualization working
 
@@ -190,15 +190,15 @@ gantt
 
 ### Tests for User Story 4
 
-- [ ] T018 [P] [US4] Create unit tests for StateManager in tests/unit/test_state_manager.py
+- [x] T018 [P] [US4] Create unit tests for StateManager in tests/unit/test_state_manager.py
 
 ### Implementation for User Story 4
 
-- [ ] T019 [US4] Implement StateManager.save() and load() in src/doit_cli/services/state_manager.py
-- [ ] T020 [US4] Implement StateManager.delete() and cleanup_stale() in src/doit_cli/services/state_manager.py
-- [ ] T021 [US4] Add Ctrl+C handler to save state on interrupt in src/doit_cli/services/workflow_engine.py
-- [ ] T022 [US4] Add resume prompt to WorkflowEngine.start() in src/doit_cli/services/workflow_engine.py
-- [ ] T023 [US4] Implement state file cleanup on successful completion in src/doit_cli/services/workflow_engine.py
+- [x] T019 [US4] Implement StateManager.save() and load() in src/doit_cli/services/state_manager.py
+- [x] T020 [US4] Implement StateManager.delete() and cleanup_stale() in src/doit_cli/services/state_manager.py
+- [x] T021 [US4] Add Ctrl+C handler to save state on interrupt in src/doit_cli/services/workflow_engine.py
+- [x] T022 [US4] Add resume prompt to WorkflowEngine.start() in src/doit_cli/services/workflow_engine.py
+- [x] T023 [US4] Implement state file cleanup on successful completion in src/doit_cli/services/workflow_engine.py
 
 **Checkpoint**: User Story 4 complete - workflow recovery functional
 
@@ -215,15 +215,15 @@ gantt
 
 ### Tests for User Story 5
 
-- [ ] T024 [P] [US5] Create unit tests for non-interactive mode in tests/unit/test_non_interactive.py
+- [x] T024 [P] [US5] Create unit tests for non-interactive mode in tests/unit/test_non_interactive.py
 
 ### Implementation for User Story 5
 
-- [ ] T025 [US5] Implement TTY detection in WorkflowEngine (sys.stdin.isatty()) in src/doit_cli/services/workflow_engine.py
-- [ ] T026 [US5] Add DOIT_NON_INTERACTIVE environment variable check in src/doit_cli/services/workflow_engine.py
-- [ ] T027 [US5] Add --non-interactive flag support to CLI mixin in src/doit_cli/cli/workflow_mixin.py
-- [ ] T028 [US5] Implement default value fallback for non-interactive mode in src/doit_cli/services/workflow_engine.py
-- [ ] T029 [US5] Add clear error messages for missing required inputs in non-interactive mode in src/doit_cli/services/workflow_engine.py
+- [x] T025 [US5] Implement TTY detection in WorkflowEngine (sys.stdin.isatty()) in src/doit_cli/services/workflow_engine.py
+- [x] T026 [US5] Add DOIT_NON_INTERACTIVE environment variable check in src/doit_cli/services/workflow_engine.py
+- [x] T027 [US5] Add --non-interactive flag support to CLI mixin in src/doit_cli/cli/workflow_mixin.py
+- [x] T028 [US5] Implement default value fallback for non-interactive mode in src/doit_cli/services/workflow_engine.py
+- [x] T029 [US5] Add clear error messages for missing required inputs in non-interactive mode in src/doit_cli/services/workflow_engine.py
 
 **Checkpoint**: User Story 5 complete - non-interactive mode functional
 
@@ -233,13 +233,13 @@ gantt
 
 **Purpose**: Integration testing, documentation, and cleanup
 
-- [ ] T030 Create integration tests for complete workflow scenarios in tests/integration/test_guided_workflows.py
-- [ ] T031 Create contract tests verifying API compliance in tests/contract/test_workflow_contracts.py
-- [ ] T032 [P] Implement WorkflowMixin for easy command integration in src/doit_cli/cli/workflow_mixin.py
-- [ ] T033 [P] Update existing init command to use workflow system in src/doit_cli/__init__.py
-- [ ] T034 [P] Add workflow documentation to docs/features/030-guided-workflows.md
-- [ ] T035 Run quickstart.md validation scenarios
-- [ ] T036 Code review and cleanup
+- [x] T030 Create integration tests for complete workflow scenarios in tests/integration/test_guided_workflows.py
+- [x] T031 Create contract tests verifying API compliance in tests/contract/test_workflow_contracts.py
+- [x] T032 [P] Implement WorkflowMixin for easy command integration in src/doit_cli/cli/workflow_mixin.py
+- [ ] T033 [P] Update existing init command to use workflow system in src/doit_cli/__init__.py (DEFERRED - requires careful migration)
+- [ ] T034 [P] Add workflow documentation to docs/features/030-guided-workflows.md (FOLLOW-UP)
+- [x] T035 Run quickstart.md validation scenarios (validated via integration tests)
+- [x] T036 Code review and cleanup
 
 ---
 

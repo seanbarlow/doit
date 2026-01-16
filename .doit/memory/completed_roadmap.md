@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, real-time validation, progress visualization, workflow recovery, non-interactive mode |
 | Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` | Validate command with 10 rules, quality scoring, pre-commit hooks, custom rules |
 
 ---
@@ -33,9 +34,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 1
+- **Total Items Completed**: 2
 - **P1 Items Completed**: 0
-- **P2 Items Completed**: 1
+- **P2 Items Completed**: 2
 - **P3 Items Completed**: 0
 - **P4 Items Completed**: 0
 

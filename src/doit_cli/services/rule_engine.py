@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from ..models.validation_models import (
     Severity,
@@ -11,6 +11,9 @@ from ..models.validation_models import (
     ValidationRule,
 )
 from ..rules.builtin_rules import get_builtin_rules
+
+if TYPE_CHECKING:
+    from .crossref_service import CrossReferenceService
 
 
 class RuleEngine:
@@ -104,6 +107,11 @@ class RuleEngine:
             List of issues found (empty if rule passes).
         """
         issues: list[ValidationIssue] = []
+
+        # Traceability rules have no pattern and require cross-file analysis
+        if rule.category == "traceability":
+            issues = self._check_traceability(rule, spec_path)
+            return issues
 
         if not rule.pattern:
             return issues
@@ -371,3 +379,65 @@ class RuleEngine:
             "todo-in-approved-spec": "Complete the TODO item or change spec status to Draft",
         }
         return suggestions.get(rule_id, "Review and address this issue")
+
+    def _check_traceability(
+        self,
+        rule: ValidationRule,
+        spec_path: Path,
+    ) -> list[ValidationIssue]:
+        """Check cross-reference traceability between spec.md and tasks.md.
+
+        Args:
+            rule: The traceability rule to check.
+            spec_path: Path to the spec file.
+
+        Returns:
+            List of issues found.
+        """
+        issues: list[ValidationIssue] = []
+
+        # Determine the feature directory from spec path
+        feature_dir = spec_path.parent
+        tasks_path = feature_dir / "tasks.md"
+
+        # Skip traceability checks if tasks.md doesn't exist
+        if not tasks_path.exists():
+            return issues
+
+        # Import here to avoid circular imports
+        from .crossref_service import CrossReferenceService
+
+        try:
+            service = CrossReferenceService()
+            uncovered, orphaned = service.validate_references(spec_path=spec_path)
+
+            if rule.id == "orphaned-task-reference":
+                for task, ref_id in orphaned:
+                    issues.append(
+                        ValidationIssue(
+                            rule_id=rule.id,
+                            severity=rule.severity,
+                            line_number=task.line_number,
+                            message=f"Task references non-existent requirement {ref_id}",
+                            suggestion=f"Verify {ref_id} exists in spec.md or remove the reference",
+                        )
+                    )
+
+            elif rule.id == "uncovered-requirement":
+                for req_id in uncovered:
+                    issues.append(
+                        ValidationIssue(
+                            rule_id=rule.id,
+                            severity=rule.severity,
+                            line_number=0,
+                            message=f"Requirement {req_id} has no linked tasks",
+                            suggestion=f"Add [task description] [{req_id}] to tasks.md",
+                        )
+                    )
+
+        except Exception:
+            # If cross-reference validation fails, skip silently
+            # (e.g., spec not found, parsing errors)
+            pass
+
+        return issues

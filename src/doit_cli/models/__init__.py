@@ -38,6 +38,15 @@ from .status_models import (
     SpecStatus,
     StatusReport,
 )
+from .crossref_models import (
+    CoverageStatus,
+    Requirement,
+    TaskReference,
+    Task,
+    CrossReference,
+    RequirementCoverage,
+    CoverageReport,
+)
 
 __all__ = [
     "Agent",
@@ -75,4 +84,12 @@ __all__ = [
     "SpecState",
     "SpecStatus",
     "StatusReport",
+    # Cross-reference models
+    "CoverageStatus",
+    "Requirement",
+    "TaskReference",
+    "Task",
+    "CrossReference",
+    "RequirementCoverage",
+    "CoverageReport",
 ]

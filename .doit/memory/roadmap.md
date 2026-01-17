@@ -27,6 +27,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Eliminates duplicate templates, simplifies maintenance
   - **Feature**: `[024-unified-templates]`
 
+- [x] Bug-fix workflow command (`doit.fixit`)
+  - **Rationale**: Provides structured bug-fix process integrated with GitHub issues - investigation plan, AI-assisted root cause analysis, fix planning, reuses existing reviewit/testit commands
+  - **Feature**: `[034-fixit-workflow]` ✅ COMPLETED 2026-01-16
+
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
@@ -47,11 +51,13 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks
   - **Feature**: `[025-git-hooks-workflow]`
 
-- [ ] Cross-reference support between specs and tasks
+- [x] Cross-reference support between specs and tasks
   - **Rationale**: Maintains traceability from requirements through implementation
+  - **Feature**: `[033-spec-task-crossrefs]`
 
-- [ ] Automatic Mermaid diagram generation from specs
+- [x] Automatic Mermaid diagram generation from specs
   - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
+  - **Feature**: `[035-auto-mermaid-diagrams]` ✅ COMPLETED 2026-01-16
 
 - [x] AI context injection for commands
   - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
@@ -65,8 +71,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [ ] Spec analytics and metrics dashboard
+- [x] Spec analytics and metrics dashboard
   - **Rationale**: Provides insights on spec completion, cycle times, and team velocity
+  - **Feature**: `[036-spec-analytics-dashboard]` ✅ COMPLETED 2026-01-16
 
 - [ ] Template versioning and update notifications
   - **Rationale**: Alerts users when command templates have newer versions available

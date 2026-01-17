@@ -91,6 +91,23 @@ BUILTIN_RULES: list[ValidationRule] = [
         category="naming",
         pattern=r"\*\*Feature\s+Branch\*\*:\s+`\d{3}-[\w-]+`",
     ),
+    # Traceability rules (cross-reference validation)
+    ValidationRule(
+        id="orphaned-task-reference",
+        name="Orphaned Task Reference",
+        description="Task references a requirement that does not exist in spec.md",
+        severity=Severity.ERROR,
+        category="traceability",
+        pattern=None,  # Requires cross-file analysis
+    ),
+    ValidationRule(
+        id="uncovered-requirement",
+        name="Uncovered Requirement",
+        description="Requirement has no linked tasks in tasks.md",
+        severity=Severity.WARNING,
+        category="traceability",
+        pattern=None,  # Requires cross-file analysis
+    ),
 ]
 
 

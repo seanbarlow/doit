@@ -38,6 +38,28 @@ from .status_models import (
     SpecStatus,
     StatusReport,
 )
+from .crossref_models import (
+    CoverageStatus,
+    Requirement,
+    TaskReference,
+    Task,
+    CrossReference,
+    RequirementCoverage,
+    CoverageReport,
+)
+from .diagram_models import (
+    DiagramType,
+    Cardinality,
+    AcceptanceScenario,
+    ParsedUserStory,
+    EntityAttribute,
+    EntityRelationship,
+    ParsedEntity,
+    DiagramSection,
+    ValidationResult as DiagramValidationResult,
+    GeneratedDiagram,
+    DiagramResult,
+)
 
 __all__ = [
     "Agent",
@@ -75,4 +97,24 @@ __all__ = [
     "SpecState",
     "SpecStatus",
     "StatusReport",
+    # Cross-reference models
+    "CoverageStatus",
+    "Requirement",
+    "TaskReference",
+    "Task",
+    "CrossReference",
+    "RequirementCoverage",
+    "CoverageReport",
+    # Diagram models
+    "DiagramType",
+    "Cardinality",
+    "AcceptanceScenario",
+    "ParsedUserStory",
+    "EntityAttribute",
+    "EntityRelationship",
+    "ParsedEntity",
+    "DiagramSection",
+    "DiagramValidationResult",
+    "GeneratedDiagram",
+    "DiagramResult",
 ]

@@ -12,6 +12,10 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Spec analytics and metrics dashboard | P3 | 2026-01-16 | `036-spec-analytics-dashboard` | Completion metrics, cycle time analysis, velocity trends, report export (Markdown/JSON) |
+| Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
+| Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
+| Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
 | Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` | Rich/JSON/Markdown output, filtering by status/blocking/recent, validation integration |
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
@@ -36,10 +40,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 4
-- **P1 Items Completed**: 0
-- **P2 Items Completed**: 4
-- **P3 Items Completed**: 0
+- **Total Items Completed**: 8
+- **P1 Items Completed**: 1
+- **P2 Items Completed**: 6
+- **P3 Items Completed**: 1
 - **P4 Items Completed**: 0
 
 ---

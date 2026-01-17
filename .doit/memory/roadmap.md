@@ -71,8 +71,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [ ] Spec analytics and metrics dashboard
+- [x] Spec analytics and metrics dashboard
   - **Rationale**: Provides insights on spec completion, cycle times, and team velocity
+  - **Feature**: `[036-spec-analytics-dashboard]` ✅ COMPLETED 2026-01-16
 
 - [ ] Template versioning and update notifications
   - **Rationale**: Alerts users when command templates have newer versions available

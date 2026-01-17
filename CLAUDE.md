@@ -49,6 +49,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based (reads `specs/` directory and spec.md files) (032-status-dashboard)
 - Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), httpx (GitHub API) (034-fixit-workflow)
 - File-based markdown in `.doit/memory/` and feature directory (034-fixit-workflow)
+- Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), statistics (stdlib) (036-spec-analytics-dashboard)
+- File-based (reads specs/ directory and git history, writes to .doit/reports/) (036-spec-analytics-dashboard)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -68,9 +70,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 036-spec-analytics-dashboard: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), statistics (stdlib)
 - 035-auto-mermaid-diagrams: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 034-fixit-workflow: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), httpx (GitHub API)
-- 033-spec-task-crossrefs: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 
 <!-- MANUAL ADDITIONS START -->

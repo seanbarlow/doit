@@ -67,21 +67,32 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits
   - **Feature**: `[032-status-dashboard]`
 
+- [x] Memory search and query across project context
+  - **Rationale**: Enables finding relevant context in constitution, roadmap, completed specs - enhances AI context injection capabilities
+  - **Feature**: `[037-memory-search-query]` ✅ COMPLETED 2026-01-16
+
 ### P3 - Medium Priority (Valuable)
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [ ] Spec analytics and metrics dashboard
+- [x] Spec analytics and metrics dashboard
   - **Rationale**: Provides insights on spec completion, cycle times, and team velocity
+  - **Feature**: `[036-spec-analytics-dashboard]` ✅ COMPLETED 2026-01-16
+
+- [ ] Batch command execution
+  - **Rationale**: Run multiple specs through the workflow sequentially with a single command
+
+- [ ] Spec dependencies graph
+  - **Rationale**: Visualize spec dependencies to complement cross-references and Mermaid diagrams
+
+- [ ] CLI plugin architecture
+  - **Rationale**: Enable community extensions without core changes - prepares for VS Code extension
 
 - [ ] Template versioning and update notifications
   - **Rationale**: Alerts users when command templates have newer versions available
 
 - [ ] VS Code extension for doit commands
   - **Rationale**: Integrates workflow commands directly into the IDE
-
-- [ ] Memory search and query across project context
-  - **Rationale**: Enables finding relevant context in constitution, roadmap, completed specs
 
 - [ ] Workflow checkpoint validation
   - **Rationale**: Validate each workflow step completes successfully before allowing the next step (enforces opinionated workflow)

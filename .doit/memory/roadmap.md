@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-16
+**Last Updated**: 2026-01-17
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -16,56 +16,13 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items that are essential for minimum viable product or blocking other work -->
 
-- [x] Core workflow commands (specit, planit, taskit, implementit, testit, reviewit, checkin)
-  - **Rationale**: Complete spec-driven development workflow - foundation of the CLI
-
-- [x] Multi-agent prompt synchronization (`sync-prompts` command)
-  - **Rationale**: Enables consistent prompt files across Claude, Copilot, and other AI agents
-  - **Feature**: `[023-copilot-prompts-sync]`
-
-- [x] Unified template management (single source of truth for commands)
-  - **Rationale**: Eliminates duplicate templates, simplifies maintenance
-  - **Feature**: `[024-unified-templates]`
-
-- [x] Bug-fix workflow command (`doit.fixit`)
-  - **Rationale**: Provides structured bug-fix process integrated with GitHub issues - investigation plan, AI-assisted root cause analysis, fix planning, reuses existing reviewit/testit commands
-  - **Feature**: `[034-fixit-workflow]` ✅ COMPLETED 2026-01-16
+✅ **All P1 items completed!** See `.doit/memory/completed_roadmap.md` for history.
 
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [x] Interactive guided workflows with validation
-  - **Rationale**: Improves user experience by guiding through each command step-by-step
-  - **Feature**: `[030-guided-workflows]`
-
-- [x] Init command workflow integration
-  - **Rationale**: Update init command to use workflow system, expand documentation
-  - **Feature**: `[031-init-workflow-integration]`
-
-- [x] Spec validation and linting
-  - **Rationale**: Catches specification errors before implementation, enforces quality standards
-  - **Feature**: `[029-spec-validation-linting]`
-
-- [x] Git hook integration for workflow enforcement
-  - **Rationale**: Ensures team compliance with spec-first workflow via pre-commit/push hooks
-  - **Feature**: `[025-git-hooks-workflow]`
-
-- [x] Cross-reference support between specs and tasks
-  - **Rationale**: Maintains traceability from requirements through implementation
-  - **Feature**: `[033-spec-task-crossrefs]`
-
-- [x] Automatic Mermaid diagram generation from specs
-  - **Rationale**: Aligns with constitution principle III - auto-generate architecture diagrams from specifications
-  - **Feature**: `[035-auto-mermaid-diagrams]` ✅ COMPLETED 2026-01-16
-
-- [x] AI context injection for commands
-  - **Rationale**: Automatically inject relevant project context (constitution, roadmap, related specs) into command execution
-  - **Feature**: `[026-ai-context-injection]`, `[027-template-context-injection]`
-
-- [x] Spec status dashboard command (`doit status`)
-  - **Rationale**: Shows all specs, their statuses, and validation readiness - helps developers see what's blocking commits
-  - **Feature**: `[032-status-dashboard]`
+✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
 
 ### P3 - Medium Priority (Valuable)
 

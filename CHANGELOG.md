@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-01-17
+
+### Added
+
+- **Spec-Task Cross References** (#389)
+  - `doit xref` command for bidirectional traceability between specs and tasks
+  - Coverage reports showing which requirements are implemented
+  - Validation rules for orphan tasks and uncovered requirements
+  - JSON and line output formats for CI/IDE integration
+
+- **Bug-Fix Workflow** (#440)
+  - `/doit.fixit` slash command for structured bug-fix workflow
+  - GitHub issue integration for bug tracking
+  - AI-assisted investigation and root cause analysis
+  - Fix planning with test scenarios
+  - Reuses existing reviewit/testit commands
+
+- **Automatic Mermaid Diagram Generation** (#472)
+  - `doit diagram` command for auto-generating diagrams from specs
+  - User journey flowcharts from user stories
+  - Entity relationship diagrams from data models
+  - Architecture diagrams from component descriptions
+  - Syntax validation before insertion
+  - Preview mode and strict validation options
+
+### Changed
+
+- **Documentation Updates**
+  - Updated README.md, quickstart.md, tutorials with new commands
+  - Added `/doit.fixit` to all command reference tables
+  - Added `doit validate`, `doit status`, `doit xref`, `doit diagram` CLI commands
+  - Fixed 2 broken documentation links
+  - Audited and verified all 43 documentation files
+
+- **Roadmap Milestone**
+  - All P1 and P2 items completed - MVP achieved
+  - 13 total items shipped (4 P1, 8 P2)
+
 ## [0.1.7] - 2026-01-16
 
 ### Fixed

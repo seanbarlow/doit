@@ -263,7 +263,7 @@ Please include:
 
 ## Status
 
-- **Current Version:** 0.1.4
+- **Current Version:** 0.1.8
 - **Python Support:** 3.11, 3.12
 - **Status:** Beta
 - **Last Updated:** January 2026

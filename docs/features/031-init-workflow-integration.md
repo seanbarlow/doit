@@ -165,4 +165,3 @@ Resume from step 1? [y/n]:
 
 - [Workflow System Guide](../guides/workflow-system-guide.md)
 - [Creating Workflows Tutorial](../tutorials/creating-workflows.md)
-- [Init Command Reference](../commands/init.md)

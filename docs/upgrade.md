@@ -74,7 +74,7 @@ Run this inside your project directory:
 doit init --here --force --ai <your-agent>
 ```
 
-Replace `<your-agent>` with your AI assistant. Refer to this list of [Supported AI Agents](../README.md#-supported-ai-agents)
+Replace `<your-agent>` with your AI assistant (`claude`, `copilot`, or `claude,copilot` for both)
 
 **Example:**
 

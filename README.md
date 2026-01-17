@@ -129,6 +129,7 @@ Run these in your AI coding assistant (Claude Code, Copilot, etc.):
 | **/doit.roadmapit** | Manage priorities | roadmap.md with P1-P4 items |
 | **/doit.documentit** | Organize documentation | Organized docs/, index.md |
 | **/doit.scaffoldit** | Bootstrap new projects | .doit/ structure, templates |
+| **/doit.fixit** | Bug-fix workflow | Investigation, fix planning, review |
 | **/doit.checkin** | Archive completed work | PR creation, issue closing |
 
 ### CLI Commands (Terminal)
@@ -143,6 +144,10 @@ Run these in your terminal:
 | `doit context show` | Display loaded project context |
 | `doit hooks install` | Install git hooks for workflow enforcement |
 | `doit hooks validate` | Validate branch meets requirements |
+| `doit validate` | Validate spec against quality rules |
+| `doit status` | Show spec status dashboard |
+| `doit xref` | Cross-reference specs and tasks |
+| `doit diagram` | Generate Mermaid diagrams from specs |
 
 ## Project Structure
 
@@ -258,7 +263,7 @@ Please include:
 
 ## Status
 
-- **Current Version:** 0.1.4
+- **Current Version:** 0.1.8
 - **Python Support:** 3.11, 3.12
 - **Status:** Beta
 - **Last Updated:** January 2026

@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Documentation audit and link fixes | — | 2026-01-17 | — | Fixed 2 broken links, audited 43 docs, verified all headers |
 | Memory search and query across project context | P2 | 2026-01-16 | `037-memory-search-query` | Keyword search, natural language queries, result display, source filtering, search history |
 | Spec analytics and metrics dashboard | P3 | 2026-01-16 | `036-spec-analytics-dashboard` | Completion metrics, cycle time analysis, velocity trends, report export (Markdown/JSON) |
 | Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
@@ -21,6 +22,11 @@
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
 | Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` | Validate command with 10 rules, quality scoring, pre-commit hooks, custom rules |
+| AI context injection for commands | P2 | 2026-01-15 | `026-ai-context-injection`, `027-template-context-injection` | Auto-load constitution, roadmap, related specs into command execution |
+| Git hook integration for workflow enforcement | P2 | 2026-01-15 | `025-git-hooks-workflow` | Pre-commit/push hooks, spec-first validation, bypass logging |
+| Unified template management | P1 | 2026-01-15 | `024-unified-templates` | Single source of truth for commands, eliminates duplicate templates |
+| Multi-agent prompt synchronization | P1 | 2026-01-15 | `023-copilot-prompts-sync` | Consistent prompts across Claude, Copilot agents |
+| Core workflow commands | P1 | 2026-01-10 | — | specit, planit, taskit, implementit, testit, reviewit, checkin |
 
 ---
 
@@ -41,11 +47,12 @@
 
 ## Statistics
 
-- **Total Items Completed**: 9
-- **P1 Items Completed**: 1
-- **P2 Items Completed**: 7
+- **Total Items Completed**: 13
+- **P1 Items Completed**: 4
+- **P2 Items Completed**: 8
 - **P3 Items Completed**: 1
-- **P4 Items Completed**: 0
+- **P4 Items Completed**: 1
+- **Other**: 1 (documentation audit)
 
 ---
 

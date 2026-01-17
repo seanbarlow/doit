@@ -8,6 +8,7 @@ Welcome to the Do-It tutorials! These step-by-step guides will teach you how to 
 |----------|----------|------|
 | [Greenfield Project](01-greenfield-tutorial.md) | Starting a new project from scratch | ~2 hours |
 | [Existing Project](02-existing-project-tutorial.md) | Adding Do-It to an existing codebase | ~90 minutes |
+| [Creating Workflows](creating-workflows.md) | Building custom interactive workflows | ~60 minutes |
 
 ## Tutorial Overview
 
@@ -72,6 +73,7 @@ flowchart LR
         J["testit"]
         K["roadmapit"]
         L["documentit"]
+        M["fixit"]
     end
 
     C --> D
@@ -93,8 +95,13 @@ flowchart LR
 | `/doit.reviewit` | Review implementation | After implementation |
 | `/doit.testit` | Run automated tests | Before/after changes |
 | `/doit.checkin` | Finalize feature | When feature is complete |
+| `/doit.fixit` | Bug-fix workflow | When fixing bugs |
 | `/doit.roadmapit` | Manage project backlog | Anytime |
 | `/doit.documentit` | Organize documentation | As needed |
+| `doit validate` | Validate spec quality | Before commit |
+| `doit status` | Show spec dashboard | Track progress |
+| `doit xref` | Cross-reference traceability | Verify coverage |
+| `doit diagram` | Generate diagrams | After spec updates |
 
 ## Need Help?
 

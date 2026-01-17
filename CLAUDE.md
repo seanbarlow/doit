@@ -49,8 +49,6 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based (reads `specs/` directory and spec.md files) (032-status-dashboard)
 - Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), httpx (GitHub API) (034-fixit-workflow)
 - File-based markdown in `.doit/memory/` and feature directory (034-fixit-workflow)
-- Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting), existing context_loader.py (037-memory-search-query)
-- File-based (markdown files in `.doit/memory/` and `specs/`) (037-memory-search-query)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 

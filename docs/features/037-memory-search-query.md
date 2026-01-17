@@ -2,7 +2,7 @@
 
 **Completed**: 2026-01-16
 **Branch**: `037-memory-search-query`
-**PR**: TBD (pending creation)
+**PR**: [#540](https://github.com/seanbarlow/doit/pull/540)
 
 ## Overview
 

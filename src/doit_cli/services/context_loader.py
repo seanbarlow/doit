@@ -557,6 +557,60 @@ class ContextLoader:
             original_tokens=original_tokens if was_truncated else None,
         )
 
+    def get_memory_files(self) -> list[Path]:
+        """Get list of governance memory files.
+
+        Returns paths to constitution.md, roadmap.md, and completed_roadmap.md
+        if they exist.
+
+        Returns:
+            List of paths to governance memory files.
+        """
+        memory_dir = self.project_root / ".doit" / "memory"
+        files = []
+
+        governance_files = [
+            "constitution.md",
+            "roadmap.md",
+            "completed_roadmap.md",
+        ]
+
+        for filename in governance_files:
+            path = memory_dir / filename
+            if path.exists():
+                files.append(path)
+
+        return files
+
+    def get_spec_files(self) -> list[Path]:
+        """Get list of all spec.md files in the specs directory.
+
+        Returns:
+            List of paths to spec.md files.
+        """
+        specs_dir = self.project_root / "specs"
+        files = []
+
+        if not specs_dir.exists():
+            return files
+
+        for spec_dir in specs_dir.iterdir():
+            if not spec_dir.is_dir():
+                continue
+            spec_path = spec_dir / "spec.md"
+            if spec_path.exists():
+                files.append(spec_path)
+
+        return sorted(files)
+
+    def get_all_searchable_files(self) -> list[Path]:
+        """Get all files that can be searched.
+
+        Returns:
+            Combined list of memory and spec files.
+        """
+        return self.get_memory_files() + self.get_spec_files()
+
     def find_related_specs(
         self,
         max_count: int = 3,

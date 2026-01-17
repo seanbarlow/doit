@@ -13,6 +13,8 @@
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
 | Documentation audit and link fixes | — | 2026-01-17 | — | Fixed 2 broken links, audited 43 docs, verified all headers |
+| Memory search and query across project context | P2 | 2026-01-16 | `037-memory-search-query` | Keyword search, natural language queries, result display, source filtering, search history |
+| Spec analytics and metrics dashboard | P3 | 2026-01-16 | `036-spec-analytics-dashboard` | Completion metrics, cycle time analysis, velocity trends, report export (Markdown/JSON) |
 | Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
 | Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
 | Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
@@ -48,8 +50,8 @@
 - **Total Items Completed**: 13
 - **P1 Items Completed**: 4
 - **P2 Items Completed**: 8
-- **P3 Items Completed**: 0
-- **P4 Items Completed**: 0
+- **P3 Items Completed**: 1
+- **P4 Items Completed**: 1
 - **Other**: 1 (documentation audit)
 
 ---

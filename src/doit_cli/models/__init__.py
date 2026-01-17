@@ -60,6 +60,16 @@ from .diagram_models import (
     GeneratedDiagram,
     DiagramResult,
 )
+from .search_models import (
+    QueryType,
+    SourceType,
+    SourceFilter,
+    SearchQuery,
+    SearchResult,
+    MemorySource,
+    ContentSnippet,
+    SearchHistory,
+)
 
 __all__ = [
     "Agent",
@@ -117,4 +127,13 @@ __all__ = [
     "DiagramValidationResult",
     "GeneratedDiagram",
     "DiagramResult",
+    # Search models
+    "QueryType",
+    "SourceType",
+    "SourceFilter",
+    "SearchQuery",
+    "SearchResult",
+    "MemorySource",
+    "ContentSnippet",
+    "SearchHistory",
 ]

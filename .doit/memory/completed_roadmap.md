@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Memory search and query across project context | P2 | 2026-01-16 | `037-memory-search-query` | Keyword search, natural language queries, result display, source filtering, search history |
 | Spec analytics and metrics dashboard | P3 | 2026-01-16 | `036-spec-analytics-dashboard` | Completion metrics, cycle time analysis, velocity trends, report export (Markdown/JSON) |
 | Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
 | Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
@@ -40,9 +41,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 8
+- **Total Items Completed**: 9
 - **P1 Items Completed**: 1
-- **P2 Items Completed**: 6
+- **P2 Items Completed**: 7
 - **P3 Items Completed**: 1
 - **P4 Items Completed**: 0
 

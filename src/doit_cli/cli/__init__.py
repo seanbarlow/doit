@@ -1,6 +1,7 @@
 """CLI commands for doit-cli."""
 
 from .init_command import init_command, run_init, parse_agent_string
+from .memory_command import memory_app
 from .verify_command import verify_command
 from .workflow_mixin import (
     WorkflowMixin,
@@ -14,6 +15,7 @@ __all__ = [
     "init_command",
     "run_init",
     "parse_agent_string",
+    "memory_app",
     "verify_command",
     # Workflow support
     "WorkflowMixin",

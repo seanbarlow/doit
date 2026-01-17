@@ -43,6 +43,14 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Git Hooks Workflow](./features/025-git-hooks-workflow.md) | Git hook integration for spec-driven workflow enforcement... | 2026-01-15 |
 | [AI Context Injection](./features/026-ai-context-injection.md) | Automatic project context loading for AI assistant commands... | 2026-01-15 |
 | [Template Context Injection](./features/027-template-context-injection.md) | Integrated context loading into all 11 doit command templates... | 2026-01-15 |
+| [Documentation Tutorial Refresh](./features/028-docs-tutorial-refresh.md) | Refreshed tutorials and documentation for current workflow... | 2026-01-15 |
+| [Spec Validation and Linting](./features/029-spec-validation-linting.md) | Added `doit validate` command with quality rules and scoring... | 2026-01-15 |
+| [Guided Workflows](./features/030-guided-workflows.md) | Interactive step-by-step workflows with validation and recovery... | 2026-01-16 |
+| [Init Workflow Integration](./features/031-init-workflow-integration.md) | Init command uses WorkflowEngine with state persistence... | 2026-01-16 |
+| [Spec Status Dashboard](./features/032-status-dashboard.md) | Added `doit status` command for spec progress dashboard... | 2026-01-16 |
+| [Spec-Task Cross References](./features/033-spec-task-crossrefs.md) | Bidirectional traceability between specs and tasks with `doit xref`... | 2026-01-16 |
+| [Bug-Fix Workflow (doit.fixit)](./features/034-fixit-workflow.md) | Structured bug-fix workflow with GitHub integration... | 2026-01-16 |
+| [Auto Mermaid Diagrams](./features/035-auto-mermaid-diagrams.md) | Automatic diagram generation with `doit diagram` command... | 2026-01-16 |
 | [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
 
 ## Guides
@@ -50,6 +58,7 @@ Spec-Driven Development **flips the script** on traditional software development
 | Document | Description | Last Modified |
 | -------- | ----------- | ------------- |
 | [Mermaid Diagram Patterns](./guides/diagram-patterns.md) | All auto-generated diagrams use HTML comment markers to identify content... | 2026-01-10 |
+| [Workflow System Guide](./guides/workflow-system-guide.md) | Interactive workflow architecture with WorkflowEngine... | 2026-01-16 |
 
 ## Tutorials
 
@@ -58,6 +67,7 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Tutorial Index](./tutorials/index.md) | Overview of Do-It tutorials and learning paths... | 2026-01-14 |
 | [Greenfield Tutorial](./tutorials/01-greenfield-tutorial.md) | Building a new project from scratch with Do-It... | 2026-01-14 |
 | [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) | Adding Do-It to an existing codebase... | 2026-01-14 |
+| [Creating Workflows Tutorial](./tutorials/creating-workflows.md) | Build custom interactive workflows... | 2026-01-16 |
 
 ## Templates
 

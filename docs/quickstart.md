@@ -203,6 +203,10 @@ Run these commands in your terminal:
 | `doit context show` | Display loaded project context | Debug context injection |
 | `doit hooks install` | Install git hooks for workflow | Once per repo clone |
 | `doit hooks validate` | Validate branch meets requirements | Before commit/push |
+| `doit validate` | Validate spec against quality rules | Before commit or review |
+| `doit status` | Show spec status dashboard | Track spec progress |
+| `doit xref` | Cross-reference specs and tasks | Verify traceability |
+| `doit diagram` | Generate Mermaid diagrams | After spec/plan updates |
 
 ### Slash Commands (AI Agent)
 
@@ -219,6 +223,7 @@ Run these commands in your AI coding assistant (Claude Code, Copilot, etc.):
 | `/doit.reviewit` | Review implementation | After implementation |
 | `/doit.testit` | Run automated tests | Before/after changes |
 | `/doit.checkin` | Finalize feature | When feature is complete |
+| `/doit.fixit` | Bug-fix workflow | When fixing bugs |
 | `/doit.roadmapit` | Manage project backlog | Anytime |
 | `/doit.documentit` | Organize documentation | As needed |
 

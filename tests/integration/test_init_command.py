@@ -253,3 +253,109 @@ class TestInitScriptsCopy:
 
         # Script should be replaced (not equal to custom content)
         assert common_sh.read_text() != custom_content
+
+
+class TestInitMemoryFilesPreservation:
+    """Tests for memory file preservation during init --update (Issue #542)."""
+
+    def test_update_preserves_memory_files(self, project_dir):
+        """Test that --update does NOT overwrite existing memory files.
+
+        Memory files (constitution.md, roadmap.md, roadmap_completed.md) contain
+        user-customized project content and should only be overwritten with --force.
+        """
+        from doit_cli.main import app
+
+        # First init
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Customize memory files
+        memory_dir = project_dir / ".doit" / "memory"
+        constitution_file = memory_dir / "constitution.md"
+        roadmap_file = memory_dir / "roadmap.md"
+
+        custom_constitution = "# My Custom Constitution\n\nThis is my project's constitution.\n"
+        custom_roadmap = "# My Custom Roadmap\n\n## Phase 1\n- Feature A\n"
+
+        constitution_file.write_text(custom_constitution)
+        roadmap_file.write_text(custom_roadmap)
+
+        # Run init with --update flag
+        result = runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--update", "--yes"]
+        )
+
+        assert result.exit_code == 0
+
+        # Memory files should be preserved (not overwritten)
+        assert constitution_file.read_text() == custom_constitution, \
+            "constitution.md should NOT be overwritten by --update"
+        assert roadmap_file.read_text() == custom_roadmap, \
+            "roadmap.md should NOT be overwritten by --update"
+
+    def test_force_overwrites_memory_files(self, project_dir):
+        """Test that --force DOES overwrite existing memory files."""
+        from doit_cli.main import app
+
+        # First init
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Customize memory files
+        memory_dir = project_dir / ".doit" / "memory"
+        constitution_file = memory_dir / "constitution.md"
+
+        custom_constitution = "# My Custom Constitution\n\nThis is my project's constitution.\n"
+        constitution_file.write_text(custom_constitution)
+
+        # Run init with --force flag
+        result = runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--force", "--yes"]
+        )
+
+        assert result.exit_code == 0
+
+        # Memory files SHOULD be overwritten with --force
+        assert constitution_file.read_text() != custom_constitution, \
+            "constitution.md SHOULD be overwritten by --force"
+
+    def test_update_still_updates_command_templates(self, project_dir):
+        """Test that --update still updates command templates even while preserving memory."""
+        from doit_cli.main import app
+
+        # First init
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Modify a command template
+        command_dir = project_dir / ".claude" / "commands"
+        template_files = list(command_dir.glob("doit.*.md"))
+        if template_files:
+            test_template = template_files[0]
+            custom_content = "# Custom Command Template\n"
+            test_template.write_text(custom_content)
+
+            # Customize a memory file too
+            memory_dir = project_dir / ".doit" / "memory"
+            constitution_file = memory_dir / "constitution.md"
+            custom_constitution = "# My Custom Constitution\n"
+            constitution_file.write_text(custom_constitution)
+
+            # Run update
+            result = runner.invoke(
+                app, ["init", str(project_dir), "--agent", "claude", "--update", "--yes"]
+            )
+
+            assert result.exit_code == 0
+
+            # Command template SHOULD be updated
+            assert test_template.read_text() != custom_content, \
+                "Command templates should be updated with --update"
+
+            # Memory file should be preserved
+            assert constitution_file.read_text() == custom_constitution, \
+                "Memory files should be preserved with --update"

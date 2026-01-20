@@ -451,9 +451,11 @@ def run_init(
     result.skipped_files.extend(scripts_result.get("skipped", []))
 
     # Copy memory templates to .doit/memory/
+    # Note: Memory files (constitution, roadmap) should only be overwritten with --force,
+    # not --update, since they contain user-customized project content
     memory_result = template_manager.copy_memory_templates(
         target_dir=project.doit_folder / "memory",
-        overwrite=update or force,
+        overwrite=force,
     )
     result.created_files.extend(memory_result.get("created", []))
     result.updated_files.extend(memory_result.get("updated", []))

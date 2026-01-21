@@ -261,7 +261,7 @@ class TestInitMemoryFilesPreservation:
     def test_update_preserves_memory_files(self, project_dir):
         """Test that --update does NOT overwrite existing memory files.
 
-        Memory files (constitution.md, roadmap.md, roadmap_completed.md) contain
+        Memory files (constitution.md, roadmap.md, completed_roadmap.md) contain
         user-customized project content and should only be overwritten with --force.
         """
         from doit_cli.main import app

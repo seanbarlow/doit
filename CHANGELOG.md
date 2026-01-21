@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-01-20
+
+### Added
+
+- **Context Roadmap Summary** (#576)
+  - Intelligent roadmap summarization for AI context injection
+  - Priority-based summaries: P1/P2 items with full content and rationale, P3/P4 titles only
+  - Current feature branch highlighting with `[CURRENT]` marker
+  - Completed roadmap items formatted for AI semantic matching
+  - Two-tier context condensation: guidance prompt at soft threshold, truncation fallback
+  - New `SummarizationConfig` for customizing summarization behavior
+  - `doit context show` now displays summarization status (summarized/formatted/complete)
+
+### Changed
+
+- **AI Context Injection**
+  - Context loader now uses RoadmapSummarizer for intelligent roadmap condensation
+  - Added ContextCondenser for threshold-based condensation with AI guidance prompts
+  - Completed roadmap items parsed and formatted for AI semantic understanding
+
 ## [0.1.8] - 2026-01-17
 
 ### Added

@@ -1,10 +1,10 @@
 {
   "issue_id": 542,
   "title": "[Bug]: doit --update overwrites files",
-  "phase": "implementing",
+  "phase": "completed",
   "branch": "fix/542-update-overwrites-files",
   "created_at": "2026-01-19T00:00:00Z",
-  "updated_at": "2026-01-19T00:00:00Z",
+  "updated_at": "2026-01-20T18:30:00Z",
   "issue_summary": {
     "description": "When running doit --update from the command line, it overwrites completed_roadmap.md, roadmap.md, constitution.md and tech-stack.md if they already exist, replacing them with default templates.",
     "steps_to_reproduce": [
@@ -109,5 +109,12 @@
     ],
     "tests_passed": 19,
     "tests_failed": 0
+  },
+  "checkin": {
+    "commit_hash": "12009a9",
+    "pr_number": 543,
+    "pr_url": "https://github.com/seanbarlow/doit/pull/543",
+    "completed_at": "2026-01-20T18:30:00Z",
+    "notes": "PR was previously merged, issue closed during checkin"
   }
 }

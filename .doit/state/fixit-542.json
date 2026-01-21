@@ -1,0 +1,120 @@
+{
+  "issue_id": 542,
+  "title": "[Bug]: doit --update overwrites files",
+  "phase": "completed",
+  "branch": "fix/542-update-overwrites-files",
+  "created_at": "2026-01-19T00:00:00Z",
+  "updated_at": "2026-01-20T18:30:00Z",
+  "issue_summary": {
+    "description": "When running doit --update from the command line, it overwrites completed_roadmap.md, roadmap.md, constitution.md and tech-stack.md if they already exist, replacing them with default templates.",
+    "steps_to_reproduce": [
+      "Run doit --update"
+    ],
+    "expected_behavior": "roadmap, completed_roadmap, tech-stack and constitution should retain their existing content",
+    "environment": "macOS, Python 12"
+  },
+  "investigation": {
+    "checkpoints": [
+      {
+        "id": "cp-1",
+        "description": "Review error logs and stack traces",
+        "status": "completed",
+        "notes": "No error - this is a logic bug, not an exception"
+      },
+      {
+        "id": "cp-2",
+        "description": "Identify affected code paths in doit --update",
+        "status": "completed",
+        "notes": "Found in init_command.py and template_manager.py"
+      },
+      {
+        "id": "cp-3",
+        "description": "Search for related issues or commits",
+        "status": "completed",
+        "notes": "No related issues found"
+      },
+      {
+        "id": "cp-4",
+        "description": "Formulate root cause hypothesis",
+        "status": "completed",
+        "notes": "Root cause identified - see confirmed_cause finding"
+      }
+    ],
+    "findings": [
+      {
+        "id": "f-1",
+        "type": "reproduction_step",
+        "description": "Run 'doit init . --update' on an existing project with customized memory files"
+      },
+      {
+        "id": "f-2",
+        "type": "affected_file",
+        "description": "src/doit_cli/cli/init_command.py - passes overwrite=update to copy functions (lines 454-460)"
+      },
+      {
+        "id": "f-3",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/template_manager.py - copy_memory_templates() overwrites when overwrite=True (lines 616-662)"
+      },
+      {
+        "id": "f-4",
+        "type": "hypothesis",
+        "description": "The --update flag is meant to update COMMAND templates, not user-customized memory files"
+      },
+      {
+        "id": "f-5",
+        "type": "confirmed_cause",
+        "description": "In init_command.py:454-460, copy_memory_templates is called with overwrite=update. When --update is passed, memory templates (constitution.md, roadmap.md, roadmap_completed.md) are overwritten with default templates, destroying user customizations. Memory files should NEVER be overwritten during update since they contain project-specific content."
+      }
+    ],
+    "keywords": ["--update", "overwrites", "files", "roadmap", "constitution", "tech-stack", "completed_roadmap"]
+  },
+  "plan": {
+    "root_cause_summary": "The --update flag passes overwrite=True to copy_memory_templates(), causing user-customized memory files (constitution.md, roadmap.md, roadmap_completed.md) to be replaced with default templates.",
+    "proposed_solution": "Change the overwrite parameter for copy_memory_templates() from 'update or force' to just 'force'. This ensures memory files are only overwritten when --force is explicitly used, not during normal --update operations. The --update flag is intended for updating command templates, not destroying user content.",
+    "files_to_modify": [
+      {
+        "path": "src/doit_cli/cli/init_command.py",
+        "change": "Line 456: Change 'overwrite=update or force' to 'overwrite=force' for copy_memory_templates() call"
+      },
+      {
+        "path": "tests/integration/test_init_command.py",
+        "change": "Add test case to verify --update does NOT overwrite existing memory files"
+      }
+    ],
+    "risk_assessment": "low",
+    "risk_notes": "Minimal risk - single line change with clear behavior. Only affects memory template copying. Existing --force behavior preserved.",
+    "testing_strategy": [
+      "Run existing tests to ensure no regressions",
+      "Add integration test: create project, customize memory files, run --update, verify files unchanged",
+      "Manual test: doit init, modify constitution.md, doit init --update, verify constitution.md preserved"
+    ],
+    "approved": true,
+    "approved_at": "2026-01-19T00:00:00Z"
+  },
+  "implementation": {
+    "status": "completed",
+    "completed_at": "2026-01-19T00:00:00Z",
+    "changes": [
+      {
+        "file": "src/doit_cli/cli/init_command.py",
+        "description": "Changed overwrite=update or force to overwrite=force for copy_memory_templates() call",
+        "lines_changed": 1
+      },
+      {
+        "file": "tests/integration/test_init_command.py",
+        "description": "Added TestInitMemoryFilesPreservation class with 3 test cases",
+        "lines_changed": 85
+      }
+    ],
+    "tests_passed": 19,
+    "tests_failed": 0
+  },
+  "checkin": {
+    "commit_hash": "12009a9",
+    "pr_number": 543,
+    "pr_url": "https://github.com/seanbarlow/doit/pull/543",
+    "completed_at": "2026-01-20T18:30:00Z",
+    "notes": "PR was previously merged, issue closed during checkin"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "epics_with_features": [
+    {
+      "number": 577,
+      "title": "[Epic]: GitHub Epic Integration",
+      "state": "open",
+      "labels": [
+        {"name": "epic"},
+        {"name": "priority:P2"}
+      ],
+      "body": "Integrates GitHub epics with roadmap for bidirectional sync",
+      "url": "https://github.com/seanbarlow/doit/issues/577",
+      "createdAt": "2026-01-21T10:00:00Z",
+      "updatedAt": "2026-01-21T15:30:00Z"
+    },
+    {
+      "number": 600,
+      "title": "[Epic]: Documentation Improvements",
+      "state": "open",
+      "labels": [
+        {"name": "epic"},
+        {"name": "priority:P3"}
+      ],
+      "body": "Improve documentation and add examples",
+      "url": "https://github.com/seanbarlow/doit/issues/600",
+      "createdAt": "2026-01-20T08:00:00Z",
+      "updatedAt": "2026-01-21T12:00:00Z"
+    }
+  ],
+  "epics_no_priority": [
+    {
+      "number": 601,
+      "title": "[Epic]: Feature Without Priority",
+      "state": "open",
+      "labels": [
+        {"name": "epic"},
+        {"name": "enhancement"}
+      ],
+      "body": "Epic without explicit priority label (should default to P3)",
+      "url": "https://github.com/seanbarlow/doit/issues/601",
+      "createdAt": "2026-01-21T09:00:00Z",
+      "updatedAt": "2026-01-21T09:00:00Z"
+    }
+  ],
+  "features_for_epic_577": [
+    {
+      "number": 578,
+      "title": "[Feature]: Display GitHub Epics in Roadmap",
+      "state": "open",
+      "labels": [
+        {"name": "feature"},
+        {"name": "priority:P1"}
+      ],
+      "url": "https://github.com/seanbarlow/doit/issues/578"
+    },
+    {
+      "number": 579,
+      "title": "[Feature]: Link Feature Issues to Roadmap Items",
+      "state": "open",
+      "labels": [
+        {"name": "feature"},
+        {"name": "priority:P2"}
+      ],
+      "url": "https://github.com/seanbarlow/doit/issues/579"
+    },
+    {
+      "number": 580,
+      "title": "[Feature]: Auto-create GitHub Epics",
+      "state": "open",
+      "labels": [
+        {"name": "feature"},
+        {"name": "priority:P3"}
+      ],
+      "url": "https://github.com/seanbarlow/doit/issues/580"
+    }
+  ],
+  "empty_repo": [],
+  "closed_epic": [
+    {
+      "number": 500,
+      "title": "[Epic]: Completed Feature",
+      "state": "closed",
+      "labels": [
+        {"name": "epic"},
+        {"name": "priority:P1"}
+      ],
+      "body": "This epic was completed",
+      "url": "https://github.com/seanbarlow/doit/issues/500",
+      "createdAt": "2026-01-10T10:00:00Z",
+      "updatedAt": "2026-01-15T16:00:00Z"
+    }
+  ],
+  "rate_limit_error": {
+    "error": "API rate limit exceeded",
+    "message": "You have exceeded a secondary rate limit",
+    "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits"
+  },
+  "auth_error": {
+    "error": "authentication required",
+    "message": "You are not logged into any GitHub hosts. Run gh auth login to authenticate."
+  }
+}

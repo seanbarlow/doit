@@ -1,0 +1,149 @@
+{
+  "issue_id": 544,
+  "title": "[Bug]: doit init",
+  "phase": "completed",
+  "branch": "fix/544-copilot-prompt-filename",
+  "created_at": "2026-01-20T17:41:55Z",
+  "updated_at": "2026-01-20T19:15:00Z",
+  "issue_summary": {
+    "description": "When running doit init, it creates GitHub Copilot prompts with incorrect naming: doit-fixit.prompt.md instead of doit.fixit.prompt.md",
+    "steps_to_reproduce": [
+      "Run doit init .",
+      "Review the file names generated in .github/prompts/"
+    ],
+    "expected_behavior": "Files should be named doit.fixit.prompt.md (dots, not hyphens)",
+    "environment": "macOS 14, Python 3.13"
+  },
+  "investigation": {
+    "checkpoints": [
+      {
+        "id": "cp-1",
+        "description": "Review error logs and stack traces",
+        "status": "completed",
+        "notes": "No error - this is a naming convention inconsistency, not an exception"
+      },
+      {
+        "id": "cp-2",
+        "description": "Identify affected code paths",
+        "status": "completed",
+        "notes": "Found in 6 files: template.py, template_manager.py, agent.py, scaffolder.py, agent_detector.py, validator.py"
+      },
+      {
+        "id": "cp-3",
+        "description": "Search for related issues or commits",
+        "status": "completed",
+        "notes": "sync_models.py uses correct format (dots). Existing .github/prompts/ files use correct format. Old code uses wrong format (hyphens)."
+      },
+      {
+        "id": "cp-4",
+        "description": "Formulate root cause hypothesis",
+        "status": "completed",
+        "notes": "Root cause confirmed - see confirmed_cause finding"
+      }
+    ],
+    "findings": [
+      {
+        "id": "f-1",
+        "type": "reproduction_step",
+        "description": "Run 'doit init . --copilot' and check .github/prompts/ - files would be generated with doit-{name}.prompt.md format"
+      },
+      {
+        "id": "f-2",
+        "type": "affected_file",
+        "description": "src/doit_cli/models/template.py:47 - returns f\"doit-{self.name}.prompt.md\" for COPILOT"
+      },
+      {
+        "id": "f-3",
+        "type": "affected_file",
+        "description": "src/doit_cli/models/template.py:60-61 - parses filename using doit- prefix"
+      },
+      {
+        "id": "f-4",
+        "type": "affected_file",
+        "description": "src/doit_cli/models/agent.py:63 - file_pattern uses \"doit-*.prompt.md\""
+      },
+      {
+        "id": "f-5",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/template_manager.py:300 - generates f\"doit-{template.name}.prompt.md\""
+      },
+      {
+        "id": "f-6",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/scaffolder.py:120 - checks startswith(\"doit-\")"
+      },
+      {
+        "id": "f-7",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/agent_detector.py:139,165 - checks startswith(\"doit-\")"
+      },
+      {
+        "id": "f-8",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/validator.py:95 - expects f\"doit-{cmd}.prompt.md\""
+      },
+      {
+        "id": "f-9",
+        "type": "confirmed_cause",
+        "description": "Naming convention inconsistency: Old code (template.py, agent.py, template_manager.py, scaffolder.py, agent_detector.py, validator.py) uses hyphen format (doit-fixit.prompt.md), but newer code (sync_models.py) and existing files in .github/prompts/ use dot format (doit.fixit.prompt.md). The hyphen format was an older convention that should be replaced with the dot format to match Claude commands (doit.fixit.md) for consistency."
+      }
+    ],
+    "keywords": ["init", "copilot", "prompt", "filename", "doit-fixit", "doit.fixit", "naming", "hyphen", "dot"]
+  },
+  "plan": {
+    "root_cause_summary": "Old code uses hyphen format (doit-fixit.prompt.md) for Copilot prompt filenames, but newer code and existing files use dot format (doit.fixit.prompt.md). This creates inconsistency when doit init generates new files.",
+    "proposed_solution": "Update all 6 affected files to use the dot format (doit.{name}.prompt.md) instead of the hyphen format (doit-{name}.prompt.md). This aligns Copilot prompts with the Claude command naming convention (doit.{name}.md) for consistency.",
+    "files_to_modify": [
+      {
+        "path": "src/doit_cli/models/template.py",
+        "change": "Line 47: Change f\"doit-{self.name}.prompt.md\" to f\"doit.{self.name}.prompt.md\"; Lines 60-61: Change doit- to doit. for parsing"
+      },
+      {
+        "path": "src/doit_cli/models/agent.py",
+        "change": "Line 63: Change \"doit-*.prompt.md\" to \"doit.*.prompt.md\""
+      },
+      {
+        "path": "src/doit_cli/services/template_manager.py",
+        "change": "Line 300: Change f\"doit-{template.name}.prompt.md\" to f\"doit.{template.name}.prompt.md\""
+      },
+      {
+        "path": "src/doit_cli/services/scaffolder.py",
+        "change": "Line 120: Change startswith(\"doit-\") to startswith(\"doit.\")"
+      },
+      {
+        "path": "src/doit_cli/services/agent_detector.py",
+        "change": "Lines 139, 165: Change startswith(\"doit-\") to startswith(\"doit.\")"
+      },
+      {
+        "path": "src/doit_cli/services/validator.py",
+        "change": "Line 95: Change f\"doit-{cmd}.prompt.md\" to f\"doit.{cmd}.prompt.md\""
+      }
+    ],
+    "risk_assessment": "low",
+    "risk_notes": "Low risk - string constant updates only. All changes are consistent with existing newer code (sync_models.py) and existing files. No logic changes required.",
+    "testing_strategy": [
+      "Run existing tests to ensure no regressions",
+      "Verify doit init --copilot creates files with doit.{name}.prompt.md format",
+      "Verify existing .github/prompts/ files are detected correctly"
+    ],
+    "approved": true,
+    "approved_at": "2026-01-20T18:50:00Z"
+  },
+  "implementation": {
+    "status": "completed",
+    "completed_at": "2026-01-20T19:15:00Z",
+    "files_modified": [
+      "src/doit_cli/models/template.py",
+      "src/doit_cli/models/agent.py",
+      "src/doit_cli/services/template_manager.py",
+      "src/doit_cli/services/scaffolder.py",
+      "src/doit_cli/services/agent_detector.py",
+      "src/doit_cli/services/validator.py",
+      "tests/unit/test_agent.py",
+      "tests/unit/test_template_manager.py"
+    ],
+    "tests_passed": true,
+    "tests_count": 1026,
+    "notes": "Updated all 6 source files and 2 test files to use doit.{name}.prompt.md format. All 1026 tests pass."
+  }
+}

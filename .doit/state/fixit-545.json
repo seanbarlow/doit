@@ -1,0 +1,124 @@
+{
+  "issue_id": 545,
+  "title": "[Bug]: doit init",
+  "phase": "completed",
+  "branch": "fix/545-init-roadmap-completed-filename",
+  "created_at": "2026-01-20T17:48:07Z",
+  "updated_at": "2026-01-20T18:15:00Z",
+  "issue_summary": {
+    "description": "When running doit init, it creates a file named roadmap_completed.md in the memory folder, but the expected filename is completed_roadmap.md",
+    "steps_to_reproduce": [
+      "Run doit init .",
+      "Look at the memory folder",
+      "Observe roadmap_completed.md instead of completed_roadmap.md"
+    ],
+    "expected_behavior": "File should be named completed_roadmap.md",
+    "environment": "macOS 14, Python 3.13"
+  },
+  "investigation": {
+    "checkpoints": [
+      {
+        "id": "cp-1",
+        "description": "Review error logs and stack traces",
+        "status": "completed",
+        "notes": "No error - this is a naming inconsistency bug, not an exception"
+      },
+      {
+        "id": "cp-2",
+        "description": "Identify affected code paths",
+        "status": "completed",
+        "notes": "Found in template_manager.py:42 (MEMORY_TEMPLATES list) and templates/memory/ directory"
+      },
+      {
+        "id": "cp-3",
+        "description": "Search for related issues or commits",
+        "status": "completed",
+        "notes": "No related issues. The rest of the codebase uses completed_roadmap.md (context_loader.py:575, README.md, command templates)"
+      },
+      {
+        "id": "cp-4",
+        "description": "Formulate root cause hypothesis",
+        "status": "completed",
+        "notes": "Root cause confirmed - see confirmed_cause finding"
+      }
+    ],
+    "findings": [
+      {
+        "id": "f-1",
+        "type": "reproduction_step",
+        "description": "Run 'doit init .' in a new directory, then check .doit/memory/ - the file is named roadmap_completed.md"
+      },
+      {
+        "id": "f-2",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/template_manager.py:42 - MEMORY_TEMPLATES list contains 'roadmap_completed.md' (wrong name)"
+      },
+      {
+        "id": "f-3",
+        "type": "affected_file",
+        "description": "templates/memory/roadmap_completed.md - template file has wrong filename"
+      },
+      {
+        "id": "f-4",
+        "type": "hypothesis",
+        "description": "The template filename and MEMORY_TEMPLATES reference were created with inverted word order compared to the expected convention"
+      },
+      {
+        "id": "f-5",
+        "type": "confirmed_cause",
+        "description": "Naming inconsistency: The template file is named 'roadmap_completed.md' and template_manager.py:42 references this name, but the rest of the codebase (context_loader.py:575, README.md, roadmap-template.md, command templates) expects 'completed_roadmap.md'. When doit init runs, it copies the wrongly-named template, so the file cannot be found by context_loader and other components."
+      }
+    ],
+    "keywords": ["init", "roadmap_completed.md", "completed_roadmap.md", "memory", "filename", "template_manager", "MEMORY_TEMPLATES"]
+  },
+  "plan": {
+    "root_cause_summary": "The template file is named 'roadmap_completed.md' but the codebase expects 'completed_roadmap.md'. This naming inconsistency causes doit init to create a file that context_loader and other components cannot find.",
+    "proposed_solution": "Rename the template file and update the MEMORY_TEMPLATES constant to use the correct filename 'completed_roadmap.md'. This aligns with the naming convention used throughout the codebase (context_loader.py, README.md, command templates).",
+    "files_to_modify": [
+      {
+        "path": "templates/memory/roadmap_completed.md",
+        "change": "Rename file to 'completed_roadmap.md'"
+      },
+      {
+        "path": "src/doit_cli/services/template_manager.py",
+        "change": "Line 42: Change 'roadmap_completed.md' to 'completed_roadmap.md' in MEMORY_TEMPLATES list"
+      },
+      {
+        "path": "tests/integration/test_init_command.py",
+        "change": "Line 264: Update comment to reference 'completed_roadmap.md' for consistency"
+      }
+    ],
+    "risk_assessment": "low",
+    "risk_notes": "Minimal risk - simple file rename and string constant update. No logic changes. The fix aligns with existing codebase conventions.",
+    "testing_strategy": [
+      "Run existing tests to ensure no regressions",
+      "Verify doit init creates completed_roadmap.md in .doit/memory/",
+      "Verify context_loader can find the memory file after init"
+    ],
+    "approved": true,
+    "approved_at": "2026-01-20T18:10:00Z"
+  },
+  "implementation": {
+    "status": "completed",
+    "completed_at": "2026-01-20T18:15:00Z",
+    "changes": [
+      {
+        "file": "templates/memory/roadmap_completed.md",
+        "description": "Renamed to completed_roadmap.md using git mv",
+        "lines_changed": 0
+      },
+      {
+        "file": "src/doit_cli/services/template_manager.py",
+        "description": "Updated MEMORY_TEMPLATES list to use 'completed_roadmap.md'",
+        "lines_changed": 1
+      },
+      {
+        "file": "tests/integration/test_init_command.py",
+        "description": "Updated docstring comment to reference 'completed_roadmap.md'",
+        "lines_changed": 1
+      }
+    ],
+    "tests_passed": 19,
+    "tests_failed": 0
+  }
+}

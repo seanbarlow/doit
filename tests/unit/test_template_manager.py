@@ -398,7 +398,7 @@ class TestUnifiedTemplates:
 
         # Files should have Copilot naming convention
         for path in result["created"]:
-            assert path.name.startswith("doit-")
+            assert path.name.startswith("doit.")
             assert path.name.endswith(".prompt.md")
 
     def test_copilot_templates_are_transformed(self, temp_dir):
@@ -447,11 +447,11 @@ class TestUnifiedTemplates:
         templates = manager._get_command_templates()
         result = manager._transform_and_write_templates(templates, target_dir)
 
-        # Each created file should match doit-{name}.prompt.md pattern
+        # Each created file should match doit.{name}.prompt.md pattern
         for path in result["created"]:
             filename = path.name
-            assert filename.startswith("doit-")
+            assert filename.startswith("doit.")
             assert filename.endswith(".prompt.md")
             # Extract name and verify it's valid
-            name = filename.replace("doit-", "").replace(".prompt.md", "")
+            name = filename.replace("doit.", "").replace(".prompt.md", "")
             assert name in DOIT_COMMANDS

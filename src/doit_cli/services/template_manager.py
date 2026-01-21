@@ -39,7 +39,7 @@ WORKFLOW_SCRIPTS = [
 MEMORY_TEMPLATES = [
     "constitution.md",
     "roadmap.md",
-    "roadmap_completed.md",
+    "completed_roadmap.md",
 ]
 
 # Config templates to copy to .doit/config/
@@ -296,8 +296,8 @@ class TemplateManager:
             # Transform the content
             transformed_content = transformer.transform(command_template)
 
-            # Generate Copilot filename: doit-{name}.prompt.md
-            target_filename = f"doit-{template.name}.prompt.md"
+            # Generate Copilot filename: doit.{name}.prompt.md
+            target_filename = f"doit.{template.name}.prompt.md"
             target_path = target_dir / target_filename
 
             if target_path.exists():

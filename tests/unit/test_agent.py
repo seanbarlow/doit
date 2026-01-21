@@ -38,7 +38,7 @@ class TestAgentProperties:
 
     def test_copilot_file_pattern(self):
         """Test Copilot file pattern."""
-        assert Agent.COPILOT.file_pattern == "doit-*.prompt.md"
+        assert Agent.COPILOT.file_pattern == "doit.*.prompt.md"
 
     def test_claude_file_prefix(self):
         """Test Claude file prefix."""
@@ -46,7 +46,7 @@ class TestAgentProperties:
 
     def test_copilot_file_prefix(self):
         """Test Copilot file prefix."""
-        assert Agent.COPILOT.file_prefix == "doit-"
+        assert Agent.COPILOT.file_prefix == "doit."
 
 
 class TestTemplateDirectory:

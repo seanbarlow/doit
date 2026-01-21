@@ -48,6 +48,14 @@ def show_context(
     console.print(f"  Max tokens per source: {config.max_tokens_per_source:,}")
     console.print(f"  Total max tokens: {config.total_max_tokens:,}")
 
+    # Show summarization settings
+    if config.summarization.enabled:
+        soft_threshold = int(config.total_max_tokens * (config.summarization.threshold_percentage / 100.0))
+        console.print(f"\n[bold]Summarization:[/bold]")
+        console.print(f"  Enabled: [green]yes[/green]")
+        console.print(f"  Soft threshold: {soft_threshold:,} tokens ({config.summarization.threshold_percentage}%)")
+        console.print(f"  Fallback to truncation: {'yes' if config.summarization.fallback_to_truncation else 'no'}")
+
     # Load context
     loader = ContextLoader(
         project_root=project_root,
@@ -90,6 +98,10 @@ def show_context(
         # Status indicator
         if source.truncated:
             status = f"[yellow]truncated ({source.original_tokens:,} -> {source.token_count:,})[/yellow]"
+        elif source.source_type == "roadmap" and config.summarization.enabled:
+            status = "[cyan]summarized[/cyan]"
+        elif source.source_type == "completed_roadmap":
+            status = "[cyan]formatted[/cyan]"
         else:
             status = "[green]complete[/green]"
 
@@ -109,6 +121,10 @@ def show_context(
 
     if context.any_truncated:
         console.print("  [yellow]Some sources were truncated to fit token limits[/yellow]")
+
+    # Check for guidance prompt (indicates context was condensed)
+    if hasattr(context, '_guidance_prompt') and context._guidance_prompt:
+        console.print("  [cyan]AI guidance prompt included (context condensed)[/cyan]")
 
     # Show verbose content
     if verbose:
@@ -150,6 +166,7 @@ def context_status() -> None:
     sources = [
         ("constitution", memory_dir / "constitution.md"),
         ("roadmap", memory_dir / "roadmap.md"),
+        ("completed_roadmap", memory_dir / "completed_roadmap.md"),
     ]
 
     for name, path in sources:

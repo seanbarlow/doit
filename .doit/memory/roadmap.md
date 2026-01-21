@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-21
+**Last Updated**: 2026-01-22 (Updated: Promoted GitHub Milestone Generation to P3)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -34,17 +34,11 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 **Completed P2 Items**: See `.doit/memory/completed_roadmap.md` for history.
 
-- [x] Memory search and query across project context
-  - **Rationale**: Enables finding relevant context in constitution, roadmap, completed specs - enhances AI context injection capabilities
-  - **Feature**: `[037-memory-search-query]` ✅ COMPLETED 2026-01-16
-
 ### P3 - Medium Priority (Valuable)
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [x] Spec analytics and metrics dashboard
-  - **Rationale**: Provides insights on spec completion, cycle times, and team velocity
-  - **Feature**: `[036-spec-analytics-dashboard]` ✅ COMPLETED 2026-01-16
+**Completed P3 Items**: See `.doit/memory/completed_roadmap.md` for history.
 
 - [ ] Auto-create GitHub Epics from Roadmap Items
   - **Rationale**: Completes bi-directional sync - when adding roadmap items via `/doit.roadmapit add`, automatically creates corresponding GitHub epic with proper labels and description. Aligns with GitHub epic integration feature and AI-Native Design principle (automates manual work)
@@ -81,6 +75,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Template diff on version updates
   - **Rationale**: Show diff view when unified templates are updated to help users understand changes
+
+- [ ] GitHub Milestone Generation from Priorities
+  - **Rationale**: Automatically create GitHub milestones for each roadmap priority level (P1, P2, P3, P4) and assign epics to appropriate milestones. Provides GitHub-native view of roadmap priorities and enables team visibility through GitHub interface. Builds on recent GitHub integration momentum (039, 040).
+  - **Why promoted from P4**: Completes the GitHub integration ecosystem started with epic sync and auto-linking. Natural next step to organize epics into milestones by priority.
 
 ### P4 - Low Priority (Nice to Have)
 

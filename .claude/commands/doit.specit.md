@@ -382,6 +382,240 @@ If Partial or Missing categories exist that require user input:
 
 ---
 
+## Automatic Epic Linking (FR-040)
+
+After the spec is complete and validated, attempt to automatically link it to an existing GitHub epic from the roadmap.
+
+### Auto-linking Process
+
+1. **Check for Skip Flag**:
+   - If `--skip-github-linking` or `--skip-github` provided in arguments, skip auto-linking
+   - Example: `/doit.specit "my feature" --skip-github-linking`
+
+2. **Match Feature to Roadmap**:
+
+   ```bash
+   python -c "
+   from pathlib import Path
+   from src.doit_toolkit_cli.services.roadmap_matcher import RoadmapMatcherService
+
+   roadmap_path = Path('.doit/memory/roadmap.md')
+   if roadmap_path.exists():
+       matcher = RoadmapMatcherService(roadmap_path)
+       try:
+           match = matcher.find_best_match('${FEATURE_NAME}', threshold=0.8)
+           if match:
+               if match.item.github_number:
+                   print(f'MATCH_FOUND:{match.item.github_number}:{match.item.github_url}:{match.item.priority}:{match.similarity_score:.2f}')
+               else:
+                   # Roadmap match found but no GitHub epic exists
+                   print(f'MATCH_NO_EPIC:{match.item.title}:{match.item.priority}:{match.similarity_score:.2f}')
+           else:
+               print('NO_MATCH')
+       except Exception as e:
+           print(f'ERROR:{str(e)}')
+   else:
+       print('NO_ROADMAP')
+   "
+   ```
+
+   Replace `${FEATURE_NAME}` with the actual feature name from the spec frontmatter.
+
+3. **Create Epic if Match Found Without Epic** (P3 Feature):
+
+   If a roadmap match is found but no GitHub epic exists (output starts with `MATCH_NO_EPIC:`):
+
+   a. **Prompt User for Epic Creation**:
+
+      Display this prompt to the user:
+
+      ```markdown
+      ✓ Matched roadmap item: "${ROADMAP_TITLE}" (${SIMILARITY_SCORE}% similarity)
+      ⚠ No GitHub epic found for this roadmap item
+
+      Would you like to create a GitHub epic for tracking? (Y/n):
+      ```
+
+      - Default choice: **Yes** (press Enter to accept)
+      - If user chooses "n" or "No": Skip epic creation, continue to spec completion (step 5)
+      - If user chooses "Y" or "Yes" or just presses Enter: Continue to epic creation (step 3b)
+
+   b. **Create GitHub Epic**:
+
+      ```bash
+      python -c "
+      from pathlib import Path
+      from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+
+      roadmap_title = '${ROADMAP_TITLE}'
+      priority = '${PRIORITY}'
+      feature_name = '${FEATURE_NAME}'
+      spec_path = Path('${SPEC_FILE}')
+      roadmap_path = Path('.doit/memory/roadmap.md')
+
+      try:
+          linker = GitHubLinkerService()
+
+          # Create epic
+          epic_number, epic_url = linker.create_epic_for_roadmap_item(
+              title=roadmap_title,
+              priority=priority,
+              feature_description=f'Epic for feature: {feature_name}'
+          )
+
+          # Update roadmap with new epic
+          linker.update_roadmap_with_epic(
+              roadmap_path=roadmap_path,
+              roadmap_title=roadmap_title,
+              epic_number=epic_number,
+              epic_url=epic_url
+          )
+
+          # Link spec to newly created epic
+          success = linker.link_spec_to_epic(spec_path, epic_number, overwrite=False)
+
+          if success:
+              print(f'EPIC_CREATED:{epic_number}:{epic_url}:{priority}')
+          else:
+              print(f'EPIC_CREATED_LINK_FAILED:{epic_number}:{epic_url}')
+
+      except Exception as e:
+          print(f'CREATE_ERROR:{str(e)}')
+      "
+      ```
+
+      Replace placeholders:
+      - `${ROADMAP_TITLE}`: The matched roadmap item title
+      - `${PRIORITY}`: The roadmap item priority (P1, P2, P3, P4)
+      - `${FEATURE_NAME}`: The feature name from user input
+      - `${SPEC_FILE}`: The spec file path
+
+   c. **Handle Epic Creation Errors**:
+
+      If epic creation fails (output starts with `CREATE_ERROR:`):
+      - Display: "⚠ Failed to create GitHub epic: ${ERROR_MESSAGE}"
+      - Display: "  - Spec created successfully"
+      - Display: "  - You can manually create an epic and link later"
+      - Continue to spec completion (step 5)
+
+4. **Link to Epic if Match Found**:
+
+   If a roadmap match is found with a GitHub epic (output starts with `MATCH_FOUND:`):
+
+   ```bash
+   python -c "
+   from pathlib import Path
+   from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+
+   spec_path = Path('${SPEC_FILE}')
+   epic_number = ${EPIC_NUMBER}
+
+   try:
+       linker = GitHubLinkerService()
+       success = linker.link_spec_to_epic(spec_path, epic_number, overwrite=False)
+       if success:
+           print(f'LINKED:{epic_number}')
+       else:
+           print(f'LINK_SKIPPED:{epic_number}')
+   except Exception as e:
+       print(f'LINK_ERROR:{str(e)}')
+   "
+   ```
+
+   Replace `${SPEC_FILE}` with the actual spec file path and `${EPIC_NUMBER}` with the matched epic number.
+
+4. **Graceful Fallback**:
+   - If roadmap.md doesn't exist: Skip auto-linking, continue normally
+   - If no match found: Skip auto-linking, continue normally
+   - If match found but below 80% threshold: Skip auto-linking, continue normally
+   - If GitHub API fails: Log warning, continue without linking
+   - If epic is closed or invalid: Log warning, continue without linking
+   - **CRITICAL**: Never fail the spec creation due to auto-linking errors
+
+5. **User Feedback**:
+
+   Based on the auto-linking result, display appropriate feedback:
+
+   - **MATCH_FOUND with successful link**:
+
+     ```markdown
+     ✓ Automatically linked to roadmap epic: [#{EPIC_NUMBER}](${EPIC_URL})
+       - Roadmap match: "${ROADMAP_TITLE}" (${SIMILARITY_SCORE}% similarity)
+       - Priority: ${PRIORITY}
+       - Spec frontmatter updated with epic reference
+       - GitHub epic updated with spec file path
+     ```
+
+   - **MATCH_FOUND but link skipped** (spec already linked to different epic):
+
+     ```markdown
+     ⚠ Roadmap match found but spec already linked to different epic
+       - Matched: [#{EPIC_NUMBER}](${EPIC_URL}) (${SIMILARITY_SCORE}% similarity)
+       - Existing link preserved
+       - Use `doit spec link` to manually update if needed
+     ```
+
+   - **EPIC_CREATED** (P3 Feature - Epic created successfully):
+
+     ```markdown
+     ✓ GitHub epic created and linked successfully!
+       - Created epic: [#{EPIC_NUMBER}](${EPIC_URL})
+       - Roadmap match: "${ROADMAP_TITLE}" (${SIMILARITY_SCORE}% similarity)
+       - Priority: ${PRIORITY}
+       - Roadmap.md updated with epic reference
+       - Spec frontmatter updated with epic reference
+       - GitHub epic updated with spec file path
+     ```
+
+   - **MATCH_NO_EPIC with user decline** (P3 Feature - User chose not to create epic):
+
+     ```markdown
+     ℹ Roadmap match found without GitHub epic
+       - Matched: "${ROADMAP_TITLE}" (${SIMILARITY_SCORE}% similarity)
+       - Epic creation skipped by user
+       - You can manually create an epic later and link with: `doit spec link`
+     ```
+
+   - **CREATE_ERROR** (P3 Feature - Epic creation failed):
+
+     ```markdown
+     ⚠ Failed to create GitHub epic: ${ERROR_MESSAGE}
+       - Roadmap match: "${ROADMAP_TITLE}"
+       - Spec created successfully
+       - You can manually create an epic on GitHub and link later
+     ```
+
+   - **NO_MATCH**:
+
+     ```markdown
+     ℹ No matching epic found in roadmap for automatic linking
+       - You can manually link later using: `doit spec link`
+     ```
+
+   - **LINK_ERROR**:
+
+     ```markdown
+     ⚠ Auto-linking failed: ${ERROR_MESSAGE}
+       - Spec created successfully
+       - You can manually link using: `doit spec link`
+     ```
+
+   - **NO_ROADMAP** or **ERROR**:
+
+     ```markdown
+     ℹ Auto-linking skipped (roadmap unavailable)
+       - You can manually link later using: `doit spec link`
+     ```
+
+### Benefits of Auto-linking
+
+- **Traceability**: Maintains bidirectional links between roadmap, specs, and GitHub epics
+- **Consistency**: Ensures spec priority matches roadmap epic priority
+- **Automation**: Reduces manual effort in linking specs to tracking systems
+- **Non-blocking**: Always allows spec creation to succeed even if linking fails
+
+---
+
 ## GitHub Issue Integration (FR-048, FR-049)
 
 After the spec is complete and validated, create GitHub issues if a remote is available.

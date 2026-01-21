@@ -1,0 +1,272 @@
+# GitHub API Contract for Epic Integration
+# This documents the GitHub CLI commands and expected responses used by the roadmapit command
+
+openapi: 3.0.0
+info:
+  title: GitHub CLI API Contract
+  description: GitHub CLI commands used for epic and issue integration
+  version: 1.0.0
+
+paths:
+  /gh/issue/list/epics:
+    get:
+      summary: List all open epic issues
+      description: Fetches all open GitHub issues with the "epic" label
+      operationId: listEpics
+      parameters:
+        - name: label
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [epic]
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [open, closed, all]
+            default: open
+        - name: json
+          in: query
+          required: true
+          description: Fields to return in JSON format
+          schema:
+            type: string
+            example: "number,title,labels,body,url,createdAt,updatedAt"
+      responses:
+        '200':
+          description: List of epics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GitHubIssue'
+              example:
+                - number: 577
+                  title: "[Epic]: GitHub Epic Integration"
+                  labels:
+                    - name: epic
+                    - name: priority:P2
+                  body: "Integrates GitHub epics with roadmap..."
+                  url: "https://github.com/owner/repo/issues/577"
+                  createdAt: "2026-01-21T10:00:00Z"
+                  updatedAt: "2026-01-21T15:30:00Z"
+
+      x-cli-command: |
+        gh issue list \
+          --label epic \
+          --state open \
+          --json number,title,labels,body,url,createdAt,updatedAt
+
+  /gh/issue/list/features:
+    get:
+      summary: Search for feature issues linked to an epic
+      description: Finds all feature issues that reference a specific epic
+      operationId: listFeaturesForEpic
+      parameters:
+        - name: search
+          in: query
+          required: true
+          description: Search query to find features linked to epic
+          schema:
+            type: string
+            example: "is:open part of epic #577"
+        - name: json
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "number,title,labels,state,url"
+      responses:
+        '200':
+          description: List of feature issues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GitHubIssue'
+              example:
+                - number: 578
+                  title: "[Feature]: Display epics in roadmap"
+                  labels:
+                    - name: feature
+                    - name: priority:P1
+                  state: open
+                  url: "https://github.com/owner/repo/issues/578"
+
+      x-cli-command: |
+        gh issue list \
+          --search "is:open part of epic #577" \
+          --json number,title,labels,state,url
+
+  /gh/issue/create:
+    post:
+      summary: Create a new GitHub issue
+      description: Creates a new GitHub epic issue from a roadmap item
+      operationId: createEpic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "[Epic]: New Feature"
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  example: ["epic", "priority:P2"]
+                body:
+                  type: string
+                  example: "Feature description\n\n---\nCreated from roadmap"
+              required:
+                - title
+                - labels
+      responses:
+        '201':
+          description: Epic created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitHubIssue'
+              example:
+                number: 581
+                title: "[Epic]: New Feature"
+                labels:
+                  - name: epic
+                  - name: priority:P2
+                body: "Feature description\n\n---\nCreated from roadmap"
+                url: "https://github.com/owner/repo/issues/581"
+                state: open
+
+      x-cli-command: |
+        gh issue create \
+          --title "[Epic]: New Feature" \
+          --label "epic,priority:P2" \
+          --body "Feature description..."
+
+  /gh/auth/status:
+    get:
+      summary: Check GitHub authentication status
+      description: Verifies that gh CLI is authenticated
+      operationId: checkAuthStatus
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            text/plain:
+              example: |
+                github.com
+                  ✓ Logged in to github.com as username (oauth_token)
+        '401':
+          description: Not authenticated
+          content:
+            text/plain:
+              example: |
+                You are not logged into any GitHub hosts. Run gh auth login to authenticate.
+
+      x-cli-command: gh auth status
+
+  /git/remote/get-url:
+    get:
+      summary: Get GitHub remote URL
+      description: Retrieves the origin remote URL from git config
+      operationId: getRemoteUrl
+      responses:
+        '200':
+          description: Remote URL retrieved
+          content:
+            text/plain:
+              example: https://github.com/owner/repo.git
+        '404':
+          description: No remote configured
+          content:
+            text/plain:
+              example: "fatal: No such remote 'origin'"
+
+      x-cli-command: git remote get-url origin
+
+components:
+  schemas:
+    GitHubIssue:
+      type: object
+      properties:
+        number:
+          type: integer
+          description: Unique issue number
+          example: 577
+        title:
+          type: string
+          description: Issue title
+          example: "[Epic]: GitHub Epic Integration"
+        labels:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: epic
+        body:
+          type: string
+          description: Issue description/body text
+          example: "Feature description..."
+        url:
+          type: string
+          format: uri
+          description: GitHub issue URL
+          example: "https://github.com/owner/repo/issues/577"
+        state:
+          type: string
+          enum: [open, closed]
+          example: open
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-21T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-01-21T15:30:00Z"
+      required:
+        - number
+        - title
+        - labels
+        - url
+        - state
+
+  securitySchemes:
+    GitHubCLI:
+      type: http
+      scheme: bearer
+      description: GitHub CLI manages authentication via `gh auth login`
+
+security:
+  - GitHubCLI: []
+
+# Error Handling
+x-error-responses:
+  rate-limit:
+    description: GitHub API rate limit exceeded
+    message: "API rate limit exceeded. Try again later or use --skip-github flag."
+    retry-after: 3600
+
+  auth-failure:
+    description: GitHub authentication failed
+    message: "Not authenticated with GitHub. Run: gh auth login"
+    action: "gh auth login"
+
+  network-error:
+    description: Network connection failed
+    message: "Failed to connect to GitHub. Using cached data if available."
+    fallback: use-cache
+
+  gh-not-found:
+    description: GitHub CLI not installed
+    message: "GitHub CLI (gh) not found. Install from: https://cli.github.com"
+    install-url: "https://cli.github.com"

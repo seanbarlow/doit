@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-17
+**Last Updated**: 2026-01-22
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -28,6 +28,26 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 ✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
 
+---
+
+**Completed P2 Items**: See `.doit/memory/completed_roadmap.md` for history.
+
+- [x] GitHub Issue Auto-linking in Spec Creation
+  - **Rationale**: When `/doit.specit` creates a new spec, automatically link it to the corresponding GitHub epic from the roadmap. Provides traceability from roadmap → spec → GitHub issue. Aligns with Persistent Memory principle (maintains links in markdown files). Completes the end-to-end GitHub integration story after 039-github-roadmap-sync.
+  - **Feature**: `[040-spec-github-linking]` ✅ COMPLETED 2026-01-21
+
+---
+
+**Completed P2 Items**: See `.doit/memory/completed_roadmap.md` for history.
+
+- [x] GitHub epic and issue integration for roadmap command
+  - **Rationale**: Unifies roadmap with GitHub tracking (keeps roadmap synchronized with GitHub epics/issues, reduces manual duplication, provides single source of truth), enables better project visibility (team members can see roadmap status through GitHub issues without accessing .doit files), automates roadmap maintenance (reduces manual effort by pulling GitHub epic/issue data automatically)
+  - **Feature**: `[039-github-roadmap-sync]` ✅ COMPLETED 2026-01-21
+
+---
+
+**Completed P2 Items**: See `.doit/memory/completed_roadmap.md` for history.
+
 - [x] Memory search and query across project context
   - **Rationale**: Enables finding relevant context in constitution, roadmap, completed specs - enhances AI context injection capabilities
   - **Feature**: `[037-memory-search-query]` ✅ COMPLETED 2026-01-16
@@ -39,6 +59,14 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [x] Spec analytics and metrics dashboard
   - **Rationale**: Provides insights on spec completion, cycle times, and team velocity
   - **Feature**: `[036-spec-analytics-dashboard]` ✅ COMPLETED 2026-01-16
+
+- [x] Auto-create GitHub Epics from Roadmap Items
+  - **Rationale**: Completes bi-directional sync - when adding roadmap items via `/doit.roadmapit add`, automatically creates corresponding GitHub epic with proper labels and description. Aligns with GitHub epic integration feature and AI-Native Design principle (automates manual work)
+  - **Feature**: `[039-github-roadmap-sync]` (User Story 3) ✅ COMPLETED 2026-01-21
+
+- [x] Roadmap Status Sync from GitHub
+  - **Rationale**: Automatically update roadmap item status (pending/in-progress/completed) based on GitHub epic state. Reduces manual status updates and keeps roadmap current. Aligns with GitHub epic integration to automate maintenance overhead
+  - **Feature**: `[039-github-roadmap-sync]` (GitHub epic state display) ✅ COMPLETED 2026-01-21
 
 - [ ] Batch command execution
   - **Rationale**: Run multiple specs through the workflow sequentially with a single command
@@ -70,6 +98,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
+
+- [ ] GitHub Milestone Generation from Priorities
+  - **Rationale**: Automatically create GitHub milestones for each roadmap priority level (P1, P2, P3, P4) and assign epics to appropriate milestones. Provides GitHub-native view of roadmap priorities and enables team visibility through GitHub interface
 
 - [ ] Web dashboard for project visualization
   - **Rationale**: Visual representation of project architecture and progress

@@ -12,6 +12,10 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
+| Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` | GitHub epic state display (open/closed), synced with roadmap items, part of GitHub integration |
+| Auto-create GitHub Epics from Roadmap Items | P3 | 2026-01-21 | `039-github-roadmap-sync` | `doit roadmapit add` creates GitHub epics with priority labels, descriptions, and custom labels |
+| GitHub epic and issue integration for roadmap command | P2 | 2026-01-21 | `039-github-roadmap-sync` | Display GitHub epics in roadmap (P1), link feature issues (P2), auto-create epics (P3), 30-min cache, smart merge, 152 tests |
 | Context roadmap summary and AI context condensation | P2 | 2026-01-20 | `038-context-roadmap-summary` | Intelligent roadmap summarization by priority, completed items context, AI-powered condensation with guidance prompts |
 | Documentation audit and link fixes | — | 2026-01-17 | — | Fixed 2 broken links, audited 43 docs, verified all headers |
 | Memory search and query across project context | P2 | 2026-01-16 | `037-memory-search-query` | Keyword search, natural language queries, result display, source filtering, search history |
@@ -48,10 +52,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 14
+- **Total Items Completed**: 18
 - **P1 Items Completed**: 4
-- **P2 Items Completed**: 9
-- **P3 Items Completed**: 1
+- **P2 Items Completed**: 11
+- **P3 Items Completed**: 3
 - **P4 Items Completed**: 1
 - **Other**: 1 (documentation audit)
 

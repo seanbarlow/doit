@@ -39,7 +39,7 @@ WORKFLOW_SCRIPTS = [
 MEMORY_TEMPLATES = [
     "constitution.md",
     "roadmap.md",
-    "roadmap_completed.md",
+    "completed_roadmap.md",
 ]
 
 # Config templates to copy to .doit/config/

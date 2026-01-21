@@ -2,7 +2,7 @@
 
 **Completed**: 2026-01-20
 **Branch**: `038-context-roadmap-summary`
-**PR**: Pending
+**PR**: [#576](https://github.com/seanbarlow/doit/pull/576)
 **Epic**: [#548](https://github.com/seanbarlow/doit/issues/548)
 
 ## Overview

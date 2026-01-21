@@ -136,7 +136,7 @@ class AgentDetector:
                     if file.name.startswith("doit.") and file.name.endswith(".md"):
                         return True
                 else:  # COPILOT
-                    if file.name.startswith("doit-") and file.name.endswith(".prompt.md"):
+                    if file.name.startswith("doit.") and file.name.endswith(".prompt.md"):
                         return True
 
         return False
@@ -162,7 +162,7 @@ class AgentDetector:
                     if file.name.startswith("doit.") and file.name.endswith(".md"):
                         count += 1
                 else:  # COPILOT
-                    if file.name.startswith("doit-") and file.name.endswith(".prompt.md"):
+                    if file.name.startswith("doit.") and file.name.endswith(".prompt.md"):
                         count += 1
 
         return count

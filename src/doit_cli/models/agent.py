@@ -60,7 +60,7 @@ class Agent(str, Enum):
         """Glob pattern for doit-managed files."""
         patterns = {
             Agent.CLAUDE: "doit.*.md",
-            Agent.COPILOT: "doit-*.prompt.md",
+            Agent.COPILOT: "doit.*.prompt.md",
         }
         return patterns[self]
 
@@ -69,6 +69,6 @@ class Agent(str, Enum):
         """Filename prefix for doit commands."""
         prefixes = {
             Agent.CLAUDE: "doit.",
-            Agent.COPILOT: "doit-",
+            Agent.COPILOT: "doit.",
         }
         return prefixes[self]

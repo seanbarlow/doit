@@ -92,7 +92,7 @@ class Validator:
         if agent == Agent.CLAUDE:
             expected_files = {f"doit.{cmd}.md" for cmd in DOIT_COMMANDS}
         else:  # COPILOT
-            expected_files = {f"doit-{cmd}.prompt.md" for cmd in DOIT_COMMANDS}
+            expected_files = {f"doit.{cmd}.prompt.md" for cmd in DOIT_COMMANDS}
 
         # Get actual files
         actual_files = {f.name for f in cmd_dir.iterdir() if f.is_file()}

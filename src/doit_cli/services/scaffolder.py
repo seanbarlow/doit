@@ -117,7 +117,7 @@ class Scaffolder:
         if agent == Agent.CLAUDE:
             return filename.startswith("doit.") and filename.endswith(".md")
         else:  # COPILOT
-            return filename.startswith("doit-") and filename.endswith(".prompt.md")
+            return filename.startswith("doit.") and filename.endswith(".prompt.md")
 
     def get_doit_files(self, agent: Agent) -> list[Path]:
         """Get all doit-managed files for an agent.

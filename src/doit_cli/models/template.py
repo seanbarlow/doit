@@ -44,7 +44,7 @@ class Template:
         if self.agent == Agent.CLAUDE:
             return f"doit.{self.name}.md"
         else:  # COPILOT
-            return f"doit-{self.name}.prompt.md"
+            return f"doit.{self.name}.prompt.md"
 
     @classmethod
     def from_file(cls, path: Path, agent: Agent) -> "Template":
@@ -57,8 +57,8 @@ class Template:
             # doit.specit.md -> specit
             name = filename.replace("doit.", "").replace(".md", "")
         else:  # COPILOT
-            # doit-specit.prompt.md -> specit
-            name = filename.replace("doit-", "").replace(".prompt.md", "")
+            # doit.specit.prompt.md -> specit
+            name = filename.replace("doit.", "").replace(".prompt.md", "")
 
         return cls(name=name, agent=agent, source_path=path, content=content)
 

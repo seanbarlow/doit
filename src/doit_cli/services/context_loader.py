@@ -745,8 +745,9 @@ class ContextLoader:
     def load_roadmap(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
         """Load roadmap.md if enabled and exists.
 
-        If summarization is enabled, parses the roadmap and generates a
-        condensed summary with P1/P2 items prioritized.
+        If summarization is enabled AND the roadmap exceeds max_tokens,
+        parses the roadmap and generates a condensed summary with P1/P2
+        items prioritized.
 
         Args:
             max_tokens: Maximum token count (uses config default if None).
@@ -762,11 +763,12 @@ class ContextLoader:
             self._log_debug("Roadmap not found")
             return None
 
-        # Check if summarization is enabled
-        if self.config.summarization.enabled:
+        # Check if summarization is needed (enabled AND exceeds limit)
+        original_tokens = estimate_tokens(content)
+        if self.config.summarization.enabled and original_tokens > max_tokens:
             return self._summarize_roadmap(path, content, max_tokens)
 
-        # Fall back to simple truncation
+        # Content fits within limit - use truncation only if needed
         truncated_content, was_truncated, original_tokens = truncate_content(
             content, max_tokens, path
         )

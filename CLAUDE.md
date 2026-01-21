@@ -68,9 +68,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 038-context-roadmap-summary: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 037-memory-search-query: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal formatting), existing context_loader.py
 - 035-auto-mermaid-diagrams: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
-- 034-fixit-workflow: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (output formatting), httpx (GitHub API)
 
 
 <!-- MANUAL ADDITIONS START -->

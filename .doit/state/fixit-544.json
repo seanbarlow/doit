@@ -1,7 +1,7 @@
 {
   "issue_id": 544,
   "title": "[Bug]: doit init",
-  "phase": "implementing",
+  "phase": "completed",
   "branch": "fix/544-copilot-prompt-filename",
   "created_at": "2026-01-20T17:41:55Z",
   "updated_at": "2026-01-20T19:15:00Z",

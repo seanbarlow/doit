@@ -41,6 +41,42 @@ total_max_tokens: 16000
 #   - current_spec: Feature spec based on current git branch
 #   - related_specs: Similar specs found via content matching
 
+# ---------------------------------------------------------------------------
+# Summarization Configuration
+# ---------------------------------------------------------------------------
+# Controls how context is condensed when it approaches token limits.
+# The AI coding agent (Claude, Copilot, etc.) receives guidance to prioritize.
+#
+# Two-tier approach:
+#   1. Soft threshold: Adds guidance prompt for AI to focus on P1/P2 items
+#   2. Hard limit: Truncates lowest-priority sources
+
+summarization:
+  # Enable roadmap summarization by priority (P1/P2 full, P3/P4 titles)
+  enabled: true
+
+  # Percentage of total_max_tokens that triggers guidance prompt
+  # Default: 80.0 (adds guidance at 80% capacity)
+  threshold_percentage: 80.0
+
+  # If exceeding hard limit, truncate lower-priority sources
+  fallback_to_truncation: true
+
+  # Order of priority for preserving content during truncation
+  # Sources not listed get lowest priority
+  source_priorities:
+    - constitution
+    - roadmap
+    - completed_roadmap
+    - current_spec
+
+  # Completed items matching configuration
+  completed_items:
+    # Maximum completed items to include in context
+    max_count: 5
+    # Minimum relevance score to include (0.0 - 1.0)
+    min_relevance: 0.3
+
 sources:
   # Project constitution - core principles and architecture decisions
   # Always loaded first as it provides essential context
@@ -49,22 +85,30 @@ sources:
     priority: 1
 
   # Project roadmap - current priorities and upcoming work
-  # Helps AI understand project direction
+  # Summarized by priority when summarization is enabled
   roadmap:
     enabled: true
     priority: 2
+
+  # Completed roadmap items - historical context for the AI
+  # Formatted for AI semantic understanding to identify relevant patterns
+  completed_roadmap:
+    enabled: true
+    priority: 3
+    # Maximum completed items to include
+    max_count: 5
 
   # Current feature specification - detected from git branch
   # Example: branch "026-ai-context" loads specs/026-ai-context/spec.md
   current_spec:
     enabled: true
-    priority: 3
+    priority: 4
 
   # Related specifications - found via content similarity
   # Provides context from similar features
   related_specs:
     enabled: true
-    priority: 4
+    priority: 5
     # Maximum number of related specs to include
     max_count: 3
 

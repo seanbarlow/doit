@@ -6,11 +6,98 @@ and related specifications.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
 import yaml
+
+
+@dataclass
+class SummarizationConfig:
+    """Configuration for context summarization behavior.
+
+    Attributes:
+        enabled: Whether summarization features are enabled
+        threshold_percentage: Percentage of total_max_tokens that triggers condensation
+        source_priorities: Order of priority for preserving content during condensation
+        timeout_seconds: Timeout for AI summarization API calls (if used)
+        fallback_to_truncation: Whether to fall back to truncation on AI failure
+        completed_items_max_count: Maximum completed items to include
+        completed_items_min_relevance: Minimum relevance score for completed items
+    """
+
+    enabled: bool = True
+    threshold_percentage: float = 80.0
+    source_priorities: list[str] = field(
+        default_factory=lambda: ["constitution", "roadmap", "completed_roadmap", "current_spec"]
+    )
+    timeout_seconds: float = 10.0
+    fallback_to_truncation: bool = True
+    completed_items_max_count: int = 5
+    completed_items_min_relevance: float = 0.3
+
+    def __post_init__(self) -> None:
+        """Validate configuration after initialization."""
+        if self.threshold_percentage < 50.0:
+            self.threshold_percentage = 50.0
+        if self.threshold_percentage > 100.0:
+            self.threshold_percentage = 100.0
+        if self.timeout_seconds <= 0:
+            self.timeout_seconds = 10.0
+
+
+@dataclass
+class RoadmapItem:
+    """Represents a single item from roadmap.md.
+
+    Attributes:
+        text: The item text/description
+        priority: Priority level (P1, P2, P3, P4)
+        rationale: Optional rationale/reason for the item
+        feature_ref: Optional feature branch reference (e.g., '034-fixit-workflow')
+        completed: Whether the item is marked as completed
+    """
+
+    text: str
+    priority: str = "P4"
+    rationale: str = ""
+    feature_ref: str = ""
+    completed: bool = False
+
+
+@dataclass
+class CompletedItem:
+    """Represents a matched item from completed_roadmap.md.
+
+    Attributes:
+        text: The completed item description
+        priority: Original priority when active
+        completion_date: Date the item was completed
+        feature_branch: Feature branch that implemented it
+        relevance_score: Similarity score for matching (0.0 - 1.0)
+    """
+
+    text: str
+    priority: str = ""
+    completion_date: Optional[date] = None
+    feature_branch: str = ""
+    relevance_score: float = 0.0
+
+
+@dataclass
+class RoadmapSummary:
+    """Condensed representation of the roadmap for context injection.
+
+    Attributes:
+        condensed_text: Summarized markdown content
+        item_count: Number of items included in summary
+        priorities_included: Which priority levels were included
+    """
+
+    condensed_text: str
+    item_count: int = 0
+    priorities_included: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -35,8 +122,9 @@ class SourceConfig:
         return {
             "constitution": cls(source_type="constitution", enabled=True, priority=1),
             "roadmap": cls(source_type="roadmap", enabled=True, priority=2),
-            "current_spec": cls(source_type="current_spec", enabled=True, priority=3),
-            "related_specs": cls(source_type="related_specs", enabled=True, priority=4, max_count=3),
+            "completed_roadmap": cls(source_type="completed_roadmap", enabled=True, priority=3, max_count=5),
+            "current_spec": cls(source_type="current_spec", enabled=True, priority=4),
+            "related_specs": cls(source_type="related_specs", enabled=True, priority=5, max_count=3),
         }
 
 
@@ -66,6 +154,7 @@ class ContextConfig:
         total_max_tokens: Token limit for all context combined
         sources: Per-source configuration
         commands: Per-command overrides
+        summarization: Configuration for summarization behavior
     """
 
     version: int = 1
@@ -74,6 +163,7 @@ class ContextConfig:
     total_max_tokens: int = 16000
     sources: dict[str, SourceConfig] = field(default_factory=SourceConfig.default_sources)
     commands: dict[str, CommandOverride] = field(default_factory=dict)
+    summarization: SummarizationConfig = field(default_factory=SummarizationConfig)
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -153,6 +243,32 @@ class ContextConfig:
                     sources=cmd_sources
                 )
 
+        # Parse summarization config
+        summarization_data = data.get("summarization", {})
+        summarization = SummarizationConfig()
+        if isinstance(summarization_data, dict):
+            # Handle nested completed_items config
+            completed_items = summarization_data.get("completed_items", {})
+            if isinstance(completed_items, dict):
+                if "max_count" in completed_items:
+                    summarization_data["completed_items_max_count"] = completed_items["max_count"]
+                if "min_relevance" in completed_items:
+                    summarization_data["completed_items_min_relevance"] = completed_items["min_relevance"]
+
+            # Build SummarizationConfig from data
+            summarization = SummarizationConfig(
+                enabled=summarization_data.get("enabled", True),
+                threshold_percentage=summarization_data.get("threshold_percentage", 80.0),
+                source_priorities=summarization_data.get(
+                    "source_priorities",
+                    ["constitution", "roadmap", "completed_roadmap", "current_spec"]
+                ),
+                timeout_seconds=summarization_data.get("timeout_seconds", 10.0),
+                fallback_to_truncation=summarization_data.get("fallback_to_truncation", True),
+                completed_items_max_count=summarization_data.get("completed_items_max_count", 5),
+                completed_items_min_relevance=summarization_data.get("completed_items_min_relevance", 0.3),
+            )
+
         return cls(
             version=data.get("version", 1),
             enabled=data.get("enabled", True),
@@ -160,6 +276,7 @@ class ContextConfig:
             total_max_tokens=data.get("total_max_tokens", 16000),
             sources=sources,
             commands=commands,
+            summarization=summarization,
         )
 
     @classmethod
@@ -253,15 +370,20 @@ class LoadedContext:
         total_tokens: Sum of all source token counts
         any_truncated: True if any source was truncated
         loaded_at: Timestamp when context was loaded
+        _guidance_prompt: Optional AI guidance prompt when context is condensed
     """
 
     sources: list[ContextSource] = field(default_factory=list)
     total_tokens: int = 0
     any_truncated: bool = False
     loaded_at: datetime = field(default_factory=datetime.now)
+    _guidance_prompt: Optional[str] = None
 
     def to_markdown(self) -> str:
         """Format all sources as markdown for injection.
+
+        If a guidance prompt is set (due to context condensation), it will be
+        included at the start of the output to help the AI prioritize context.
 
         Returns:
             Markdown-formatted context suitable for AI consumption.
@@ -271,10 +393,16 @@ class LoadedContext:
 
         sections = ["<!-- PROJECT CONTEXT - Auto-loaded by doit -->", ""]
 
+        # Add guidance prompt if context was condensed
+        if self._guidance_prompt:
+            sections.append(self._guidance_prompt)
+            sections.append("")
+
         # Map source types to display names
         display_names = {
             "constitution": "Constitution",
             "roadmap": "Roadmap",
+            "completed_roadmap": "Completed Roadmap",
             "current_spec": "Current Spec",
             "related_specs": "Related Specs",
         }

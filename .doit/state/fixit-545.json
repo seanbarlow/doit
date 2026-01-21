@@ -1,7 +1,7 @@
 {
   "issue_id": 545,
   "title": "[Bug]: doit init",
-  "phase": "implementing",
+  "phase": "completed",
   "branch": "fix/545-init-roadmap-completed-filename",
   "created_at": "2026-01-20T17:48:07Z",
   "updated_at": "2026-01-20T18:15:00Z",

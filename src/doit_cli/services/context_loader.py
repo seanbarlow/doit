@@ -13,11 +13,14 @@ from pathlib import Path
 from typing import Optional
 
 from ..models.context_config import (
+    CompletedItem,
     ContextConfig,
     ContextSource,
     LoadedContext,
     SourceConfig,
+    SummarizationConfig,
 )
+from .roadmap_summarizer import RoadmapSummarizer
 
 logger = logging.getLogger(__name__)
 
@@ -267,6 +270,232 @@ def compute_similarity_scores(
     return scores
 
 
+class ContextCondenser:
+    """Service for condensing context when it exceeds token thresholds.
+
+    Uses a two-tier approach:
+    1. Soft threshold: Add guidance prompt for the AI agent to prioritize
+    2. Hard limit: Truncate sources based on priority configuration
+
+    The key insight is that the AI coding agent (Claude, Copilot, etc.) running
+    the command IS the summarizer - no external API calls are needed. The guidance
+    prompt tells the AI how to prioritize the provided context.
+    """
+
+    def __init__(self, config: SummarizationConfig) -> None:
+        """Initialize with summarization configuration.
+
+        Args:
+            config: SummarizationConfig with threshold and priority settings.
+        """
+        self.config = config
+
+    def check_threshold(
+        self, total_tokens: int, max_tokens: int
+    ) -> tuple[bool, bool]:
+        """Check if context exceeds soft or hard thresholds.
+
+        Args:
+            total_tokens: Current total token count.
+            max_tokens: Maximum allowed tokens.
+
+        Returns:
+            Tuple of (exceeds_soft_threshold, exceeds_hard_limit).
+        """
+        soft_threshold = int(max_tokens * (self.config.threshold_percentage / 100.0))
+        return (total_tokens >= soft_threshold, total_tokens >= max_tokens)
+
+    def add_guidance_prompt(
+        self,
+        content: str,
+        current_feature: Optional[str] = None,
+    ) -> str:
+        """Add AI guidance prompt when context exceeds soft threshold.
+
+        The guidance tells the AI coding agent how to prioritize the context.
+        This works identically for Claude, Copilot, Cursor, or any AI agent.
+
+        Args:
+            content: The markdown context content.
+            current_feature: Current feature branch name for highlighting.
+
+        Returns:
+            Markdown content with guidance prepended.
+        """
+        guidance_lines = [
+            "<!-- AI CONTEXT GUIDANCE -->",
+            "**Context Priority Instructions**: This context has been condensed. Please:",
+            "- **Focus on P1/P2 priority items** in the roadmap - these are critical/high priority",
+        ]
+
+        if current_feature:
+            guidance_lines.append(
+                f"- **Pay special attention** to items related to: `{current_feature}`"
+            )
+
+        guidance_lines.extend([
+            "- Treat P3/P4 items as background context only",
+            "- Use completed roadmap items for pattern reference and consistency",
+            "<!-- END GUIDANCE -->",
+            "",
+        ])
+
+        return "\n".join(guidance_lines) + content
+
+    def truncate_if_needed(
+        self,
+        sources: list["ContextSource"],
+        max_tokens: int,
+        source_priorities: list[str],
+    ) -> tuple[list["ContextSource"], int]:
+        """Truncate sources based on priority when exceeding hard limit.
+
+        Removes lowest-priority sources first until under limit.
+        Uses source_priorities from config to determine removal order.
+
+        Args:
+            sources: List of context sources.
+            max_tokens: Maximum total token count.
+            source_priorities: Ordered list of source types to preserve.
+
+        Returns:
+            Tuple of (filtered sources, new total tokens).
+        """
+        total_tokens = sum(s.token_count for s in sources)
+
+        if total_tokens <= max_tokens:
+            return sources, total_tokens
+
+        # Build priority map (lower index = higher priority = keep)
+        priority_map: dict[str, int] = {}
+        for idx, source_type in enumerate(source_priorities):
+            priority_map[source_type] = idx
+
+        # Sort sources by priority (higher priority = lower index = first)
+        # Sources not in priority list get lowest priority (will be removed first)
+        sorted_sources = sorted(
+            sources,
+            key=lambda s: priority_map.get(s.source_type, 999),
+        )
+
+        # Keep sources until we exceed the limit
+        kept_sources: list[ContextSource] = []
+        kept_tokens = 0
+
+        for source in sorted_sources:
+            if kept_tokens + source.token_count <= max_tokens:
+                kept_sources.append(source)
+                kept_tokens += source.token_count
+            else:
+                logger.debug(
+                    f"Truncating source '{source.source_type}' due to token limit "
+                    f"({kept_tokens + source.token_count} > {max_tokens})"
+                )
+
+        return kept_sources, kept_tokens
+
+
+def parse_completed_roadmap(content: str) -> list[CompletedItem]:
+    """Parse completed_roadmap.md content into CompletedItem list.
+
+    Handles markdown table format with columns for item, priority, date, branch.
+
+    Args:
+        content: Raw markdown content of completed_roadmap.md
+
+    Returns:
+        List of CompletedItem objects
+    """
+    from datetime import date as date_type
+
+    items: list[CompletedItem] = []
+    lines = content.split("\n")
+
+    # Find table rows (lines starting with |)
+    in_table = False
+    for line in lines:
+        line = line.strip()
+
+        # Skip header separator row (|---|---|...)
+        if line.startswith("|") and "---" in line:
+            in_table = True
+            continue
+
+        # Skip header row before separator
+        if line.startswith("|") and not in_table:
+            continue
+
+        # Parse table data rows
+        if line.startswith("|") and in_table:
+            # Split by | and filter empty strings
+            cells = [c.strip() for c in line.split("|") if c.strip()]
+            if len(cells) >= 2:
+                text = cells[0]
+                priority = cells[1] if len(cells) > 1 else ""
+                date_str = cells[2] if len(cells) > 2 else ""
+                branch = cells[3] if len(cells) > 3 else ""
+
+                # Parse date if provided
+                completion_date = None
+                if date_str:
+                    try:
+                        # Try common formats
+                        for fmt in ["%Y-%m-%d", "%m/%d/%Y", "%d-%m-%Y"]:
+                            try:
+                                completion_date = date_type.fromisoformat(date_str) if "-" in date_str and len(date_str) == 10 else None
+                                break
+                            except ValueError:
+                                continue
+                    except Exception:
+                        pass
+
+                items.append(CompletedItem(
+                    text=text,
+                    priority=priority,
+                    completion_date=completion_date,
+                    feature_branch=branch,
+                    relevance_score=0.0,
+                ))
+
+    return items
+
+
+def format_completed_for_context(items: list[CompletedItem]) -> str:
+    """Format completed items as AI-friendly markdown.
+
+    Creates a structured format that AI agents can semantically match
+    against the current feature being implemented.
+
+    Args:
+        items: List of CompletedItem to format
+
+    Returns:
+        Formatted markdown string for context injection
+    """
+    if not items:
+        return ""
+
+    sections = ["## Completed Roadmap Items", ""]
+    sections.append("*Related completed features for context:*")
+    sections.append("")
+
+    for item in items:
+        # Format the item with available metadata
+        line = f"- **{item.text}**"
+        if item.priority:
+            line += f" ({item.priority})"
+        sections.append(line)
+
+        # Add metadata as sub-items
+        if item.completion_date:
+            sections.append(f"  - Completed: {item.completion_date}")
+        if item.feature_branch:
+            sections.append(f"  - Branch: `{item.feature_branch}`")
+
+    sections.append("")
+    return "\n".join(sections)
+
+
 class ContextLoader:
     """Service for loading and aggregating project context.
 
@@ -347,7 +576,7 @@ class ContextLoader:
         # Get source configs sorted by priority
         source_configs = [
             (name, self.config.get_source_config(name, self.command))
-            for name in ["constitution", "roadmap", "current_spec", "related_specs"]
+            for name in ["constitution", "roadmap", "completed_roadmap", "current_spec", "related_specs"]
         ]
         source_configs.sort(key=lambda x: x[1].priority)
 
@@ -373,6 +602,11 @@ class ContextLoader:
                 if source:
                     sources.append(source)
                     total_tokens += source.token_count
+            elif source_name == "completed_roadmap":
+                source = self.load_completed_roadmap(max_tokens=max_for_source)
+                if source:
+                    sources.append(source)
+                    total_tokens += source.token_count
             elif source_name == "current_spec":
                 source = self.load_current_spec(max_tokens=max_for_source)
                 if source:
@@ -392,12 +626,88 @@ class ContextLoader:
 
         self._log_debug(f"Total context: {total_tokens} tokens from {len(sources)} sources")
 
-        return LoadedContext(
+        # Apply condensation if needed
+        context = LoadedContext(
             sources=sources,
             total_tokens=total_tokens,
             any_truncated=any_truncated,
             loaded_at=datetime.now(),
         )
+
+        return self._check_and_apply_condensation(context)
+
+    def _check_and_apply_condensation(
+        self, context: LoadedContext
+    ) -> LoadedContext:
+        """Apply condensation if context exceeds token thresholds.
+
+        Uses a two-tier approach:
+        1. Soft threshold: Adds guidance prompt for AI to prioritize
+        2. Hard limit: Truncates sources based on priority
+
+        The guidance prompt is designed to work with any AI coding agent
+        (Claude, Copilot, Cursor, etc.) - no external API calls needed.
+
+        Args:
+            context: The loaded context to check.
+
+        Returns:
+            LoadedContext, possibly with condensation_guidance set.
+        """
+        if not self.config.summarization.enabled:
+            return context
+
+        condenser = ContextCondenser(self.config.summarization)
+
+        exceeds_soft, exceeds_hard = condenser.check_threshold(
+            context.total_tokens, self.config.total_max_tokens
+        )
+
+        # If exceeds hard limit, truncate sources
+        if exceeds_hard:
+            self._log_debug(
+                f"Context exceeds hard limit ({context.total_tokens} >= "
+                f"{self.config.total_max_tokens}), truncating sources"
+            )
+            new_sources, new_total = condenser.truncate_if_needed(
+                context.sources,
+                self.config.total_max_tokens,
+                self.config.summarization.source_priorities,
+            )
+            context = LoadedContext(
+                sources=new_sources,
+                total_tokens=new_total,
+                any_truncated=True,
+                loaded_at=context.loaded_at,
+            )
+            # Recheck soft threshold after truncation
+            exceeds_soft, _ = condenser.check_threshold(
+                context.total_tokens, self.config.total_max_tokens
+            )
+
+        # If exceeds soft threshold, add guidance prompt
+        if exceeds_soft:
+            soft_threshold = int(
+                self.config.total_max_tokens
+                * (self.config.summarization.threshold_percentage / 100.0)
+            )
+            self._log_debug(
+                f"Context exceeds soft threshold ({context.total_tokens} >= "
+                f"{soft_threshold}), adding guidance prompt"
+            )
+
+            # Get current feature for context-aware guidance
+            current_feature = None
+            branch = self.get_current_branch()
+            if branch:
+                current_feature = self.extract_feature_name(branch)
+
+            # Store guidance flag in context for to_markdown to use
+            context._guidance_prompt = condenser.add_guidance_prompt(
+                "", current_feature
+            ).rstrip()
+
+        return context
 
     def load_constitution(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
         """Load constitution.md if enabled and exists.
@@ -435,6 +745,9 @@ class ContextLoader:
     def load_roadmap(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
         """Load roadmap.md if enabled and exists.
 
+        If summarization is enabled, parses the roadmap and generates a
+        condensed summary with P1/P2 items prioritized.
+
         Args:
             max_tokens: Maximum token count (uses config default if None).
 
@@ -449,6 +762,11 @@ class ContextLoader:
             self._log_debug("Roadmap not found")
             return None
 
+        # Check if summarization is enabled
+        if self.config.summarization.enabled:
+            return self._summarize_roadmap(path, content, max_tokens)
+
+        # Fall back to simple truncation
         truncated_content, was_truncated, original_tokens = truncate_content(
             content, max_tokens, path
         )
@@ -458,6 +776,105 @@ class ContextLoader:
 
         return ContextSource(
             source_type="roadmap",
+            path=path,
+            content=truncated_content,
+            token_count=token_count,
+            truncated=was_truncated,
+            original_tokens=original_tokens if was_truncated else None,
+        )
+
+    def _summarize_roadmap(
+        self, path: Path, content: str, max_tokens: int
+    ) -> ContextSource:
+        """Summarize roadmap content by priority.
+
+        Args:
+            path: Path to roadmap file.
+            content: Raw roadmap content.
+            max_tokens: Maximum token count.
+
+        Returns:
+            ContextSource with summarized roadmap content.
+        """
+        original_tokens = estimate_tokens(content)
+
+        # Get current feature for highlighting
+        branch = self.get_current_branch()
+        current_feature = self.extract_feature_name(branch) if branch else None
+
+        # Parse and summarize
+        summarizer = RoadmapSummarizer(self.config.summarization)
+        items = summarizer.parse_roadmap(content)
+        summary = summarizer.summarize(items, max_tokens, current_feature)
+
+        token_count = estimate_tokens(summary.condensed_text)
+        was_summarized = token_count < original_tokens
+
+        self._log_debug(
+            f"Loaded roadmap (summarized): {token_count} tokens "
+            f"({summary.item_count} items, priorities: {summary.priorities_included})"
+        )
+
+        return ContextSource(
+            source_type="roadmap",
+            path=path,
+            content=summary.condensed_text,
+            token_count=token_count,
+            truncated=was_summarized,
+            original_tokens=original_tokens if was_summarized else None,
+        )
+
+    def load_completed_roadmap(
+        self, max_tokens: Optional[int] = None
+    ) -> Optional[ContextSource]:
+        """Load completed_roadmap.md and format for AI context.
+
+        Parses the completed roadmap items and formats them for semantic
+        matching by the AI coding agent.
+
+        Args:
+            max_tokens: Maximum token count (uses config default if None).
+
+        Returns:
+            ContextSource with formatted completed items, or None if not available.
+        """
+        max_tokens = max_tokens or self.config.max_tokens_per_source
+        path = self.project_root / ".doit" / "memory" / "completed_roadmap.md"
+
+        content = self._read_file(path)
+        if content is None:
+            self._log_debug("Completed roadmap not found")
+            return None
+
+        # Parse completed items
+        items = parse_completed_roadmap(content)
+        if not items:
+            self._log_debug("No completed items found in completed_roadmap.md")
+            return None
+
+        # Limit items based on config
+        max_count = self.config.summarization.completed_items_max_count
+        items = items[:max_count]
+
+        # Format for context
+        formatted_content = format_completed_for_context(items)
+        token_count = estimate_tokens(formatted_content)
+
+        # Truncate if needed
+        if token_count > max_tokens:
+            truncated_content, was_truncated, original_tokens = truncate_content(
+                formatted_content, max_tokens, path
+            )
+            token_count = estimate_tokens(truncated_content)
+        else:
+            truncated_content = formatted_content
+            was_truncated = False
+            original_tokens = token_count
+
+        self._log_debug(f"Loaded completed_roadmap: {token_count} tokens ({len(items)} items)")
+
+        return ContextSource(
+            source_type="completed_roadmap",
             path=path,
             content=truncated_content,
             token_count=token_count,

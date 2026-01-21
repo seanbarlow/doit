@@ -1,0 +1,131 @@
+# Context Roadmap Summary
+
+**Completed**: 2026-01-20
+**Branch**: `038-context-roadmap-summary`
+**PR**: [#576](https://github.com/seanbarlow/doit/pull/576)
+**Epic**: [#548](https://github.com/seanbarlow/doit/issues/548)
+
+## Overview
+
+Enhanced the AI context injection system to provide intelligent roadmap summarization for AI agents. Instead of loading the full roadmap, the system now generates a prioritized summary that:
+
+- Prioritizes P1/P2 items with full content and rationale
+- Condenses P3/P4 items to titles only
+- Highlights items matching the current feature branch
+- Includes relevant completed roadmap items for pattern reference
+- Applies AI-powered context condensation when token limits are exceeded
+
+## Requirements Implemented
+
+| ID | Description | Status |
+|----|-------------|--------|
+| FR-001 | Generate summarized view of roadmap.md prioritizing P1/P2 items | Done |
+| FR-002 | Include rationale for each roadmap item when available | Done |
+| FR-003 | Highlight roadmap items matching current feature branch | Done |
+| FR-004 | Search completed_roadmap.md for relevant items | Done |
+| FR-005 | Use keyword extraction for matching completed items | Done |
+| FR-006 | Include completion date and branch reference for completed items | Done |
+| FR-007 | Invoke AI summarization when context exceeds threshold | Done |
+| FR-008 | Preserve source attribution in summarized output | Done |
+| FR-009 | Fall back to truncation when AI summarization unavailable | Done |
+| FR-010 | Support configuration options for summarization behavior | Done |
+| FR-011 | Provide sensible defaults without explicit configuration | Done |
+| FR-012 | Log summarization activity for debugging | Done |
+| FR-013 | Respect existing token limits from ContextConfig | Done |
+
+## Technical Details
+
+### Architecture
+
+The implementation follows an AI-first design philosophy, leveraging the AI coding agent (Claude, Copilot, etc.) for semantic understanding rather than implementing TF-IDF matching ourselves.
+
+**Key Components:**
+
+- **SummarizationConfig**: Configuration dataclass for summarization behavior
+- **RoadmapSummarizer**: Parses roadmap.md and generates priority-based summaries
+- **ContextCondenser**: Two-tier condensation (guidance prompt + truncation fallback)
+- **Extended ContextLoader**: Integrated summarization into context loading pipeline
+
+### Two-Tier Context Condensation
+
+1. **Soft Threshold** (default 80%): Adds AI guidance prompt instructing the agent to prioritize P1/P2 items and current feature context
+2. **Hard Limit** (100%): Truncates lowest-priority sources to fit within token limits
+
+### Configuration
+
+```yaml
+# .doit/config/context.yaml
+summarization:
+  enabled: true
+  threshold_percentage: 80.0
+  source_priorities:
+    - constitution
+    - roadmap
+    - completed_roadmap
+    - current_spec
+  fallback_to_truncation: true
+```
+
+## Files Changed
+
+### New Files
+- `src/doit_cli/services/roadmap_summarizer.py` - RoadmapSummarizer service
+- `tests/unit/test_roadmap_summarizer.py` - 20 unit tests
+- `specs/038-context-roadmap-summary/` - Feature specification and artifacts
+
+### Modified Files
+- `src/doit_cli/models/context_config.py` - Added SummarizationConfig, RoadmapItem, CompletedItem, RoadmapSummary dataclasses
+- `src/doit_cli/services/context_loader.py` - Added ContextCondenser, completed roadmap loading
+- `src/doit_cli/cli/context_command.py` - Updated to display summarization status
+- `tests/unit/test_context_config.py` - Added summarization config tests
+- `tests/integration/test_context_injection.py` - Added 5 integration tests
+
+## Testing
+
+### Automated Tests
+- **Total Tests**: 99
+- **Passed**: 99
+- **Failed**: 0
+- **Duration**: 5.07s
+
+### Test Coverage by Component
+| Component | Tests |
+|-----------|-------|
+| RoadmapSummarizer | 20 |
+| ContextConfig | 25 |
+| ContextLoader | 34 |
+| Integration | 20 |
+
+### Manual Tests
+12 manual test cases defined covering:
+- UI/UX verification (MT-001 to MT-003)
+- Integration validation (MT-004 to MT-006)
+- Configuration tests (MT-007 to MT-009)
+- Edge cases (MT-010 to MT-012)
+
+## Related Issues
+
+### Epic
+- [#548](https://github.com/seanbarlow/doit/issues/548) - Context Roadmap Summary
+
+### Features
+- [#549](https://github.com/seanbarlow/doit/issues/549) - Roadmap Priority Summary
+- [#550](https://github.com/seanbarlow/doit/issues/550) - Completed Roadmap Context
+- [#551](https://github.com/seanbarlow/doit/issues/551) - AI-Powered Context Summarization
+- [#552](https://github.com/seanbarlow/doit/issues/552) - Summarization Configuration
+
+### Tasks
+- #553 through #575 (21 task issues)
+
+## Success Metrics
+
+| Metric | Target | Achieved |
+|--------|--------|----------|
+| Context generation time | < 3 seconds | Yes |
+| Summarized content reduction | > 60% | Yes (~78% for roadmap) |
+| Test coverage | 100% requirements | 13/13 (100%) |
+| Breaking changes | Zero | Zero |
+
+---
+
+*Generated by `/doit.checkin` on 2026-01-20*

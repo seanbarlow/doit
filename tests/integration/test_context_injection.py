@@ -389,6 +389,173 @@ class TestContextLoadingEndToEnd:
         assert "status" in result.stdout.lower()
 
 
+class TestContextSummarization:
+    """Integration tests for context summarization features."""
+
+    @pytest.fixture
+    def project_with_roadmap_priorities(self, tmp_path: Path):
+        """Create a project with roadmap having P1-P4 priorities."""
+        # Create .doit structure
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        config_dir = tmp_path / ".doit" / "config"
+        config_dir.mkdir(parents=True)
+
+        # Create constitution
+        constitution = memory_dir / "constitution.md"
+        constitution.write_text("# Constitution\n\nProject principles.")
+
+        # Create roadmap with priorities
+        roadmap = memory_dir / "roadmap.md"
+        roadmap.write_text(
+            "# Project Roadmap\n\n"
+            "## P1 - Critical\n\n"
+            "- [ ] Critical feature one\n"
+            "  - **Rationale**: Most important work\n"
+            "- [ ] Critical feature two\n\n"
+            "## P2 - High Priority\n\n"
+            "- [ ] High priority feature\n"
+            "  - **Rationale**: Important but not critical\n\n"
+            "## P3 - Medium\n\n"
+            "- [ ] Medium priority with long description that explains the feature\n"
+            "- [ ] Another medium item\n\n"
+            "## P4 - Low\n\n"
+            "- [ ] Low priority backlog item\n"
+        )
+
+        # Create config with summarization enabled
+        config = config_dir / "context.yaml"
+        config.write_text(
+            "version: 1\n"
+            "enabled: true\n"
+            "max_tokens_per_source: 4000\n"
+            "total_max_tokens: 16000\n"
+            "summarization:\n"
+            "  enabled: true\n"
+            "  threshold_percentage: 80.0\n"
+        )
+
+        return tmp_path
+
+    @pytest.fixture
+    def project_with_completed_roadmap(self, tmp_path: Path):
+        """Create a project with completed roadmap items."""
+        # Create .doit structure
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        config_dir = tmp_path / ".doit" / "config"
+        config_dir.mkdir(parents=True)
+
+        # Create constitution
+        constitution = memory_dir / "constitution.md"
+        constitution.write_text("# Constitution\n\nProject principles.")
+
+        # Create roadmap
+        roadmap = memory_dir / "roadmap.md"
+        roadmap.write_text("# Roadmap\n\n## P1\n\n- [ ] Current work\n")
+
+        # Create completed roadmap with table format
+        completed = memory_dir / "completed_roadmap.md"
+        completed.write_text(
+            "# Completed Roadmap Items\n\n"
+            "| Item | Priority | Date | Branch |\n"
+            "|------|----------|------|--------|\n"
+            "| AI context injection | P1 | 2026-01-15 | 026-ai-context |\n"
+            "| Memory search | P2 | 2026-01-16 | 037-memory-search |\n"
+        )
+
+        # Create config
+        config = config_dir / "context.yaml"
+        config.write_text(
+            "version: 1\n"
+            "enabled: true\n"
+            "sources:\n"
+            "  completed_roadmap:\n"
+            "    enabled: true\n"
+        )
+
+        return tmp_path
+
+    def test_context_show_displays_summarization_settings(
+        self, project_with_roadmap_priorities: Path
+    ):
+        """Test that context show displays summarization settings."""
+        result = subprocess.run(
+            ["doit", "context", "show"],
+            cwd=project_with_roadmap_priorities,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0
+        # Should show summarization section
+        assert "Summarization" in result.stdout or "summariz" in result.stdout.lower()
+
+    def test_context_show_roadmap_is_summarized(
+        self, project_with_roadmap_priorities: Path
+    ):
+        """Test that roadmap shows as summarized when summarization enabled."""
+        result = subprocess.run(
+            ["doit", "context", "show"],
+            cwd=project_with_roadmap_priorities,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0
+        assert "roadmap" in result.stdout.lower()
+        # Should show summarized status
+        assert "summarized" in result.stdout.lower()
+
+    def test_context_show_includes_completed_roadmap(
+        self, project_with_completed_roadmap: Path
+    ):
+        """Test that completed_roadmap source is loaded."""
+        result = subprocess.run(
+            ["doit", "context", "show"],
+            cwd=project_with_completed_roadmap,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0
+        # Should include completed_roadmap source
+        assert "completed_roadmap" in result.stdout.lower() or "completed" in result.stdout.lower()
+
+    def test_context_status_shows_completed_roadmap_file(
+        self, project_with_completed_roadmap: Path
+    ):
+        """Test that status shows completed_roadmap file availability."""
+        result = subprocess.run(
+            ["doit", "context", "status"],
+            cwd=project_with_completed_roadmap,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0
+        assert "completed_roadmap" in result.stdout.lower()
+
+    def test_context_verbose_shows_roadmap_summary_structure(
+        self, project_with_roadmap_priorities: Path
+    ):
+        """Test verbose output shows roadmap summary structure."""
+        result = subprocess.run(
+            ["doit", "context", "show", "--verbose"],
+            cwd=project_with_roadmap_priorities,
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0
+        # Should show summarized roadmap content with priority sections
+        output = result.stdout
+        # Either high priority or P1/P2 markers should be present
+        assert ("High Priority" in output or
+                "[P1]" in output or
+                "Critical" in output.lower())
+
+
 class TestContextWithSpecDirectory:
     """Tests for context loading with spec directory integration."""
 

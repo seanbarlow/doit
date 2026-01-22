@@ -567,11 +567,25 @@ update_agent_file() {
 update_specific_agent() {
     local agent_type="$1"
 
+    # Detect configured agents
+    local configured_agents
+    configured_agents=$(detect_configured_agents)
+
     case "$agent_type" in
         claude)
+            # Warn if Claude not detected but allow proceeding
+            if [[ "$configured_agents" != *"claude"* ]]; then
+                log_warning "Claude agent not detected (.claude/ directory doesn't exist)"
+                log_warning "Proceeding anyway as explicitly requested"
+            fi
             update_agent_file "$CLAUDE_FILE" "Claude Code"
             ;;
         copilot)
+            # Warn if Copilot not detected but allow proceeding
+            if [[ "$configured_agents" != *"copilot"* ]]; then
+                log_warning "Copilot agent not detected (.github/copilot-instructions.md or .github/prompts/ doesn't exist)"
+                log_warning "Proceeding anyway as explicitly requested"
+            fi
             update_agent_file "$COPILOT_FILE" "GitHub Copilot"
             ;;
         *)
@@ -582,23 +596,81 @@ update_specific_agent() {
     esac
 }
 
+detect_configured_agents() {
+    # Detect which agents are configured by checking for agent directories
+    # This matches the logic from AgentDetector service in Python
+    local has_claude=false
+    local has_copilot=false
+
+    # Check for Claude setup (.claude/ or .claude/commands/)
+    if [[ -d "$REPO_ROOT/.claude" ]] || [[ -d "$REPO_ROOT/.claude/commands" ]]; then
+        has_claude=true
+    fi
+
+    # Check for Copilot setup (.github/copilot-instructions.md or .github/prompts/)
+    if [[ -f "$REPO_ROOT/.github/copilot-instructions.md" ]] || [[ -d "$REPO_ROOT/.github/prompts" ]]; then
+        has_copilot=true
+    fi
+
+    # Return results as space-separated string
+    local agents=""
+    if [[ "$has_claude" == true ]]; then
+        agents="claude"
+    fi
+    if [[ "$has_copilot" == true ]]; then
+        agents="$agents copilot"
+    fi
+
+    echo "$agents"
+}
+
 update_all_existing_agents() {
     local found_agent=false
 
-    # Check each possible agent file and update if it exists
-    if [[ -f "$CLAUDE_FILE" ]]; then
-        update_agent_file "$CLAUDE_FILE" "Claude Code"
-        found_agent=true
+    # Detect which agents are actually configured
+    local configured_agents
+    configured_agents=$(detect_configured_agents)
+
+    # Log detected agents
+    if [[ -n "$configured_agents" ]]; then
+        log_info "Detected configured agents: $configured_agents"
+    else
+        log_info "No agents detected, will create default Claude file"
     fi
 
-    if [[ -f "$COPILOT_FILE" ]]; then
-        update_agent_file "$COPILOT_FILE" "GitHub Copilot"
-        found_agent=true
+    # Update Claude file only if Claude is configured
+    if [[ "$configured_agents" == *"claude"* ]]; then
+        if [[ -f "$CLAUDE_FILE" ]]; then
+            update_agent_file "$CLAUDE_FILE" "Claude Code"
+            found_agent=true
+        else
+            log_info "Claude agent detected but $CLAUDE_FILE doesn't exist yet"
+            # Create Claude file if .claude directory exists
+            if [[ -d "$REPO_ROOT/.claude" ]]; then
+                update_agent_file "$CLAUDE_FILE" "Claude Code"
+                found_agent=true
+            fi
+        fi
     fi
 
-    # If no agent files exist, create a default Claude file
+    # Update Copilot file only if Copilot is configured
+    if [[ "$configured_agents" == *"copilot"* ]]; then
+        if [[ -f "$COPILOT_FILE" ]]; then
+            update_agent_file "$COPILOT_FILE" "GitHub Copilot"
+            found_agent=true
+        else
+            log_info "Copilot agent detected but $COPILOT_FILE doesn't exist yet"
+            # Create Copilot file if .github directory exists
+            if [[ -d "$REPO_ROOT/.github" ]]; then
+                update_agent_file "$COPILOT_FILE" "GitHub Copilot"
+                found_agent=true
+            fi
+        fi
+    fi
+
+    # If no agents detected, create a default Claude file
     if [[ "$found_agent" == false ]]; then
-        log_info "No existing agent files found, creating default Claude file..."
+        log_info "No existing agent files or configurations found, creating default Claude file..."
         update_agent_file "$CLAUDE_FILE" "Claude Code"
     fi
 }

@@ -13,17 +13,17 @@ import tempfile
 import shutil
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
-from src.doit_toolkit_cli.services.roadmap_matcher import (
+from doit_cli.services.roadmap_matcher import (
     RoadmapMatcherService,
     RoadmapItem,
     MatchResult
 )
-from src.doit_toolkit_cli.services.github_linker import (
+from doit_cli.services.github_linker import (
     GitHubLinkerService,
     EpicReference,
     SpecReference
 )
-from src.doit_toolkit_cli.utils.spec_parser import (
+from doit_cli.utils.spec_parser import (
     parse_spec_file,
     get_epic_reference
 )
@@ -225,7 +225,7 @@ class TestEndToEndAutoLinking:
         with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
              patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate:
 
-            from src.doit_toolkit_cli.services.github_service import GitHubServiceError
+            from doit_cli.services.github_service import GitHubServiceError
 
             # Validation fails due to API error
             mock_validate.return_value = (False, "GitHub API Error: Rate limit exceeded")
@@ -288,8 +288,8 @@ class TestEndToEndAutoLinking:
              patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate, \
              patch.object(GitHubLinkerService, '_update_epic_via_cli') as mock_update_cli, \
              patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
-             patch('src.doit_toolkit_cli.services.github_linker.add_epic_to_spec') as mock_add_epic, \
-             patch('src.doit_toolkit_cli.services.github_linker.get_epic_reference') as mock_get_epic_ref, \
+             patch('doit_cli.services.github_linker.add_epic_to_spec') as mock_add_epic, \
+             patch('doit_cli.services.github_linker.get_epic_reference') as mock_get_epic_ref, \
              patch('subprocess.run') as mock_run:
 
             mock_get_epic.return_value = {
@@ -440,7 +440,7 @@ class TestNavigationFeatures:
         sample_spec
     ):
         """Test that epic links in spec frontmatter are in clickable markdown format."""
-        from src.doit_toolkit_cli.utils.spec_parser import add_epic_reference, parse_spec_file
+        from doit_cli.utils.spec_parser import add_epic_reference, parse_spec_file
 
         # Add epic reference
         add_epic_reference(
@@ -464,7 +464,7 @@ class TestNavigationFeatures:
     ):
         """Test that multiple specs can be linked to the same epic."""
         from pathlib import Path
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.services.github_linker import GitHubLinkerService
 
         linker = GitHubLinkerService()
 
@@ -490,7 +490,7 @@ class TestNavigationFeatures:
         sample_spec
     ):
         """Test that spec paths in epic body are relative to repository root."""
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.services.github_linker import GitHubLinkerService
         from unittest.mock import patch, Mock
 
         with patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
@@ -527,8 +527,8 @@ class TestEpicCreation:
     ):
         """Test creating a GitHub epic when roadmap item has no epic."""
         from pathlib import Path
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
-        from src.doit_toolkit_cli.models.github_epic import GitHubEpic
+        from doit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.models.github_epic import GitHubEpic
         from unittest.mock import patch, Mock
 
         linker = GitHubLinkerService()
@@ -568,7 +568,7 @@ class TestEpicCreation:
     ):
         """Test updating roadmap.md with newly created epic reference."""
         from pathlib import Path
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.services.github_linker import GitHubLinkerService
 
         # Create roadmap file
         roadmap_path = temp_project_dir / ".doit" / "memory" / "roadmap.md"
@@ -611,8 +611,8 @@ class TestEpicCreation:
     ):
         """Test complete workflow: create epic → update roadmap → link spec."""
         from pathlib import Path
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
-        from src.doit_toolkit_cli.models.github_epic import GitHubEpic
+        from doit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.models.github_epic import GitHubEpic
         from unittest.mock import patch, Mock
 
         # Create roadmap
@@ -687,7 +687,7 @@ class TestEpicCreation:
             assert success is True
 
             # Verify spec was updated
-            from src.doit_toolkit_cli.utils.spec_parser import get_epic_reference
+            from doit_cli.utils.spec_parser import get_epic_reference
             epic_ref = get_epic_reference(sample_spec)
             assert epic_ref is not None
             assert epic_ref[0] == 999
@@ -697,7 +697,7 @@ class TestEpicCreation:
         temp_project_dir
     ):
         """Test that invalid priority raises ValueError."""
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.services.github_linker import GitHubLinkerService
         import pytest
 
         linker = GitHubLinkerService()
@@ -715,7 +715,7 @@ class TestEpicCreation:
     ):
         """Test that updating non-existent roadmap item raises ValueError."""
         from pathlib import Path
-        from src.doit_toolkit_cli.services.github_linker import GitHubLinkerService
+        from doit_cli.services.github_linker import GitHubLinkerService
         import pytest
 
         # Create roadmap

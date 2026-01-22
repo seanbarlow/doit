@@ -35,6 +35,12 @@ doit context show
 - Consider roadmap priorities
 - Identify connections to related specifications
 
+**For this command specifically**:
+
+- Read `.doit/memory/tech-stack.md` for implementation technology choices
+- If tech-stack.md doesn't exist, check plan.md or constitution.md for Tech Stack section (legacy format)
+- Use tech stack info for accurate file paths and framework-specific tasks
+
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
@@ -45,7 +51,8 @@ doit context show
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
-   - Load plan.md and extract tech stack, libraries, project structure
+   - Load `.doit/memory/tech-stack.md` (or fallback to plan.md/constitution.md) for tech stack, libraries
+   - Load plan.md and extract project structure
    - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
    - If data-model.md exists: Extract entities and map to user stories
    - If contracts/ exists: Map endpoints to user stories

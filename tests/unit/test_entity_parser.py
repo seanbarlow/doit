@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.doit_cli.services.entity_parser import EntityParser
+from doit_cli.services.entity_parser import EntityParser
 
 
 @pytest.fixture

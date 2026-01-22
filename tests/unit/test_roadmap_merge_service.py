@@ -6,9 +6,9 @@ testing merge logic with matched items, GitHub-only items, local-only items, and
 
 import pytest
 
-from doit_toolkit_cli.models.github_epic import GitHubEpic
-from doit_toolkit_cli.models.roadmap import RoadmapItem
-from doit_toolkit_cli.services.roadmap_merge_service import RoadmapMergeService
+from doit_cli.models.github_epic import GitHubEpic
+from doit_cli.models.roadmap import RoadmapItem
+from doit_cli.services.roadmap_merge_service import RoadmapMergeService
 
 
 @pytest.fixture

@@ -9,7 +9,7 @@ from io import StringIO
 
 from rich.console import Console
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     WorkflowStep,
     ValidationResult,
 )
@@ -21,7 +21,7 @@ class TestProgressDisplayShowStep:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance with captured output."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         # Use a string buffer to capture output
         output = StringIO()
@@ -85,7 +85,7 @@ class TestProgressDisplayMarkComplete:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         output = StringIO()
         console = Console(file=output, force_terminal=True)
@@ -129,7 +129,7 @@ class TestProgressDisplayMarkSkipped:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         output = StringIO()
         console = Console(file=output, force_terminal=True)
@@ -173,7 +173,7 @@ class TestProgressDisplayShowError:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         output = StringIO()
         console = Console(file=output, force_terminal=True)
@@ -223,7 +223,7 @@ class TestProgressDisplayShowSummary:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         output = StringIO()
         console = Console(file=output, force_terminal=True)
@@ -260,7 +260,7 @@ class TestProgressDisplayShowInterrupted:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         output = StringIO()
         console = Console(file=output, force_terminal=True)
@@ -293,7 +293,7 @@ class TestProgressDisplayIntegration:
     @pytest.fixture
     def progress(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         return ProgressDisplay()
 

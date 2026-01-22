@@ -30,7 +30,7 @@ class SummarizationConfig:
     enabled: bool = True
     threshold_percentage: float = 80.0
     source_priorities: list[str] = field(
-        default_factory=lambda: ["constitution", "roadmap", "completed_roadmap", "current_spec"]
+        default_factory=lambda: ["constitution", "tech_stack", "roadmap", "completed_roadmap", "current_spec"]
     )
     timeout_seconds: float = 10.0
     fallback_to_truncation: bool = True
@@ -121,10 +121,11 @@ class SourceConfig:
         """Get default source configurations."""
         return {
             "constitution": cls(source_type="constitution", enabled=True, priority=1),
-            "roadmap": cls(source_type="roadmap", enabled=True, priority=2),
-            "completed_roadmap": cls(source_type="completed_roadmap", enabled=True, priority=3, max_count=5),
-            "current_spec": cls(source_type="current_spec", enabled=True, priority=4),
-            "related_specs": cls(source_type="related_specs", enabled=True, priority=5, max_count=3),
+            "tech_stack": cls(source_type="tech_stack", enabled=True, priority=2),
+            "roadmap": cls(source_type="roadmap", enabled=True, priority=3),
+            "completed_roadmap": cls(source_type="completed_roadmap", enabled=True, priority=4, max_count=5),
+            "current_spec": cls(source_type="current_spec", enabled=True, priority=5),
+            "related_specs": cls(source_type="related_specs", enabled=True, priority=6, max_count=3),
         }
 
 
@@ -139,6 +140,40 @@ class CommandOverride:
 
     command_name: str = ""
     sources: dict[str, SourceConfig] = field(default_factory=dict)
+
+    @classmethod
+    def default_commands(cls) -> dict[str, "CommandOverride"]:
+        """Get default command overrides.
+
+        Returns default overrides for commands that should have
+        modified context loading behavior:
+        - specit: Disables tech_stack (specs focus on principles, not tech)
+        - constitution: Disables tech_stack (working on constitution itself)
+        """
+        return {
+            "specit": cls(
+                command_name="specit",
+                sources={
+                    "tech_stack": SourceConfig(source_type="tech_stack", enabled=False),
+                    "related_specs": SourceConfig(source_type="related_specs", enabled=False),
+                },
+            ),
+            "constitution": cls(
+                command_name="constitution",
+                sources={
+                    "tech_stack": SourceConfig(source_type="tech_stack", enabled=False),
+                    "related_specs": SourceConfig(source_type="related_specs", enabled=False),
+                    "current_spec": SourceConfig(source_type="current_spec", enabled=False),
+                },
+            ),
+            "roadmapit": cls(
+                command_name="roadmapit",
+                sources={
+                    "current_spec": SourceConfig(source_type="current_spec", enabled=False),
+                    "related_specs": SourceConfig(source_type="related_specs", enabled=False),
+                },
+            ),
+        }
 
 
 @dataclass
@@ -162,7 +197,7 @@ class ContextConfig:
     max_tokens_per_source: int = 4000
     total_max_tokens: int = 16000
     sources: dict[str, SourceConfig] = field(default_factory=SourceConfig.default_sources)
-    commands: dict[str, CommandOverride] = field(default_factory=dict)
+    commands: dict[str, CommandOverride] = field(default_factory=CommandOverride.default_commands)
     summarization: SummarizationConfig = field(default_factory=SummarizationConfig)
 
     def __post_init__(self) -> None:
@@ -261,7 +296,7 @@ class ContextConfig:
                 threshold_percentage=summarization_data.get("threshold_percentage", 80.0),
                 source_priorities=summarization_data.get(
                     "source_priorities",
-                    ["constitution", "roadmap", "completed_roadmap", "current_spec"]
+                    ["constitution", "tech_stack", "roadmap", "completed_roadmap", "current_spec"]
                 ),
                 timeout_seconds=summarization_data.get("timeout_seconds", 10.0),
                 fallback_to_truncation=summarization_data.get("fallback_to_truncation", True),
@@ -401,6 +436,7 @@ class LoadedContext:
         # Map source types to display names
         display_names = {
             "constitution": "Constitution",
+            "tech_stack": "Tech Stack",
             "roadmap": "Roadmap",
             "completed_roadmap": "Completed Roadmap",
             "current_spec": "Current Spec",

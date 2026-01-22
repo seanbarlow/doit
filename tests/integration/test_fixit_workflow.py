@@ -11,8 +11,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from src.doit_cli.main import app
-from src.doit_cli.models.fixit_models import (
+from doit_cli.main import app
+from doit_cli.models.fixit_models import (
     FixPhase,
     GitHubIssue,
     IssueState,
@@ -25,10 +25,10 @@ runner = CliRunner()
 class TestFixitWorkflowStartCommand:
     """Integration tests for doit fixit start command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_fixit_starts_workflow_for_issue(self, mock_service_class, tmp_path):
         """doit fixit start <issue_id> should start workflow."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.is_github_available.return_value = True
@@ -49,10 +49,10 @@ class TestFixitWorkflowStartCommand:
             manual_branch=None,
         )
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_fixit_shows_error_for_nonexistent_issue(self, mock_service_class):
         """doit fixit start should show error for nonexistent issue."""
-        from src.doit_cli.services.fixit_service import FixitServiceError
+        from doit_cli.services.fixit_service import FixitServiceError
 
         mock_service = MagicMock()
         mock_service.is_github_available.return_value = True
@@ -64,10 +64,10 @@ class TestFixitWorkflowStartCommand:
         assert result.exit_code == 1
         assert "not found" in result.output.lower()
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_fixit_resumes_existing_workflow(self, mock_service_class):
         """doit fixit start --resume should continue existing workflow."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.is_github_available.return_value = True
@@ -93,7 +93,7 @@ class TestFixitWorkflowStartCommand:
 class TestFixitWorkflowListCommand:
     """Integration tests for doit fixit list command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_fixit_list_shows_open_bugs(self, mock_service_class):
         """doit fixit list should show open bugs."""
         mock_service = MagicMock()
@@ -109,7 +109,7 @@ class TestFixitWorkflowListCommand:
         assert "Bug 1" in result.output
         assert "Bug 2" in result.output
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_fixit_list_json_format(self, mock_service_class):
         """doit fixit list --format json should output JSON."""
         mock_service = MagicMock()
@@ -128,7 +128,7 @@ class TestFixitWorkflowListCommand:
         assert len(data) == 1
         assert data[0]["number"] == 1
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_fixit_list_empty_shows_message(self, mock_service_class):
         """doit fixit list should show message when no bugs found."""
         mock_service = MagicMock()
@@ -144,10 +144,10 @@ class TestFixitWorkflowListCommand:
 class TestFixitWorkflowInvestigateCommand:
     """Integration tests for doit fixit investigate command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_investigate_starts_investigation(self, mock_service_class):
         """doit fixit investigate should start investigation."""
-        from src.doit_cli.models.fixit_models import InvestigationPlan, InvestigationCheckpoint, FixWorkflow
+        from doit_cli.models.fixit_models import InvestigationPlan, InvestigationCheckpoint, FixWorkflow
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -172,10 +172,10 @@ class TestFixitWorkflowInvestigateCommand:
         assert result.exit_code == 0
         assert "investigation started" in result.output.lower()
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_investigate_add_finding(self, mock_service_class):
         """doit fixit investigate -a should add finding."""
-        from src.doit_cli.models.fixit_models import (
+        from doit_cli.models.fixit_models import (
             InvestigationFinding, FindingType, FixWorkflow
         )
 
@@ -202,10 +202,10 @@ class TestFixitWorkflowInvestigateCommand:
         assert result.exit_code == 0
         assert "finding added" in result.output.lower()
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_investigate_complete_checkpoint(self, mock_service_class):
         """doit fixit investigate -c should complete checkpoint."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -222,10 +222,10 @@ class TestFixitWorkflowInvestigateCommand:
         assert result.exit_code == 0
         assert "completed" in result.output.lower()
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_investigate_done_advances_phase(self, mock_service_class):
         """doit fixit investigate --done should complete investigation."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -246,10 +246,10 @@ class TestFixitWorkflowInvestigateCommand:
 class TestFixitWorkflowPlanCommand:
     """Integration tests for doit fixit plan command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_plan_generate_creates_plan(self, mock_service_class):
         """doit fixit plan --generate should create fix plan."""
-        from src.doit_cli.models.fixit_models import (
+        from doit_cli.models.fixit_models import (
             FixPlan, PlanStatus, RiskLevel, FixWorkflow
         )
 
@@ -276,10 +276,10 @@ class TestFixitWorkflowPlanCommand:
         assert result.exit_code == 0
         assert "generated" in result.output.lower()
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_plan_submit_for_review(self, mock_service_class):
         """doit fixit plan --submit should submit for review."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -300,10 +300,10 @@ class TestFixitWorkflowPlanCommand:
 class TestFixitWorkflowReviewCommand:
     """Integration tests for doit fixit review command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_review_approve_advances_phase(self, mock_service_class):
         """doit fixit review --approve should approve plan."""
-        from src.doit_cli.models.fixit_models import (
+        from doit_cli.models.fixit_models import (
             FixPlan, PlanStatus, RiskLevel, FixWorkflow
         )
 
@@ -335,10 +335,10 @@ class TestFixitWorkflowReviewCommand:
 class TestFixitWorkflowStatusCommand:
     """Integration tests for doit fixit status command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_status_shows_active_workflow(self, mock_service_class):
         """doit fixit status should show active workflow."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -360,7 +360,7 @@ class TestFixitWorkflowStatusCommand:
         assert result.exit_code == 0
         assert "123" in result.output
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_status_no_active_workflow(self, mock_service_class):
         """doit fixit status should show message when no workflow active."""
         mock_service = MagicMock()
@@ -376,10 +376,10 @@ class TestFixitWorkflowStatusCommand:
 class TestFixitWorkflowCancelCommand:
     """Integration tests for doit fixit cancel command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_cancel_with_force_skips_confirm(self, mock_service_class):
         """doit fixit cancel --force should skip confirmation."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -400,10 +400,10 @@ class TestFixitWorkflowCancelCommand:
 class TestFixitWorkflowWorkflowsCommand:
     """Integration tests for doit fixit workflows command."""
 
-    @patch("src.doit_cli.cli.fixit_command.FixitService")
+    @patch("doit_cli.cli.fixit_command.FixitService")
     def test_workflows_lists_all_workflows(self, mock_service_class):
         """doit fixit workflows should list all workflows."""
-        from src.doit_cli.models.fixit_models import FixWorkflow
+        from doit_cli.models.fixit_models import FixWorkflow
 
         mock_service = MagicMock()
         mock_service.list_workflows.return_value = [
@@ -432,12 +432,12 @@ class TestFixitWorkflowWorkflowsCommand:
 class TestFixitWorkflowEndToEnd:
     """End-to-end integration tests for complete workflow."""
 
-    @patch("src.doit_cli.services.fixit_service.GitHubService")
-    @patch("src.doit_cli.services.fixit_service.StateManager")
+    @patch("doit_cli.services.fixit_service.GitHubService")
+    @patch("doit_cli.services.fixit_service.StateManager")
     def test_full_workflow_lifecycle(self, mock_state_class, mock_github_class, tmp_path):
         """Test complete workflow: start → investigate → plan → complete."""
-        from src.doit_cli.services.fixit_service import FixitService
-        from src.doit_cli.models.fixit_models import FindingType
+        from doit_cli.services.fixit_service import FixitService
+        from doit_cli.models.fixit_models import FindingType
 
         # Setup mocks
         mock_github = MagicMock()
@@ -529,11 +529,11 @@ class TestFixitWorkflowEndToEnd:
         workflow = service.get_workflow(123)
         assert workflow.phase == FixPhase.COMPLETED
 
-    @patch("src.doit_cli.services.fixit_service.GitHubService")
-    @patch("src.doit_cli.services.fixit_service.StateManager")
+    @patch("doit_cli.services.fixit_service.GitHubService")
+    @patch("doit_cli.services.fixit_service.StateManager")
     def test_workflow_cancel(self, mock_state_class, mock_github_class):
         """Test workflow cancellation."""
-        from src.doit_cli.services.fixit_service import FixitService
+        from doit_cli.services.fixit_service import FixitService
 
         # Setup mocks
         mock_github = MagicMock()
@@ -569,12 +569,12 @@ class TestFixitWorkflowEndToEnd:
         workflow = service.get_workflow(456)
         assert workflow.phase == FixPhase.CANCELLED
 
-    @patch("src.doit_cli.services.fixit_service.GitHubService")
-    @patch("src.doit_cli.services.fixit_service.StateManager")
+    @patch("doit_cli.services.fixit_service.GitHubService")
+    @patch("doit_cli.services.fixit_service.StateManager")
     def test_investigation_requires_confirmed_cause(self, mock_state_class, mock_github_class):
         """Test that investigation cannot complete without confirmed cause."""
-        from src.doit_cli.services.fixit_service import FixitService
-        from src.doit_cli.models.fixit_models import FindingType
+        from doit_cli.services.fixit_service import FixitService
+        from doit_cli.models.fixit_models import FindingType
 
         # Setup mocks
         mock_github = MagicMock()

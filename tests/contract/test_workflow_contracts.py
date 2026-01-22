@@ -6,7 +6,7 @@ These tests verify that implementations conform to the defined protocols.
 import pytest
 from typing import Protocol
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     Workflow,
     WorkflowStep,
     WorkflowState,
@@ -22,7 +22,7 @@ class TestWorkflowEngineContract:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         return WorkflowEngine()
 
@@ -119,7 +119,7 @@ class TestStateManagerContract:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager instance."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -186,7 +186,7 @@ class TestInputValidatorContract:
 
     def test_required_validator_returns_validation_result(self, step):
         """Contract: validate() must return ValidationResult."""
-        from src.doit_cli.services.input_validator import RequiredValidator
+        from doit_cli.services.input_validator import RequiredValidator
 
         validator = RequiredValidator()
         result = validator.validate("value", step, {})
@@ -198,7 +198,7 @@ class TestInputValidatorContract:
 
     def test_path_exists_validator_returns_validation_result(self, step):
         """Contract: PathExistsValidator.validate() must return ValidationResult."""
-        from src.doit_cli.services.input_validator import PathExistsValidator
+        from doit_cli.services.input_validator import PathExistsValidator
 
         validator = PathExistsValidator()
         result = validator.validate("/some/path", step, {})
@@ -207,7 +207,7 @@ class TestInputValidatorContract:
 
     def test_choice_validator_returns_validation_result(self):
         """Contract: ChoiceValidator.validate() must return ValidationResult."""
-        from src.doit_cli.services.input_validator import ChoiceValidator
+        from doit_cli.services.input_validator import ChoiceValidator
 
         step = WorkflowStep(
             id="choice",
@@ -225,7 +225,7 @@ class TestInputValidatorContract:
 
     def test_pattern_validator_returns_validation_result(self, step):
         """Contract: PatternValidator.validate() must return ValidationResult."""
-        from src.doit_cli.services.input_validator import PatternValidator
+        from doit_cli.services.input_validator import PatternValidator
 
         validator = PatternValidator(pattern=r"^\w+$")
         result = validator.validate("test", step, {})
@@ -239,7 +239,7 @@ class TestInteractivePromptContract:
     @pytest.fixture
     def prompt(self):
         """Create an InteractivePrompt in non-interactive mode."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         return InteractivePrompt(force_non_interactive=True)
 
@@ -293,7 +293,7 @@ class TestProgressDisplayContract:
     @pytest.fixture
     def display(self):
         """Create a ProgressDisplay instance."""
-        from src.doit_cli.prompts.interactive import ProgressDisplay
+        from doit_cli.prompts.interactive import ProgressDisplay
 
         return ProgressDisplay()
 

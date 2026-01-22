@@ -8,7 +8,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 from unittest.mock import patch, MagicMock
 
-from src.doit_cli.main import app
+from doit_cli.main import app
 
 
 runner = CliRunner()
@@ -50,7 +50,7 @@ class TestInitWorkflowIntegration:
         assert (tmp_path / ".claude" / "commands").exists()
         assert (tmp_path / ".github" / "prompts").exists()
 
-    @patch("src.doit_cli.cli.init_command.WorkflowEngine")
+    @patch("doit_cli.cli.init_command.WorkflowEngine")
     def test_interactive_uses_workflow_engine(self, mock_engine_class, tmp_path):
         """Interactive init must use WorkflowEngine."""
         # Setup mock
@@ -69,7 +69,7 @@ class TestInitWorkflowIntegration:
         mock_engine_class.assert_called_once()
         mock_engine.run.assert_called_once()
 
-    @patch("src.doit_cli.cli.init_command.WorkflowEngine")
+    @patch("doit_cli.cli.init_command.WorkflowEngine")
     def test_workflow_responses_map_to_init(self, mock_engine_class, tmp_path):
         """Workflow responses must map correctly to init parameters."""
         # Setup mock to return both agents
@@ -88,7 +88,7 @@ class TestInitWorkflowIntegration:
         assert (tmp_path / ".claude" / "commands").exists()
         assert (tmp_path / ".github" / "prompts").exists()
 
-    @patch("src.doit_cli.cli.init_command.WorkflowEngine")
+    @patch("doit_cli.cli.init_command.WorkflowEngine")
     def test_workflow_cancel_exits_gracefully(self, mock_engine_class, tmp_path):
         """confirm-path 'no' must exit with code 0."""
         mock_engine = MagicMock()
@@ -105,7 +105,7 @@ class TestInitWorkflowIntegration:
         assert result.exit_code == 0
         assert "cancelled" in result.output.lower()
 
-    @patch("src.doit_cli.cli.init_command.WorkflowEngine")
+    @patch("doit_cli.cli.init_command.WorkflowEngine")
     def test_cli_agent_overrides_workflow(self, mock_engine_class, tmp_path):
         """CLI --agent flag must override workflow selection."""
         mock_engine = MagicMock()
@@ -129,7 +129,7 @@ class TestInitWorkflowIntegration:
 class TestInitWorkflowStateRecovery:
     """Tests for workflow state persistence and recovery."""
 
-    @patch("src.doit_cli.cli.init_command.WorkflowEngine")
+    @patch("doit_cli.cli.init_command.WorkflowEngine")
     def test_keyboard_interrupt_exits_130(self, mock_engine_class, tmp_path):
         """Ctrl+C during workflow must exit with code 130."""
         mock_engine = MagicMock()
@@ -145,13 +145,13 @@ class TestInitWorkflowStateRecovery:
 class TestInitWorkflowProgressDisplay:
     """Tests for progress display during workflow."""
 
-    @patch("src.doit_cli.cli.init_command.WorkflowEngine")
-    @patch("src.doit_cli.cli.init_command.create_init_workflow")
+    @patch("doit_cli.cli.init_command.WorkflowEngine")
+    @patch("doit_cli.cli.init_command.create_init_workflow")
     def test_workflow_created_with_correct_path(
         self, mock_create_workflow, mock_engine_class, tmp_path
     ):
         """create_init_workflow must receive the correct path."""
-        from src.doit_cli.models.workflow_models import Workflow, WorkflowStep
+        from doit_cli.models.workflow_models import Workflow, WorkflowStep
 
         # Create a minimal valid workflow
         mock_workflow = Workflow(

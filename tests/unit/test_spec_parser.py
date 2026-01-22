@@ -4,7 +4,7 @@ import pytest
 import tempfile
 import shutil
 from pathlib import Path
-from src.doit_toolkit_cli.utils.spec_parser import (
+from doit_cli.utils.spec_parser import (
     SpecFrontmatter,
     parse_spec_file,
     update_spec_frontmatter,

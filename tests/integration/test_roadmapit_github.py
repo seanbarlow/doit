@@ -11,16 +11,16 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from doit_toolkit_cli.models.github_epic import GitHubEpic
-from doit_toolkit_cli.models.roadmap import RoadmapItem
-from doit_toolkit_cli.models.sync_metadata import SyncMetadata
-from doit_toolkit_cli.services.github_cache_service import GitHubCacheService
-from doit_toolkit_cli.services.github_service import (
+from doit_cli.models.github_epic import GitHubEpic
+from doit_cli.models.roadmap import RoadmapItem
+from doit_cli.models.sync_metadata import SyncMetadata
+from doit_cli.services.github_cache_service import GitHubCacheService
+from doit_cli.services.github_service import (
     GitHubService,
     GitHubAuthError,
     GitHubAPIError,
 )
-from doit_toolkit_cli.services.roadmap_merge_service import RoadmapMergeService
+from doit_cli.services.roadmap_merge_service import RoadmapMergeService
 
 
 @pytest.fixture
@@ -100,8 +100,8 @@ def mock_github_epics():
 class TestRoadmapitGitHubIntegration:
     """Integration tests for roadmapit command with GitHub."""
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_full_cycle_with_github_sync(
         self,
@@ -294,8 +294,8 @@ class TestRoadmapitGitHubIntegration:
         # After invalidation, would fetch fresh from GitHub
         # (tested separately in GitHub service tests)
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_github_rate_limit_fallback_to_cache(
         self,
@@ -423,8 +423,8 @@ class TestRoadmapitGitHubIntegration:
         assert age >= 0
         assert age < 1  # Should be very recent
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     def test_skip_github_flag(self, mock_has_cli, mock_is_auth):
         """Test --skip-github flag bypasses GitHub API calls."""
         mock_has_cli.return_value = True
@@ -519,8 +519,8 @@ class TestRoadmapitGitHubIntegration:
 class TestRoadmapitPerformance:
     """Performance tests for roadmapit GitHub integration."""
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_sync_performance_with_50_epics(
         self,
@@ -586,14 +586,14 @@ class TestRoadmapitPerformance:
         # Per spec: cached mode should be <2 seconds
         assert load_time < 2.0, f"Cache load took {load_time:.2f}s, should be <2s"
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_epic_with_linked_features(
         self, mock_run, mock_has_cli, mock_is_auth, cache_service
     ):
         """Test that epic with linked features displays correctly (User Story 2)."""
-        from doit_toolkit_cli.models.github_feature import GitHubFeature
+        from doit_cli.models.github_feature import GitHubFeature
 
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -720,8 +720,8 @@ class TestRoadmapitPerformance:
 class TestRoadmapitAddCommand:
     """Integration tests for roadmapit add command (User Story 3)."""
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_add_creates_github_epic(
         self, mock_run, mock_has_cli, mock_is_auth
@@ -755,8 +755,10 @@ class TestRoadmapitAddCommand:
         assert "priority:P2" in epic.labels
 
         # Verify gh CLI was called with correct arguments
-        mock_run.assert_called_once()
-        call_args = mock_run.call_args[0][0]
+        # Note: called twice - once for auth check in __init__, once for create_epic
+        assert mock_run.call_count == 2
+        # Get the create_epic call (second call)
+        call_args = mock_run.call_args_list[1][0][0]
         assert call_args[0] == "gh"
         assert call_args[1] == "issue"
         assert call_args[2] == "create"
@@ -770,8 +772,8 @@ class TestRoadmapitAddCommand:
         assert "epic" in labels
         assert "priority:P2" in labels
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     def test_add_handles_github_not_configured(
         self, mock_has_cli, mock_is_auth
     ):
@@ -791,8 +793,8 @@ class TestRoadmapitAddCommand:
 
         assert "not installed" in str(exc_info.value).lower()
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_add_handles_api_error(
         self, mock_run, mock_has_cli, mock_is_auth
@@ -820,8 +822,8 @@ class TestRoadmapitAddCommand:
 
         assert "Failed to create epic" in str(exc_info.value)
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_add_with_custom_priority(
         self, mock_run, mock_has_cli, mock_is_auth
@@ -855,8 +857,8 @@ class TestRoadmapitAddCommand:
             labels = call_args[label_idx]
             assert f"priority:{priority}" in labels
 
-    @patch("doit_toolkit_cli.services.github_service.is_gh_authenticated")
-    @patch("doit_toolkit_cli.services.github_service.has_gh_cli")
+    @patch("doit_cli.services.github_service.is_gh_authenticated")
+    @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
     def test_add_with_additional_labels(
         self, mock_run, mock_has_cli, mock_is_auth

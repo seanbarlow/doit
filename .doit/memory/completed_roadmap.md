@@ -12,6 +12,11 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Constitution and tech stack separation | P2 | 2026-01-22 | `046-constitution-tech-stack-split` | Separated constitution.md from tech-stack.md, cleanup command for migration, context loading optimization, command overrides, 24 tasks (100% complete), 1377 tests pass |
+| Azure DevOps git provider support | P2 | 2026-01-22 | `044-git-provider-abstraction` | *Delivered as part of 044* - Full Azure DevOps REST API implementation, issue/PR/milestone management, PAT authentication, 745 lines |
+| Git provider abstraction layer | P2 | 2026-01-22 | `044-git-provider-abstraction` | Unified interface for GitHub/Azure DevOps/GitLab, provider auto-detection from git remote, 31 tasks (100% complete), full GitHub+ADO implementation, GitLab stub |
+| Unified CLI package consolidation | P2 | 2026-01-22 | `043-unified-cli` | Merged doit_toolkit_cli into doit_cli, single package structure, 17 files migrated, github_service.py merged, 1345 tests pass, cleaner imports |
+| Team collaboration features (shared memory, notifications) | P4 | 2026-01-22 | `042-team-collaboration` | Git-based sync for constitution/roadmap, change notifications via watchdog, conflict resolution UI, access control (read-only/read-write), 28 tasks (100% complete), 18 integration tests passed |
 | GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` | Auto-create GitHub milestones for priority levels (P1-P4), assign epics to milestones, close completed milestones, --dry-run support, 21 tasks (100% complete), 1,327 tests passed |
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
 | Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` | GitHub epic state display (open/closed), synced with roadmap items, part of GitHub integration |
@@ -28,11 +33,6 @@
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
 | Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` | Validate command with 10 rules, quality scoring, pre-commit hooks, custom rules |
-| AI context injection for commands | P2 | 2026-01-15 | `026-ai-context-injection`, `027-template-context-injection` | Auto-load constitution, roadmap, related specs into command execution |
-| Git hook integration for workflow enforcement | P2 | 2026-01-15 | `025-git-hooks-workflow` | Pre-commit/push hooks, spec-first validation, bypass logging |
-| Unified template management | P1 | 2026-01-15 | `024-unified-templates` | Single source of truth for commands, eliminates duplicate templates |
-| Multi-agent prompt synchronization | P1 | 2026-01-15 | `023-copilot-prompts-sync` | Consistent prompts across Claude, Copilot agents |
-| Core workflow commands | P1 | 2026-01-10 | — | specit, planit, taskit, implementit, testit, reviewit, checkin |
 
 ---
 
@@ -45,7 +45,11 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
-<!-- Older items will be moved here automatically -->
+| AI context injection for commands | P2 | 2026-01-15 | `026-ai-context-injection`, `027-template-context-injection` |
+| Git hook integration for workflow enforcement | P2 | 2026-01-15 | `025-git-hooks-workflow` |
+| Unified template management | P1 | 2026-01-15 | `024-unified-templates` |
+| Multi-agent prompt synchronization | P1 | 2026-01-15 | `023-copilot-prompts-sync` |
+| Core workflow commands | P1 | 2026-01-10 | — |
 
 </details>
 
@@ -53,11 +57,11 @@
 
 ## Statistics
 
-- **Total Items Completed**: 19
-- **P1 Items Completed**: 4
-- **P2 Items Completed**: 11
+- **Total Items Completed**: 26
+- **P1 Items Completed**: 4 (4 archived)
+- **P2 Items Completed**: 16 (2 archived)
 - **P3 Items Completed**: 4
-- **P4 Items Completed**: 1
+- **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)
 
 ---

@@ -6,12 +6,12 @@ import shutil
 import json
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
-from src.doit_toolkit_cli.services.github_linker import (
+from doit_cli.services.github_linker import (
     GitHubLinkerService,
     EpicReference,
     SpecReference
 )
-from src.doit_toolkit_cli.services.github_service import GitHubServiceError
+from doit_cli.services.github_service import GitHubServiceError
 
 
 @pytest.fixture
@@ -110,14 +110,14 @@ class TestGetEpicDetails:
 
     @patch('subprocess.run')
     @patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo')
-    def test_get_epic_details_not_found(self, mock_repo_slug, mock_run):
+    def test_get_epic_details_not_found(self, mock_repo_slug, mock_run, mock_github_service):
         """Test fetching non-existent epic."""
         import subprocess
         mock_run.side_effect = subprocess.CalledProcessError(
             1, 'gh', stderr="404 Not Found"
         )
 
-        linker = GitHubLinkerService()
+        linker = GitHubLinkerService(github_service=mock_github_service)
 
         with pytest.raises(GitHubServiceError, match="not found"):
             linker.get_epic_details(999)
@@ -321,12 +321,12 @@ class TestGetRepoSlug:
             linker._get_repo_slug()
 
     @patch('subprocess.run')
-    def test_get_repo_slug_no_remote(self, mock_run):
+    def test_get_repo_slug_no_remote(self, mock_run, mock_github_service):
         """Test error when no git remote found."""
         import subprocess
         mock_run.side_effect = subprocess.CalledProcessError(1, 'git')
 
-        linker = GitHubLinkerService()
+        linker = GitHubLinkerService(github_service=mock_github_service)
 
         with pytest.raises(GitHubServiceError, match="Failed to get git remote"):
             linker._get_repo_slug()
@@ -350,12 +350,12 @@ class TestGetRelativePath:
         assert relative_path == "specs/001-test/spec.md"
 
     @patch('subprocess.run')
-    def test_get_relative_path_fallback(self, mock_run):
+    def test_get_relative_path_fallback(self, mock_run, mock_github_service):
         """Test fallback when git command fails."""
         import subprocess
         mock_run.side_effect = subprocess.CalledProcessError(1, 'git')
 
-        linker = GitHubLinkerService()
+        linker = GitHubLinkerService(github_service=mock_github_service)
         spec_path = Path("/home/user/repo/specs/001-test/spec.md")
 
         # Should return full path as fallback
@@ -370,8 +370,8 @@ class TestLinkSpecToEpic:
     @patch.object(GitHubLinkerService, 'get_epic_details')
     @patch.object(GitHubLinkerService, 'update_epic_body')
     @patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo')
-    @patch('src.doit_toolkit_cli.services.github_linker.add_epic_to_spec')
-    @patch('src.doit_toolkit_cli.services.github_linker.get_epic_reference', return_value=None)
+    @patch('doit_cli.services.github_linker.add_epic_to_spec')
+    @patch('doit_cli.services.github_linker.get_epic_reference', return_value=None)
     def test_link_spec_to_epic_success(
         self,
         mock_get_epic_ref,
@@ -427,7 +427,7 @@ class TestLinkSpecToEpic:
         with pytest.raises(ValueError, match="Invalid epic number"):
             linker.link_spec_to_epic(spec_path, epic_number=0)
 
-    @patch('src.doit_toolkit_cli.services.github_linker.get_epic_reference', return_value=(456, "url"))
+    @patch('doit_cli.services.github_linker.get_epic_reference', return_value=(456, "url"))
     def test_link_spec_already_linked(self, mock_get_epic_ref, temp_spec_dir, sample_spec_content):
         """Test linking spec that's already linked to different epic."""
         spec_path = temp_spec_dir / "spec.md"
@@ -444,7 +444,7 @@ class TestUnlinkSpecFromEpic:
 
     @patch.object(GitHubLinkerService, 'get_epic_details')
     @patch.object(GitHubLinkerService, '_update_epic_via_cli')
-    @patch('src.doit_toolkit_cli.services.github_linker.remove_epic_reference')
+    @patch('doit_cli.services.github_linker.remove_epic_reference')
     def test_unlink_success(
         self,
         mock_remove_epic,

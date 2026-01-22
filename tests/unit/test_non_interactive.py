@@ -7,7 +7,7 @@ import os
 import pytest
 from unittest.mock import Mock, patch
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     Workflow,
     WorkflowStep,
 )
@@ -41,7 +41,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_force_non_interactive_flag(self, optional_step):
         """Test that force_non_interactive flag works."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         prompt = InteractivePrompt(force_non_interactive=True)
 
@@ -51,7 +51,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_env_var_forces_non_interactive(self, optional_step, monkeypatch):
         """Test that DOIT_NON_INTERACTIVE env var forces non-interactive."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         monkeypatch.setenv("DOIT_NON_INTERACTIVE", "true")
         prompt = InteractivePrompt()
@@ -62,7 +62,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_env_var_true_values(self, optional_step, monkeypatch):
         """Test various true values for env var."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         for value in ["true", "TRUE", "True", "1", "yes", "YES", "Yes"]:
             monkeypatch.setenv("DOIT_NON_INTERACTIVE", value)
@@ -73,7 +73,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_env_var_false_values(self, optional_step, monkeypatch):
         """Test that other values don't trigger non-interactive."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         for value in ["false", "0", "no", "", "anything"]:
             monkeypatch.setenv("DOIT_NON_INTERACTIVE", value)
@@ -85,7 +85,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_non_interactive_required_no_default_raises(self, required_step):
         """Test that required step without default raises in non-interactive mode."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         prompt = InteractivePrompt(force_non_interactive=True)
 
@@ -96,7 +96,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_non_interactive_choice_uses_default(self):
         """Test that choice prompts use default in non-interactive mode."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         step = WorkflowStep(
             id="choice",
@@ -115,7 +115,7 @@ class TestInteractivePromptNonInteractive:
 
     def test_non_interactive_confirm_uses_default(self):
         """Test that confirmation prompts use default in non-interactive mode."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         prompt = InteractivePrompt(force_non_interactive=True)
 
@@ -148,7 +148,7 @@ class TestWorkflowMixin:
 
     def test_init_workflow_non_interactive(self, simple_workflow):
         """Test initializing workflow in non-interactive mode."""
-        from src.doit_cli.cli.workflow_mixin import WorkflowMixin
+        from doit_cli.cli.workflow_mixin import WorkflowMixin
 
         mixin = WorkflowMixin()
         mixin.init_workflow(non_interactive=True)
@@ -157,7 +157,7 @@ class TestWorkflowMixin:
 
     def test_init_workflow_from_env(self, simple_workflow, monkeypatch):
         """Test initializing workflow with env var."""
-        from src.doit_cli.cli.workflow_mixin import WorkflowMixin
+        from doit_cli.cli.workflow_mixin import WorkflowMixin
 
         monkeypatch.setenv("DOIT_NON_INTERACTIVE", "true")
         mixin = WorkflowMixin()
@@ -167,7 +167,7 @@ class TestWorkflowMixin:
 
     def test_execute_workflow_without_init_raises(self, simple_workflow):
         """Test that executing without init raises error."""
-        from src.doit_cli.cli.workflow_mixin import WorkflowMixin
+        from doit_cli.cli.workflow_mixin import WorkflowMixin
 
         mixin = WorkflowMixin()
 
@@ -180,7 +180,7 @@ class TestValidateRequiredDefaults:
 
     def test_returns_empty_when_all_have_defaults(self):
         """Test that no issues found when all required have defaults."""
-        from src.doit_cli.cli.workflow_mixin import validate_required_defaults
+        from doit_cli.cli.workflow_mixin import validate_required_defaults
 
         workflow = Workflow(
             id="test",
@@ -204,7 +204,7 @@ class TestValidateRequiredDefaults:
 
     def test_returns_missing_required_without_default(self):
         """Test that required steps without defaults are flagged."""
-        from src.doit_cli.cli.workflow_mixin import validate_required_defaults
+        from doit_cli.cli.workflow_mixin import validate_required_defaults
 
         workflow = Workflow(
             id="test",
@@ -247,7 +247,7 @@ class TestCreateNonInteractiveWorkflow:
 
     def test_applies_overrides_to_required_steps(self):
         """Test that overrides are applied to required steps without defaults."""
-        from src.doit_cli.cli.workflow_mixin import create_non_interactive_workflow
+        from doit_cli.cli.workflow_mixin import create_non_interactive_workflow
 
         original = Workflow(
             id="test",
@@ -272,7 +272,7 @@ class TestCreateNonInteractiveWorkflow:
 
     def test_preserves_existing_defaults(self):
         """Test that existing defaults are preserved."""
-        from src.doit_cli.cli.workflow_mixin import create_non_interactive_workflow
+        from doit_cli.cli.workflow_mixin import create_non_interactive_workflow
 
         original = Workflow(
             id="test",
@@ -299,7 +299,7 @@ class TestCreateNonInteractiveWorkflow:
 
     def test_preserves_workflow_metadata(self):
         """Test that workflow metadata is preserved."""
-        from src.doit_cli.cli.workflow_mixin import create_non_interactive_workflow
+        from doit_cli.cli.workflow_mixin import create_non_interactive_workflow
 
         original = Workflow(
             id="test-id",
@@ -331,7 +331,7 @@ class TestTTYDetection:
 
     def test_non_tty_stdin_uses_non_interactive(self):
         """Test that non-TTY stdin triggers non-interactive mode."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         with patch("sys.stdin.isatty", return_value=False):
             prompt = InteractivePrompt()
@@ -339,7 +339,7 @@ class TestTTYDetection:
 
     def test_tty_stdin_is_interactive(self):
         """Test that TTY stdin allows interactive mode."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         with patch("sys.stdin.isatty", return_value=True):
             prompt = InteractivePrompt()
@@ -347,7 +347,7 @@ class TestTTYDetection:
 
     def test_force_flag_overrides_tty(self):
         """Test that force flag overrides TTY detection."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         with patch("sys.stdin.isatty", return_value=True):
             prompt = InteractivePrompt(force_non_interactive=True)

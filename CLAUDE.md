@@ -55,6 +55,13 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based (`.doit/memory/roadmap.md` for roadmap data, spec frontmatter for link metadata) (040-spec-github-linking)
 - Python 3.11+ + Typer (CLI), Rich (terminal output), httpx (HTTP client), pytest (testing) (041-milestone-generation)
 - File-based markdown in `.doit/memory/roadmap.md` and `.doit/memory/completed_roadmap.md` (041-milestone-generation)
+- Python 3.11+ + Typer (CLI), Rich (terminal output), PyYAML (configuration), watchdog (file monitoring) (042-team-collaboration)
+- File-based YAML in `.doit/config/team.yaml`, JSON in `.doit/state/`, markdown in `.doit/memory/` (042-team-collaboration)
+- Python 3.11+ (from constitution) + Typer, Rich, httpx, pytest (from constitution) (043-unified-cli)
+- File-based markdown (no database) (043-unified-cli)
+- Python 3.11+ + Typer (CLI), Rich (output), httpx (HTTP client), pytest (testing) (044-git-provider-abstraction)
+- File-based (`.doit/config/provider.yaml` for provider settings) (044-git-provider-abstraction)
+- Python 3.11+ + Typer (CLI), Rich (terminal formatting), readchar (keyboard input) (046-constitution-tech-stack-split)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -74,9 +81,10 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
-- 041-milestone-generation: Added Python 3.11+ + Typer (CLI), Rich (terminal output), httpx (HTTP client), pytest (testing)
-- 040-spec-github-linking: Added Python 3.11+ (per constitution) + Typer (CLI framework), Rich (terminal output), httpx (GitHub API client)
-- 039-github-roadmap-sync: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal output), httpx (HTTP client)
+- 046-constitution-tech-stack-split: Added Python 3.11+ + Typer (CLI), Rich (terminal formatting), readchar (keyboard input)
+- 044-git-provider-abstraction: Added Python 3.11+ + Typer (CLI), Rich (output), httpx (HTTP client), pytest (testing)
+- 043-unified-cli: Added Python 3.11+ (from constitution) + Typer, Rich, httpx, pytest (from constitution)
+
 
 
 <!-- MANUAL ADDITIONS START -->

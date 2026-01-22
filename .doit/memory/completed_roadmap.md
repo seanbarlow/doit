@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` | Auto-create GitHub milestones for priority levels (P1-P4), assign epics to milestones, close completed milestones, --dry-run support, 21 tasks (100% complete), 1,327 tests passed |
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
 | Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` | GitHub epic state display (open/closed), synced with roadmap items, part of GitHub integration |
 | Auto-create GitHub Epics from Roadmap Items | P3 | 2026-01-21 | `039-github-roadmap-sync` | `doit roadmapit add` creates GitHub epics with priority labels, descriptions, and custom labels |
@@ -52,10 +53,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 18
+- **Total Items Completed**: 19
 - **P1 Items Completed**: 4
 - **P2 Items Completed**: 11
-- **P3 Items Completed**: 3
+- **P3 Items Completed**: 4
 - **P4 Items Completed**: 1
 - **Other**: 1 (documentation audit)
 

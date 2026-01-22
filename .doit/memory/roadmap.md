@@ -61,9 +61,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Template diff on version updates
   - **Rationale**: Show diff view when unified templates are updated to help users understand changes
 
-- [ ] GitHub Milestone Generation from Priorities
-  - **Rationale**: Automatically create GitHub milestones for each roadmap priority level (P1, P2, P3, P4) and assign epics to appropriate milestones. Provides GitHub-native view of roadmap priorities and enables team visibility through GitHub interface. Builds on recent GitHub integration momentum (039, 040).
-  - **Why promoted from P4**: Completes the GitHub integration ecosystem started with epic sync and auto-linking. Natural next step to organize epics into milestones by priority.
 
 ### P4 - Low Priority (Nice to Have)
 

@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-22 (Updated: Synced completed items, released v0.1.11)
+**Last Updated**: 2026-01-22 (Added: Azure DevOps provider support)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -22,7 +22,8 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
+- [ ] Azure DevOps git provider support `[045-azure-devops-provider]`
+  - **Rationale**: Enable users to select Azure DevOps as an alternative to GitHub for git operations, expanding enterprise adoption and supporting teams using Microsoft's DevOps platform
 
 ### P3 - Medium Priority (Valuable)
 
@@ -54,6 +55,12 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Template diff on version updates
   - **Rationale**: Show diff view when unified templates are updated to help users understand changes
+
+- [ ] Git provider configuration wizard
+  - **Rationale**: Interactive setup wizard to configure authentication and default settings for each git provider (GitHub, Azure DevOps, GitLab)
+
+- [ ] GitLab git provider support
+  - **Rationale**: Support GitLab as a git provider option, enabling teams using GitLab for source control and CI/CD
 
 ### P4 - Low Priority (Nice to Have)
 

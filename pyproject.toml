@@ -1,6 +1,6 @@
 [project]
 name = "doit-toolkit-cli"
-version = "0.1.9"
+version = "0.1.11"
 description = "Doit CLI - A tool to bootstrap your projects for Spec-Driven Development (SDD)."
 readme = "README.md"
 license = {text = "MIT"}
@@ -55,7 +55,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/doit_cli"]
+packages = ["src/doit_cli", "src/doit_toolkit_cli"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

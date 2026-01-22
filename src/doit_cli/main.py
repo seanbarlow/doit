@@ -12,6 +12,7 @@ from .cli.memory_command import memory_app
 from .cli.roadmapit_command import app as roadmapit_app
 from .cli.status_command import status_command
 from .cli.sync_prompts_command import sync_prompts_command
+from .cli.team_command import app as team_app
 from .cli.validate_command import validate_command
 from .cli.verify_command import verify_command
 from .cli.xref_command import xref_app
@@ -39,6 +40,7 @@ app.add_typer(fixit_app, name="fixit")
 app.add_typer(hooks_app, name="hooks")
 app.add_typer(memory_app, name="memory")
 app.add_typer(roadmapit_app, name="roadmapit")
+app.add_typer(team_app, name="team")
 app.add_typer(xref_app, name="xref")
 
 

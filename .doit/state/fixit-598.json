@@ -1,0 +1,95 @@
+{
+  "issue_id": 598,
+  "issue_title": "[Bug]: CLI error",
+  "issue_url": "https://github.com/seanbarlow/doit/issues/598",
+  "phase": "completed",
+  "branch": "fix/598-cli-error",
+  "created_at": "2026-01-22T15:21:11Z",
+  "updated_at": "2026-01-22T16:20:00Z",
+  "investigation": {
+    "checkpoints": [
+      {
+        "id": "cp-1",
+        "description": "Review error logs and stack traces",
+        "completed": true
+      },
+      {
+        "id": "cp-2",
+        "description": "Identify affected code paths",
+        "completed": true
+      },
+      {
+        "id": "cp-3",
+        "description": "Search for related issues or commits",
+        "completed": true
+      },
+      {
+        "id": "cp-4",
+        "description": "Formulate root cause hypothesis",
+        "completed": true
+      }
+    ],
+    "findings": [
+      {
+        "type": "reproduction_step",
+        "description": "Install doit-toolkit-cli via pip/uv, then run any doit command"
+      },
+      {
+        "type": "affected_file",
+        "description": "pyproject.toml - build configuration missing doit_toolkit_cli package"
+      },
+      {
+        "type": "affected_file",
+        "description": "src/doit_cli/cli/roadmapit_command.py - imports from missing package"
+      },
+      {
+        "type": "confirmed_cause",
+        "description": "pyproject.toml [tool.hatch.build.targets.wheel] only includes 'src/doit_cli' but doit_cli imports from doit_toolkit_cli which is not packaged"
+      }
+    ],
+    "keywords": ["ModuleNotFoundError", "doit_toolkit_cli", "import", "roadmapit_command", "pyproject.toml", "hatch", "wheel"]
+  },
+  "plan": {
+    "root_cause_summary": "The pyproject.toml build configuration only includes 'src/doit_cli' in the wheel package, but doit_cli has dependencies on doit_toolkit_cli which exists in src/doit_toolkit_cli/ but is not included in the distribution.",
+    "proposed_solution": "Add 'src/doit_toolkit_cli' to the packages list in [tool.hatch.build.targets.wheel] section of pyproject.toml.",
+    "files_to_modify": [
+      {
+        "file": "pyproject.toml",
+        "line": 58,
+        "change_type": "modify",
+        "current": "packages = [\"src/doit_cli\"]",
+        "proposed": "packages = [\"src/doit_cli\", \"src/doit_toolkit_cli\"]",
+        "reason": "Include the doit_toolkit_cli package in the wheel distribution"
+      }
+    ],
+    "verification_steps": [
+      "Build the wheel: hatch build",
+      "Inspect wheel contents: unzip -l dist/*.whl | grep doit_toolkit_cli",
+      "Install locally and test: pip install dist/*.whl && doit --help"
+    ],
+    "risk_assessment": "low",
+    "risk_notes": "Single-line configuration change with no functional code changes. The fix adds a missing package to the build; no existing behavior is altered.",
+    "approved_at": "2026-01-22T16:10:00Z"
+  },
+  "implementation": {
+    "started_at": "2026-01-22T16:15:00Z",
+    "completed_at": "2026-01-22T16:15:30Z",
+    "files_modified": [
+      "pyproject.toml"
+    ],
+    "verification_results": {
+      "build_success": true,
+      "wheel_contains_doit_cli": true,
+      "wheel_contains_doit_toolkit_cli": true
+    },
+    "status": "completed"
+  },
+  "checkin": {
+    "commit_hash": "76dd567",
+    "pr_number": 599,
+    "pr_url": "https://github.com/seanbarlow/doit/pull/599",
+    "completed_at": "2026-01-22T16:20:00Z",
+    "pr_merged_at": "2026-01-22T15:30:29Z",
+    "issue_closed": true
+  }
+}

@@ -61,6 +61,7 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based markdown (no database) (043-unified-cli)
 - Python 3.11+ + Typer (CLI), Rich (output), httpx (HTTP client), pytest (testing) (044-git-provider-abstraction)
 - File-based (`.doit/config/provider.yaml` for provider settings) (044-git-provider-abstraction)
+- Python 3.11+ + Typer (CLI), Rich (terminal formatting), readchar (keyboard input) (046-constitution-tech-stack-split)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -80,10 +81,10 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 046-constitution-tech-stack-split: Added Python 3.11+ + Typer (CLI), Rich (terminal formatting), readchar (keyboard input)
 - 044-git-provider-abstraction: Added Python 3.11+ + Typer (CLI), Rich (output), httpx (HTTP client), pytest (testing)
 - 043-unified-cli: Added Python 3.11+ (from constitution) + Typer, Rich, httpx, pytest (from constitution)
 
-- 042-team-collaboration: Added Python 3.11+ + Typer (CLI), Rich (terminal output), PyYAML (configuration), watchdog (file monitoring)
 
 
 <!-- MANUAL ADDITIONS START -->

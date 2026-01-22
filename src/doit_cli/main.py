@@ -9,6 +9,7 @@ from .cli.fixit_command import app as fixit_app
 from .cli.hooks_command import hooks_app
 from .cli.init_command import init_command
 from .cli.memory_command import memory_app
+from .cli.provider_command import app as provider_app
 from .cli.roadmapit_command import app as roadmapit_app
 from .cli.status_command import status_command
 from .cli.sync_prompts_command import sync_prompts_command
@@ -39,6 +40,7 @@ app.add_typer(diagram_app, name="diagram")
 app.add_typer(fixit_app, name="fixit")
 app.add_typer(hooks_app, name="hooks")
 app.add_typer(memory_app, name="memory")
+app.add_typer(provider_app, name="provider")
 app.add_typer(roadmapit_app, name="roadmapit")
 app.add_typer(team_app, name="team")
 app.add_typer(xref_app, name="xref")

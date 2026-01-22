@@ -2,16 +2,26 @@
 
 This module provides the GitHubService class for interacting
 with GitHub issues, epics, milestones, and branches using the gh CLI tool.
+
+Note:
+    This service is maintained for backward compatibility.
+    New code should use the provider abstraction layer instead:
+
+    from doit_cli.services.provider_factory import ProviderFactory
+    provider = ProviderFactory.create()
 """
 
 import json
 import subprocess
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from ..models.fixit_models import GitHubIssue
 from ..models.github_epic import GitHubEpic
 from ..models.milestone import Milestone
 from ..utils.github_auth import has_gh_cli, is_gh_authenticated
+
+if TYPE_CHECKING:
+    from .providers.github import GitHubProvider
 
 
 class GitHubServiceError(Exception):
@@ -46,7 +56,27 @@ class GitHubService:
             timeout: Timeout in seconds for gh CLI commands (default: 30)
         """
         self.timeout = timeout
+        self._provider: Optional["GitHubProvider"] = None
         self._verify_gh_cli()
+
+    def get_provider(self) -> "GitHubProvider":
+        """Get the GitHubProvider instance for provider abstraction operations.
+
+        This method provides access to the new provider abstraction layer
+        while maintaining backward compatibility with existing code.
+
+        Returns:
+            GitHubProvider instance.
+
+        Example:
+            service = GitHubService()
+            provider = service.get_provider()
+            issue = provider.create_issue(IssueCreateRequest(title="Bug"))
+        """
+        if self._provider is None:
+            from .providers.github import GitHubProvider
+            self._provider = GitHubProvider(timeout=self.timeout)
+        return self._provider
 
     def _verify_gh_cli(self) -> None:
         """Verify that gh CLI is available."""

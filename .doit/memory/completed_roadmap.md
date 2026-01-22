@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Team collaboration features (shared memory, notifications) | P4 | 2026-01-22 | `042-team-collaboration` | Git-based sync for constitution/roadmap, change notifications via watchdog, conflict resolution UI, access control (read-only/read-write), 28 tasks (100% complete), 18 integration tests passed |
 | GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` | Auto-create GitHub milestones for priority levels (P1-P4), assign epics to milestones, close completed milestones, --dry-run support, 21 tasks (100% complete), 1,327 tests passed |
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
 | Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` | GitHub epic state display (open/closed), synced with roadmap items, part of GitHub integration |
@@ -32,8 +33,6 @@
 | Git hook integration for workflow enforcement | P2 | 2026-01-15 | `025-git-hooks-workflow` | Pre-commit/push hooks, spec-first validation, bypass logging |
 | Unified template management | P1 | 2026-01-15 | `024-unified-templates` | Single source of truth for commands, eliminates duplicate templates |
 | Multi-agent prompt synchronization | P1 | 2026-01-15 | `023-copilot-prompts-sync` | Consistent prompts across Claude, Copilot agents |
-| Core workflow commands | P1 | 2026-01-10 | — | specit, planit, taskit, implementit, testit, reviewit, checkin |
-
 ---
 
 ## Archive
@@ -45,7 +44,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
-<!-- Older items will be moved here automatically -->
+| Core workflow commands | P1 | 2026-01-10 | — |
 
 </details>
 
@@ -53,11 +52,11 @@
 
 ## Statistics
 
-- **Total Items Completed**: 19
-- **P1 Items Completed**: 4
+- **Total Items Completed**: 20
+- **P1 Items Completed**: 4 (1 archived)
 - **P2 Items Completed**: 11
 - **P3 Items Completed**: 4
-- **P4 Items Completed**: 1
+- **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)
 
 ---

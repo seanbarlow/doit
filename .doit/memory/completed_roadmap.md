@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Git provider configuration wizard | P3 | 2026-01-22 | `047-provider-config-wizard` | Interactive wizard for GitHub/ADO/GitLab auth setup, gh CLI integration, PAT validation, config backup/restore, 28 tasks (100% complete), 1432 tests pass |
 | Constitution and tech stack separation | P2 | 2026-01-22 | `046-constitution-tech-stack-split` | Separated constitution.md from tech-stack.md, cleanup command for migration, context loading optimization, command overrides, 24 tasks (100% complete), 1377 tests pass |
 | Azure DevOps git provider support | P2 | 2026-01-22 | `044-git-provider-abstraction` | *Delivered as part of 044* - Full Azure DevOps REST API implementation, issue/PR/milestone management, PAT authentication, 745 lines |
 | Git provider abstraction layer | P2 | 2026-01-22 | `044-git-provider-abstraction` | Unified interface for GitHub/Azure DevOps/GitLab, provider auto-detection from git remote, 31 tasks (100% complete), full GitHub+ADO implementation, GitLab stub |
@@ -57,10 +58,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 26
+- **Total Items Completed**: 27
 - **P1 Items Completed**: 4 (4 archived)
 - **P2 Items Completed**: 16 (2 archived)
-- **P3 Items Completed**: 4
+- **P3 Items Completed**: 5
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)
 

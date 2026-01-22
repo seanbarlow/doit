@@ -70,6 +70,16 @@ from .search_models import (
     ContentSnippet,
     SearchHistory,
 )
+from .wizard_models import (
+    WizardStep,
+    ValidationResult as WizardValidationResult2,
+    WizardState,
+    WizardResult,
+    ConfigBackup,
+    WizardCancelledError,
+    WizardStepError,
+    BackupNotFoundError,
+)
 
 __all__ = [
     "Agent",
@@ -136,4 +146,13 @@ __all__ = [
     "MemorySource",
     "ContentSnippet",
     "SearchHistory",
+    # Wizard models
+    "WizardStep",
+    "WizardValidationResult2",
+    "WizardState",
+    "WizardResult",
+    "ConfigBackup",
+    "WizardCancelledError",
+    "WizardStepError",
+    "BackupNotFoundError",
 ]

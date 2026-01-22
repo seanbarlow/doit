@@ -55,9 +55,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Template diff on version updates
   - **Rationale**: Show diff view when unified templates are updated to help users understand changes
 
-- [ ] Git provider configuration wizard
-  - **Rationale**: Interactive setup wizard to configure authentication and default settings for each git provider (GitHub, Azure DevOps, GitLab)
-
 - [ ] GitLab git provider support
   - **Rationale**: Support GitLab as a git provider option, enabling teams using GitLab for source control and CI/CD
 

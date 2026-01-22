@@ -96,7 +96,7 @@ Before starting, ensure you have:
 Open your terminal and install Do-It using pip:
 
 ```bash
-pip install doit-cli
+pip install doit-toolkit-cli
 ```
 
 ### Step 1.2: Verify Installation
@@ -110,7 +110,7 @@ doit --version
 You should see output like:
 
 ```text
-doit-cli version 0.1.3
+doit-cli version 0.1.11
 ```
 
 ### Step 1.3: Verify Claude Code
@@ -1236,7 +1236,7 @@ flowchart LR
 
 | Problem | Solution |
 |---------|----------|
-| Command not found | Ensure Do-It is installed: `pip install doit-cli` |
+| Command not found | Ensure Do-It is installed: `pip install doit-toolkit-cli` |
 | Slash command doesn't work | Make sure you're in Claude Code, not terminal |
 | GitHub issues not created | Check `--skip-issues` flag or GitHub authentication |
 | Tests failing | Run `/doit.testit` to see detailed output |

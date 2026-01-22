@@ -27,11 +27,12 @@
 - **Specification-Driven** - Define what you're building before you build it
 - **Auto-Generated Diagrams** - Automatic Mermaid diagrams from specs (user journeys, architecture, ER models, task dependencies, timelines)
 - **Intelligent Roadmapping** - Prioritized roadmaps with P1-P4 system and vision tracking
+- **GitHub Integration** - Auto-create epics from roadmap items, link specs to issues, sync milestones with priorities
 - **Guided Workflows** - Step-by-step interactive initialization with progress tracking, back navigation, and state recovery
 - **Persistent Memory** - All project context stored in version-controlled `.doit/memory/` folder
 - **Opinionated Approach** - Best practices built-in; strong opinions that reduce decision fatigue
 - **AI-Powered** - Works with Claude Code, Cursor, and other AI coding assistants via slash commands
-- **Team-Focused** - Quality gates, code reviews, and collaborative workflows built-in
+- **Team Collaboration** - Git-based sync, change notifications, conflict resolution, and access control
 - **Living Docs** - Automatically organized and indexed project documentation
 
 ## The Problem Do-It Solves
@@ -148,6 +149,11 @@ Run these in your terminal:
 | `doit status` | Show spec status dashboard |
 | `doit xref` | Cross-reference specs and tasks |
 | `doit diagram` | Generate Mermaid diagrams from specs |
+| `doit roadmapit show` | Display roadmap with GitHub epics |
+| `doit roadmapit add` | Add item and create GitHub epic |
+| `doit roadmapit sync-milestones` | Sync GitHub milestones with priorities |
+| `doit team sync` | Sync shared memory files |
+| `doit team status` | Show team sync status |
 
 ## Project Structure
 
@@ -263,7 +269,7 @@ Please include:
 
 ## Status
 
-- **Current Version:** 0.1.8
+- **Current Version:** 0.1.11
 - **Python Support:** 3.11, 3.12
 - **Status:** Beta
 - **Last Updated:** January 2026

@@ -8,6 +8,7 @@ Welcome to the Do-It tutorials! These step-by-step guides will teach you how to 
 |----------|----------|------|
 | [Greenfield Project](01-greenfield-tutorial.md) | Starting a new project from scratch | ~2 hours |
 | [Existing Project](02-existing-project-tutorial.md) | Adding Do-It to an existing codebase | ~90 minutes |
+| [Team Collaboration](03-team-collaboration-tutorial.md) | Setting up multi-developer workflows | ~45 minutes |
 | [Creating Workflows](creating-workflows.md) | Building custom interactive workflows | ~60 minutes |
 
 ## Tutorial Overview
@@ -28,7 +29,7 @@ Welcome to the Do-It tutorials! These step-by-step guides will teach you how to 
 - Complete features with `/doit.checkin`
 
 **Prerequisites**:
-- Do-It CLI installed (`pip install doit-cli`)
+- Do-It CLI installed (`pip install doit-toolkit-cli`)
 - Git installed and configured
 - Claude Code or compatible AI IDE
 - GitHub account (optional, for issue/PR creation)
@@ -49,6 +50,25 @@ Welcome to the Do-It tutorials! These step-by-step guides will teach you how to 
 - An existing project (or use our sample Weather API)
 - Do-It CLI installed
 - Git initialized in your project
+
+---
+
+### Tutorial 3: Team Collaboration
+
+**What you'll build**: A shared team environment for collaborative spec-driven development.
+
+**What you'll learn**:
+- Initialize team collaboration with `doit team init`
+- Add and manage team members with permissions
+- Synchronize shared memory files across the team
+- Handle notifications about team changes
+- Resolve conflicts when multiple developers edit the same files
+
+**Prerequisites**:
+- Do-It CLI installed (`pip install doit-toolkit-cli`)
+- An initialized Do-It project
+- A remote Git repository (GitHub, GitLab, Azure DevOps)
+- At least one other team member to collaborate with
 
 ---
 
@@ -102,6 +122,11 @@ flowchart LR
 | `doit status` | Show spec dashboard | Track progress |
 | `doit xref` | Cross-reference traceability | Verify coverage |
 | `doit diagram` | Generate diagrams | After spec updates |
+| `doit roadmapit show` | Display roadmap with GitHub epics | View priorities |
+| `doit roadmapit add` | Add item and create GitHub epic | Add to roadmap |
+| `doit roadmapit sync-milestones` | Sync GitHub milestones | Priority tracking |
+| `doit team sync` | Sync shared memory files | Team collaboration |
+| `doit team status` | Show team sync status | Check collaboration |
 
 ## Need Help?
 

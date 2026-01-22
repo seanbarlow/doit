@@ -36,9 +36,11 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Scripts Cleanup](./features/016-scripts-cleanup.md) | Cleaned up Bash and PowerShell scripts to support only Claude and Copilot... | 2026-01-12 |
 | [Roadmap Template Cleanup](./features/017-roadmap-template-cleanup.md) | Updated roadmap templates to contain placeholder syntax... | 2026-01-13 |
 | [Develop Branch Setup](./features/018-develop-branch-setup.md) | Implemented Gitflow-inspired branching strategy with develop branch... | 2026-01-13 |
+| [DoIt Comprehensive Tutorials](./features/019-doit-tutorials.md) | Greenfield and existing project tutorials with complete workflow examples... | 2026-01-13 |
 | [Constitution Improvements](./features/020-constitution-improvements.md) | Improved `/doit.constitution` with dotfile exclusion and greenfield detection... | 2026-01-13 |
 | [Copilot Prompt File Fix](./features/021-copilot-agent-fix.md) | Updated Copilot prompt files to use `agent: true` specification... | 2026-01-13 |
 | [Documentation Logo Integration](./features/022-docs-logo-integration.md) | Integrated Do-It framework logos into README and documentation... | 2026-01-14 |
+| [GitHub Copilot Prompts Sync](./features/023-copilot-prompts-sync.md) | Synchronize Copilot prompt files with command templates via `doit sync-prompts`... | 2026-01-15 |
 | [Unified Template Management](./features/024-unified-templates.md) | Consolidated command templates into single source of truth... | 2026-01-15 |
 | [Git Hooks Workflow](./features/025-git-hooks-workflow.md) | Git hook integration for spec-driven workflow enforcement... | 2026-01-15 |
 | [AI Context Injection](./features/026-ai-context-injection.md) | Automatic project context loading for AI assistant commands... | 2026-01-15 |
@@ -51,6 +53,14 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Spec-Task Cross References](./features/033-spec-task-crossrefs.md) | Bidirectional traceability between specs and tasks with `doit xref`... | 2026-01-16 |
 | [Bug-Fix Workflow (doit.fixit)](./features/034-fixit-workflow.md) | Structured bug-fix workflow with GitHub integration... | 2026-01-16 |
 | [Auto Mermaid Diagrams](./features/035-auto-mermaid-diagrams.md) | Automatic diagram generation with `doit diagram` command... | 2026-01-16 |
+| [Spec Analytics Dashboard](./features/036-spec-analytics-dashboard.md) | Completion metrics, cycle time analysis, velocity trends... | 2026-01-16 |
+| [Memory Search Query](./features/037-memory-search-query.md) | Keyword search and natural language queries across project context... | 2026-01-16 |
+| [Context Roadmap Summary](./features/038-context-roadmap-summary.md) | Intelligent roadmap summarization for AI context injection... | 2026-01-20 |
+| [GitHub Roadmap Sync](./features/039-github-roadmap-sync.md) | Display GitHub epics in roadmap, auto-create epics, 30-min cache... | 2026-01-21 |
+| [GitHub Issue Auto-linking](./features/040-spec-github-linking.md) | Auto-link specs to GitHub epics with fuzzy matching... | 2026-01-21 |
+| [GitHub Milestone Generation](./features/041-milestone-generation.md) | Auto-create milestones for priority levels, assign epics... | 2026-01-22 |
+| [Team Collaboration](./features/042-team-collaboration.md) | Git-based sync, change notifications, conflict resolution... | 2026-01-22 |
+| [Unified CLI Package](./features/043-unified-cli.md) | Consolidated doit_cli and doit_toolkit_cli into single package... | 2026-01-22 |
 | [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
 
 ## Guides
@@ -67,6 +77,7 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Tutorial Index](./tutorials/index.md) | Overview of Do-It tutorials and learning paths... | 2026-01-14 |
 | [Greenfield Tutorial](./tutorials/01-greenfield-tutorial.md) | Building a new project from scratch with Do-It... | 2026-01-14 |
 | [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) | Adding Do-It to an existing codebase... | 2026-01-14 |
+| [Team Collaboration Tutorial](./tutorials/03-team-collaboration-tutorial.md) | Setting up multi-developer workflows with shared memory... | 2026-01-22 |
 | [Creating Workflows Tutorial](./tutorials/creating-workflows.md) | Build custom interactive workflows... | 2026-01-16 |
 
 ## Templates

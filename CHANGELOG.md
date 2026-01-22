@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-01-22
+
+### Added
+
+- **Unified CLI Package** (#603)
+  - Consolidated `doit_cli` and `doit_toolkit_cli` into single unified package
+  - Merged 17 files (7 models, 4 utils, 5 services, 1 command) into `doit_cli`
+  - Combined two `github_service.py` files into unified service with issue, epic, milestone, and branch operations
+  - Cleaner import structure using `doit_cli.*` paths throughout
+  - All 1345 tests pass with no test logic modifications
+
+- **Team Collaboration Features** (#602)
+  - Git-based sync for constitution and roadmap files across team members
+  - Change notifications via watchdog file monitoring
+  - Conflict resolution UI for handling merge conflicts
+  - Access control with read-only and read-write modes
+  - 28 implementation tasks, 18 integration tests
+
+### Fixed
+
+- **Agent Detection** (#596)
+  - Improved agent detection before updating instruction files
+  - Scripts now correctly detect configured AI agents (Claude, Copilot)
+  - Prevents errors when only one agent is configured
+
+### Changed
+
+- **Package Structure**
+  - `pyproject.toml` now references only `doit_cli` package
+  - Removed `doit_toolkit_cli` directory entirely
+  - Import paths standardized across codebase
+
 ## [0.1.10] - 2026-01-22
 
 ### Added

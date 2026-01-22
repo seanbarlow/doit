@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
-from doit_toolkit_cli.models.github_epic import GitHubEpic
-from doit_toolkit_cli.models.sync_metadata import SyncMetadata
+from ..models.github_epic import GitHubEpic
+from ..models.sync_metadata import SyncMetadata
 
 
 class CacheError(Exception):

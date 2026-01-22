@@ -11,9 +11,9 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
-from doit_toolkit_cli.models.github_epic import GitHubEpic
-from doit_toolkit_cli.models.sync_metadata import SyncMetadata
-from doit_toolkit_cli.services.github_cache_service import (
+from doit_cli.models.github_epic import GitHubEpic
+from doit_cli.models.sync_metadata import SyncMetadata
+from doit_cli.services.github_cache_service import (
     CacheError,
     GitHubCacheService,
 )

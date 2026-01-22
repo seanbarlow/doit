@@ -9,7 +9,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     WorkflowStep,
     StepResponse,
     ValidationResult,
@@ -22,7 +22,7 @@ class TestRequiredValidator:
     @pytest.fixture
     def validator(self):
         """Create a RequiredValidator instance."""
-        from src.doit_cli.services.input_validator import RequiredValidator
+        from doit_cli.services.input_validator import RequiredValidator
 
         return RequiredValidator()
 
@@ -65,7 +65,7 @@ class TestPathExistsValidator:
     @pytest.fixture
     def validator(self):
         """Create a PathExistsValidator instance."""
-        from src.doit_cli.services.input_validator import PathExistsValidator
+        from doit_cli.services.input_validator import PathExistsValidator
 
         return PathExistsValidator()
 
@@ -124,7 +124,7 @@ class TestChoiceValidator:
     @pytest.fixture
     def validator(self):
         """Create a ChoiceValidator instance."""
-        from src.doit_cli.services.input_validator import ChoiceValidator
+        from doit_cli.services.input_validator import ChoiceValidator
 
         return ChoiceValidator()
 
@@ -177,7 +177,7 @@ class TestPatternValidator:
     @pytest.fixture
     def email_validator(self):
         """Create a PatternValidator for email."""
-        from src.doit_cli.services.input_validator import PatternValidator
+        from doit_cli.services.input_validator import PatternValidator
 
         return PatternValidator(
             pattern=r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -213,7 +213,7 @@ class TestPatternValidator:
     @pytest.fixture
     def semver_validator(self):
         """Create a PatternValidator for semantic versioning."""
-        from src.doit_cli.services.input_validator import PatternValidator
+        from doit_cli.services.input_validator import PatternValidator
 
         return PatternValidator(pattern=r"^\d+\.\d+\.\d+$")
 
@@ -233,21 +233,21 @@ class TestValidatorRegistry:
 
     def test_get_validator_by_name(self):
         """Test getting a validator by its type name."""
-        from src.doit_cli.services.input_validator import get_validator
+        from doit_cli.services.input_validator import get_validator
 
         validator = get_validator("RequiredValidator")
         assert validator is not None
 
     def test_get_unknown_validator_returns_none(self):
         """Test that unknown validator type returns None."""
-        from src.doit_cli.services.input_validator import get_validator
+        from doit_cli.services.input_validator import get_validator
 
         validator = get_validator("UnknownValidator")
         assert validator is None
 
     def test_register_custom_validator(self):
         """Test registering a custom validator."""
-        from src.doit_cli.services.input_validator import (
+        from doit_cli.services.input_validator import (
             InputValidator,
             register_validator,
             get_validator,
@@ -278,7 +278,7 @@ class TestCompositeValidation:
 
     def test_chain_validators(self, step):
         """Test that validators can be chained."""
-        from src.doit_cli.services.input_validator import (
+        from doit_cli.services.input_validator import (
             RequiredValidator,
             PatternValidator,
             chain_validators,
@@ -319,7 +319,7 @@ class TestContextAwareValidation:
 
     def test_validator_can_access_previous_responses(self, step):
         """Test that validators can access previous step responses."""
-        from src.doit_cli.services.input_validator import InputValidator
+        from doit_cli.services.input_validator import InputValidator
 
         class MatchPreviousValidator(InputValidator):
             def __init__(self, previous_step_id: str):

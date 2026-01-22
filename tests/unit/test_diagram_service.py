@@ -4,8 +4,8 @@ import pytest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from src.doit_cli.models.diagram_models import DiagramType, GeneratedDiagram, ValidationResult
-from src.doit_cli.services.diagram_service import DiagramService
+from doit_cli.models.diagram_models import DiagramType, GeneratedDiagram, ValidationResult
+from doit_cli.services.diagram_service import DiagramService
 
 
 @pytest.fixture

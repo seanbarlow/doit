@@ -2,13 +2,13 @@
 
 import pytest
 
-from src.doit_cli.models.diagram_models import (
+from doit_cli.models.diagram_models import (
     Cardinality,
     EntityAttribute,
     EntityRelationship,
     ParsedEntity,
 )
-from src.doit_cli.services.er_diagram_generator import ERDiagramGenerator
+from doit_cli.services.er_diagram_generator import ERDiagramGenerator
 
 
 @pytest.fixture

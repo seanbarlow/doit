@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     Workflow,
     WorkflowStep,
     WorkflowState,
@@ -23,7 +23,7 @@ class TestWorkflowEngineStart:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         return WorkflowEngine()
 
@@ -109,7 +109,7 @@ class TestWorkflowEngineExecuteStep:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         engine = WorkflowEngine()
         # Mock the prompt to avoid actual user input
@@ -210,7 +210,7 @@ class TestWorkflowEngineNavigation:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         engine = WorkflowEngine()
         engine.prompt = Mock()
@@ -312,7 +312,7 @@ class TestWorkflowEngineComplete:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         engine = WorkflowEngine()
         engine.progress = Mock()
@@ -382,7 +382,7 @@ class TestWorkflowEngineCancel:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         engine = WorkflowEngine()
         engine.progress = Mock()
@@ -436,7 +436,7 @@ class TestWorkflowEngineRun:
     @pytest.fixture
     def engine(self):
         """Create a WorkflowEngine instance."""
-        from src.doit_cli.services.workflow_engine import WorkflowEngine
+        from doit_cli.services.workflow_engine import WorkflowEngine
 
         engine = WorkflowEngine()
         engine.prompt = Mock()

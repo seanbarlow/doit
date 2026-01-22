@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.doit_cli.services.user_story_parser import UserStoryParser
+from doit_cli.services.user_story_parser import UserStoryParser
 
 
 @pytest.fixture

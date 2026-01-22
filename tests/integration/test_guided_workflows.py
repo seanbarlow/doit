@@ -7,15 +7,15 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, Mock
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     Workflow,
     WorkflowStep,
     WorkflowState,
     WorkflowStatus,
 )
-from src.doit_cli.services.workflow_engine import WorkflowEngine
-from src.doit_cli.services.state_manager import StateManager
-from src.doit_cli.prompts.interactive import InteractivePrompt, ProgressDisplay
+from doit_cli.services.workflow_engine import WorkflowEngine
+from doit_cli.services.state_manager import StateManager
+from doit_cli.prompts.interactive import InteractivePrompt, ProgressDisplay
 
 
 class TestWorkflowEndToEnd:
@@ -88,7 +88,7 @@ class TestWorkflowEndToEnd:
         engine.prompt.prompt_choice.return_value = "vue"
 
         # Simulate skip navigation
-        from src.doit_cli.models.workflow_models import NavigationCommand
+        from doit_cli.models.workflow_models import NavigationCommand
 
         def prompt_side_effect(step, validator=None):
             if step.id == "description":
@@ -142,7 +142,7 @@ class TestWorkflowRecovery:
         state.status = WorkflowStatus.RUNNING
 
         # Simulate partial completion
-        from src.doit_cli.models.workflow_models import StepResponse
+        from doit_cli.models.workflow_models import StepResponse
 
         state.responses["step1"] = StepResponse(step_id="step1", value="value1")
         state.current_step = 1
@@ -168,7 +168,7 @@ class TestWorkflowRecovery:
             current_step=1,
             status=WorkflowStatus.INTERRUPTED,
         )
-        from src.doit_cli.models.workflow_models import StepResponse
+        from doit_cli.models.workflow_models import StepResponse
 
         interrupted_state.responses["step1"] = StepResponse(
             step_id="step1",
@@ -274,7 +274,7 @@ class TestWorkflowValidation:
         engine.progress = Mock()
 
         # First invalid, then valid
-        from src.doit_cli.models.workflow_models import ValidationResult
+        from doit_cli.models.workflow_models import ValidationResult
 
         validation_results = [
             ValidationResult.failure("Invalid email"),

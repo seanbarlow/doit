@@ -1,7 +1,7 @@
 """Unit tests for fuzzy string matching algorithm."""
 
 import pytest
-from src.doit_toolkit_cli.utils.fuzzy_match import (
+from doit_cli.utils.fuzzy_match import (
     calculate_similarity,
     find_best_match,
     find_all_matches,

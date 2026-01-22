@@ -6,9 +6,9 @@ with GitHub epics, matching by feature branch reference and preserving local dat
 
 from typing import List, Optional
 
-from doit_toolkit_cli.models.github_epic import GitHubEpic
-from doit_toolkit_cli.models.roadmap import RoadmapItem
-from doit_toolkit_cli.utils.priority_mapper import map_labels_to_priority
+from ..models.github_epic import GitHubEpic
+from ..models.roadmap import RoadmapItem
+from ..utils.priority_mapper import map_labels_to_priority
 
 
 class RoadmapMergeService:

@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.doit_cli.services.architecture_generator import ArchitectureGenerator, ComponentInfo
+from doit_cli.services.architecture_generator import ArchitectureGenerator, ComponentInfo
 
 
 @pytest.fixture

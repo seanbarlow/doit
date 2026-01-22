@@ -9,16 +9,16 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-from doit_toolkit_cli.models.roadmap import RoadmapItem
-from doit_toolkit_cli.models.sync_metadata import SyncMetadata
-from doit_toolkit_cli.services.github_service import (
+from ..models.roadmap import RoadmapItem
+from ..models.sync_metadata import SyncMetadata
+from ..services.github_service import (
     GitHubService,
     GitHubAuthError,
     GitHubAPIError,
 )
-from doit_toolkit_cli.services.github_cache_service import GitHubCacheService, CacheError
-from doit_toolkit_cli.services.roadmap_merge_service import RoadmapMergeService
-from doit_toolkit_cli.utils.github_auth import get_github_config_status, get_repository_name
+from ..services.github_cache_service import GitHubCacheService, CacheError
+from ..services.roadmap_merge_service import RoadmapMergeService
+from ..utils.github_auth import get_github_config_status, get_repository_name
 
 app = typer.Typer(help="Manage project roadmap with GitHub epic integration")
 console = Console()
@@ -429,8 +429,8 @@ def sync_milestones(
     """
     try:
         from datetime import datetime
-        from doit_toolkit_cli.models.sync_operation import SyncOperation
-        from doit_toolkit_cli.services.milestone_service import MilestoneService
+        from ..models.sync_operation import SyncOperation
+        from ..services.milestone_service import MilestoneService
 
         if dry_run:
             console.print("\n🔍 [bold yellow]DRY RUN - No changes will be made[/bold yellow]\n")

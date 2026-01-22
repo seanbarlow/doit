@@ -6,7 +6,7 @@ Tests the interactive prompting functionality for guided workflows.
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     WorkflowStep,
     ValidationResult,
     NavigationCommand,
@@ -19,7 +19,7 @@ class TestInteractivePrompt:
     @pytest.fixture
     def prompt(self):
         """Create an InteractivePrompt instance with interactive mode enabled."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         p = InteractivePrompt()
         # Patch _is_interactive to return True for testing
@@ -208,7 +208,7 @@ class TestInteractivePromptIntegration:
     @pytest.fixture
     def prompt(self):
         """Create an InteractivePrompt instance with interactive mode enabled."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         p = InteractivePrompt()
         # Patch _is_interactive to return True for testing
@@ -217,7 +217,7 @@ class TestInteractivePromptIntegration:
 
     def test_non_tty_uses_defaults(self):
         """Test that non-TTY environments use defaults automatically."""
-        from src.doit_cli.prompts.interactive import InteractivePrompt
+        from doit_cli.prompts.interactive import InteractivePrompt
 
         # Create a fresh prompt without interactive mode override
         prompt = InteractivePrompt()

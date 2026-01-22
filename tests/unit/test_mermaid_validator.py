@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.doit_cli.models.diagram_models import DiagramType
-from src.doit_cli.services.mermaid_validator import MermaidValidator
+from doit_cli.models.diagram_models import DiagramType
+from doit_cli.services.mermaid_validator import MermaidValidator
 
 
 @pytest.fixture

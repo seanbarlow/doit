@@ -12,14 +12,14 @@ from datetime import datetime
 
 from rich.console import Console
 
-from doit_toolkit_cli.models.milestone import Milestone
-from doit_toolkit_cli.models.priority import PRIORITIES, PRIORITY_LEVELS, get_priority
-from doit_toolkit_cli.models.sync_operation import (
+from ..models.milestone import Milestone
+from ..models.priority import PRIORITIES, PRIORITY_LEVELS, get_priority
+from ..models.sync_operation import (
     SyncOperation,
     SyncAction,
     SyncStatus,
 )
-from doit_toolkit_cli.services.github_service import GitHubService, GitHubServiceError
+from .github_service import GitHubService, GitHubServiceError
 
 
 class MilestoneService:

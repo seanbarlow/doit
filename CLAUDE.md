@@ -57,6 +57,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based markdown in `.doit/memory/roadmap.md` and `.doit/memory/completed_roadmap.md` (041-milestone-generation)
 - Python 3.11+ + Typer (CLI), Rich (terminal output), PyYAML (configuration), watchdog (file monitoring) (042-team-collaboration)
 - File-based YAML in `.doit/config/team.yaml`, JSON in `.doit/state/`, markdown in `.doit/memory/` (042-team-collaboration)
+- Python 3.11+ (from constitution) + Typer, Rich, httpx, pytest (from constitution) (043-unified-cli)
+- File-based markdown (no database) (043-unified-cli)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -76,10 +78,10 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 043-unified-cli: Added Python 3.11+ (from constitution) + Typer, Rich, httpx, pytest (from constitution)
 
 - 042-team-collaboration: Added Python 3.11+ + Typer (CLI), Rich (terminal output), PyYAML (configuration), watchdog (file monitoring)
 - 041-milestone-generation: Added Python 3.11+ + Typer (CLI), Rich (terminal output), httpx (HTTP client), pytest (testing)
-- 040-spec-github-linking: Added Python 3.11+ (per constitution) + Typer (CLI framework), Rich (terminal output), httpx (GitHub API client)
 
 
 <!-- MANUAL ADDITIONS START -->

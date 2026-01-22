@@ -22,8 +22,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Azure DevOps git provider support `[045-azure-devops-provider]`
-  - **Rationale**: Enable users to select Azure DevOps as an alternative to GitHub for git operations, expanding enterprise adoption and supporting teams using Microsoft's DevOps platform
+✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
 
 ### P3 - Medium Priority (Valuable)
 

@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Azure DevOps git provider support | P2 | 2026-01-22 | `044-git-provider-abstraction` | *Delivered as part of 044* - Full Azure DevOps REST API implementation, issue/PR/milestone management, PAT authentication, 745 lines |
 | Git provider abstraction layer | P2 | 2026-01-22 | `044-git-provider-abstraction` | Unified interface for GitHub/Azure DevOps/GitLab, provider auto-detection from git remote, 31 tasks (100% complete), full GitHub+ADO implementation, GitLab stub |
 | Unified CLI package consolidation | P2 | 2026-01-22 | `043-unified-cli` | Merged doit_toolkit_cli into doit_cli, single package structure, 17 files migrated, github_service.py merged, 1345 tests pass, cleaner imports |
 | Team collaboration features (shared memory, notifications) | P4 | 2026-01-22 | `042-team-collaboration` | Git-based sync for constitution/roadmap, change notifications via watchdog, conflict resolution UI, access control (read-only/read-write), 28 tasks (100% complete), 18 integration tests passed |
@@ -31,7 +32,6 @@
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
 | Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` | Validate command with 10 rules, quality scoring, pre-commit hooks, custom rules |
-| AI context injection for commands | P2 | 2026-01-15 | `026-ai-context-injection`, `027-template-context-injection` | Auto-load constitution, roadmap, related specs into command execution |
 
 ---
 
@@ -44,6 +44,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
+| AI context injection for commands | P2 | 2026-01-15 | `026-ai-context-injection`, `027-template-context-injection` |
 | Git hook integration for workflow enforcement | P2 | 2026-01-15 | `025-git-hooks-workflow` |
 | Unified template management | P1 | 2026-01-15 | `024-unified-templates` |
 | Multi-agent prompt synchronization | P1 | 2026-01-15 | `023-copilot-prompts-sync` |
@@ -55,9 +56,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 24
+- **Total Items Completed**: 25
 - **P1 Items Completed**: 4 (4 archived)
-- **P2 Items Completed**: 14 (1 archived)
+- **P2 Items Completed**: 15 (2 archived)
 - **P3 Items Completed**: 4
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)

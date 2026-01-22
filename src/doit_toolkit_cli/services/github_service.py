@@ -9,6 +9,7 @@ import subprocess
 from typing import List, Optional
 
 from doit_toolkit_cli.models.github_epic import GitHubEpic
+from doit_toolkit_cli.models.milestone import Milestone
 from doit_toolkit_cli.utils.github_auth import has_gh_cli, is_gh_authenticated
 
 
@@ -291,3 +292,267 @@ class GitHubService:
             raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
         except (ValueError, IndexError) as e:
             raise GitHubAPIError(f"Failed to parse created issue URL: {e}")
+
+    def get_all_milestones(self, state: str = "open") -> List[Milestone]:
+        """Fetch all GitHub milestones for the repository.
+
+        Args:
+            state: Milestone state to filter by (open, closed, or all). Default: open
+
+        Returns:
+            List of Milestone instances
+
+        Raises:
+            GitHubAuthError: If GitHub authentication is not available
+            GitHubAPIError: If the GitHub API returns an error
+
+        Examples:
+            >>> service = GitHubService()
+            >>> milestones = service.get_all_milestones()
+            >>> len(milestones)
+            4
+        """
+        self._ensure_authenticated()
+
+        try:
+            # Get repository slug first
+            repo_slug = self._get_repo_slug()
+
+            # Fetch milestones via gh API
+            result = subprocess.run(
+                [
+                    "gh",
+                    "api",
+                    f"repos/{repo_slug}/milestones",
+                    "--jq",
+                    ".",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+
+            if result.returncode != 0:
+                if "rate limit" in result.stderr.lower():
+                    raise GitHubAPIError(
+                        "GitHub API rate limit exceeded. Try again later."
+                    )
+                raise GitHubAPIError(f"GitHub CLI error: {result.stderr}")
+
+            # Parse JSON response
+            milestones_data = json.loads(result.stdout)
+
+            # Filter by state if requested
+            if state != "all":
+                milestones_data = [m for m in milestones_data if m["state"] == state]
+
+            # Convert to Milestone instances
+            milestones = []
+            for ms_data in milestones_data:
+                try:
+                    milestone = Milestone(
+                        number=ms_data["number"],
+                        title=ms_data["title"],
+                        description=ms_data.get("description", ""),
+                        state=ms_data["state"],
+                        url=ms_data["html_url"],
+                    )
+                    milestones.append(milestone)
+                except (ValueError, KeyError) as e:
+                    print(f"Warning: Skipping malformed milestone: {e}")
+                    continue
+
+            return milestones
+
+        except subprocess.TimeoutExpired:
+            raise GitHubAPIError(
+                f"GitHub CLI timeout after {self.timeout} seconds."
+            )
+        except json.JSONDecodeError as e:
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+
+    def create_milestone(self, title: str, description: str) -> Milestone:
+        """Create a new GitHub milestone.
+
+        Args:
+            title: Milestone title (e.g., "P1 - Critical")
+            description: Milestone description
+
+        Returns:
+            Created Milestone instance
+
+        Raises:
+            GitHubAuthError: If GitHub authentication is not available
+            GitHubAPIError: If the GitHub API returns an error
+
+        Examples:
+            >>> service = GitHubService()
+            >>> milestone = service.create_milestone(
+            ...     title="P1 - Critical",
+            ...     description="Auto-managed by doit..."
+            ... )
+            >>> milestone.title
+            'P1 - Critical'
+        """
+        self._ensure_authenticated()
+
+        try:
+            # Get repository slug first
+            repo_slug = self._get_repo_slug()
+
+            # Create milestone via gh API
+            result = subprocess.run(
+                [
+                    "gh",
+                    "api",
+                    f"repos/{repo_slug}/milestones",
+                    "--method",
+                    "POST",
+                    "--field",
+                    f"title={title}",
+                    "--field",
+                    f"description={description}",
+                    "--field",
+                    "state=open",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+
+            if result.returncode != 0:
+                if "rate limit" in result.stderr.lower():
+                    raise GitHubAPIError("GitHub API rate limit exceeded")
+                if "422" in result.stderr:
+                    raise GitHubAPIError(
+                        f"Milestone with title '{title}' already exists"
+                    )
+                raise GitHubAPIError(f"Failed to create milestone: {result.stderr}")
+
+            # Parse JSON response
+            ms_data = json.loads(result.stdout)
+
+            # Create Milestone instance
+            return Milestone(
+                number=ms_data["number"],
+                title=ms_data["title"],
+                description=ms_data["description"],
+                state=ms_data["state"],
+                url=ms_data["html_url"],
+            )
+
+        except subprocess.TimeoutExpired:
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+        except json.JSONDecodeError as e:
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+
+    def _get_repo_slug(self) -> str:
+        """Get the repository slug (owner/repo) from git remote.
+
+        Returns:
+            Repository slug in format "owner/repo"
+
+        Raises:
+            GitHubAPIError: If not a GitHub repository or no remote found
+        """
+        try:
+            result = subprocess.run(
+                ["git", "remote", "get-url", "origin"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+
+            if result.returncode != 0:
+                raise GitHubAPIError("Failed to get git remote: Not in a git repository?")
+
+            remote_url = result.stdout.strip()
+
+            # Parse GitHub URL (supports both HTTPS and SSH)
+            # HTTPS: https://github.com/owner/repo.git
+            # SSH: git@github.com:owner/repo.git
+            if "github.com" not in remote_url:
+                raise GitHubAPIError("Not a GitHub repository")
+
+            if remote_url.startswith("git@github.com:"):
+                # SSH format
+                slug = remote_url.replace("git@github.com:", "").replace(".git", "")
+            elif "github.com/" in remote_url:
+                # HTTPS format
+                slug = remote_url.split("github.com/")[1].replace(".git", "")
+            else:
+                raise GitHubAPIError("Unable to parse GitHub repository URL")
+
+            return slug
+
+        except subprocess.TimeoutExpired:
+            raise GitHubAPIError("Git command timeout")
+        except Exception as e:
+            raise GitHubAPIError(f"Failed to get repository slug: {e}")
+
+    def close_milestone(self, milestone_number: int) -> Milestone:
+        """Close a GitHub milestone.
+
+        Args:
+            milestone_number: GitHub milestone number to close
+
+        Returns:
+            Updated Milestone instance
+
+        Raises:
+            GitHubAuthError: If GitHub authentication is not available
+            GitHubAPIError: If the GitHub API returns an error
+
+        Examples:
+            >>> service = GitHubService()
+            >>> milestone = service.close_milestone(7)
+            >>> milestone.state
+            'closed'
+        """
+        self._ensure_authenticated()
+
+        try:
+            # Get repository slug first
+            repo_slug = self._get_repo_slug()
+
+            # Close milestone via gh API PATCH
+            result = subprocess.run(
+                [
+                    "gh",
+                    "api",
+                    f"repos/{repo_slug}/milestones/{milestone_number}",
+                    "--method",
+                    "PATCH",
+                    "--field",
+                    "state=closed",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+
+            if result.returncode != 0:
+                if "rate limit" in result.stderr.lower():
+                    raise GitHubAPIError("GitHub API rate limit exceeded")
+                if "404" in result.stderr:
+                    raise GitHubAPIError(
+                        f"Milestone #{milestone_number} not found"
+                    )
+                raise GitHubAPIError(f"Failed to close milestone: {result.stderr}")
+
+            # Parse JSON response
+            ms_data = json.loads(result.stdout)
+
+            # Create Milestone instance
+            return Milestone(
+                number=ms_data["number"],
+                title=ms_data["title"],
+                description=ms_data.get("description", ""),
+                state=ms_data["state"],
+                url=ms_data["html_url"],
+            )
+
+        except subprocess.TimeoutExpired:
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+        except json.JSONDecodeError as e:
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")

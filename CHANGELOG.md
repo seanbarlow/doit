@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-01-22
+
+### Added
+
+- **GitHub Milestone Generation from Priorities** (#594)
+  - `doit roadmapit sync-milestones` command to create GitHub milestones for priority levels (P1-P4)
+  - Automatic assignment of roadmap epics to corresponding priority milestones
+  - Detection and prompt to close completed priority milestones
+  - `--dry-run` flag to preview milestone sync changes
+  - Milestone titles: "P1 - Critical", "P2 - High Priority", "P3 - Medium Priority", "P4 - Low Priority"
+  - Seamless integration with GitHub via `gh` CLI
+
+- **GitHub Epic Auto-linking in Spec Creation** (#591)
+  - Automatic linking of specs to GitHub epics during `/doit.specit`
+  - Fuzzy matching of spec names to roadmap items (80% threshold)
+  - Bidirectional linking: spec→epic and epic→spec
+  - Interactive epic creation workflow when no epic exists
+  - Priority label propagation from roadmap to GitHub issues
+
+- **GitHub Epic and Issue Integration for Roadmap** (#586)
+  - Display GitHub epic state (open/closed) in roadmap items
+  - `doit roadmapit add` creates GitHub epics with priority labels
+  - Smart epic description generation with rationale
+  - 30-minute cache for GitHub API responses
+  - Custom label support for epics
+
+### Fixed
+
+- **Agent Detection in update-agent-context.sh** (#596)
+  - Fixed errors when only one AI agent (Claude or Copilot) is configured
+  - Added `detect_configured_agents()` function matching Python's AgentDetector logic
+  - Script now only updates instruction files for detected agents
+  - Prevents attempts to create/update CLAUDE.md when only Copilot configured (and vice versa)
+
+- **Context Roadmap Summarization** (#593)
+  - Fixed roadmap being summarized even when under token limit
+  - Summarization now only triggers when roadmap exceeds soft threshold
+  - Improved context efficiency and preservation of roadmap details
+
 ## [0.1.9] - 2026-01-20
 
 ### Added

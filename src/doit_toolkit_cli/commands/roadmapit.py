@@ -407,5 +407,88 @@ def add(
         raise typer.Exit(code=1)
 
 
+@app.command(name="sync-milestones")
+def sync_milestones(
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Preview changes without executing them"
+    ),
+):
+    """Sync roadmap priorities to GitHub milestones.
+
+    Automatically creates GitHub milestones for each roadmap priority level (P1-P4)
+    if they don't exist. Provides GitHub-native view of roadmap priorities.
+
+    Examples:
+        # Sync priorities to GitHub milestones
+        doit roadmapit sync-milestones
+
+        # Preview changes without executing
+        doit roadmapit sync-milestones --dry-run
+    """
+    try:
+        from datetime import datetime
+        from doit_toolkit_cli.models.sync_operation import SyncOperation
+        from doit_toolkit_cli.services.milestone_service import MilestoneService
+
+        if dry_run:
+            console.print("\n🔍 [bold yellow]DRY RUN - No changes will be made[/bold yellow]\n")
+        else:
+            console.print("\n🚀 [bold]Syncing roadmap priorities to GitHub milestones...[/bold]\n")
+
+        # Create sync operation
+        sync_id = f"sync_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        sync_op = SyncOperation(
+            id=sync_id,
+            started_at=datetime.now(),
+            dry_run=dry_run
+        )
+
+        # Initialize services
+        github_service = GitHubService()
+        milestone_service = MilestoneService(github_service, dry_run=dry_run)
+
+        # Create missing milestones
+        console.print("[bold]Creating missing priority milestones...[/bold]")
+        all_milestones = milestone_service.create_missing_milestones(sync_op)
+
+        # Extract epic references from roadmap
+        console.print("\n[bold]Assigning epics to priority milestones...[/bold]")
+        epic_by_priority = milestone_service.extract_epic_references()
+
+        # Assign epics to their corresponding milestones
+        milestone_service.assign_epics_to_milestones(epic_by_priority, all_milestones, sync_op)
+
+        # Mark sync as complete
+        sync_op.completed_at = datetime.now()
+
+        # Display summary
+        console.print(f"\n{sync_op.get_summary()}")
+
+        if sync_op.milestones_created > 0:
+            console.print(f"\n[green]✓ Sync complete![/green]")
+            # Get repo name for URL
+            repo_name = get_repository_name()
+            if repo_name:
+                console.print(f"\nView milestones: https://github.com/{repo_name}/milestones")
+        else:
+            console.print(f"\n[dim]All priority milestones already exist.[/dim]")
+
+    except GitHubAuthError as e:
+        console.print(f"\n[red]✗ GitHub Authentication Error:[/red] {e}")
+        console.print("\n[dim]Run: gh auth login[/dim]")
+        raise typer.Exit(code=1)
+    except GitHubAPIError as e:
+        console.print(f"\n[red]✗ GitHub API Error:[/red] {e}")
+        raise typer.Exit(code=1)
+    except FileNotFoundError as e:
+        console.print(f"\n[red]✗ File Not Found:[/red] {e}")
+        raise typer.Exit(code=1)
+    except Exception as e:
+        console.print(f"\n[red]✗ Error:[/red] {e}")
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

@@ -11,9 +11,13 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from ..models.wizard_models import WizardCancelledError
+from ..services.config_backup_service import ConfigBackupService
 from ..services.provider_config import ProviderConfig
 from ..services.provider_factory import ProviderFactory
+from ..services.provider_validation_service import ProviderValidationService
 from ..services.providers.base import ProviderType
+from ..services.wizard_service import WizardService
 
 app = typer.Typer(
     name="provider",
@@ -232,3 +236,58 @@ def detect_command() -> None:
         console.print(
             "\n[dim]Run 'doit provider configure' to manually select a provider.[/dim]"
         )
+
+
+@app.command(name="wizard")
+def wizard_command(
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-f",
+        help="Skip confirmation when reconfiguring existing provider",
+    ),
+) -> None:
+    """Interactive wizard to configure git provider authentication.
+
+    Guides you step-by-step through configuring your git provider
+    (GitHub, Azure DevOps, or GitLab) with validation and helpful
+    error messages.
+
+    Examples:
+        # Start the wizard
+        doit provider wizard
+
+        # Skip confirmation for existing config
+        doit provider wizard --force
+    """
+    validation_service = ProviderValidationService()
+    backup_service = ConfigBackupService()
+    existing_config = ProviderConfig.load()
+
+    wizard = WizardService(
+        console=console,
+        validation_service=validation_service,
+        backup_service=backup_service,
+        existing_config=existing_config,
+    )
+
+    try:
+        result = wizard.run(force_reconfigure=force)
+
+        if result.cancelled:
+            console.print("\n[yellow]Wizard cancelled.[/yellow]")
+            raise typer.Exit(code=0)
+
+        if not result.success:
+            console.print(f"\n[red]Configuration failed: {result.error_message}[/red]")
+            raise typer.Exit(code=1)
+
+    except WizardCancelledError:
+        wizard.handle_cancellation()
+        console.print("\n[yellow]Wizard cancelled.[/yellow]")
+        raise typer.Exit(code=0)
+
+    except KeyboardInterrupt:
+        wizard.handle_cancellation()
+        console.print("\n[yellow]Wizard interrupted.[/yellow]")
+        raise typer.Exit(code=130)

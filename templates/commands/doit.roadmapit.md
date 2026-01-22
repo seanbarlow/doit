@@ -47,6 +47,8 @@ Extract the operation and details from `$ARGUMENTS`:
 | `add [item]` | Add item to roadmap | `/doit.roadmapit add user authentication` |
 | `defer [item]` | Move item to deferred | `/doit.roadmapit defer social login` |
 | `reprioritize` | Review and change priorities | `/doit.roadmapit reprioritize` |
+| `sync-milestones` | Sync priorities to GitHub milestones | `/doit.roadmapit sync-milestones` |
+| `sync-milestones --dry-run` | Preview milestone sync | `/doit.roadmapit sync-milestones --dry-run` |
 | (empty or `update`) | Interactive update | `/doit.roadmapit` |
 
 If no arguments provided or unrecognized pattern, proceed to step 2 for detection.
@@ -187,6 +189,24 @@ Based on the parsed operation from Step 1:
    - Ask for rationale for the change
 4. Update items in their new sections
 
+**Sync Milestones Operation (`sync-milestones` or `sync-milestones --dry-run`)**:
+
+1. Execute the milestone sync command:
+
+   ```bash
+   doit roadmapit sync-milestones [--dry-run]
+   ```
+
+2. The command will:
+   - Create GitHub milestones for each priority level (P1-P4) if they don't exist
+   - Assign roadmap epics to their corresponding priority milestones
+   - Display a summary of changes made
+3. After sync completes, show:
+   - Milestones created count
+   - Epics assigned count
+   - Link to view milestones on GitHub
+4. **Complete this operation** - Do not proceed to other steps
+
 **Interactive Update (no specific operation)**:
 1. Ask: "What would you like to do?"
    - A. Add a new item
@@ -194,6 +214,7 @@ Based on the parsed operation from Step 1:
    - C. Reprioritize items
    - D. Update the vision statement
    - E. Mark an item as complete (moves to completed_roadmap.md)
+   - F. Sync priorities to GitHub milestones
 2. Execute the selected operation
 
 #### 4.4 Preserve Unmodified Content

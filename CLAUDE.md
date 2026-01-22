@@ -53,6 +53,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-10
 - File-based markdown in `.doit/memory/` + GitHub API (read/write) (039-github-roadmap-sync)
 - Python 3.11+ (per constitution) + Typer (CLI framework), Rich (terminal output), httpx (GitHub API client) (040-spec-github-linking)
 - File-based (`.doit/memory/roadmap.md` for roadmap data, spec frontmatter for link metadata) (040-spec-github-linking)
+- Python 3.11+ + Typer (CLI), Rich (terminal output), httpx (HTTP client), pytest (testing) (041-milestone-generation)
+- File-based markdown in `.doit/memory/roadmap.md` and `.doit/memory/completed_roadmap.md` (041-milestone-generation)
 
 - Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI) + Claude Code slash command system, GitHub MCP server, typer, rich, httpx (001-doit-command-refactor)
 
@@ -72,9 +74,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Markdown (command definitions), Bash 5.x (scripts), Python 3.11+ (CLI): Follow standard conventions
 
 ## Recent Changes
+- 041-milestone-generation: Added Python 3.11+ + Typer (CLI), Rich (terminal output), httpx (HTTP client), pytest (testing)
 - 040-spec-github-linking: Added Python 3.11+ (per constitution) + Typer (CLI framework), Rich (terminal output), httpx (GitHub API client)
 - 039-github-roadmap-sync: Added Python 3.11+ (per constitution) + Typer (CLI), Rich (terminal output), httpx (HTTP client)
-- 038-context-roadmap-summary: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 
 <!-- MANUAL ADDITIONS START -->

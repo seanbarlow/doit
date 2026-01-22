@@ -359,3 +359,125 @@ class TestInitMemoryFilesPreservation:
             # Memory file should be preserved
             assert constitution_file.read_text() == custom_constitution, \
                 "Memory files should be preserved with --update"
+
+
+class TestInitTechStackCreation:
+    """Tests for tech-stack.md creation during init (Feature #046)."""
+
+    def test_init_creates_both_constitution_and_tech_stack(self, project_dir):
+        """Test that init creates both constitution.md and tech-stack.md."""
+        from doit_cli.main import app
+
+        result = runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        assert result.exit_code == 0
+
+        memory_dir = project_dir / ".doit" / "memory"
+        constitution_file = memory_dir / "constitution.md"
+        tech_stack_file = memory_dir / "tech-stack.md"
+
+        assert constitution_file.exists(), "constitution.md should be created"
+        assert tech_stack_file.exists(), "tech-stack.md should be created"
+
+    def test_constitution_has_cross_reference_to_tech_stack(self, project_dir):
+        """Test that constitution.md contains cross-reference to tech-stack.md."""
+        from doit_cli.main import app
+
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        memory_dir = project_dir / ".doit" / "memory"
+        constitution_file = memory_dir / "constitution.md"
+        content = constitution_file.read_text()
+
+        # Check for cross-reference
+        assert "tech-stack.md" in content, \
+            "constitution.md should reference tech-stack.md"
+        assert "See also" in content, \
+            "constitution.md should have 'See also' cross-reference"
+
+    def test_tech_stack_has_cross_reference_to_constitution(self, project_dir):
+        """Test that tech-stack.md contains cross-reference to constitution.md."""
+        from doit_cli.main import app
+
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        memory_dir = project_dir / ".doit" / "memory"
+        tech_stack_file = memory_dir / "tech-stack.md"
+        content = tech_stack_file.read_text()
+
+        # Check for cross-reference
+        assert "constitution.md" in content, \
+            "tech-stack.md should reference constitution.md"
+        assert "See also" in content, \
+            "tech-stack.md should have 'See also' cross-reference"
+
+    def test_tech_stack_has_required_sections(self, project_dir):
+        """Test that tech-stack.md contains required sections."""
+        from doit_cli.main import app
+
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        memory_dir = project_dir / ".doit" / "memory"
+        tech_stack_file = memory_dir / "tech-stack.md"
+        content = tech_stack_file.read_text()
+
+        # Check for required sections
+        assert "## Tech Stack" in content, "tech-stack.md should have Tech Stack section"
+        assert "### Languages" in content, "tech-stack.md should have Languages section"
+        assert "### Frameworks" in content, "tech-stack.md should have Frameworks section"
+        assert "## Infrastructure" in content, "tech-stack.md should have Infrastructure section"
+        assert "## Deployment" in content, "tech-stack.md should have Deployment section"
+
+    def test_constitution_does_not_have_tech_sections(self, project_dir):
+        """Test that constitution.md does NOT contain tech stack sections."""
+        from doit_cli.main import app
+
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        memory_dir = project_dir / ".doit" / "memory"
+        constitution_file = memory_dir / "constitution.md"
+        content = constitution_file.read_text()
+
+        # Constitution should NOT have tech-related H2 sections
+        assert "## Tech Stack" not in content, \
+            "constitution.md should NOT have Tech Stack H2 section"
+        assert "## Infrastructure" not in content, \
+            "constitution.md should NOT have Infrastructure H2 section"
+        assert "## Deployment" not in content, \
+            "constitution.md should NOT have Deployment H2 section"
+
+    def test_update_preserves_tech_stack(self, project_dir):
+        """Test that --update preserves customized tech-stack.md."""
+        from doit_cli.main import app
+
+        # First init
+        runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
+        )
+
+        # Customize tech-stack.md
+        memory_dir = project_dir / ".doit" / "memory"
+        tech_stack_file = memory_dir / "tech-stack.md"
+        custom_tech_stack = "# My Tech Stack\n\n## Languages\nPython 3.11+\n"
+        tech_stack_file.write_text(custom_tech_stack)
+
+        # Run init with --update
+        result = runner.invoke(
+            app, ["init", str(project_dir), "--agent", "claude", "--update", "--yes"]
+        )
+
+        assert result.exit_code == 0
+
+        # tech-stack.md should be preserved
+        assert tech_stack_file.read_text() == custom_tech_stack, \
+            "tech-stack.md should NOT be overwritten by --update"

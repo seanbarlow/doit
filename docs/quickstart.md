@@ -247,7 +247,8 @@ doit context show --format yaml
 
 | Context Source | Description | When Loaded |
 | -------------- | ----------- | ----------- |
-| `constitution.md` | Project principles and tech stack | Always |
+| `constitution.md` | Project principles and governance | Always |
+| `tech-stack.md` | Languages, frameworks, infrastructure | Always |
 | `roadmap.md` | Current priorities (P1-P4 items) | Always |
 | Current spec | Feature specification for active branch | When on feature branch |
 | Related specs | Specifications matching keywords | As relevant |
@@ -257,10 +258,11 @@ doit context show --format yaml
 The context system uses `.doit/context.yaml` for configuration:
 
 ```yaml
-# .doit/context.yaml
+# .doit/config/context.yaml
 max_related_specs: 3      # Maximum related specs to include
 include_roadmap: true     # Include roadmap priorities
 include_constitution: true # Include project principles
+include_tech_stack: true  # Include tech stack details
 ```
 
 Context injection ensures AI assistants understand your project's constraints, goals, and current priorities without manual copy-pasting.

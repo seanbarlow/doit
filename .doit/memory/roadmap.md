@@ -22,8 +22,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Constitution and tech stack separation `[046-constitution-tech-stack-split]` [#605](https://github.com/seanbarlow/doit/issues/605)
-  - **Rationale**: Constitution should focus on core principles, best practices, standards, and governance only. Tech stack and deployment information should live in a dedicated `tech-stack.md` file. Scripts (planit, taskit, research workflows) need to reference the correct file for technical decisions during planning.
+✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
 
 ### P3 - Medium Priority (Valuable)
 

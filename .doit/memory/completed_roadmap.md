@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Constitution and tech stack separation | P2 | 2026-01-22 | `046-constitution-tech-stack-split` | Separated constitution.md from tech-stack.md, cleanup command for migration, context loading optimization, command overrides, 24 tasks (100% complete), 1377 tests pass |
 | Azure DevOps git provider support | P2 | 2026-01-22 | `044-git-provider-abstraction` | *Delivered as part of 044* - Full Azure DevOps REST API implementation, issue/PR/milestone management, PAT authentication, 745 lines |
 | Git provider abstraction layer | P2 | 2026-01-22 | `044-git-provider-abstraction` | Unified interface for GitHub/Azure DevOps/GitLab, provider auto-detection from git remote, 31 tasks (100% complete), full GitHub+ADO implementation, GitLab stub |
 | Unified CLI package consolidation | P2 | 2026-01-22 | `043-unified-cli` | Merged doit_toolkit_cli into doit_cli, single package structure, 17 files migrated, github_service.py merged, 1345 tests pass, cleaner imports |
@@ -56,9 +57,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 25
+- **Total Items Completed**: 26
 - **P1 Items Completed**: 4 (4 archived)
-- **P2 Items Completed**: 15 (2 archived)
+- **P2 Items Completed**: 16 (2 archived)
 - **P3 Items Completed**: 4
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)

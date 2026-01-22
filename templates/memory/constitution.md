@@ -1,5 +1,7 @@
 # [PROJECT_NAME] Constitution
 
+> **See also**: [Tech Stack](tech-stack.md) for languages, frameworks, and deployment details.
+
 <!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Purpose & Goals
@@ -16,57 +18,6 @@
 - Reduce feature specification time by 50%
 - Enable consistent task breakdown across teams
 - Support multiple AI assistants for development -->
-
-## Tech Stack
-
-### Languages
-
-[PRIMARY_LANGUAGE]
-<!-- Example: Python 3.11+ (primary), TypeScript (frontend) -->
-
-### Frameworks
-
-[FRAMEWORKS]
-<!-- Example: FastAPI (API), React (frontend), pytest (testing) -->
-
-### Libraries
-
-[KEY_LIBRARIES]
-<!-- Example: Pydantic (validation), SQLAlchemy (ORM), Rich (CLI) -->
-
-## Infrastructure
-
-### Hosting
-
-[HOSTING_PLATFORM]
-<!-- Example: AWS ECS, Google Cloud Run, Azure Container Apps, Self-hosted -->
-
-### Cloud Provider
-
-[CLOUD_PROVIDER]
-<!-- Example: AWS, GCP, Azure, Multi-cloud, On-premises -->
-
-### Database
-
-[DATABASE]
-<!-- Example: PostgreSQL (primary), Redis (cache), none -->
-
-## Deployment
-
-### CI/CD Pipeline
-
-[CICD_PIPELINE]
-<!-- Example: GitHub Actions, GitLab CI, Jenkins, CircleCI -->
-
-### Deployment Strategy
-
-[DEPLOYMENT_STRATEGY]
-<!-- Example: Blue-green, Rolling, Canary, Manual -->
-
-### Environments
-
-[ENVIRONMENTS]
-<!-- Example: dev, staging, production -->
 
 ## Core Principles
 
@@ -100,19 +51,22 @@
 [PRINCIPLE_5_DESCRIPTION]
 <!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
-## [SECTION_2_NAME]
+## Quality Standards
 
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+[QUALITY_STANDARDS]
+<!-- Example: All code MUST include tests. The test suite uses pytest and MUST pass before any release. -->
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Development Workflow
 
-## [SECTION_3_NAME]
-
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+[DEVELOPMENT_WORKFLOW]
+<!-- Example:
+1. Create feature branch from main
+2. Run /doit.specit to create specification
+3. Run /doit.planit for technical design
+4. Run /doit.taskit for task breakdown
+5. Implement with /doit.implementit
+6. Review with /doit.reviewit
+7. Check in with /doit.checkin -->
 
 ## Governance
 

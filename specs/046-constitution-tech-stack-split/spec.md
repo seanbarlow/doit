@@ -2,7 +2,7 @@
 
 **Feature Branch**: `[046-constitution-tech-stack-split]`
 **Created**: 2026-01-22
-**Status**: Draft
+**Status**: Complete
 **GitHub Epic**: [#605](https://github.com/seanbarlow/doit/issues/605)
 **Input**: User description: "Constitution and tech stack separation - constitution should only have core principles, best practices, standards, and governance; tech-stack.md should have tech stack and deployment information; include a slash command for AI agents to cleanup existing projects"
 

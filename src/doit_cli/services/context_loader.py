@@ -576,7 +576,7 @@ class ContextLoader:
         # Get source configs sorted by priority
         source_configs = [
             (name, self.config.get_source_config(name, self.command))
-            for name in ["constitution", "roadmap", "completed_roadmap", "current_spec", "related_specs"]
+            for name in ["constitution", "tech_stack", "roadmap", "completed_roadmap", "current_spec", "related_specs"]
         ]
         source_configs.sort(key=lambda x: x[1].priority)
 
@@ -594,6 +594,11 @@ class ContextLoader:
 
             if source_name == "constitution":
                 source = self.load_constitution(max_tokens=max_for_source)
+                if source:
+                    sources.append(source)
+                    total_tokens += source.token_count
+            elif source_name == "tech_stack":
+                source = self.load_tech_stack(max_tokens=max_for_source)
                 if source:
                     sources.append(source)
                     total_tokens += source.token_count
@@ -735,6 +740,39 @@ class ContextLoader:
 
         return ContextSource(
             source_type="constitution",
+            path=path,
+            content=truncated_content,
+            token_count=token_count,
+            truncated=was_truncated,
+            original_tokens=original_tokens if was_truncated else None,
+        )
+
+    def load_tech_stack(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+        """Load tech-stack.md if enabled and exists.
+
+        Args:
+            max_tokens: Maximum token count (uses config default if None).
+
+        Returns:
+            ContextSource for tech_stack or None if not available.
+        """
+        max_tokens = max_tokens or self.config.max_tokens_per_source
+        path = self.project_root / ".doit" / "memory" / "tech-stack.md"
+
+        content = self._read_file(path)
+        if content is None:
+            self._log_debug("Tech stack not found")
+            return None
+
+        truncated_content, was_truncated, original_tokens = truncate_content(
+            content, max_tokens, path
+        )
+        token_count = estimate_tokens(truncated_content)
+
+        self._log_debug(f"Loaded tech stack: {token_count} tokens")
+
+        return ContextSource(
+            source_type="tech_stack",
             path=path,
             content=truncated_content,
             token_count=token_count,

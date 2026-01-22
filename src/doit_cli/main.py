@@ -3,6 +3,7 @@
 import typer
 
 from .cli.analytics_command import app as analytics_app
+from .cli.constitution_command import app as constitution_app
 from .cli.context_command import context_app
 from .cli.diagram_command import diagram_app
 from .cli.fixit_command import app as fixit_app
@@ -35,6 +36,7 @@ app.command(name="verify")(verify_command)
 
 # Register subcommand groups
 app.add_typer(analytics_app, name="analytics")
+app.add_typer(constitution_app, name="constitution")
 app.add_typer(context_app, name="context")
 app.add_typer(diagram_app, name="diagram")
 app.add_typer(fixit_app, name="fixit")

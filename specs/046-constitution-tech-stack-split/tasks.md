@@ -119,7 +119,7 @@ gantt
 
 **Purpose**: Verify project structure and dependencies
 
-- [ ] T001 Verify existing project structure matches plan.md source code layout
+- [x] T001 Verify existing project structure matches plan.md source code layout
 
 ---
 
@@ -129,9 +129,9 @@ gantt
 
 **⚠️ CRITICAL**: No user story work can begin until templates are in place
 
-- [ ] T002 [P] Create tech-stack.md template in templates/memory/tech-stack.md with Languages, Frameworks, Libraries, Infrastructure, Deployment sections and cross-reference to constitution.md
-- [ ] T003 [P] Update constitution.md template in templates/memory/constitution.md to remove Tech Stack, Infrastructure, Deployment sections and add cross-reference to tech-stack.md
-- [ ] T004 Update MEMORY_TEMPLATES constant in src/doit_cli/services/template_manager.py to include "tech-stack.md"
+- [x] T002 [P] Create tech-stack.md template in templates/memory/tech-stack.md with Languages, Frameworks, Libraries, Infrastructure, Deployment sections and cross-reference to constitution.md
+- [x] T003 [P] Update constitution.md template in templates/memory/constitution.md to remove Tech Stack, Infrastructure, Deployment sections and add cross-reference to tech-stack.md
+- [x] T004 Update MEMORY_TEMPLATES constant in src/doit_cli/services/template_manager.py to include "tech-stack.md"
 
 **Checkpoint**: Foundation ready - all templates exist with proper cross-references
 
@@ -145,9 +145,9 @@ gantt
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Verify run_init() in src/doit_cli/cli/init_command.py copies tech-stack.md via existing copy_memory_templates() method (should work after T004)
-- [ ] T006 [US1] Manual verification: Create test directory, run `doit init --yes`, confirm both constitution.md and tech-stack.md exist in .doit/memory/
-- [ ] T007 [US1] Add integration test in tests/integration/test_init_command.py to verify both files are created with cross-references
+- [x] T005 [US1] Verify run_init() in src/doit_cli/cli/init_command.py copies tech-stack.md via existing copy_memory_templates() method (should work after T004)
+- [x] T006 [US1] Manual verification: Create test directory, run `doit init --yes`, confirm both constitution.md and tech-stack.md exist in .doit/memory/
+- [x] T007 [US1] Add integration test in tests/integration/test_init_command.py to verify both files are created with cross-references
 
 **Checkpoint**: User Story 1 complete - new projects get separated files
 
@@ -161,12 +161,12 @@ gantt
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Create CleanupResult dataclass in src/doit_cli/models/cleanup_models.py with backup_path, extracted_sections, preserved_sections, unclear_sections, tech_stack_created fields
-- [ ] T009 [US2] Create CleanupService in src/doit_cli/services/cleanup_service.py with TECH_SECTIONS constant, analyze(), create_backup(), and cleanup() methods per research.md algorithm
-- [ ] T010 [US2] Create constitution command in src/doit_cli/cli/constitution_command.py with cleanup subcommand that accepts --merge and --dry-run flags
-- [ ] T011 [US2] Register constitution command in src/doit_cli/cli/main.py using app.add_typer()
-- [ ] T012 [US2] Update templates/commands/doit.constitution.md to document cleanup subcommand usage
-- [ ] T013 [US2] Add unit tests in tests/unit/test_cleanup_service.py for analyze(), create_backup(), and cleanup() methods including edge cases (no tech sections, existing tech-stack.md)
+- [x] T008 [US2] Create CleanupResult dataclass in src/doit_cli/models/cleanup_models.py with backup_path, extracted_sections, preserved_sections, unclear_sections, tech_stack_created fields
+- [x] T009 [US2] Create CleanupService in src/doit_cli/services/cleanup_service.py with TECH_SECTIONS constant, analyze(), create_backup(), and cleanup() methods per research.md algorithm
+- [x] T010 [US2] Create constitution command in src/doit_cli/cli/constitution_command.py with cleanup subcommand that accepts --merge and --dry-run flags
+- [x] T011 [US2] Register constitution command in src/doit_cli/cli/main.py using app.add_typer()
+- [x] T012 [US2] Update templates/commands/doit.constitution.md to document cleanup subcommand usage
+- [x] T013 [US2] Add unit tests in tests/unit/test_cleanup_service.py for analyze(), create_backup(), and cleanup() methods including edge cases (no tech sections, existing tech-stack.md)
 
 **Checkpoint**: User Story 2 complete - existing projects can migrate to separated files
 
@@ -180,9 +180,9 @@ gantt
 
 ### Implementation for User Story 3
 
-- [ ] T014 [P] [US3] Update templates/commands/doit.planit.md to add instruction to read .doit/memory/tech-stack.md for technology decisions
-- [ ] T015 [P] [US3] Update templates/commands/doit.taskit.md to add instruction to reference tech-stack.md for implementation technology choices
-- [ ] T016 [US3] Add fallback logic note in both templates for legacy projects: "If tech-stack.md doesn't exist, check constitution.md for Tech Stack section"
+- [x] T014 [P] [US3] Update templates/commands/doit.planit.md to add instruction to read .doit/memory/tech-stack.md for technology decisions
+- [x] T015 [P] [US3] Update templates/commands/doit.taskit.md to add instruction to reference tech-stack.md for implementation technology choices
+- [x] T016 [US3] Add fallback logic note in both templates for legacy projects: "If tech-stack.md doesn't exist, check constitution.md for Tech Stack section"
 
 **Checkpoint**: User Story 3 complete - AI agents access tech-stack.md during planning
 
@@ -196,12 +196,12 @@ gantt
 
 ### Implementation for User Story 4
 
-- [ ] T017 [US4] Add "tech_stack" entry to SourceConfig.get_defaults() in src/doit_cli/models/context_config.py with priority=2, enabled=True
-- [ ] T018 [US4] Add load_tech_stack() method to ContextLoader in src/doit_cli/services/context_loader.py following pattern of load_constitution()
-- [ ] T019 [US4] Update ContextLoader.load() method to call load_tech_stack() and include result in aggregated context
-- [ ] T020 [US4] Add command overrides in src/doit_cli/models/context_config.py: specit disables tech_stack, constitution command disables tech_stack
-- [ ] T021 [US4] Update templates/config/context.yaml to include tech_stack source configuration and command_overrides for specit and constitution
-- [ ] T022 [US4] Add unit tests in tests/unit/test_context_loader.py for load_tech_stack() method and command-specific overrides
+- [x] T017 [US4] Add "tech_stack" entry to SourceConfig.get_defaults() in src/doit_cli/models/context_config.py with priority=2, enabled=True
+- [x] T018 [US4] Add load_tech_stack() method to ContextLoader in src/doit_cli/services/context_loader.py following pattern of load_constitution()
+- [x] T019 [US4] Update ContextLoader.load() method to call load_tech_stack() and include result in aggregated context
+- [x] T020 [US4] Add command overrides in src/doit_cli/models/context_config.py: specit disables tech_stack, constitution command disables tech_stack
+- [x] T021 [US4] Update templates/config/context.yaml to include tech_stack source configuration and command_overrides for specit and constitution
+- [x] T022 [US4] Add unit tests in tests/unit/test_context_loader.py for load_tech_stack() method and command-specific overrides
 
 **Checkpoint**: User Story 4 complete - context loading supports selective tech-stack loading
 
@@ -211,8 +211,8 @@ gantt
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T023 Run full test suite with pytest and verify all tests pass
-- [ ] T024 [P] Update docs/tutorials if any references to constitution need updating for tech-stack separation
+- [x] T023 Run full test suite with pytest and verify all tests pass
+- [x] T024 [P] Update docs/tutorials if any references to constitution need updating for tech-stack separation
 
 ---
 

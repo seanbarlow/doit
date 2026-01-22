@@ -484,3 +484,102 @@ commands:
         loader2 = ContextLoader(project_root=tmp_path, command="specit")
         context2 = loader2.load()
         assert not context2.has_source("roadmap")
+
+
+class TestContextLoaderTechStack:
+    """Tests for tech-stack loading (Feature #046)."""
+
+    def test_load_tech_stack(self, tmp_path: Path):
+        """Test loading tech-stack.md file."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        tech_stack = memory_dir / "tech-stack.md"
+        tech_stack.write_text("# Tech Stack\n\n## Languages\nPython 3.11+")
+
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_tech_stack()
+
+        assert source is not None
+        assert source.source_type == "tech_stack"
+        assert "Python 3.11" in source.content
+        assert source.token_count > 0
+
+    def test_load_tech_stack_missing(self, tmp_path: Path):
+        """Test loading missing tech-stack returns None."""
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_tech_stack()
+
+        assert source is None
+
+    def test_load_includes_tech_stack(self, tmp_path: Path):
+        """Test that load() includes tech_stack in results."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "tech-stack.md").write_text("# Tech Stack\n\nPython")
+
+        loader = ContextLoader(project_root=tmp_path)
+        context = loader.load()
+
+        assert context.has_source("constitution")
+        assert context.has_source("tech_stack")
+
+    def test_tech_stack_priority(self, tmp_path: Path):
+        """Test tech_stack has priority 2 (after constitution)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "tech-stack.md").write_text("# Tech Stack")
+        (memory_dir / "roadmap.md").write_text("# Roadmap")
+
+        loader = ContextLoader(project_root=tmp_path)
+        context = loader.load()
+
+        # Should be: constitution (1), tech_stack (2), roadmap (3)
+        types = [s.source_type for s in context.sources]
+        const_idx = types.index("constitution")
+        tech_idx = types.index("tech_stack")
+        road_idx = types.index("roadmap")
+        assert const_idx < tech_idx < road_idx
+
+    def test_specit_command_disables_tech_stack(self, tmp_path: Path):
+        """Test that specit command disables tech_stack loading."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "tech-stack.md").write_text("# Tech Stack")
+
+        # Load without command - should have tech_stack
+        loader1 = ContextLoader(project_root=tmp_path)
+        context1 = loader1.load()
+        assert context1.has_source("tech_stack")
+
+        # Load with specit command - should not have tech_stack
+        loader2 = ContextLoader(project_root=tmp_path, command="specit")
+        context2 = loader2.load()
+        assert not context2.has_source("tech_stack")
+
+    def test_constitution_command_disables_tech_stack(self, tmp_path: Path):
+        """Test that constitution command disables tech_stack loading."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "tech-stack.md").write_text("# Tech Stack")
+
+        # Load with constitution command - should not have tech_stack
+        loader = ContextLoader(project_root=tmp_path, command="constitution")
+        context = loader.load()
+        assert context.has_source("constitution")
+        assert not context.has_source("tech_stack")
+
+    def test_tech_stack_display_name(self, tmp_path: Path):
+        """Test tech_stack appears with proper display name in markdown output."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "tech-stack.md").write_text("# Tech Stack\n\nPython")
+
+        loader = ContextLoader(project_root=tmp_path)
+        context = loader.load()
+        markdown = context.to_markdown()
+
+        assert "## Tech Stack" in markdown

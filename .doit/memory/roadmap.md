@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-22 (Added: Constitution/Tech Stack separation)
+**Last Updated**: 2026-01-22 (Completed: GitLab git provider support)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -55,9 +55,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Template diff on version updates
   - **Rationale**: Show diff view when unified templates are updated to help users understand changes
 
-- [ ] GitLab git provider support
-  - **Rationale**: Support GitLab as a git provider option, enabling teams using GitLab for source control and CI/CD
-
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
@@ -79,10 +76,11 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 ## Recent Releases
 
-| Version | Date | Key Changes |
-|---------|------|-------------|
+| Version | Date       | Key Changes                                                                         |
+|---------|------------|-------------------------------------------------------------------------------------|
+| v0.1.12 | 2026-01-22 | Git provider configuration wizard - interactive setup for GitHub/ADO/GitLab (#636)  |
 | v0.1.11 | 2026-01-22 | Fixed CLI ModuleNotFoundError - included `doit_toolkit_cli` in wheel package (#598) |
-| v0.1.10 | 2026-01-22 | GitHub Milestone Generation feature |
+| v0.1.10 | 2026-01-22 | GitHub Milestone Generation feature                                                 |
 
 ---
 

@@ -1,0 +1,91 @@
+{
+  "workflow": {
+    "id": "fixit-595",
+    "issue_id": 595,
+    "branch_name": "fix/595-error-when-writing-ai-instructions-with-only-one-age",
+    "phase": "approved",
+    "started_at": "2026-01-21T19:38:54.000599",
+    "updated_at": "2026-01-21T19:39:55.677527"
+  },
+  "issue": {
+    "number": 595,
+    "title": "Error when writing AI instructions with only one agent configured",
+    "body": "## Description\n\nWhen only Copilot (or only Claude) is configured, the system throws an error trying to write to the non-existent agent instruction file.\n\n## Steps to Reproduce\n\n1. Initialize a project with only Copilot agent: `doit init . --agent copilot`\n2. Run any command that updates AI instructions (e.g., constitution updates, spec creation)\n3. System tries to update CLAUDE.md which doesn't exist\n4. Error is thrown instead of gracefully skipping the missing file\n\n## Expected Behavior\n\nThe system should:\n- Detect which agents are configured using the AgentDetector service\n- Only write instructions to files for configured agents\n- Gracefully skip non-configured agents without errors\n\n## Current Behavior\n\nThe system attempts to write to all potential agent instruction files regardless of which agents are actually configured, causing file-not-found errors.\n\n## Impact\n\n- Users with only one agent configured experience errors\n- Prevents smooth operation in Copilot-only or Claude-only environments\n- Blocks workflows that update AI instructions\n\n## Affected Code\n\n- `scripts/bash/update-agent-context.sh` - Hardcoded paths, doesn't detect agents\n- Any code that writes to agent instruction files without checking agent configuration\n- Need to integrate with existing `AgentDetector` service\n\n## Solution Approach\n\n1. Use `AgentDetector` service to detect configured agents before writing instructions\n2. Only write to instruction files for detected agents\n3. Add graceful error handling for missing files\n4. Update bash scripts to check agent configuration",
+    "state": "open",
+    "labels": [
+      "bug"
+    ]
+  },
+  "investigation_plan": {
+    "id": "inv-9b6c5daf",
+    "workflow_id": "fixit-595",
+    "keywords": [
+      "error",
+      "writing",
+      "instructions",
+      "only",
+      "one",
+      "agent",
+      "configured",
+      "description",
+      "copilot",
+      "claude"
+    ],
+    "checkpoints": [
+      {
+        "id": "cp-e7823f",
+        "title": "Review error logs and stack traces",
+        "completed": true,
+        "notes": ""
+      },
+      {
+        "id": "cp-29781b",
+        "title": "Identify affected code paths",
+        "completed": true,
+        "notes": ""
+      },
+      {
+        "id": "cp-49c9b4",
+        "title": "Search for related issues or commits",
+        "completed": false,
+        "notes": ""
+      },
+      {
+        "id": "cp-a1468a",
+        "title": "Formulate root cause hypothesis",
+        "completed": true,
+        "notes": ""
+      }
+    ],
+    "findings": [
+      {
+        "id": "f-cbb91589",
+        "type": "confirmed_cause",
+        "description": "The update-agent-context.sh bash script has hardcoded paths for CLAUDE_FILE and COPILOT_FILE without checking which agents are actually configured. The update_all_existing_agents() function only checks if files exist, but doesn't use the AgentDetector service to determine which agents should be updated.",
+        "evidence": "",
+        "file_path": null,
+        "line_number": null
+      },
+      {
+        "id": "f-4ad53d47",
+        "type": "affected_file",
+        "description": "scripts/bash/update-agent-context.sh - Lines 62-63 define CLAUDE_FILE and COPILOT_FILE paths, and update_all_existing_agents() at line 585 doesn't integrate with AgentDetector",
+        "evidence": "",
+        "file_path": null,
+        "line_number": null
+      }
+    ],
+    "created_at": "2026-01-21T19:39:17.726009"
+  },
+  "fix_plan": {
+    "id": "plan-12c2bb99",
+    "workflow_id": "fixit-595",
+    "root_cause": "The update-agent-context.sh bash script has hardcoded paths for CLAUDE_FILE and COPILOT_FILE without checking which agents are actually configured. The update_all_existing_agents() function only checks if files exist, but doesn't use the AgentDetector service to determine which agents should be updated.",
+    "proposed_solution": "Apply fix based on confirmed root cause analysis",
+    "risk_level": "low",
+    "status": "approved",
+    "affected_files": [],
+    "created_at": "2026-01-21T19:39:50.790764",
+    "approved_at": null
+  }
+}

@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 from typer.testing import CliRunner
 
-from src.doit_cli.main import app
+from doit_cli.main import app
 
 
 runner = CliRunner()

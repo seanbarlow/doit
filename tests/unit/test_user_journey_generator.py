@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.doit_cli.models.diagram_models import AcceptanceScenario, ParsedUserStory
-from src.doit_cli.services.user_journey_generator import UserJourneyGenerator
+from doit_cli.models.diagram_models import AcceptanceScenario, ParsedUserStory
+from doit_cli.services.user_journey_generator import UserJourneyGenerator
 
 
 @pytest.fixture

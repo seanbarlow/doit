@@ -151,4 +151,4 @@ class GitHubEpic:
 
 
 # Import here to avoid circular dependency
-from doit_toolkit_cli.models.github_feature import GitHubFeature  # noqa: E402
+from .github_feature import GitHubFeature  # noqa: E402

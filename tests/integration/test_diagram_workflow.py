@@ -11,14 +11,14 @@ Tests the full workflow:
 import pytest
 from pathlib import Path
 
-from src.doit_cli.models.diagram_models import DiagramType
-from src.doit_cli.services.diagram_service import DiagramService
-from src.doit_cli.services.user_story_parser import UserStoryParser
-from src.doit_cli.services.entity_parser import EntityParser
-from src.doit_cli.services.user_journey_generator import UserJourneyGenerator
-from src.doit_cli.services.er_diagram_generator import ERDiagramGenerator
-from src.doit_cli.services.mermaid_validator import MermaidValidator
-from src.doit_cli.services.section_parser import SectionParser
+from doit_cli.models.diagram_models import DiagramType
+from doit_cli.services.diagram_service import DiagramService
+from doit_cli.services.user_story_parser import UserStoryParser
+from doit_cli.services.entity_parser import EntityParser
+from doit_cli.services.user_journey_generator import UserJourneyGenerator
+from doit_cli.services.er_diagram_generator import ERDiagramGenerator
+from doit_cli.services.mermaid_validator import MermaidValidator
+from doit_cli.services.section_parser import SectionParser
 
 
 @pytest.fixture

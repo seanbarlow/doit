@@ -15,7 +15,7 @@ from .github_service import GitHubService, GitHubServiceError
 from ..utils.spec_parser import (
     add_epic_reference as add_epic_to_spec,
     remove_epic_reference,
-    get_epic_reference
+    get_epic_reference,
 )
 
 

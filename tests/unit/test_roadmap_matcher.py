@@ -4,7 +4,7 @@ import pytest
 import tempfile
 import shutil
 from pathlib import Path
-from src.doit_toolkit_cli.services.roadmap_matcher import (
+from doit_cli.services.roadmap_matcher import (
     RoadmapMatcherService,
     RoadmapItem,
     MatchResult

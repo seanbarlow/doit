@@ -6,11 +6,11 @@ Tests for Feature 031: Init Workflow Integration
 import pytest
 from pathlib import Path
 
-from src.doit_cli.cli.init_command import (
+from doit_cli.cli.init_command import (
     create_init_workflow,
     map_workflow_responses,
 )
-from src.doit_cli.models.agent import Agent
+from doit_cli.models.agent import Agent
 
 
 class TestCreateInitWorkflow:

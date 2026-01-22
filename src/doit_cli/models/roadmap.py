@@ -98,7 +98,7 @@ class RoadmapItem:
             RoadmapItem instance with source='github'
 
         Examples:
-            >>> from doit_toolkit_cli.models.github_epic import GitHubEpic
+            >>> from doit_cli.models.github_epic import GitHubEpic
             >>> epic = GitHubEpic(
             ...     number=577,
             ...     title="[Epic]: Test",
@@ -155,4 +155,4 @@ class RoadmapItem:
 
 
 # Import at end to avoid circular dependency
-from doit_toolkit_cli.models.github_epic import GitHubEpic  # noqa: E402
+from .github_epic import GitHubEpic  # noqa: E402

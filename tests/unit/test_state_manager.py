@@ -8,7 +8,7 @@ import pytest
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from src.doit_cli.models.workflow_models import (
+from doit_cli.models.workflow_models import (
     WorkflowState,
     WorkflowStatus,
     StepResponse,
@@ -22,7 +22,7 @@ class TestStateManagerSave:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -93,7 +93,7 @@ class TestStateManagerLoad:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -186,7 +186,7 @@ class TestStateManagerDelete:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -224,7 +224,7 @@ class TestStateManagerListInterrupted:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -288,7 +288,7 @@ class TestStateManagerCleanupStale:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -349,7 +349,7 @@ class TestStateManagerGetStatePath:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 
@@ -372,7 +372,7 @@ class TestStateManagerCorruptionHandling:
     @pytest.fixture
     def manager(self, tmp_path):
         """Create a StateManager with temp directory."""
-        from src.doit_cli.services.state_manager import StateManager
+        from doit_cli.services.state_manager import StateManager
 
         return StateManager(state_dir=tmp_path / ".doit/state")
 

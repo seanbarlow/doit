@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Unified CLI package consolidation | P2 | 2026-01-22 | `043-unified-cli` | Merged doit_toolkit_cli into doit_cli, single package structure, 17 files migrated, github_service.py merged, 1345 tests pass, cleaner imports |
 | Team collaboration features (shared memory, notifications) | P4 | 2026-01-22 | `042-team-collaboration` | Git-based sync for constitution/roadmap, change notifications via watchdog, conflict resolution UI, access control (read-only/read-write), 28 tasks (100% complete), 18 integration tests passed |
 | GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` | Auto-create GitHub milestones for priority levels (P1-P4), assign epics to milestones, close completed milestones, --dry-run support, 21 tasks (100% complete), 1,327 tests passed |
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
@@ -52,9 +53,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 20
+- **Total Items Completed**: 21
 - **P1 Items Completed**: 4 (1 archived)
-- **P2 Items Completed**: 11
+- **P2 Items Completed**: 12
 - **P3 Items Completed**: 4
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)

@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-22 (Added: Azure DevOps provider support)
+**Last Updated**: 2026-01-22 (Added: Constitution/Tech Stack separation)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -22,7 +22,8 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
+- [ ] Constitution and tech stack separation `[046-constitution-tech-stack-split]`
+  - **Rationale**: Constitution should focus on core principles, best practices, standards, and governance only. Tech stack and deployment information should live in a dedicated `tech-stack.md` file. Scripts (planit, taskit, research workflows) need to reference the correct file for technical decisions during planning.
 
 ### P3 - Medium Priority (Valuable)
 

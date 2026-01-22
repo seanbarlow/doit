@@ -1,6 +1,6 @@
 ---
 description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
-handoffs: 
+handoffs:
   - label: Build Specification
     agent: doit.doit
     prompt: Implement the feature specification based on the updated constitution. I want to build...
@@ -13,6 +13,33 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+## Cleanup Subcommand
+
+If the user requests "cleanup" or "separate tech stack", use the CLI command:
+
+```bash
+# Preview what would be changed
+doit constitution cleanup --dry-run
+
+# Perform the cleanup (creates backup automatically)
+doit constitution cleanup
+
+# Merge with existing tech-stack.md if it already exists
+doit constitution cleanup --merge
+```
+
+The cleanup command:
+
+- Analyzes constitution.md for tech-stack sections (Tech Stack, Infrastructure, Deployment)
+- Creates a timestamped backup of constitution.md
+- Extracts tech sections to a new tech-stack.md
+- Adds cross-references between both files
+
+After running cleanup, inform the user about the two files:
+
+- `.doit/memory/constitution.md` - Principles, governance, quality standards, workflow
+- `.doit/memory/tech-stack.md` - Languages, frameworks, libraries, infrastructure, deployment
 
 ## Load Project Context
 
@@ -132,22 +159,32 @@ Do not create a new template; always operate on the existing `.doit/memory/const
 
 ## Constitution Reading Utility
 
-Other commands can read and utilize the constitution by:
+Other commands can read and utilize project configuration from two files:
 
-1. **Loading the constitution**: Read `.doit/memory/constitution.md`
-2. **Extracting tech stack**: Parse the Tech Stack section for language, framework, and library information
-3. **Extracting infrastructure**: Parse the Infrastructure section for hosting and cloud provider details
-4. **Extracting deployment**: Parse the Deployment section for CI/CD and environment configuration
-5. **Checking principles**: Parse Core Principles for project constraints and requirements
+**Constitution** (`.doit/memory/constitution.md`):
+
+- Purpose & Goals - Project purpose and success criteria
+- Core Principles - Non-negotiable project rules
+- Quality Standards - Testing and quality requirements
+- Development Workflow - Step-by-step process
+- Governance - Amendment rules and compliance
+
+**Tech Stack** (`.doit/memory/tech-stack.md`):
+
+- Languages - Primary and secondary languages
+- Frameworks - Application frameworks
+- Libraries - Key dependencies
+- Infrastructure - Hosting, cloud provider, database
+- Deployment - CI/CD, strategy, environments
 
 **Usage in other commands**:
 
 ```text
 # At the start of any command that needs project context:
-1. Check if `.doit/memory/constitution.md` exists
-2. If exists, read and parse relevant sections
-3. Use extracted values to inform command behavior (e.g., scaffold uses tech stack, plan uses constraints)
-4. If constitution is incomplete or missing, prompt user or proceed with defaults
+1. Check if `.doit/memory/constitution.md` exists for principles and workflow
+2. Check if `.doit/memory/tech-stack.md` exists for technical decisions
+3. For legacy projects without tech-stack.md, check constitution.md for Tech Stack section
+4. Use extracted values to inform command behavior
 ```
 
 ---

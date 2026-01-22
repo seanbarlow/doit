@@ -41,16 +41,18 @@ class TestSourceConfig:
         sources = SourceConfig.default_sources()
 
         assert "constitution" in sources
+        assert "tech_stack" in sources
         assert "roadmap" in sources
         assert "current_spec" in sources
         assert "related_specs" in sources
         assert "completed_roadmap" in sources
 
         assert sources["constitution"].priority == 1
-        assert sources["roadmap"].priority == 2
-        assert sources["completed_roadmap"].priority == 3
-        assert sources["current_spec"].priority == 4
-        assert sources["related_specs"].priority == 5
+        assert sources["tech_stack"].priority == 2
+        assert sources["roadmap"].priority == 3
+        assert sources["completed_roadmap"].priority == 4
+        assert sources["current_spec"].priority == 5
+        assert sources["related_specs"].priority == 6
         assert sources["related_specs"].max_count == 3
         assert sources["completed_roadmap"].max_count == 5
 
@@ -91,7 +93,10 @@ class TestContextConfig:
         assert config.max_tokens_per_source == 4000
         assert config.total_max_tokens == 16000
         assert "constitution" in config.sources
-        assert config.commands == {}
+        # Default command overrides for specit, constitution, roadmapit
+        assert "specit" in config.commands
+        assert "constitution" in config.commands
+        assert "roadmapit" in config.commands
 
     def test_post_init_fixes_invalid_values(self):
         """Test __post_init__ fixes invalid token values."""

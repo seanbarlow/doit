@@ -38,6 +38,7 @@ WORKFLOW_SCRIPTS = [
 # Memory templates to copy to .doit/memory/
 MEMORY_TEMPLATES = [
     "constitution.md",
+    "tech-stack.md",
     "roadmap.md",
     "completed_roadmap.md",
 ]

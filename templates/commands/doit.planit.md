@@ -36,8 +36,9 @@ doit context show
 
 **For this command specifically**:
 
-- Use tech stack from constitution as baseline for architecture
-- Flag any technology choices that deviate from constitution
+- Read `.doit/memory/tech-stack.md` for technology decisions (languages, frameworks, infrastructure, deployment)
+- If tech-stack.md doesn't exist, check constitution.md for Tech Stack section (legacy format)
+- Flag any technology choices that deviate from tech stack
 - Reference related specifications for integration points
 
 ## Outline
@@ -46,11 +47,12 @@ doit context show
 
 2. **Load context**: Read FEATURE_SPEC and `.doit/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 
-3. **Extract Constitution Tech Stack**:
-   - Read Tech Stack section from constitution.md
+3. **Extract Tech Stack**:
+   - **Primary source**: Read `.doit/memory/tech-stack.md` if it exists
+   - **Fallback**: If tech-stack.md doesn't exist, read Tech Stack/Infrastructure/Deployment sections from constitution.md (legacy format)
    - Extract: PRIMARY_LANGUAGE, FRAMEWORKS, KEY_LIBRARIES
-   - Read Infrastructure section: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
-   - Read Deployment section: CICD_PIPELINE, DEPLOYMENT_STRATEGY
+   - Extract: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
+   - Extract: CICD_PIPELINE, DEPLOYMENT_STRATEGY
    - Store these values for architecture alignment validation
 
 4. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:

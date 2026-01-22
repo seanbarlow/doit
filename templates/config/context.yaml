@@ -37,34 +37,41 @@ total_max_tokens: 16000
 #
 # Available sources:
 #   - constitution: Project principles from .doit/memory/constitution.md
+#   - tech_stack: Technology choices from .doit/memory/tech-stack.md
 #   - roadmap: Project roadmap from .doit/memory/roadmap.md
 #   - current_spec: Feature spec based on current git branch
 #   - related_specs: Similar specs found via content matching
 
 sources:
-  # Project constitution - core principles and architecture decisions
+  # Project constitution - core principles and governance
   # Always loaded first as it provides essential context
   constitution:
     enabled: true
     priority: 1
 
+  # Tech stack - languages, frameworks, infrastructure, deployment
+  # Loaded after constitution for technical decisions
+  tech_stack:
+    enabled: true
+    priority: 2
+
   # Project roadmap - current priorities and upcoming work
   # Helps AI understand project direction
   roadmap:
     enabled: true
-    priority: 2
+    priority: 3
 
   # Current feature specification - detected from git branch
   # Example: branch "026-ai-context" loads specs/026-ai-context/spec.md
   current_spec:
     enabled: true
-    priority: 3
+    priority: 4
 
   # Related specifications - found via content similarity
   # Provides context from similar features
   related_specs:
     enabled: true
-    priority: 4
+    priority: 5
     # Maximum number of related specs to include
     max_count: 3
 
@@ -79,24 +86,28 @@ sources:
 
 commands:
   # specit: Creating new feature specs
-  # Disable related_specs since we're creating something new
+  # Disable tech_stack (focus on principles) and related_specs (creating new)
   specit:
     sources:
+      tech_stack:
+        enabled: false
       related_specs:
         enabled: false
 
   # roadmapit: Updating project roadmap
-  # Disable current_spec as roadmap is project-wide
+  # Disable current_spec and related_specs as roadmap is project-wide
   roadmapit:
     sources:
       current_spec:
         enabled: false
+      related_specs:
+        enabled: false
 
   # constitution: Updating project principles
-  # Only need current constitution for reference
+  # Disable tech_stack (separate file), spec sources not relevant
   constitution:
     sources:
-      roadmap:
+      tech_stack:
         enabled: false
       current_spec:
         enabled: false

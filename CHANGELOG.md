@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-01-22
+
+### Added
+
+- **GitLab Git Provider Support** (#637)
+  - Full GitLab REST API v4 implementation (1035 lines)
+  - Personal Access Token (PAT) authentication with token validation
+  - Issue management: create, read, update, list with label filtering
+  - Merge request management: create, read, list with branch filtering
+  - Milestone management: create, read, update, list with state filtering
+  - Label auto-creation with scoped priority labels (`priority::1` through `priority::4`)
+  - Self-hosted GitLab instance support with configurable host
+  - Comprehensive error handling (401/403/404/429/5xx)
+  - 45 unit tests with 97% requirement coverage
+  - Integration test scaffolding for live API testing
+
+- **GitLab Provider Tutorial**
+  - Step-by-step guide for GitLab configuration (`docs/tutorials/04-gitlab-provider-tutorial.md`)
+  - Personal Access Token creation walkthrough
+  - Provider wizard and manual configuration options
+  - Self-hosted GitLab setup instructions
+  - Troubleshooting guide for common issues
+
+### Changed
+
+- **Documentation Updates**
+  - Added Git Provider Configuration section to quickstart.md
+  - Updated tutorials index with GitLab provider tutorial
+  - Provider comparison table (GitHub, GitLab, Azure DevOps)
+
+## [0.1.12] - 2026-01-22
+
+### Added
+
+- **Git Provider Configuration Wizard** (#636)
+  - Interactive `doit provider wizard` command for setting up git providers
+  - Auto-detection of provider from git remote URL
+  - Support for GitHub, GitLab, and Azure DevOps
+  - Token validation against provider APIs
+  - `gh` CLI integration for GitHub token retrieval
+  - Configuration backup and restore functionality
+  - Provider status command: `doit provider status`
+
+- **Constitution and Tech Stack Separation** (#606)
+  - Separated `tech-stack.md` from `constitution.md` for cleaner organization
+  - `doit constitution cleanup` command for migrating existing projects
+  - Context loading optimization with dedicated tech stack source
+  - Command overrides support in constitution
+  - 24 implementation tasks, 1377 tests pass
+
 ## [0.1.11] - 2026-01-22
 
 ### Added

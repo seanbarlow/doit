@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-01-22
+
+### Fixed
+
+- **doit init missing templates** - Fixed `doit init` and `doit init --update` not copying all bundled templates. The following templates were missing:
+  - Config files: `hooks.yaml` and `validation-rules.yaml` (only `context.yaml` was copied)
+  - Hook templates: `pre-commit.sh`, `pre-push.sh`, `post-commit.sh`, `post-merge.sh` (entire `hooks/` directory was skipped)
+  - Workflow document template: `agent-file-template.md`
+- Added `copy_hook_templates()` method to TemplateManager for git hook scripts
+- Added `copy_workflow_document_templates()` method for workflow document templates
+- `doit init` now correctly copies 36 template files (was 28)
+
 ## [0.1.13] - 2026-01-22
 
 ### Added

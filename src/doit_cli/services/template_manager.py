@@ -46,6 +46,21 @@ MEMORY_TEMPLATES = [
 # Config templates to copy to .doit/config/
 CONFIG_TEMPLATES = [
     "context.yaml",
+    "hooks.yaml",
+    "validation-rules.yaml",
+]
+
+# Hook templates to copy to .doit/hooks/ (git hook scripts)
+HOOK_TEMPLATES = [
+    "pre-commit.sh",
+    "pre-push.sh",
+    "post-commit.sh",
+    "post-merge.sh",
+]
+
+# Workflow document templates (for feature artifacts)
+WORKFLOW_DOCUMENT_TEMPLATES = [
+    "agent-file-template.md",
 ]
 
 
@@ -692,6 +707,102 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         target_dir.mkdir(parents=True, exist_ok=True)
 
         for template_name in CONFIG_TEMPLATES:
+            source_path = source_dir / template_name
+            if not source_path.exists():
+                continue
+
+            target_path = target_dir / template_name
+
+            if target_path.exists():
+                if overwrite:
+                    shutil.copy2(source_path, target_path)
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                shutil.copy2(source_path, target_path)
+                result["created"].append(target_path)
+
+        return result
+
+    def copy_hook_templates(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy git hook templates to target directory.
+
+        These are shell scripts that can be installed as git hooks.
+
+        Args:
+            target_dir: Destination directory (typically .doit/hooks/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        source_dir = self.get_base_template_path() / "hooks"
+        if not source_dir.exists():
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for template_name in HOOK_TEMPLATES:
+            source_path = source_dir / template_name
+            if not source_path.exists():
+                continue
+
+            target_path = target_dir / template_name
+
+            if target_path.exists():
+                if overwrite:
+                    shutil.copy2(source_path, target_path)
+                    result["updated"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                shutil.copy2(source_path, target_path)
+                result["created"].append(target_path)
+
+        return result
+
+    def copy_workflow_document_templates(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy workflow document templates (agent-file-template, etc.) to target directory.
+
+        These are document templates used when generating feature artifacts.
+
+        Args:
+            target_dir: Destination directory (typically .doit/templates/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        source_dir = self.get_base_template_path()
+        if not source_dir.exists():
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for template_name in WORKFLOW_DOCUMENT_TEMPLATES:
             source_path = source_dir / template_name
             if not source_path.exists():
                 continue

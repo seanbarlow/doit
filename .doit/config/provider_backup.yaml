@@ -1,0 +1,46 @@
+backups:
+- backup_id: '20260122_211800'
+  created_at: '2026-01-22T21:18:00.868682+00:00'
+  reason: delete
+  config_data:
+    provider: github
+    auto_detected: true
+    detection_source: git_remote
+    github:
+      auth_method: gh_cli
+- backup_id: '20260122_211800'
+  created_at: '2026-01-22T21:18:00.865816+00:00'
+  reason: keep
+  config_data:
+    provider: github
+    auto_detected: true
+    detection_source: git_remote
+    github:
+      auth_method: gh_cli
+- backup_id: '20260122_211800'
+  created_at: '2026-01-22T21:18:00.856257+00:00'
+  reason: second
+  config_data:
+    provider: github
+    auto_detected: true
+    detection_source: git_remote
+    github:
+      auth_method: gh_cli
+- backup_id: '20260122_211800'
+  created_at: '2026-01-22T21:18:00.853419+00:00'
+  reason: first
+  config_data:
+    provider: github
+    auto_detected: true
+    detection_source: git_remote
+    github:
+      auth_method: gh_cli
+- backup_id: '20260122_211800'
+  created_at: '2026-01-22T21:18:00.846137+00:00'
+  reason: backup_6
+  config_data:
+    provider: github
+    auto_detected: true
+    detection_source: git_remote
+    github:
+      auth_method: gh_cli

@@ -470,6 +470,24 @@ def run_init(
     result.updated_files.extend(config_result.get("updated", []))
     result.skipped_files.extend(config_result.get("skipped", []))
 
+    # Copy hook templates to .doit/hooks/
+    hooks_result = template_manager.copy_hook_templates(
+        target_dir=project.doit_folder / "hooks",
+        overwrite=update or force,
+    )
+    result.created_files.extend(hooks_result.get("created", []))
+    result.updated_files.extend(hooks_result.get("updated", []))
+    result.skipped_files.extend(hooks_result.get("skipped", []))
+
+    # Copy workflow document templates (agent-file-template, etc.) to .doit/templates/
+    doc_templates_result = template_manager.copy_workflow_document_templates(
+        target_dir=project.doit_folder / "templates",
+        overwrite=update or force,
+    )
+    result.created_files.extend(doc_templates_result.get("created", []))
+    result.updated_files.extend(doc_templates_result.get("updated", []))
+    result.skipped_files.extend(doc_templates_result.get("skipped", []))
+
     for agent in agents:
         scaffolder.create_agent_directory(agent)
 

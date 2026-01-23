@@ -12,6 +12,8 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| GitLab git provider support | P3 | 2026-01-22 | `048-gitlab-provider` | Full GitLab REST API v4 implementation, PAT authentication, issue/MR/milestone management, self-hosted support, 26 tasks (100% complete), 45 unit tests pass |
+| Git provider configuration wizard | P3 | 2026-01-22 | `047-provider-config-wizard` | Interactive wizard for GitHub/ADO/GitLab auth setup, gh CLI integration, PAT validation, config backup/restore, 28 tasks (100% complete), 1432 tests pass |
 | Constitution and tech stack separation | P2 | 2026-01-22 | `046-constitution-tech-stack-split` | Separated constitution.md from tech-stack.md, cleanup command for migration, context loading optimization, command overrides, 24 tasks (100% complete), 1377 tests pass |
 | Azure DevOps git provider support | P2 | 2026-01-22 | `044-git-provider-abstraction` | *Delivered as part of 044* - Full Azure DevOps REST API implementation, issue/PR/milestone management, PAT authentication, 745 lines |
 | Git provider abstraction layer | P2 | 2026-01-22 | `044-git-provider-abstraction` | Unified interface for GitHub/Azure DevOps/GitLab, provider auto-detection from git remote, 31 tasks (100% complete), full GitHub+ADO implementation, GitLab stub |
@@ -30,10 +32,6 @@
 | Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
 | Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
 | Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` | Rich/JSON/Markdown output, filtering by status/blocking/recent, validation integration |
-| Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` | Init uses WorkflowEngine, state persistence, resume support, CLI flag skipping |
-| Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` | Step-by-step guidance, validation, progress display, workflow recovery |
-| Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` | Validate command with 10 rules, quality scoring, pre-commit hooks, custom rules |
-
 ---
 
 ## Archive
@@ -45,6 +43,9 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
+| Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` |
+| Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` |
+| Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` |
 | AI context injection for commands | P2 | 2026-01-15 | `026-ai-context-injection`, `027-template-context-injection` |
 | Git hook integration for workflow enforcement | P2 | 2026-01-15 | `025-git-hooks-workflow` |
 | Unified template management | P1 | 2026-01-15 | `024-unified-templates` |
@@ -57,10 +58,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 26
+- **Total Items Completed**: 28
 - **P1 Items Completed**: 4 (4 archived)
-- **P2 Items Completed**: 16 (2 archived)
-- **P3 Items Completed**: 4
+- **P2 Items Completed**: 16 (5 archived)
+- **P3 Items Completed**: 6
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)
 

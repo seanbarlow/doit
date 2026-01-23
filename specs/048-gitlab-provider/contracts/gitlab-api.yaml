@@ -1,0 +1,621 @@
+# GitLab REST API v4 - Endpoints Used by GitLabProvider
+# Reference: https://docs.gitlab.com/ee/api/rest/
+# This is a subset of the full GitLab API documenting only endpoints used by doit
+
+openapi: 3.0.3
+info:
+  title: GitLab REST API v4 (doit subset)
+  version: "4"
+  description: |
+    GitLab REST API endpoints used by the doit CLI GitLabProvider.
+    Base URL: https://gitlab.com/api/v4 (or https://{host}/api/v4 for self-hosted)
+
+servers:
+  - url: https://gitlab.com/api/v4
+    description: GitLab.com
+  - url: https://{host}/api/v4
+    description: Self-hosted GitLab
+    variables:
+      host:
+        default: gitlab.example.com
+        description: Self-hosted GitLab hostname
+
+security:
+  - PersonalAccessToken: []
+
+components:
+  securitySchemes:
+    PersonalAccessToken:
+      type: apiKey
+      in: header
+      name: PRIVATE-TOKEN
+      description: GitLab Personal Access Token with `api` scope
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+
+    Issue:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Global issue ID
+        iid:
+          type: integer
+          description: Project-scoped issue ID
+        title:
+          type: string
+        description:
+          type: string
+        state:
+          type: string
+          enum: [opened, closed]
+        labels:
+          type: array
+          items:
+            type: string
+        milestone:
+          $ref: '#/components/schemas/Milestone'
+        web_url:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    IssueCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        labels:
+          type: string
+          description: Comma-separated label names
+        milestone_id:
+          type: integer
+
+    IssueUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        labels:
+          type: string
+        state_event:
+          type: string
+          enum: [close, reopen]
+        milestone_id:
+          type: integer
+
+    MergeRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        iid:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        state:
+          type: string
+          enum: [opened, closed, merged]
+        source_branch:
+          type: string
+        target_branch:
+          type: string
+        web_url:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+        merged_at:
+          type: string
+          format: date-time
+          nullable: true
+        labels:
+          type: array
+          items:
+            type: string
+
+    MergeRequestCreate:
+      type: object
+      required:
+        - source_branch
+        - target_branch
+        - title
+      properties:
+        source_branch:
+          type: string
+        target_branch:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        labels:
+          type: string
+
+    Milestone:
+      type: object
+      properties:
+        id:
+          type: integer
+        iid:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        state:
+          type: string
+          enum: [active, closed]
+        due_date:
+          type: string
+          format: date
+          nullable: true
+        web_url:
+          type: string
+          format: uri
+
+    MilestoneCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        due_date:
+          type: string
+          format: date
+
+    MilestoneUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        due_date:
+          type: string
+          format: date
+        state_event:
+          type: string
+          enum: [close, activate]
+
+    IssueLink:
+      type: object
+      properties:
+        source_issue:
+          $ref: '#/components/schemas/Issue'
+        target_issue:
+          $ref: '#/components/schemas/Issue'
+        link_type:
+          type: string
+          enum: [relates_to, blocks, is_blocked_by]
+
+    Label:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+        description:
+          type: string
+
+    LabelCreate:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          description: "Hex color code (e.g., #FF0000)"
+        description:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+
+paths:
+  /user:
+    get:
+      summary: Get authenticated user
+      description: Validates token and returns current user info
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /projects/{id}/issues:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: URL-encoded project path (e.g., owner%2Frepo)
+    get:
+      summary: List project issues
+      operationId: listIssues
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [opened, closed, all]
+        - name: labels
+          in: query
+          schema:
+            type: string
+          description: Comma-separated label names
+        - name: milestone
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of issues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+    post:
+      summary: Create a new issue
+      operationId: createIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueCreate'
+      responses:
+        '201':
+          description: Created issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '404':
+          description: Project not found
+
+  /projects/{id}/issues/{issue_iid}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: issue_iid
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a single issue
+      operationId: getIssue
+      responses:
+        '200':
+          description: Issue details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '404':
+          description: Issue not found
+    put:
+      summary: Update an issue
+      operationId: updateIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueUpdate'
+      responses:
+        '200':
+          description: Updated issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+
+  /projects/{id}/issues/{issue_iid}/links:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: issue_iid
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      summary: Create an issue link
+      operationId: createIssueLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - target_project_id
+                - target_issue_iid
+              properties:
+                target_project_id:
+                  type: string
+                target_issue_iid:
+                  type: integer
+                link_type:
+                  type: string
+                  enum: [relates_to, blocks, is_blocked_by]
+                  default: relates_to
+      responses:
+        '201':
+          description: Created link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueLink'
+
+  /projects/{id}/merge_requests:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: List merge requests
+      operationId: listMergeRequests
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [opened, closed, merged, all]
+        - name: source_branch
+          in: query
+          schema:
+            type: string
+        - name: target_branch
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of merge requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MergeRequest'
+    post:
+      summary: Create a merge request
+      operationId: createMergeRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeRequestCreate'
+      responses:
+        '201':
+          description: Created merge request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeRequest'
+
+  /projects/{id}/merge_requests/{mr_iid}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: mr_iid
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a single merge request
+      operationId: getMergeRequest
+      responses:
+        '200':
+          description: Merge request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeRequest'
+
+  /projects/{id}/milestones:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: List milestones
+      operationId: listMilestones
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [active, closed]
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of milestones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Milestone'
+    post:
+      summary: Create a milestone
+      operationId: createMilestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MilestoneCreate'
+      responses:
+        '201':
+          description: Created milestone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+
+  /projects/{id}/milestones/{milestone_id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: milestone_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a single milestone
+      operationId: getMilestone
+      responses:
+        '200':
+          description: Milestone details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+    put:
+      summary: Update a milestone
+      operationId: updateMilestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MilestoneUpdate'
+      responses:
+        '200':
+          description: Updated milestone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+
+  /projects/{id}/labels:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: List labels
+      operationId: listLabels
+      responses:
+        '200':
+          description: List of labels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Label'
+    post:
+      summary: Create a label
+      operationId: createLabel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabelCreate'
+      responses:
+        '201':
+          description: Created label
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+        '409':
+          description: Label already exists

@@ -5,6 +5,7 @@ configuration stored in .doit/config/provider.yaml.
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any, Optional
 
@@ -53,6 +54,9 @@ class ProviderConfig:
         github: GitHub-specific configuration.
         azure_devops: Azure DevOps-specific configuration.
         gitlab: GitLab-specific configuration.
+        validated_at: Timestamp of last successful validation.
+        configured_by: How the configuration was created ("wizard" or "manual").
+        wizard_version: Version of wizard used for configuration.
     """
 
     provider: Optional[ProviderType] = None
@@ -61,6 +65,9 @@ class ProviderConfig:
     github: GitHubConfig = field(default_factory=GitHubConfig)
     azure_devops: AzureDevOpsConfig = field(default_factory=AzureDevOpsConfig)
     gitlab: GitLabConfig = field(default_factory=GitLabConfig)
+    validated_at: Optional[datetime] = None
+    configured_by: Optional[str] = None
+    wizard_version: Optional[str] = None
 
     CONFIG_PATH: Path = Path(".doit/config/provider.yaml")
 
@@ -96,6 +103,19 @@ class ProviderConfig:
 
         config.auto_detected = data.get("auto_detected", False)
         config.detection_source = data.get("detection_source")
+        config.configured_by = data.get("configured_by")
+        config.wizard_version = data.get("wizard_version")
+
+        # Parse validated_at timestamp
+        if "validated_at" in data:
+            validated_str = data["validated_at"]
+            if isinstance(validated_str, str):
+                try:
+                    config.validated_at = datetime.fromisoformat(
+                        validated_str.replace("Z", "+00:00")
+                    )
+                except ValueError:
+                    pass
 
         # Parse GitHub config
         if "github" in data:
@@ -145,6 +165,15 @@ class ProviderConfig:
 
         if self.detection_source:
             data["detection_source"] = self.detection_source
+
+        if self.validated_at:
+            data["validated_at"] = self.validated_at.isoformat()
+
+        if self.configured_by:
+            data["configured_by"] = self.configured_by
+
+        if self.wizard_version:
+            data["wizard_version"] = self.wizard_version
 
         # Save provider-specific config based on selected provider
         if self.provider == ProviderType.GITHUB:

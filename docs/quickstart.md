@@ -315,6 +315,36 @@ git commit --no-verify -m "hotfix: critical production issue"
 > [!WARNING]
 > Use `--no-verify` sparingly. Bypassed commits should be retroactively documented.
 
+## Git Provider Configuration
+
+Do-It integrates with multiple git providers for issue tracking, pull/merge requests, and milestone management.
+
+### Supported Providers
+
+| Provider | Features | Setup |
+|----------|----------|-------|
+| GitHub | Issues, PRs, Milestones | `doit provider wizard` or `GITHUB_TOKEN` |
+| GitLab | Issues, MRs, Milestones | `doit provider wizard` or `GITLAB_TOKEN` |
+| Azure DevOps | Work Items, PRs, Iterations | `doit provider wizard` or `AZURE_DEVOPS_TOKEN` |
+
+### Quick Setup
+
+Run the interactive provider wizard:
+
+```bash
+doit provider wizard
+```
+
+The wizard will:
+1. Auto-detect your provider from the git remote URL
+2. Prompt for your Personal Access Token
+3. Validate the token against the provider API
+4. Save configuration to `.doit/config/provider.yaml`
+
+### Provider-Specific Tutorials
+
+- [GitLab Provider Tutorial](./tutorials/04-gitlab-provider-tutorial.md) - Complete guide for GitLab integration
+
 ## Key Principles
 
 - **Be explicit** about what you're building and why

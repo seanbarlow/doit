@@ -78,9 +78,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 | Version | Date       | Key Changes                                                                         |
 |---------|------------|-------------------------------------------------------------------------------------|
+| v0.1.13 | 2026-01-22 | GitLab Git Provider Support - full REST API implementation, tutorials (#637)        |
 | v0.1.12 | 2026-01-22 | Git provider configuration wizard - interactive setup for GitHub/ADO/GitLab (#636)  |
 | v0.1.11 | 2026-01-22 | Fixed CLI ModuleNotFoundError - included `doit_toolkit_cli` in wheel package (#598) |
-| v0.1.10 | 2026-01-22 | GitHub Milestone Generation feature                                                 |
 
 ---
 

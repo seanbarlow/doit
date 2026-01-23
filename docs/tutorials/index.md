@@ -9,6 +9,7 @@ Welcome to the Do-It tutorials! These step-by-step guides will teach you how to 
 | [Greenfield Project](01-greenfield-tutorial.md) | Starting a new project from scratch | ~2 hours |
 | [Existing Project](02-existing-project-tutorial.md) | Adding Do-It to an existing codebase | ~90 minutes |
 | [Team Collaboration](03-team-collaboration-tutorial.md) | Setting up multi-developer workflows | ~45 minutes |
+| [GitLab Provider](04-gitlab-provider-tutorial.md) | Configuring GitLab integration | ~30 minutes |
 | [Creating Workflows](creating-workflows.md) | Building custom interactive workflows | ~60 minutes |
 
 ## Tutorial Overview
@@ -69,6 +70,24 @@ Welcome to the Do-It tutorials! These step-by-step guides will teach you how to 
 - An initialized Do-It project
 - A remote Git repository (GitHub, GitLab, Azure DevOps)
 - At least one other team member to collaborate with
+
+---
+
+### Tutorial 4: GitLab Provider Configuration
+
+**What you'll build**: Full GitLab integration for your Do-It project.
+
+**What you'll learn**:
+- Create a GitLab Personal Access Token with the right permissions
+- Configure Do-It to use GitLab (gitlab.com or self-hosted)
+- Use the provider wizard for interactive setup
+- Work with GitLab issues and merge requests through Do-It
+- Sync milestones and manage roadmap items
+
+**Prerequisites**:
+- Do-It CLI installed (`pip install doit-toolkit-cli`)
+- A GitLab account with a project
+- Git repository with a GitLab remote
 
 ---
 

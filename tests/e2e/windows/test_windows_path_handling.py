@@ -49,7 +49,7 @@ def test_drive_letter_detection(path_validator):
 @pytest.mark.windows
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
 def test_unc_path_detection(path_validator):
-    """
+    r"""
     Test detection of UNC paths (\\server\share).
 
     Given: A UNC network path
@@ -139,7 +139,7 @@ def test_path_length_limit_260_chars(path_validator):
 @pytest.mark.windows
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
 def test_mixed_path_separators(path_validator, comparison_tools):
-    """
+    r"""
     Test handling of mixed forward/backward slashes in paths.
 
     Given: A path with mixed separators (C:\path/to\file)

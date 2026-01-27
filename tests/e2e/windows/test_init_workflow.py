@@ -132,7 +132,7 @@ def test_init_creates_constitution_with_crlf(temp_project_dir, windows_test_env)
 @pytest.mark.e2e
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
 def test_init_with_absolute_windows_path(temp_project_dir, windows_test_env):
-    """
+    r"""
     Test that 'doit init' works with absolute Windows paths (C:\path\to\dir).
 
     Given: An absolute Windows path with drive letter

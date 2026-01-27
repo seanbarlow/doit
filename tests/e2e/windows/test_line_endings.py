@@ -162,6 +162,18 @@ def test_git_autocrlf_behavior(temp_project_dir):
 
     autocrlf_setting = result.stdout.strip() if result.returncode == 0 else "not set"
 
+    # Configure git user for CI environments
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.com"],
+        cwd=temp_project_dir,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Test User"],
+        cwd=temp_project_dir,
+        capture_output=True,
+    )
+
     # Create a test file
     test_file = temp_project_dir / "test.txt"
     test_file.write_text("Line 1\nLine 2\n", encoding="utf-8")

@@ -63,4 +63,12 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "windows: tests that run only on Windows",
+    "unix: tests that run only on Unix-like systems",
+    "powershell: PowerShell script validation tests",
+    "e2e: end-to-end tests",
+    "slow: tests that take longer than 10 seconds",
+    "ci: tests that should run in CI",
+]
 

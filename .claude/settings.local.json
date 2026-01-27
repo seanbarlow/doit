@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh -Command '$PSVersionTable.PSVersion')",
+      "Bash(doit --help:*)",
+      "Bash(export PATH=\"/c/Program Files/PowerShell/7:$PATH\")"
+    ]
+  }
+}

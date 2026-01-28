@@ -66,8 +66,12 @@ python_functions = ["test_*"]
 markers = [
     "windows: tests that run only on Windows",
     "unix: tests that run only on Unix-like systems",
+    "macos: tests that run only on macOS",
     "powershell: PowerShell script validation tests",
     "e2e: end-to-end tests",
+    "filesystem: filesystem-specific tests",
+    "bsd: tests BSD utility compatibility",
+    "unicode: tests Unicode handling",
     "slow: tests that take longer than 10 seconds",
     "ci: tests that should run in CI",
 ]

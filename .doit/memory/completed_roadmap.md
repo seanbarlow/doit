@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Windows E2E testing infrastructure | P1 | 2026-01-27 | `049-e2e-windows-tests` | Comprehensive Windows testing: 146 automated tests (99.3% pass), PowerShell 7.x validation, cross-platform parity, CI/CD integration, 31 tasks (100% complete), 4 user stories, path handling, CRLF line endings |
 | GitLab git provider support | P3 | 2026-01-22 | `048-gitlab-provider` | Full GitLab REST API v4 implementation, PAT authentication, issue/MR/milestone management, self-hosted support, 26 tasks (100% complete), 45 unit tests pass |
 | Git provider configuration wizard | P3 | 2026-01-22 | `047-provider-config-wizard` | Interactive wizard for GitHub/ADO/GitLab auth setup, gh CLI integration, PAT validation, config backup/restore, 28 tasks (100% complete), 1432 tests pass |
 | Constitution and tech stack separation | P2 | 2026-01-22 | `046-constitution-tech-stack-split` | Separated constitution.md from tech-stack.md, cleanup command for migration, context loading optimization, command overrides, 24 tasks (100% complete), 1377 tests pass |
@@ -58,8 +59,8 @@
 
 ## Statistics
 
-- **Total Items Completed**: 28
-- **P1 Items Completed**: 4 (4 archived)
+- **Total Items Completed**: 29
+- **P1 Items Completed**: 5 (4 archived)
 - **P2 Items Completed**: 16 (5 archived)
 - **P3 Items Completed**: 6
 - **P4 Items Completed**: 2

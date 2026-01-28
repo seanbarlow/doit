@@ -63,7 +63,11 @@ def test_resource_usage_within_limits(tmp_path, macos_test_env):
     if not macos_test_env["is_macos"]:
         pytest.skip("Test requires macOS")
 
-    import psutil
+    try:
+        import psutil
+    except ImportError:
+        pytest.skip("psutil not installed - install with 'pip install psutil' for resource monitoring")
+
     import os
 
     # Get current process

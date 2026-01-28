@@ -94,5 +94,10 @@ def test_checkin_branch_management(git_repo):
         text=True
     )
 
+    # Debug output if empty
+    if not result.stdout:
+        stderr_msg = result.stderr if result.stderr else "No stderr"
+        pytest.fail(f"git branch returned empty output. stderr: {stderr_msg}, returncode: {result.returncode}")
+
     for branch in branches:
-        assert branch in result.stdout, f"Branch {branch} not found"
+        assert branch in result.stdout, f"Branch {branch} not found in output: {result.stdout}"

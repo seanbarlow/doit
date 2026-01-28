@@ -76,8 +76,11 @@ def test_apfs_features_detection(case_sensitive_volume):
 @pytest.mark.macos
 @pytest.mark.e2e
 @pytest.mark.filesystem
-def test_volume_property_queries(case_sensitive_volume, filesystem_validator):
+def test_volume_property_queries(case_sensitive_volume, macos_test_env):
     """Test querying volume properties."""
+    if not macos_test_env["is_macos"]:
+        pytest.skip("Test requires macOS")
+
     from tests.utils.macos.filesystem_utils import FilesystemValidator
 
     validator = FilesystemValidator()

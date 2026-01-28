@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-27 (Completed: Windows E2E testing infrastructure)
+**Last Updated**: 2026-01-27 (Completed: macOS E2E testing infrastructure)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -21,10 +21,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
-
-- [ ] macOS E2E testing infrastructure
-  - **Rationale**: Complete cross-platform testing coverage by adding macOS-specific tests alongside Windows. Ensures full platform parity (Windows + Linux + macOS) with macOS-specific path handling, bash script validation, filesystem behaviors, and CI/CD integration with macOS runners
-  - **Aligns with**: Windows E2E testing (`049-e2e-windows-tests`)
 
 - [ ] Cross-platform CI matrix testing
   - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection

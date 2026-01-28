@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| macOS E2E testing infrastructure | P2 | 2026-01-27 | `050-macos-e2e-tests` | Comprehensive macOS testing: 112 automated tests across 20 test files, APFS/case-sensitivity, Unicode NFD/NFC normalization, BSD utilities validation, bash/zsh compatibility, extended attributes (xattr), symbolic links, GitHub Actions CI/CD with macOS runners (12, 13, 14), 34 tasks (100% complete), 4 user stories |
 | Windows E2E testing infrastructure | P1 | 2026-01-27 | `049-e2e-windows-tests` | Comprehensive Windows testing: 146 automated tests (99.3% pass), PowerShell 7.x validation, cross-platform parity, CI/CD integration, 31 tasks (100% complete), 4 user stories, path handling, CRLF line endings |
 | GitLab git provider support | P3 | 2026-01-22 | `048-gitlab-provider` | Full GitLab REST API v4 implementation, PAT authentication, issue/MR/milestone management, self-hosted support, 26 tasks (100% complete), 45 unit tests pass |
 | Git provider configuration wizard | P3 | 2026-01-22 | `047-provider-config-wizard` | Interactive wizard for GitHub/ADO/GitLab auth setup, gh CLI integration, PAT validation, config backup/restore, 28 tasks (100% complete), 1432 tests pass |
@@ -32,7 +33,7 @@
 | Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
 | Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
 | Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
-| Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` | Rich/JSON/Markdown output, filtering by status/blocking/recent, validation integration |
+
 ---
 
 ## Archive
@@ -44,6 +45,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
+| Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` |
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` |
 | Spec validation and linting | P2 | 2026-01-15 | `029-spec-validation-linting` |
@@ -59,9 +61,9 @@
 
 ## Statistics
 
-- **Total Items Completed**: 29
+- **Total Items Completed**: 30
 - **P1 Items Completed**: 5 (4 archived)
-- **P2 Items Completed**: 16 (5 archived)
+- **P2 Items Completed**: 17 (6 archived)
 - **P3 Items Completed**: 6
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)

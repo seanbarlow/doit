@@ -7,6 +7,12 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+
 jobs:
   macos-e2e-tests:
     name: macOS E2E Tests (Python ${{ matrix.python-version }}, macOS ${{ matrix.os }})
@@ -146,6 +152,7 @@ jobs:
 
       - name: Comment PR with test results
         if: github.event_name == 'pull_request' && always()
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |

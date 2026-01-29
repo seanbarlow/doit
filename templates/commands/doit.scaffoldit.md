@@ -32,9 +32,38 @@ doit context show
 
 **Use loaded context to**:
 
-- Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Reference constitution principles when making decisions (already in context)
+- Consider roadmap priorities (already in context)
+- Use tech stack information from constitution/tech-stack (already in context)
 - Identify connections to related specifications
+
+**DO NOT read these files again** (already in context above):
+
+- `.doit/memory/constitution.md` - principles and tech stack are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context
+- `.doit/memory/roadmap.md` - priorities are in context
+
+**Legitimate explicit reads** (NOT in context show):
+
+- `README.md` - for project description (if no constitution)
+- `package.json` or `pyproject.toml` - for existing project metadata
+- Existing project files for structure analysis
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -42,15 +71,15 @@ You are generating a project folder structure based on the tech stack defined in
 
 Follow this execution flow:
 
-### 1. Load Constitution
+### 1. Extract Tech Stack from Context
 
-Read `.doit/memory/constitution.md` and extract:
+Tech stack information is already loaded from `doit context show`. Extract from context:
 
 - **Tech Stack**: Languages, Frameworks, Libraries
 - **Infrastructure**: Hosting platform, Cloud provider, Database
 - **Deployment**: CI/CD pipeline, Strategy, Environments
 
-If constitution doesn't exist or has incomplete tech stack info, proceed to step 2.
+If constitution/tech-stack context is not available or has incomplete tech stack info, proceed to step 2.
 
 ### 2. Tech Stack Clarification
 

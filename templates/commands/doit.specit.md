@@ -39,6 +39,29 @@ doit context show
 - Align new features with roadmap priorities
 - Check for overlap with existing specifications
 
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+**Context already loaded** (DO NOT read these files again):
+
+- Constitution principles and tech stack
+- Roadmap priorities
+- Current specification
+- Related specifications
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
+
 ## Outline
 
 The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.

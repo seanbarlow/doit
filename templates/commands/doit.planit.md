@@ -33,23 +33,46 @@ doit context show
 - Reference constitution principles when making decisions
 - Consider roadmap priorities
 - Identify connections to related specifications
+- Use tech stack information (already included in constitution/tech-stack context)
+- Review related_specs for integration points with other features
 
-**For this command specifically**:
+**DO NOT read these files again** (already in context above):
 
-- Read `.doit/memory/tech-stack.md` for technology decisions (languages, frameworks, infrastructure, deployment)
-- If tech-stack.md doesn't exist, check constitution.md for Tech Stack section (legacy format)
-- Flag any technology choices that deviate from tech stack
-- Reference related specifications for integration points
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context
+- `.doit/memory/roadmap.md` - priorities are in context
+- Current feature spec - available as current_spec in context
+
+**Legitimate explicit reads** (NOT in context show):
+
+- `specs/{feature}/research.md` - if research phase complete
+- `specs/{feature}/data-model.md` - if already generated
+- `specs/{feature}/contracts/*.yaml` - API contract files
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/setup-plan.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **Load context**: Read FEATURE_SPEC and `.doit/memory/constitution.md`. Load IMPL_PLAN template (already copied).
+2. **Load context**: Load IMPL_PLAN template (already copied). Feature spec and constitution are already available from `doit context show` above.
 
-3. **Extract Tech Stack**:
-   - **Primary source**: Read `.doit/memory/tech-stack.md` if it exists
-   - **Fallback**: If tech-stack.md doesn't exist, read Tech Stack/Infrastructure/Deployment sections from constitution.md (legacy format)
+3. **Extract Tech Stack from loaded context**:
+   - Tech stack is already loaded in context (from tech-stack.md or constitution.md)
    - Extract: PRIMARY_LANGUAGE, FRAMEWORKS, KEY_LIBRARIES
    - Extract: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
    - Extract: CICD_PIPELINE, DEPLOYMENT_STRATEGY

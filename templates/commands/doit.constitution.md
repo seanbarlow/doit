@@ -53,9 +53,39 @@ doit context show
 
 **Use loaded context to**:
 
-- Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Reference existing constitution principles (if updating existing constitution)
+- Consider roadmap priorities (already in context)
 - Identify connections to related specifications
+
+**Note**: Constitution is the source file being modified, so reading it for modification is legitimate.
+
+**DO NOT read these files again** (already in context above):
+
+- `.doit/memory/roadmap.md` - priorities are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context (unless modifying it)
+
+**Legitimate explicit reads** (for template sync validation in step 6):
+
+- `.doit/templates/plan-template.md` - for consistency check
+- `.doit/templates/spec-template.md` - for consistency check
+- `.doit/templates/tasks-template.md` - for consistency check
+- `.doit/templates/commands/*.md` - for consistency check
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -157,9 +187,9 @@ If critical info missing (e.g., ratification date truly unknown), insert `TODO(<
 
 Do not create a new template; always operate on the existing `.doit/memory/constitution.md` file.
 
-## Constitution Reading Utility
+## Context Sources Reference
 
-Other commands can read and utilize project configuration from two files:
+Other commands access project configuration via `doit context show`, which loads:
 
 **Constitution** (`.doit/memory/constitution.md`):
 
@@ -181,10 +211,10 @@ Other commands can read and utilize project configuration from two files:
 
 ```text
 # At the start of any command that needs project context:
-1. Check if `.doit/memory/constitution.md` exists for principles and workflow
-2. Check if `.doit/memory/tech-stack.md` exists for technical decisions
-3. For legacy projects without tech-stack.md, check constitution.md for Tech Stack section
-4. Use extracted values to inform command behavior
+1. Run `doit context show` - this loads constitution, tech-stack, roadmap automatically
+2. Use the loaded context directly - DO NOT read memory files again
+3. Only read files explicitly when they need to be MODIFIED (not just referenced)
+4. Feature-specific artifacts (plan.md, spec.md, contracts/) require explicit reads
 ```
 
 ---

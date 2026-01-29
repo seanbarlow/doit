@@ -55,4 +55,7 @@ htmlcov/
 # Backup files
 *.bak
 *.backup
+
+# Doit temporary files
 .doit/cache/
+.doit/temp/

@@ -211,3 +211,88 @@ def context_status() -> None:
     # Usage hints
     console.print(f"\n[dim]Use 'doit context show' to see loaded context[/dim]")
     console.print(f"[dim]Use 'doit context show --command specit' to see command-specific context[/dim]")
+
+
+@context_app.command("audit")
+def audit_context(
+    templates_dir: Path = typer.Option(
+        None,
+        "--templates-dir",
+        "-d",
+        help="Directory containing command templates (default: templates/commands/)",
+    ),
+    output_format: str = typer.Option(
+        "table",
+        "--format",
+        "-f",
+        help="Output format: table, json, or markdown",
+    ),
+    output_file: Path = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Write report to file instead of stdout",
+    ),
+    severity: str = typer.Option(
+        None,
+        "--severity",
+        "-s",
+        help="Filter findings by severity: critical, major, minor",
+    ),
+) -> None:
+    """Audit templates for context injection issues like double-injection patterns."""
+    from ..services.context_auditor import ContextAuditor
+
+    # Validate format option
+    valid_formats = ["table", "json", "markdown"]
+    if output_format not in valid_formats:
+        console.print(f"[red]Invalid format '{output_format}'. Use one of: {', '.join(valid_formats)}[/red]")
+        raise typer.Exit(1)
+
+    # Validate severity option
+    valid_severities = ["critical", "major", "minor"]
+    if severity and severity not in valid_severities:
+        console.print(f"[red]Invalid severity '{severity}'. Use one of: {', '.join(valid_severities)}[/red]")
+        raise typer.Exit(1)
+
+    # Create auditor
+    auditor = ContextAuditor(templates_dir=templates_dir)
+
+    if not auditor.templates_dir.exists():
+        console.print(f"[red]Templates directory not found: {auditor.templates_dir}[/red]")
+        console.print("[dim]Run this command from the repository root or specify --templates-dir[/dim]")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Auditing templates in:[/bold] {auditor.templates_dir}")
+    console.print("")
+
+    # Run audit
+    report = auditor.audit_all_templates()
+
+    # Filter by severity if requested
+    if severity:
+        report.findings = [f for f in report.findings if f.severity == severity]
+        report.total_findings = len(report.findings)
+
+    # Format report
+    formatted = auditor.format_report(report, output_format)
+
+    # Output
+    if output_file:
+        output_file.write_text(formatted, encoding="utf-8")
+        console.print(f"[green]Report written to: {output_file}[/green]")
+    else:
+        console.print(formatted)
+
+    # Summary with color-coded status
+    if report.double_injection_count > 0:
+        console.print(f"\n[yellow]⚠ Found {report.double_injection_count} templates with double-injection patterns[/yellow]")
+        console.print(f"[dim]Estimated token waste: ~{report.token_waste_estimate:,} tokens[/dim]")
+    else:
+        console.print(f"\n[green]✓ No double-injection patterns found[/green]")
+
+    if report.total_findings > 0:
+        console.print(f"\n[dim]Total findings: {report.total_findings}[/dim]")
+        raise typer.Exit(1)
+    else:
+        console.print(f"[green]✓ All templates pass audit[/green]")

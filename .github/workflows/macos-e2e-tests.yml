@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-12, macos-14]
+        os: [macos-14, macos-15]
         python-version: ['3.11', '3.12']
 
     steps:
@@ -211,7 +211,7 @@ jobs:
           echo "All macOS E2E test matrix jobs completed." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Test Matrix**:" >> $GITHUB_STEP_SUMMARY
-          echo "- macOS versions: 12, 14" >> $GITHUB_STEP_SUMMARY
+          echo "- macOS versions: 14, 15" >> $GITHUB_STEP_SUMMARY
           echo "- Python versions: 3.11, 3.12" >> $GITHUB_STEP_SUMMARY
           echo "- Total combinations: 4" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

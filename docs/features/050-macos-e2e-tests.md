@@ -1,6 +1,6 @@
 # macOS E2E Testing Infrastructure
 
-**Completed**: 2026-01-27
+**Completed**: 2026-01-28
 **Branch**: `050-macos-e2e-tests`
 **Priority**: P2
 
@@ -83,7 +83,7 @@ This feature completes cross-platform testing coverage alongside the Windows E2E
 
 GitHub Actions workflow ([.github/workflows/macos-e2e-tests.yml](../../.github/workflows/macos-e2e-tests.yml)) with:
 
-- **Matrix Testing**: macOS 12, 13, 14 × Python 3.11, 3.12 (6 combinations)
+- **Matrix Testing**: macOS 14, 15 × Python 3.11, 3.12 (4 combinations)
 - **Parallel Execution**: Independent test runs across matrix
 - **Artifact Upload**: Test logs, reports, and diagnostics
 - **Test Reporting**: JUnit XML output and GitHub Actions summary
@@ -209,7 +209,7 @@ See [test-report.md](../../specs/050-macos-e2e-tests/test-report.md) for complet
 
 ## Next Steps
 
-1. **Validate on macOS**: GitHub Actions will run tests on macOS 12, 13, 14
+1. **Validate on macOS**: GitHub Actions will run tests on macOS 14, 15
 2. **Review Results**: Verify 95%+ pass rate and < 10 minute execution
 3. **Address Failures**: Update tests based on actual macOS behavior if needed
 4. **Complete Manual Testing**: Execute 25 manual test cases

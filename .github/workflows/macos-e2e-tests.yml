@@ -1,0 +1,218 @@
+name: macOS E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  macos-e2e-tests:
+    name: macOS E2E Tests (Python ${{ matrix.python-version }}, macOS ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15]
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Display system information
+        run: |
+          echo "=== System Information ==="
+          sw_vers
+          echo ""
+          echo "=== Python Version ==="
+          python --version
+          echo ""
+          echo "=== Shell Information ==="
+          echo "SHELL: $SHELL"
+          $SHELL --version || true
+          echo ""
+          echo "=== Filesystem Information ==="
+          df -h .
+          diskutil info / | grep -E "(File System Personality|Volume Name|Case-sensitive)"
+          echo ""
+          echo "=== Command Versions ==="
+          sed --version 2>&1 | head -1 || echo "BSD sed"
+          grep --version 2>&1 | head -1 || echo "BSD grep"
+          awk --version 2>&1 | head -1 || echo "BSD awk"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install pytest pytest-timeout pytest-xdist pytest-html
+
+      - name: Run macOS E2E tests
+        run: |
+          pytest tests/e2e/macos/ \
+            -v \
+            -m "macos and e2e" \
+            --tb=short \
+            --timeout=60 \
+            --junit-xml=test-results/junit-macos-${{ matrix.os }}-py${{ matrix.python-version }}.xml \
+            --html=test-results/report-macos-${{ matrix.os }}-py${{ matrix.python-version }}.html \
+            --self-contained-html
+        continue-on-error: false
+
+      - name: Run filesystem-specific tests
+        run: |
+          pytest tests/e2e/macos/ \
+            -v \
+            -m "macos and filesystem" \
+            --tb=short \
+            --timeout=60
+        continue-on-error: true
+
+      - name: Run BSD compatibility tests
+        run: |
+          pytest tests/e2e/macos/ \
+            -v \
+            -m "macos and bsd" \
+            --tb=short \
+            --timeout=60
+        continue-on-error: true
+
+      - name: Run Unicode handling tests
+        run: |
+          pytest tests/e2e/macos/ \
+            -v \
+            -m "macos and unicode" \
+            --tb=short \
+            --timeout=60
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-macos-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: test-results/
+          retention-days: 30
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-macos-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: |
+            pytest.log
+            .pytest_cache/
+          retention-days: 7
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## macOS E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform**: ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Python**: ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f test-results/junit-macos-${{ matrix.os }}-py${{ matrix.python-version }}.xml ]; then
+            # Extract test counts from JUnit XML
+            TESTS=$(grep -o 'tests="[0-9]*"' test-results/junit-macos-${{ matrix.os }}-py${{ matrix.python-version }}.xml | head -1 | grep -o '[0-9]*')
+            FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit-macos-${{ matrix.os }}-py${{ matrix.python-version }}.xml | head -1 | grep -o '[0-9]*')
+            ERRORS=$(grep -o 'errors="[0-9]*"' test-results/junit-macos-${{ matrix.os }}-py${{ matrix.python-version }}.xml | head -1 | grep -o '[0-9]*')
+
+            echo "📊 **Test Statistics**:" >> $GITHUB_STEP_SUMMARY
+            echo "- Total Tests: ${TESTS:-0}" >> $GITHUB_STEP_SUMMARY
+            echo "- Failures: ${FAILURES:-0}" >> $GITHUB_STEP_SUMMARY
+            echo "- Errors: ${ERRORS:-0}" >> $GITHUB_STEP_SUMMARY
+
+            if [ "${FAILURES:-0}" -eq 0 ] && [ "${ERRORS:-0}" -eq 0 ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "❌ Some tests failed. Check the artifacts for details." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ Test results not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const testResultFile = 'test-results/junit-macos-${{ matrix.os }}-py${{ matrix.python-version }}.xml';
+
+            if (!fs.existsSync(testResultFile)) {
+              return;
+            }
+
+            const testResults = fs.readFileSync(testResultFile, 'utf8');
+            const testsMatch = testResults.match(/tests="(\d+)"/);
+            const failuresMatch = testResults.match(/failures="(\d+)"/);
+            const errorsMatch = testResults.match(/errors="(\d+)"/);
+
+            const tests = testsMatch ? testsMatch[1] : '0';
+            const failures = failuresMatch ? failuresMatch[1] : '0';
+            const errors = errorsMatch ? errorsMatch[1] : '0';
+
+            const passed = parseInt(tests) - parseInt(failures) - parseInt(errors);
+            const icon = (parseInt(failures) === 0 && parseInt(errors) === 0) ? '✅' : '❌';
+
+            const comment = `## ${icon} macOS E2E Test Results
+
+            **Platform**: ${{ matrix.os }}
+            **Python**: ${{ matrix.python-version }}
+
+            | Metric | Count |
+            |--------|-------|
+            | Total Tests | ${tests} |
+            | Passed | ${passed} |
+            | Failed | ${failures} |
+            | Errors | ${errors} |
+
+            [View detailed test results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: macos-e2e-tests
+    if: always()
+
+    steps:
+      - name: Generate overall summary
+        run: |
+          echo "## 🍎 macOS E2E Test Suite Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All macOS E2E test matrix jobs completed." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Matrix**:" >> $GITHUB_STEP_SUMMARY
+          echo "- macOS versions: 14, 15" >> $GITHUB_STEP_SUMMARY
+          echo "- Python versions: 3.11, 3.12" >> $GITHUB_STEP_SUMMARY
+          echo "- Total combinations: 4" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check individual job results for detailed information." >> $GITHUB_STEP_SUMMARY

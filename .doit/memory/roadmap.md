@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-22 (Completed: GitLab git provider support)
+**Last Updated**: 2026-01-27 (Completed: macOS E2E testing infrastructure)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -22,7 +22,9 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-✅ **All P2 items completed!** See `.doit/memory/completed_roadmap.md` for history.
+- [ ] Cross-platform CI matrix testing
+  - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection
+  - **Aligns with**: Windows E2E CI/CD integration (US4), Cross-platform parity goals
 
 ### P3 - Medium Priority (Valuable)
 
@@ -55,6 +57,18 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Template diff on version updates
   - **Rationale**: Show diff view when unified templates are updated to help users understand changes
 
+- [ ] Test Coverage Reporting Dashboard
+  - **Rationale**: Generate comprehensive test coverage reports showing which Windows-specific features, edge cases, and platform behaviors are tested. Includes line coverage, branch coverage, and platform-specific code path analysis with visual dashboards for tracking coverage trends over time
+  - **Aligns with**: Windows E2E testing infrastructure (`049-e2e-windows-tests`), Test suite quality goals
+
+- [ ] Performance Benchmarking Suite
+  - **Rationale**: Automated performance testing to measure and track CLI command execution times, script performance, and resource usage across Windows/Linux/macOS. Establishes baseline metrics and detects performance regressions before they reach production
+  - **Aligns with**: Cross-platform testing, CI/CD quality gates
+
+- [ ] Automated Regression Test Suite
+  - **Rationale**: Dedicated regression test suite that runs on every commit to catch platform-specific issues early. Includes tests for previously fixed bugs, edge cases, and critical user workflows to prevent feature breakage
+  - **Aligns with**: Windows E2E testing (`049-e2e-windows-tests`), Continuous quality improvement
+
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
@@ -78,6 +92,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 | Version | Date       | Key Changes                                                                         |
 |---------|------------|-------------------------------------------------------------------------------------|
+| v0.1.14 | 2026-01-27 | Windows E2E Testing - 146 tests, PowerShell 7.x, cross-platform parity, CI/CD (#645) |
 | v0.1.13 | 2026-01-22 | GitLab Git Provider Support - full REST API implementation, tutorials (#637)        |
 | v0.1.12 | 2026-01-22 | Git provider configuration wizard - interactive setup for GitHub/ADO/GitLab (#636)  |
 | v0.1.11 | 2026-01-22 | Fixed CLI ModuleNotFoundError - included `doit_toolkit_cli` in wheel package (#598) |

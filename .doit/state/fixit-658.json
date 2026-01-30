@@ -1,0 +1,142 @@
+{
+  "issue_id": 658,
+  "issue_title": "Bug: doit init does not create Claude/Copilot commands on Windows due to symlink handling",
+  "branch": "fix/658-windows-symlink-templates",
+  "phase": "completed",
+  "created_at": "2026-01-30T14:15:00Z",
+  "updated_at": "2026-01-30T14:45:00Z",
+  "investigation": {
+    "checkpoints": [
+      {
+        "id": "cp-1",
+        "description": "Review error logs and stack traces",
+        "completed": true,
+        "notes": "Reproduced bug: doit init creates .claude/commands/ directory but leaves it empty. No error messages displayed - fails silently."
+      },
+      {
+        "id": "cp-2",
+        "description": "Identify affected code paths",
+        "completed": true,
+        "notes": "Code path: init_command.py:run_init() -> template_manager.copy_templates_for_agent() -> _get_command_templates() -> get_base_template_path(). The get_base_template_path() returns src/doit_cli/templates which is a file on Windows."
+      },
+      {
+        "id": "cp-3",
+        "description": "Search for related issues or commits",
+        "completed": true,
+        "notes": "Found related issue #650 (SameFileError) but different root cause. Previous fix 5c3528a addressed missing config templates, not symlink issue."
+      },
+      {
+        "id": "cp-4",
+        "description": "Formulate root cause hypothesis",
+        "completed": true,
+        "notes": "Root cause confirmed: Git on Windows stores symlinks as text files containing the target path. The symlink src/doit_cli/templates -> ../../templates is stored as a file containing '../../templates'. Path resolution fails because base_path/commands doesn't exist when base_path is a file."
+      }
+    ],
+    "findings": [
+      {
+        "id": "f-1",
+        "type": "reproduction_step",
+        "description": "Run 'doit init . --yes' on Windows, check .claude/commands/ is empty"
+      },
+      {
+        "id": "f-2",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/template_manager.py - get_base_template_path() method (lines 83-104)"
+      },
+      {
+        "id": "f-3",
+        "type": "affected_file",
+        "description": "src/doit_cli/services/template_manager.py - _get_command_templates() method (lines 257-282)"
+      },
+      {
+        "id": "f-4",
+        "type": "hypothesis",
+        "description": "Git symlink stored as file on Windows - symlink target in file content"
+      },
+      {
+        "id": "f-5",
+        "type": "confirmed_cause",
+        "description": "Git on Windows (core.symlinks=false) stores symlinks as regular files containing the target path. get_base_template_path() returns src/doit_cli/templates which is a file (not directory) containing '../../templates'. When _get_command_templates() checks if base_path/commands exists, it fails because you cannot append paths to a file. Result: empty template list, no commands copied."
+      },
+      {
+        "id": "f-6",
+        "type": "affected_file",
+        "description": "src/doit_cli/templates - Git symlink file containing '../../templates'"
+      }
+    ],
+    "keywords": [
+      "symlink",
+      "Windows",
+      "templates",
+      "get_base_template_path",
+      "TemplateManager",
+      "init command",
+      "core.symlinks",
+      "importlib.resources"
+    ]
+  },
+  "plan": {
+    "summary": "Move templates/ directory into src/doit_cli/templates/, remove the symlink, and simplify get_base_template_path() to use package-relative paths.",
+    "root_cause": "Git on Windows stores symlinks as text files. The symlink src/doit_cli/templates -> ../../templates is stored as a file containing the path, not as an actual symlink. importlib.resources returns this file path, and template resolution fails.",
+    "solution": "Eliminate the symlink by moving templates directly into the package directory. This makes the package self-contained and works on all platforms without symlink support.",
+    "files_to_modify": [
+      {
+        "path": "src/doit_cli/templates",
+        "action": "delete",
+        "description": "Remove the symlink file"
+      },
+      {
+        "path": "templates/",
+        "action": "move",
+        "destination": "src/doit_cli/templates/",
+        "description": "Move entire templates directory into package"
+      },
+      {
+        "path": "src/doit_cli/services/template_manager.py",
+        "action": "modify",
+        "description": "Simplify get_base_template_path() - remove fallback logic since templates are now in package"
+      },
+      {
+        "path": "pyproject.toml",
+        "action": "verify",
+        "description": "Verify hatch includes templates in wheel (should work automatically since it's under src/doit_cli/)"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "T1",
+        "description": "Remove the symlink file src/doit_cli/templates",
+        "command": "git rm src/doit_cli/templates"
+      },
+      {
+        "id": "T2",
+        "description": "Move templates/ directory to src/doit_cli/templates/",
+        "command": "git mv templates src/doit_cli/templates"
+      },
+      {
+        "id": "T3",
+        "description": "Simplify get_base_template_path() in template_manager.py",
+        "details": "Update to use Path(__file__).parent.parent / 'templates' directly without symlink fallback"
+      },
+      {
+        "id": "T4",
+        "description": "Test doit init on Windows",
+        "command": "doit init /tmp/test-fix --yes && ls /tmp/test-fix/.claude/commands/"
+      },
+      {
+        "id": "T5",
+        "description": "Run existing tests to ensure no regressions",
+        "command": "pytest tests/ -v"
+      }
+    ],
+    "risk_assessment": "low",
+    "risk_notes": "Moving templates into the package is a standard Python packaging practice. The only risk is missing a path reference somewhere, which tests should catch.",
+    "testing_plan": [
+      "Verify doit init creates all 13 command templates",
+      "Verify doit init --update works correctly",
+      "Run pytest to ensure no regressions",
+      "Test on fresh directory outside the repo"
+    ]
+  },
+  "implementation": null
+}

@@ -3,7 +3,11 @@
     "allow": [
       "Bash(pwsh -Command '$PSVersionTable.PSVersion')",
       "Bash(doit --help:*)",
-      "Bash(export PATH=\"/c/Program Files/PowerShell/7:$PATH\")"
+      "Bash(export PATH=\"/c/Program Files/PowerShell/7:$PATH\")",
+      "Bash(git stash drop:*)",
+      "Bash(pip show:*)",
+      "Read(//c/GitHub/doit/**)",
+      "Bash(python3.11:*)"
     ]
   }
 }

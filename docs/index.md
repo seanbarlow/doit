@@ -61,6 +61,14 @@ Spec-Driven Development **flips the script** on traditional software development
 | [GitHub Milestone Generation](./features/041-milestone-generation.md) | Auto-create milestones for priority levels, assign epics... | 2026-01-22 |
 | [Team Collaboration](./features/042-team-collaboration.md) | Git-based sync, change notifications, conflict resolution... | 2026-01-22 |
 | [Unified CLI Package](./features/043-unified-cli.md) | Consolidated doit_cli and doit_toolkit_cli into single package... | 2026-01-22 |
+| [Git Provider Abstraction](./features/044-git-provider-abstraction.md) | Unified interface for GitHub, Azure DevOps, GitLab providers... | 2026-01-22 |
+| [Constitution Tech Stack Split](./features/046-constitution-tech-stack-split.md) | Separated constitution.md from tech-stack.md for cleaner organization... | 2026-01-22 |
+| [Provider Config Wizard](./features/047-provider-config-wizard.md) | Interactive wizard for GitHub/ADO/GitLab auth setup... | 2026-01-22 |
+| [GitLab Provider](./features/048-gitlab-provider.md) | Full GitLab REST API v4 implementation with PAT authentication... | 2026-01-22 |
+| [Windows E2E Tests](./features/049-e2e-windows-tests.md) | Comprehensive Windows testing infrastructure with PowerShell 7.x validation... | 2026-01-27 |
+| [macOS E2E Tests](./features/050-macos-e2e-tests.md) | Comprehensive macOS testing with APFS, Unicode normalization, BSD utilities... | 2026-01-28 |
+| [Research Command](./features/052-researchit-command.md) | Pre-specification Q&A workflow for Product Owners to capture business requirements... | 2026-01-29 |
+| [AI Context Optimization](./features/ai-context-optimization.md) | Optimized AI context injection with double-injection elimination... | 2026-01-29 |
 | [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
 
 ## Guides

@@ -23,8 +23,38 @@ doit context show
 **Use loaded context to**:
 
 - Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Consider roadmap priorities (roadmap content is already loaded)
 - Identify connections to related specifications
+- Determine if roadmap files exist (absence means empty context section)
+
+**DO NOT read these files again for context** (already loaded above):
+
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/roadmap.md` - content is in context (read for MODIFICATION only in step 6)
+- `.doit/memory/completed_roadmap.md` - content is in context
+
+**Legitimate explicit reads** (for modification, NOT in context show):
+
+- `specs/{feature}/spec.md` - feature details for documentation
+- `specs/{feature}/tasks.md` - completion status
+- `specs/{feature}/review-report.md` - code review status
+- `specs/{feature}/test-report.md` - test status
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -92,10 +122,10 @@ doit context show
 
    #### 6.2 Check and Update roadmap.md
 
-   - Check if `.doit/memory/roadmap.md` exists:
-     - If NOT exists: Log "No roadmap.md found, skipping roadmap archive"
-     - If exists:
-       1. Read the roadmap file
+   - Roadmap availability is known from context show (if section was empty, file doesn't exist)
+     - If no roadmap in context: Log "No roadmap.md found, skipping roadmap archive"
+     - If roadmap exists (was in context):
+       1. Read the roadmap file **for modification** (context has summary, need full file to edit)
        2. Search for items with matching feature branch reference `[###-feature-name]`
           - Pattern: Items containing backtick references like `` `008-feature-name` `` or `[008-feature-name]`
        3. For each matching item found:
@@ -105,7 +135,8 @@ doit context show
 
    #### 6.3 Archive to completed_roadmap.md
 
-   - Check if `.doit/memory/completed_roadmap.md` exists:
+   - completed_roadmap availability is known from context show
+   - Read file **for modification** if it exists:
      - If NOT exists:
        1. Copy template from `.doit/templates/completed-roadmap-template.md`
        2. Replace `[PROJECT_NAME]` with project name

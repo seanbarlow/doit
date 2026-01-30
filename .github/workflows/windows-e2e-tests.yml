@@ -1,0 +1,162 @@
+name: Windows E2E Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "*-e2e-windows-tests"
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  windows-e2e:
+    name: Windows E2E Testing
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Verify PowerShell version
+        shell: pwsh
+        run: |
+          Write-Host "PowerShell Version:"
+          $PSVersionTable.PSVersion
+          if ($PSVersionTable.PSVersion.Major -lt 7) {
+            Write-Error "PowerShell 7.x or higher required"
+            exit 1
+          }
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest pytest-xdist pytest-html pytest-json-report
+
+      - name: Run Windows E2E tests
+        shell: pwsh
+        run: |
+          Write-Host "Running Windows E2E tests..."
+          pytest tests/e2e/windows/ `
+            -v `
+            -m "windows" `
+            --tb=short `
+            --html=test-reports/windows-e2e-report.html `
+            --self-contained-html `
+            --json-report `
+            --json-report-file=test-reports/windows-e2e-report.json
+
+      - name: Run PowerShell validation tests
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "Running PowerShell validation tests..."
+          pytest tests/e2e/windows/ `
+            -v `
+            -m "powershell" `
+            --tb=short `
+            --html=test-reports/powershell-validation-report.html `
+            --self-contained-html
+
+      - name: Run cross-platform parity tests
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "Running cross-platform parity tests..."
+          pytest tests/e2e/windows/ `
+            -v `
+            -m "unix" `
+            --tb=short `
+            --html=test-reports/parity-report.html `
+            --self-contained-html
+
+      - name: Generate test summary
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "`n=== Test Results Summary ===" -ForegroundColor Cyan
+
+          # Parse JSON report if available
+          if (Test-Path "test-reports/windows-e2e-report.json") {
+            $report = Get-Content "test-reports/windows-e2e-report.json" | ConvertFrom-Json
+
+            Write-Host "Platform: $($report.environment.Platform)" -ForegroundColor Green
+            Write-Host "Python: $($report.environment.Python)" -ForegroundColor Green
+            Write-Host "Total Tests: $($report.summary.total)" -ForegroundColor Yellow
+            Write-Host "Passed: $($report.summary.passed)" -ForegroundColor Green
+            Write-Host "Failed: $($report.summary.failed)" -ForegroundColor Red
+            Write-Host "Skipped: $($report.summary.skipped)" -ForegroundColor Gray
+            Write-Host "Duration: $($report.duration)s" -ForegroundColor Cyan
+          } else {
+            Write-Host "Test report not found - tests may have failed to run" -ForegroundColor Red
+          }
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-e2e-test-reports
+          path: test-reports/
+          retention-days: 30
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-e2e-test-logs
+          path: |
+            test-reports/
+            pytest-logs/
+            .pytest_cache/
+          retention-days: 14
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'test-reports/windows-e2e-report.json';
+
+            if (!fs.existsSync(reportPath)) {
+              console.log('No test report found');
+              return;
+            }
+
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+
+            const comment = `## Windows E2E Test Results
+
+            **Platform**: ${report.environment?.Platform || 'Unknown'}
+            **Python**: ${report.environment?.Python || 'Unknown'}
+
+            | Metric | Value |
+            |--------|-------|
+            | Total Tests | ${report.summary?.total || 0} |
+            | ✅ Passed | ${report.summary?.passed || 0} |
+            | ❌ Failed | ${report.summary?.failed || 0} |
+            | ⏭️ Skipped | ${report.summary?.skipped || 0} |
+            | ⏱️ Duration | ${report.duration?.toFixed(2) || 0}s |
+
+            ${report.summary?.failed > 0 ? '⚠️ **Some tests failed. Please review the test reports.**' : '✅ **All tests passed!**'}
+
+            [View detailed HTML report](../actions/runs/${context.runId})
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

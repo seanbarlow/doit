@@ -34,12 +34,37 @@ doit context show
 - Reference constitution principles when making decisions
 - Consider roadmap priorities
 - Identify connections to related specifications
+- Use tech stack info for accurate file paths and framework-specific tasks (already in context)
 
-**For this command specifically**:
+**DO NOT read these files again** (already in context above):
 
-- Read `.doit/memory/tech-stack.md` for implementation technology choices
-- If tech-stack.md doesn't exist, check plan.md or constitution.md for Tech Stack section (legacy format)
-- Use tech stack info for accurate file paths and framework-specific tasks
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context
+- `.doit/memory/roadmap.md` - priorities are in context
+
+**Legitimate explicit reads** (NOT in context show):
+
+- `specs/{feature}/plan.md` - detailed implementation plan
+- `specs/{feature}/spec.md` - user stories with priorities
+- `specs/{feature}/data-model.md` - entities to map
+- `specs/{feature}/contracts/*.yaml` - API endpoints to map
+- `specs/{feature}/research.md` - decisions for setup tasks
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -51,7 +76,7 @@ doit context show
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
-   - Load `.doit/memory/tech-stack.md` (or fallback to plan.md/constitution.md) for tech stack, libraries
+   - Use tech stack from loaded context (already available from doit context show)
    - Load plan.md and extract project structure
    - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
    - If data-model.md exists: Extract entities and map to user stories

@@ -216,6 +216,7 @@ Run these commands in your AI coding assistant (Claude Code, Copilot, etc.):
 | ------- | ------- | ----------- |
 | `/doit.constitution` | Define project principles | After init, or to update |
 | `/doit.scaffoldit` | Generate project structure | Greenfield projects only |
+| `/doit.researchit` | Capture business requirements | Before spec (Product Owners) |
 | `/doit.specit` | Create feature specification | Start of each feature |
 | `/doit.planit` | Generate implementation plan | After spec is approved |
 | `/doit.taskit` | Create actionable tasks | After plan is approved |

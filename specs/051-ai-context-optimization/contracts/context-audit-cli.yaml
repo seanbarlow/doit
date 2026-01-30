@@ -1,0 +1,99 @@
+# Context Audit CLI Contract
+# Feature: 051-ai-context-optimization
+# Date: 2025-01-28
+
+name: doit context audit
+description: Analyze templates for context injection patterns and report optimization opportunities
+
+commands:
+  audit:
+    description: Run full context audit on all templates
+    usage: doit context audit [OPTIONS]
+    options:
+      --format:
+        type: enum
+        values: [table, json, markdown]
+        default: table
+        description: Output format for audit results
+      --output:
+        type: path
+        default: null
+        description: Save report to file instead of stdout
+      --templates-dir:
+        type: path
+        default: templates/commands/
+        description: Directory containing templates to audit
+      --severity:
+        type: enum
+        values: [all, critical, major, minor]
+        default: all
+        description: Filter findings by minimum severity
+
+    output:
+      success:
+        exit_code: 0
+        content:
+          templates_analyzed: int
+          total_findings: int
+          double_injection_count: int
+          token_waste_estimate: int
+          findings: list[Finding]
+
+      error:
+        exit_code: 1
+        content:
+          error: string
+          details: string
+
+types:
+  Finding:
+    template_name: string
+    finding_type: enum[double_injection, excessive_context, missing_instruction]
+    severity: enum[critical, major, minor]
+    line_number: int
+    description: string
+    recommendation: string
+
+examples:
+  - name: Basic audit
+    command: doit context audit
+    description: Run audit with default settings
+    expected_output: |
+      ╭─────────────────────────────────────────────────────────╮
+      │ Context Audit Report                                     │
+      ├─────────────────────────────────────────────────────────┤
+      │ Templates analyzed: 12                                   │
+      │ Total findings: 18                                       │
+      │ Double-injection patterns: 6                             │
+      │ Estimated token waste: 4,200                             │
+      ╰─────────────────────────────────────────────────────────╯
+
+      CRITICAL: doit.planit.md
+        Line 48: Double-injection - constitution.md read after doit context show
+        Line 52: Double-injection - tech-stack.md read after doit context show
+        Recommendation: Remove explicit file reads, rely on doit context show
+
+  - name: JSON output
+    command: doit context audit --format json
+    description: Get machine-readable output
+    expected_output: |
+      {
+        "templates_analyzed": 12,
+        "total_findings": 18,
+        "double_injection_count": 6,
+        "token_waste_estimate": 4200,
+        "findings": [
+          {
+            "template_name": "doit.planit.md",
+            "finding_type": "double_injection",
+            "severity": "critical",
+            "line_number": 48,
+            "description": "constitution.md read after doit context show",
+            "recommendation": "Remove explicit file read"
+          }
+        ]
+      }
+
+  - name: Save to file
+    command: doit context audit --format markdown --output specs/051/reports/audit-report.md
+    description: Generate markdown report and save to spec folder

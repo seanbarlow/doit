@@ -247,6 +247,10 @@ pip install -e ".[dev]"
 
 # Run tests
 pytest
+
+# Run platform-specific tests
+pytest -m windows  # Windows E2E tests
+pytest -m macos    # macOS E2E tests (requires macOS)
 ```
 
 ## License

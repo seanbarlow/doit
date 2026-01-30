@@ -15,6 +15,7 @@ DOIT_COMMANDS = [
     "fixit",
     "implementit",
     "planit",
+    "researchit",
     "reviewit",
     "roadmapit",
     "scaffoldit",

@@ -337,13 +337,13 @@ class TestInitMemoryFilesPreservation:
         if template_files:
             test_template = template_files[0]
             custom_content = "# Custom Command Template\n"
-            test_template.write_text(custom_content)
+            test_template.write_text(custom_content, encoding="utf-8")
 
             # Customize a memory file too
             memory_dir = project_dir / ".doit" / "memory"
             constitution_file = memory_dir / "constitution.md"
             custom_constitution = "# My Custom Constitution\n"
-            constitution_file.write_text(custom_constitution)
+            constitution_file.write_text(custom_constitution, encoding="utf-8")
 
             # Run update
             result = runner.invoke(
@@ -353,11 +353,11 @@ class TestInitMemoryFilesPreservation:
             assert result.exit_code == 0
 
             # Command template SHOULD be updated
-            assert test_template.read_text() != custom_content, \
+            assert test_template.read_text(encoding="utf-8") != custom_content, \
                 "Command templates should be updated with --update"
 
             # Memory file should be preserved
-            assert constitution_file.read_text() == custom_constitution, \
+            assert constitution_file.read_text(encoding="utf-8") == custom_constitution, \
                 "Memory files should be preserved with --update"
 
 

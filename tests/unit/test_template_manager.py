@@ -412,7 +412,7 @@ class TestUnifiedTemplates:
         # Check content of generated files
         for prompt_file in target_dir.iterdir():
             if prompt_file.is_file():
-                content = prompt_file.read_text()
+                content = prompt_file.read_text(encoding="utf-8")
                 # YAML frontmatter should be removed
                 assert not content.startswith("---")
                 # $ARGUMENTS should be replaced
@@ -430,7 +430,7 @@ class TestUnifiedTemplates:
         yaml_found = False
         for command_file in target_dir.iterdir():
             if command_file.is_file():
-                content = command_file.read_text()
+                content = command_file.read_text(encoding="utf-8")
                 # At least some should have YAML frontmatter
                 if content.startswith("---"):
                     yaml_found = True

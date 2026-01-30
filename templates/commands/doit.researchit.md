@@ -107,25 +107,100 @@ Guide the user through four phases of questions. Ask questions one at a time, wa
 
 ## Phase 2: Users and Goals
 
-**Goal**: Identify target users and define what success looks like for them.
+**Goal**: Identify target users and build comprehensive persona profiles using the persona template.
 
-### Question 2.1
+> **Template Reference**: Use `.doit/templates/persona-template.md` for the complete persona field structure.
+
+### Question 2.1 - User Identification
 > "Who are the primary users of this feature? Can you describe them?"
 
-*Wait for response. Note any distinct user types or personas.*
+*Wait for response. Note any distinct user types or personas. Assign each a preliminary ID (P-001, P-002, etc.).*
 
-### Question 2.2
-> "What does success look like for these users? When they use this feature, what should they be able to accomplish?"
+### Question 2.2 - User Roles and Archetypes
+> "For each user type you mentioned, what is their job role or title? Would you classify them as:
+> - **Power User** (frequent, advanced needs)
+> - **Casual User** (occasional, basic needs)
+> - **Administrator** (manages system/config)
+> - **Approver** (reviews/approves work)
+> - **Observer** (views but doesn't interact directly)"
 
-*Wait for response.*
+*Wait for response. Assign an archetype to each persona.*
 
-### Question 2.3
-> "Are there different types of users with different needs? For example, some users who need basic functionality vs. power users?"
+### Question 2.3 - Experience and Context
+> "For your main users:
+> - What is their typical experience level (Junior/Mid/Senior/Executive)?
+> - Do they work solo, in small teams, large teams, or enterprise settings?
+> - What domain expertise do they bring?"
 
-*Wait for response. If yes, note the distinctions.*
+*Wait for response. Capture demographics for each persona.*
+
+### Question 2.4 - Goals and Success
+> "What does success look like for these users? When they use this feature, what should they be able to accomplish? Are there any secondary goals or nice-to-haves?"
+
+*Wait for response. Note primary and secondary goals per persona.*
+
+### Question 2.5 - Pain Points
+> "What are the top 3 frustrations or pain points for each user type? Please prioritize them from most critical to least critical."
+
+*Wait for response. Capture prioritized pain points.*
+
+### Question 2.6 - Behavioral Patterns
+> "How would you describe how these users typically work?
+> - Technology proficiency (Low/Medium/High)?
+> - Work style (methodical, quick iterations, collaborative)?
+> - How do they make decisions (data-driven, intuitive, consensus-seeking)?"
+
+*Wait for response. Capture behavioral patterns.*
+
+### Question 2.7 - Usage Context
+> "When and where do users encounter this problem? What is their typical workflow when they would use this feature?"
+
+*Wait for response. Capture usage context.*
 
 **Phase 2 Summary**: After all questions, confirm understanding:
-> "So the main users are [personas] and success for them means [outcomes]. Did I capture that correctly?"
+> "Let me confirm the personas I've captured:
+> - **P-001**: [Name] - [Role], [Archetype], primary goal: [goal], top pain point: [pain point]
+> - **P-002**: [Name] - [Role], [Archetype], primary goal: [goal], top pain point: [pain point]
+>
+> Is this accurate?"
+
+---
+
+## Phase 2.5: Persona Relationships (if multiple personas)
+
+**Goal**: Capture how personas relate to each other for workflow understanding.
+
+> **Skip this phase** if only one persona was identified.
+
+### Question 2.5.1 - Working Relationships
+> "How do these personas work together? For example:
+> - Does one manage or supervise another?
+> - Do they collaborate as peers?
+> - Does one need to approve the other's work?
+> - Does one's work block another from proceeding?"
+
+*Wait for response. Map relationships to types: manages, reports_to, collaborates, approves, blocks.*
+
+### Question 2.5.2 - Relationship Context
+> "Can you describe the context of these relationships? For example, how often do they interact, and in what situations?"
+
+*Wait for response. Capture context for each relationship.*
+
+### Question 2.5.3 - Conflicts and Tensions
+> "Are there any situations where these personas might have conflicting goals or competing priorities? What tradeoffs might need to be made?"
+
+*Wait for response. Document conflicts for the Conflicts & Tensions section.*
+
+**Phase 2.5 Summary**: Confirm relationships:
+> "I've captured these relationships:
+> - P-001 [relationship] P-002: [context]
+> - [Any conflicts noted]
+>
+> Is this accurate?"
+
+**Bidirectional Documentation**: When documenting relationships:
+- If A manages B, add to both profiles (A: "manages P-002", B: "reports_to P-001")
+- If no relationships exist for a persona, document as "No direct relationships identified"
 
 ---
 
@@ -210,7 +285,38 @@ Use the template at `.doit/templates/research-template.md` as a guide. Map Q&A a
 | Phase 3 (Requirements) | Must-Haves, Nice-to-Haves, Out of Scope, Constraints |
 | Phase 4 (Metrics) | Success Metrics, Failure Indicators |
 
-### 4.3 Generate user-stories.md
+### 4.3 Generate personas.md
+
+Create comprehensive persona profiles from Phase 2 Q&A:
+
+**File**: `specs/{feature}/personas.md`
+
+Use the template at `.doit/templates/personas-output-template.md`. For each persona identified:
+
+1. **Assign unique ID**: P-001, P-002, etc.
+2. **Populate all profile fields** from Q&A answers:
+   - Identity (name, role, archetype from Q2.1, Q2.2)
+   - Demographics (experience, team size, domain from Q2.3)
+   - Goals (primary, secondary from Q2.4)
+   - Pain Points (prioritized list from Q2.5)
+   - Behavioral Patterns (tech proficiency, work style, decision making from Q2.6)
+   - Success Criteria (what success means for this persona)
+   - Usage Context (from Q2.7)
+   - Relationships (from Phase 2.5 relationship questions, if asked)
+   - Conflicts & Tensions (competing goals with other personas)
+
+3. **Create Persona Summary table** at the top with quick reference
+
+4. **Generate Relationship Map** (mermaid diagram) showing persona connections
+
+5. **Document Conflicts & Tensions** summary if any competing goals exist
+
+**Validation**: Ensure each persona has:
+- Unique ID in format P-NNN
+- All required fields populated
+- Archetype from valid enum (Power User, Casual User, Administrator, Approver, Observer)
+
+### 4.4 Generate user-stories.md
 
 Derive user stories from the Q&A responses:
 
@@ -269,6 +375,7 @@ After generating all artifacts, present a summary:
 | File | Description |
 |------|-------------|
 | `specs/{feature}/research.md` | Problem statement, users, goals, requirements |
+| `specs/{feature}/personas.md` | Comprehensive persona profiles with relationships |
 | `specs/{feature}/user-stories.md` | User stories in Given/When/Then format |
 | `specs/{feature}/interview-notes.md` | Stakeholder interview templates |
 | `specs/{feature}/competitive-analysis.md` | Competitor analysis framework |
@@ -351,9 +458,16 @@ Ask user which approach they prefer before proceeding.
 | 1.1 | What problem are you solving? | Core problem statement |
 | 1.2 | Who experiences this problem? | Affected users |
 | 1.3 | What happens today without this? | Current state/workarounds |
-| 2.1 | Who are the primary users? | Target personas |
-| 2.2 | What does success look like? | User goals |
-| 2.3 | Different user types? | Persona differentiation |
+| 2.1 | Who are the primary users? | Target personas (assign P-IDs) |
+| 2.2 | What are their roles/archetypes? | Persona classification |
+| 2.3 | Experience and context? | Demographics |
+| 2.4 | What does success look like? | Goals (primary, secondary) |
+| 2.5 | Top 3 pain points? | Prioritized frustrations |
+| 2.6 | How do they work? | Behavioral patterns |
+| 2.7 | When/where do they use this? | Usage context |
+| 2.5.1 | How do personas work together? | Relationships |
+| 2.5.2 | Relationship context? | Interaction details |
+| 2.5.3 | Any conflicting goals? | Conflicts & Tensions |
 | 3.1 | What must it absolutely do? | Must-have requirements |
 | 3.2 | What's nice to have? | Future enhancements |
 | 3.3 | What should it NOT do? | Out of scope |

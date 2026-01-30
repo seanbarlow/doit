@@ -14,6 +14,19 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty). The user input is the feature name or description they want to research.
 
+### Flag Detection
+
+Check for the following flags in `$ARGUMENTS`:
+
+- `--auto-continue`: Skip handoff prompt and automatically invoke `/doit.specit` after research completes
+- `--skip-issues`: Skip GitHub issue creation (existing behavior)
+
+**Extract the feature description** by removing any flags from the arguments. For example:
+- Input: `user-authentication --auto-continue` → Feature: `user-authentication`, Auto-continue: true
+- Input: `payment-system` → Feature: `payment-system`, Auto-continue: false
+
+Store the `auto-continue` flag value for use in Step 7 (Handoff to Specification).
+
 ## Load Project Context
 
 Before proceeding, load the project context to inform your responses:
@@ -361,24 +374,53 @@ Use the template at `.doit/templates/competitive-analysis-template.md`. Set up:
 
 ---
 
-## Step 5: Present Summary and Next Steps
+## Step 5: Validate Research Artifacts
 
-After generating all artifacts, present a summary:
+Before presenting the summary, validate that all required artifacts were created successfully:
+
+```bash
+# Check required artifacts exist
+ls specs/{feature}/research.md 2>/dev/null || echo "WARNING: research.md not found"
+ls specs/{feature}/user-stories.md 2>/dev/null || echo "WARNING: user-stories.md not found"
+```
+
+**Build Artifact Status Table**:
+
+| Artifact | Status | Required |
+|----------|--------|----------|
+| research.md | ✓ or ✗ | Yes |
+| user-stories.md | ✓ or ✗ | Yes |
+| personas.md | ✓ or ✗ | No |
+| interview-notes.md | ✓ or ✗ | No |
+| competitive-analysis.md | ✓ or ✗ | No |
+
+**Validation Rules**:
+- If `research.md` is missing: **ERROR** - Cannot proceed to specification without research
+- If `user-stories.md` is missing: **WARNING** - Specification may be incomplete
+- Optional artifacts: Note their presence for handoff summary
+
+Store the artifact status for display in the handoff prompt.
+
+---
+
+## Step 6: Present Summary and Artifact Status
+
+After generating all artifacts, present a summary with the artifact status from Step 5:
 
 ```markdown
 ---
 
 ## Research Session Complete
 
-### Files Created
+### Artifact Status
 
-| File | Description |
-|------|-------------|
-| `specs/{feature}/research.md` | Problem statement, users, goals, requirements |
-| `specs/{feature}/personas.md` | Comprehensive persona profiles with relationships |
-| `specs/{feature}/user-stories.md` | User stories in Given/When/Then format |
-| `specs/{feature}/interview-notes.md` | Stakeholder interview templates |
-| `specs/{feature}/competitive-analysis.md` | Competitor analysis framework |
+| Artifact | Status | Description |
+|----------|--------|-------------|
+| `specs/{feature}/research.md` | ✓ Created | Problem statement, users, goals, requirements |
+| `specs/{feature}/user-stories.md` | ✓ Created | User stories in Given/When/Then format |
+| `specs/{feature}/personas.md` | [✓ or ✗] | Comprehensive persona profiles with relationships |
+| `specs/{feature}/interview-notes.md` | [✓ or ✗] | Stakeholder interview templates |
+| `specs/{feature}/competitive-analysis.md` | [✓ or ✗] | Competitor analysis framework |
 
 ### Key Findings Summary
 
@@ -386,23 +428,98 @@ After generating all artifacts, present a summary:
 **Target Users**: [Persona list]
 **Core Requirements**: [Top 3 must-haves]
 **Success Metric**: [Primary success measure]
+```
 
 ---
 
-## Next Steps
+## Step 7: Handoff to Specification
 
+### 7.1 Workflow Progress Indicator
+
+Display the current workflow position:
+
+```markdown
 ┌─────────────────────────────────────────────────────────────────┐
 │  Workflow Progress                                              │
 │  ● researchit → ○ specit → ○ planit → ○ taskit → ○ implementit │
 └─────────────────────────────────────────────────────────────────┘
+```
 
-**Recommended**: Run `/doit.specit` to create a technical specification from this research.
+### 7.2 Auto-Continue Check
+
+**If `--auto-continue` flag was detected in Step 1**:
+- Skip the handoff prompt
+- Display: "Auto-continuing to specification phase..."
+- Proceed directly to invoke `/doit.specit {feature-name}`
+- **Go to Step 7.5**
+
+**If no `--auto-continue` flag**: Continue to Step 7.3
+
+### 7.3 Handoff Prompt
+
+Present the interactive handoff prompt:
+
+```markdown
+---
+
+## Continue to Specification?
+
+Your research artifacts are ready to be used for technical specification.
+
+**Options**:
+1. **Continue** - Run `/doit.specit` now with research context pre-loaded
+2. **Later** - Exit and resume specification later
 
 The specification phase will:
 - Use your research.md as context for requirements
 - Reference your user stories for acceptance scenarios
 - Create a formal specification ready for development planning
+
+Your choice: _
 ```
+
+Wait for user response.
+
+### 7.4 Handle User Choice
+
+**If user selects "Continue" (or "1" or "yes")**:
+- Confirm: "Continuing to specification phase..."
+- Proceed to Step 7.5 to invoke specit
+
+**If user selects "Later" (or "2" or "no")**:
+- Display resume instructions:
+
+```markdown
+---
+
+## Session Saved
+
+Your research artifacts are saved in `specs/{feature}/`.
+
+To resume the specification phase later, run:
+```
+/doit.specit {feature-name}
+```
+
+The specification phase will automatically load your research context.
+
+┌─────────────────────────────────────────────────────────────────┐
+│  Workflow Progress                                              │
+│  ✓ researchit → ○ specit → ○ planit → ○ taskit → ○ implementit │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+- End the session
+
+### 7.5 Invoke Specification Phase
+
+When continuing to specification (either via auto-continue or user choice):
+
+1. **Invoke** `/doit.specit {feature-name}` where `{feature-name}` is the feature directory name (e.g., `054-research-spec-pipeline`)
+2. **Pass context**: The feature directory path so specit knows where to find research artifacts
+3. **Report**: "Starting specification phase with research context from `specs/{feature}/`..."
+
+The specit command will automatically detect and load the research artifacts.
 
 ---
 

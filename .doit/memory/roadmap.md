@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-30 (Completed: Stakeholder Persona Templates)
+**Last Updated**: 2026-01-30 (Completed: Research-to-Spec Auto-Pipeline)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -68,10 +68,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Automated Regression Test Suite
   - **Rationale**: Dedicated regression test suite that runs on every commit to catch platform-specific issues early. Includes tests for previously fixed bugs, edge cases, and critical user workflows to prevent feature breakage
   - **Aligns with**: Windows E2E testing (`049-e2e-windows-tests`), Continuous quality improvement
-
-- [ ] Research-to-Spec Auto-Pipeline
-  - **Rationale**: Automatic handoff from researchit → specit with context preservation. When research is complete, prompt to run `/doit.specit` with research artifacts pre-loaded.
-  - **Aligns with**: Opinionated Workflow, researchit feature (`052-researchit-command`)
 
 - [ ] Requirements Traceability Matrix
   - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost.

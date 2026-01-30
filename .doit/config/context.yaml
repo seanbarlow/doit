@@ -37,66 +37,29 @@ total_max_tokens: 16000
 #
 # Available sources:
 #   - constitution: Project principles from .doit/memory/constitution.md
+#   - tech_stack: Technology choices from .doit/memory/tech-stack.md
 #   - roadmap: Project roadmap from .doit/memory/roadmap.md
 #   - current_spec: Feature spec based on current git branch
 #   - related_specs: Similar specs found via content matching
 
-# ---------------------------------------------------------------------------
-# Summarization Configuration
-# ---------------------------------------------------------------------------
-# Controls how context is condensed when it approaches token limits.
-# The AI coding agent (Claude, Copilot, etc.) receives guidance to prioritize.
-#
-# Two-tier approach:
-#   1. Soft threshold: Adds guidance prompt for AI to focus on P1/P2 items
-#   2. Hard limit: Truncates lowest-priority sources
-
-summarization:
-  # Enable roadmap summarization by priority (P1/P2 full, P3/P4 titles)
-  enabled: true
-
-  # Percentage of total_max_tokens that triggers guidance prompt
-  # Default: 80.0 (adds guidance at 80% capacity)
-  threshold_percentage: 80.0
-
-  # If exceeding hard limit, truncate lower-priority sources
-  fallback_to_truncation: true
-
-  # Order of priority for preserving content during truncation
-  # Sources not listed get lowest priority
-  source_priorities:
-    - constitution
-    - roadmap
-    - completed_roadmap
-    - current_spec
-
-  # Completed items matching configuration
-  completed_items:
-    # Maximum completed items to include in context
-    max_count: 5
-    # Minimum relevance score to include (0.0 - 1.0)
-    min_relevance: 0.3
-
 sources:
-  # Project constitution - core principles and architecture decisions
+  # Project constitution - core principles and governance
   # Always loaded first as it provides essential context
   constitution:
     enabled: true
     priority: 1
 
-  # Project roadmap - current priorities and upcoming work
-  # Summarized by priority when summarization is enabled
-  roadmap:
+  # Tech stack - languages, frameworks, infrastructure, deployment
+  # Loaded after constitution for technical decisions
+  tech_stack:
     enabled: true
     priority: 2
 
-  # Completed roadmap items - historical context for the AI
-  # Formatted for AI semantic understanding to identify relevant patterns
-  completed_roadmap:
+  # Project roadmap - current priorities and upcoming work
+  # Helps AI understand project direction
+  roadmap:
     enabled: true
     priority: 3
-    # Maximum completed items to include
-    max_count: 5
 
   # Current feature specification - detected from git branch
   # Example: branch "026-ai-context" loads specs/026-ai-context/spec.md
@@ -123,24 +86,28 @@ sources:
 
 commands:
   # specit: Creating new feature specs
-  # Disable related_specs since we're creating something new
+  # Disable tech_stack (focus on principles) and related_specs (creating new)
   specit:
     sources:
+      tech_stack:
+        enabled: false
       related_specs:
         enabled: false
 
   # roadmapit: Updating project roadmap
-  # Disable current_spec as roadmap is project-wide
+  # Disable current_spec and related_specs as roadmap is project-wide
   roadmapit:
     sources:
       current_spec:
         enabled: false
+      related_specs:
+        enabled: false
 
   # constitution: Updating project principles
-  # Only need current constitution for reference
+  # Disable tech_stack (separate file), spec sources not relevant
   constitution:
     sources:
-      roadmap:
+      tech_stack:
         enabled: false
       current_spec:
         enabled: false

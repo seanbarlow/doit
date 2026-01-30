@@ -1,0 +1,64 @@
+# Validation Rules Configuration for doit
+# Place this file at .doit/validation-rules.yaml to customize validation behavior
+#
+# For more information, see: https://github.com/yourusername/doit#spec-validation
+
+version: "1.0"
+
+# Enable/disable validation globally
+enabled: true
+
+# Disable specific built-in rules by ID
+# Available rule IDs:
+#   - missing-user-scenarios
+#   - missing-requirements
+#   - missing-success-criteria
+#   - missing-acceptance-scenarios
+#   - fr-naming-convention
+#   - sc-naming-convention
+#   - feature-branch-format
+#   - todo-in-approved-spec
+#   - unresolved-clarification
+disabled_rules: []
+  # Example:
+  # - feature-branch-format  # Disable branch naming check
+
+# Override severity of built-in rules
+# Severity levels: error, warning, info
+overrides: []
+  # Example:
+  # - rule: todo-in-approved-spec
+  #   severity: info  # Change from error to info
+
+# Define custom validation rules
+# Each custom rule must have:
+#   - name: Unique identifier (will be used as rule ID)
+#   - description: Human-readable description
+#   - pattern: Regular expression to match
+#   - severity: error, warning, or info
+#   - category: custom (or structure, requirements, clarity for built-in categories)
+#   - check: present (pattern MUST exist) or absent (pattern must NOT exist)
+custom_rules: []
+  # Example - require Overview section:
+  # - name: require-overview
+  #   description: "Spec must include an Overview section"
+  #   pattern: "^## Overview"
+  #   severity: warning
+  #   category: structure
+  #   check: present
+  #
+  # Example - no placeholder text:
+  # - name: no-placeholder-text
+  #   description: "Remove placeholder text before approving"
+  #   pattern: "\\[placeholder\\]|\\[TBD\\]|\\[TODO\\]"
+  #   severity: error
+  #   category: clarity
+  #   check: absent
+  #
+  # Example - require dependencies section:
+  # - name: require-dependencies
+  #   description: "Spec should document dependencies"
+  #   pattern: "^##\\s+(Dependencies|External Dependencies)"
+  #   severity: info
+  #   category: structure
+  #   check: present

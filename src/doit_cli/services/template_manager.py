@@ -83,25 +83,19 @@ class TemplateManager:
     def get_base_template_path(self) -> Path:
         """Get the base path for all templates.
 
+        Templates are bundled inside the doit_cli package at src/doit_cli/templates/.
+        This eliminates the need for symlinks and works on all platforms including
+        Windows where Git may store symlinks as text files.
+
         Returns:
             Path to base templates directory
         """
         if self.custom_source:
             return self.custom_source
 
-        # Use bundled templates
-        try:
-            # Try importlib.resources first (Python 3.9+)
-            import importlib.resources as resources
-
-            # Get the package location
-            with resources.as_file(resources.files("doit_cli")) as pkg_path:
-                return pkg_path / "templates"
-        except (ImportError, TypeError, AttributeError):
-            # Fallback: look relative to this file
-            # During development, templates are at repo_root/templates/
-            module_path = Path(__file__).parent.parent.parent.parent
-            return module_path / "templates"
+        # Templates are bundled in the package directory
+        # Path: src/doit_cli/templates/ (relative to src/doit_cli/services/template_manager.py)
+        return Path(__file__).parent.parent / "templates"
 
     def get_template_source_path(self, agent: Agent) -> Path:
         """Get the source path for templates.

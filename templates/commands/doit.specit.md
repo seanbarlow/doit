@@ -62,6 +62,41 @@ Before generating or modifying code:
 - **Create directories if needed**: Use `mkdir -p` before writing files
 - Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
+## Load Research Artifacts (if available)
+
+Before generating a specification, check if research artifacts exist from a prior `/doit.researchit` session:
+
+```bash
+# Check for research artifacts in the feature directory
+# Pattern: specs/{NNN-feature-name}/research.md
+ls specs/*/research.md 2>/dev/null | head -5
+```
+
+**If research.md exists for this feature**:
+
+1. **Load research.md** - Read the problem statement, target users, goals, and requirements
+2. **Load user-stories.md** (if exists) - Read the user stories to inform acceptance scenarios
+3. **Use research as context**:
+   - Map Problem Statement section to spec Summary
+   - Map Target Users/Personas to user story actors
+   - Map Must-Have requirements to P1 functional requirements
+   - Map Nice-to-Have requirements to P2/P3 functional requirements
+   - Map Success Metrics to spec Success Criteria
+   - Map Out of Scope items directly to spec Out of Scope section
+
+4. **Reference research in spec**: Add a "Research Reference" link at the top of the generated spec:
+
+   ```markdown
+   **Research**: [research.md](research.md) | [user-stories.md](user-stories.md)
+   ```
+
+**If research artifacts also include**:
+
+- `interview-notes.md`: Review for additional user insights and quote notable findings
+- `competitive-analysis.md`: Review for differentiation opportunities and market context
+
+**If NO research artifacts found**: Proceed normally with user-provided feature description.
+
 ## Outline
 
 The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.

@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Research command for Product Owners (`/doit.researchit`) | P2 | 2026-01-29 | `052-researchit-command` | Pre-specification Q&A workflow for capturing business requirements without technology decisions. 12-question interactive session across 4 phases (Problem, Users, Requirements, Metrics). Generates research.md, user-stories.md, interview-notes.md, competitive-analysis.md. Integrated with `/doit.specit` for automatic artifact loading. 15 tasks (100% complete), 5 user stories, 18 requirements covered |
 | macOS E2E testing infrastructure | P2 | 2026-01-28 | `050-macos-e2e-tests` | Comprehensive macOS testing: 112 automated tests across 20 test files, APFS/case-sensitivity, Unicode NFD/NFC normalization, BSD utilities validation, bash/zsh compatibility, extended attributes (xattr), symbolic links, GitHub Actions CI/CD with macOS runners (14, 15), 34 tasks (100% complete), 4 user stories |
 | Windows E2E testing infrastructure | P1 | 2026-01-27 | `049-e2e-windows-tests` | Comprehensive Windows testing: 146 automated tests (99.3% pass), PowerShell 7.x validation, cross-platform parity, CI/CD integration, 31 tasks (100% complete), 4 user stories, path handling, CRLF line endings |
 | GitLab git provider support | P3 | 2026-01-22 | `048-gitlab-provider` | Full GitLab REST API v4 implementation, PAT authentication, issue/MR/milestone management, self-hosted support, 26 tasks (100% complete), 45 unit tests pass |

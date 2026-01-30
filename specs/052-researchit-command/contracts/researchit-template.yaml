@@ -1,0 +1,76 @@
+# Template Contract: /doit.researchit Command
+# Version: 1.0.0
+# Date: 2026-01-29
+
+command:
+  name: researchit
+  type: slash-command-template
+  description: Pre-specification research workflow for Product Owners
+  template_path: templates/commands/doit.researchit.md
+
+arguments:
+  - name: feature_description
+    type: string
+    required: false
+    description: Brief description of the feature to research (AI will prompt if not provided)
+
+execution:
+  executor: AI Assistant (Claude Code, GitHub Copilot, Cursor)
+  method: Template-based conversation
+  interaction: Interactive Q&A through chat interface
+
+qa_phases:
+  - name: Problem Understanding
+    questions:
+      - "What problem are you trying to solve?"
+      - "Who currently experiences this problem?"
+      - "What happens today without this solution?"
+
+  - name: Users and Goals
+    questions:
+      - "Who are the primary users of this feature?"
+      - "What does success look like for these users?"
+      - "Are there different types of users with different needs?"
+
+  - name: Requirements and Constraints
+    questions:
+      - "What must this feature absolutely do? (Must-haves)"
+      - "What would be nice to have but isn't essential?"
+      - "What should this feature NOT do? (Explicit exclusions)"
+      - "Are there any constraints (timeline, budget, compliance)?"
+
+  - name: Success Metrics
+    questions:
+      - "How will you measure if this feature is successful?"
+      - "What would failure look like?"
+
+output_artifacts:
+  - path: "specs/{feature}/research.md"
+    description: Main research document with problem statement, users, goals
+    template: ".doit/templates/research-template.md"
+    required: true
+
+  - path: "specs/{feature}/user-stories.md"
+    description: User stories in Given/When/Then format
+    template: ".doit/templates/user-stories-template.md"
+    required: true
+
+  - path: "specs/{feature}/interview-notes.md"
+    description: Stakeholder interview templates
+    template: ".doit/templates/interview-notes-template.md"
+    required: false
+
+  - path: "specs/{feature}/competitive-analysis.md"
+    description: Competitive analysis structure
+    template: ".doit/templates/competitive-analysis-template.md"
+    required: false
+
+integration:
+  consumes: []
+  produces:
+    - command: "/doit.specit"
+      files: ["research.md", "user-stories.md"]
+      relationship: "Research artifacts provide context for specification"
+
+next_steps:
+  on_complete: "Run `/doit.specit` to create a technical specification from this research"

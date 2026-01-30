@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-27 (Completed: macOS E2E testing infrastructure)
+**Last Updated**: 2026-01-29 (Added: Research command for Product Owners)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -69,9 +69,25 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Dedicated regression test suite that runs on every commit to catch platform-specific issues early. Includes tests for previously fixed bugs, edge cases, and critical user workflows to prevent feature breakage
   - **Aligns with**: Windows E2E testing (`049-e2e-windows-tests`), Continuous quality improvement
 
+- [ ] Research-to-Spec Auto-Pipeline
+  - **Rationale**: Automatic handoff from researchit → specit with context preservation. When research is complete, prompt to run `/doit.specit` with research artifacts pre-loaded.
+  - **Aligns with**: Opinionated Workflow, researchit feature (`052-researchit-command`)
+
+- [ ] Stakeholder Persona Templates
+  - **Rationale**: Pre-built persona templates for common stakeholder types (end-user, admin, power-user). Helps Product Owners structure user research consistently with guided questions about goals, pain points, and success metrics.
+  - **Aligns with**: researchit Q&A mode, user-stories.md output
+
+- [ ] Requirements Traceability Matrix
+  - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost.
+  - **Aligns with**: Cross-reference support (`033-spec-task-crossrefs`), researchit feature
+
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
+
+- [ ] Research Version History
+  - **Rationale**: Track iterations of research.md as understanding evolves. Requirements often change during discovery; version history shows how thinking evolved and supports "why" questions later.
+  - **Aligns with**: Persistent Memory principle, researchit feature
 
 - [ ] Web dashboard for project visualization
   - **Rationale**: Visual representation of project architecture and progress

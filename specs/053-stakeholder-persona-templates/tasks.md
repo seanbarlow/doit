@@ -96,8 +96,8 @@ gantt
 
 **Purpose**: Create the core persona templates that all user stories depend on
 
-- [ ] T001 [P] Create comprehensive persona profile template in .doit/templates/persona-template.md with 10+ fields: Identity (name, role, archetype), Demographics (experience level, team size, domain expertise), Goals (primary, secondary), Pain Points (prioritized list), Behavioral Patterns (technology proficiency, work style, decision making), Success Criteria, Usage Context, Relationships table, Conflicts & Tensions section
-- [ ] T002 [P] Create personas output template in .doit/templates/personas-output-template.md with: Persona Summary table, Detailed Profiles section, Relationship Map section, Conflicts & Tensions consolidated view
+- [X] T001 [P] Create comprehensive persona profile template in .doit/templates/persona-template.md with 10+ fields: Identity (name, role, archetype), Demographics (experience level, team size, domain expertise), Goals (primary, secondary), Pain Points (prioritized list), Behavioral Patterns (technology proficiency, work style, decision making), Success Criteria, Usage Context, Relationships table, Conflicts & Tensions section
+- [X] T002 [P] Create personas output template in .doit/templates/personas-output-template.md with: Persona Summary table, Detailed Profiles section, Relationship Map section, Conflicts & Tensions consolidated view
 
 **Checkpoint**: Base templates ready - command integration can now begin
 
@@ -111,8 +111,8 @@ gantt
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Update Phase 2 (Users and Goals) in templates/commands/doit.researchit.md to add comprehensive persona questions: archetype selection, demographics, technology proficiency, behavioral patterns, success criteria beyond basic role/goals/pain points
-- [ ] T004 [US1] Add personas.md generation logic in templates/commands/doit.researchit.md to output all persona profiles using personas-output-template.md format, assign unique IDs (P-001, P-002), include summary table
+- [X] T003 [US1] Update Phase 2 (Users and Goals) in templates/commands/doit.researchit.md to add comprehensive persona questions: archetype selection, demographics, technology proficiency, behavioral patterns, success criteria beyond basic role/goals/pain points
+- [X] T004 [US1] Add personas.md generation logic in templates/commands/doit.researchit.md to output all persona profiles using personas-output-template.md format, assign unique IDs (P-001, P-002), include summary table
 
 **Checkpoint**: US1 complete - `/doit.researchit` generates full persona profiles with 10+ fields
 
@@ -126,8 +126,8 @@ gantt
 
 ### Implementation for User Story 2
 
-- [ ] T005 [US2] Add relationship questions to Phase 2 in templates/commands/doit.researchit.md asking how personas work together: who manages whom, who collaborates with whom, who approves whose work, any blocking relationships
-- [ ] T006 [US2] Update personas.md generation in templates/commands/doit.researchit.md to populate relationship tables bidirectionally (if A manages B, add to both A and B profiles) and handle "No direct relationships identified" default
+- [X] T005 [US2] Add relationship questions to Phase 2 in templates/commands/doit.researchit.md asking how personas work together: who manages whom, who collaborates with whom, who approves whose work, any blocking relationships
+- [X] T006 [US2] Update personas.md generation in templates/commands/doit.researchit.md to populate relationship tables bidirectionally (if A manages B, add to both A and B profiles) and handle "No direct relationships identified" default
 
 **Checkpoint**: US2 complete - persona relationships documented bidirectionally
 
@@ -141,8 +141,8 @@ gantt
 
 ### Implementation for User Story 3
 
-- [ ] T007 [US3] Add "Load Personas" section to templates/commands/doit.specit.md to check for specs/{feature}/personas.md, read persona IDs and names if found, store for user story generation
-- [ ] T008 [US3] Update user story generation in templates/commands/doit.specit.md to include `Persona: P-XXX` reference in each story header, require persona selection when generating stories
+- [X] T007 [US3] Add "Load Personas" section to templates/commands/doit.specit.md to check for specs/{feature}/personas.md, read persona IDs and names if found, store for user story generation
+- [X] T008 [US3] Update user story generation in templates/commands/doit.specit.md to include `Persona: P-XXX` reference in each story header, require persona selection when generating stories
 
 **Checkpoint**: US3 complete - all generated user stories reference a persona ID
 
@@ -156,7 +156,7 @@ gantt
 
 ### Implementation for User Story 4
 
-- [ ] T009 [US4] Add standalone usage instructions to .doit/templates/persona-template.md header including: how to copy and fill manually, placeholder syntax explanation, validation checklist, link to personas-output-template.md for multi-persona documents
+- [X] T009 [US4] Add standalone usage instructions to .doit/templates/persona-template.md header including: how to copy and fill manually, placeholder syntax explanation, validation checklist, link to personas-output-template.md for multi-persona documents
 
 **Checkpoint**: US4 complete - template usable standalone with clear instructions
 
@@ -166,7 +166,7 @@ gantt
 
 **Purpose**: Validation and documentation
 
-- [ ] T010 Validate all templates against data-model.md requirements: verify 10+ fields in persona-template.md, verify ID format P-NNN enforced, verify relationship types match enum (manages, collaborates, approves, blocks, reports_to), verify archetype values match enum (Power User, Casual User, Administrator, Approver, Observer)
+- [X] T010 Validate all templates against data-model.md requirements: verify 10+ fields in persona-template.md, verify ID format P-NNN enforced, verify relationship types match enum (manages, collaborates, approves, blocks, reports_to), verify archetype values match enum (Power User, Casual User, Administrator, Approver, Observer)
 
 ---
 

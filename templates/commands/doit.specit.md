@@ -94,8 +94,53 @@ ls specs/*/research.md 2>/dev/null | head -5
 
 - `interview-notes.md`: Review for additional user insights and quote notable findings
 - `competitive-analysis.md`: Review for differentiation opportunities and market context
+- `personas.md`: Load comprehensive persona profiles for user story generation (see below)
 
 **If NO research artifacts found**: Proceed normally with user-provided feature description.
+
+## Load Personas (if available)
+
+Check if comprehensive persona profiles exist from `/doit.researchit`:
+
+```bash
+# Check for personas.md in the feature directory
+ls specs/*/personas.md 2>/dev/null | head -5
+```
+
+**If personas.md exists for this feature**:
+
+1. **Load personas.md** - Read the persona summary table and detailed profiles
+2. **Extract persona IDs and names**:
+   - Parse the Persona Summary table for ID (P-001, P-002) and Name columns
+   - Store as a list: `[{id: "P-001", name: "Developer Dana", role: "Senior Developer"}, ...]`
+3. **Use personas for user story generation**:
+   - Each user story MUST reference a persona ID in the header
+   - Format: `### User Story N - [Title] (Priority: PN) | Persona: P-XXX`
+   - Match user stories to the persona whose goals/pain points they address
+4. **Reference personas in spec**: Add a "Personas Reference" link at the top of the generated spec:
+
+   ```markdown
+   **Personas**: [personas.md](personas.md)
+   ```
+
+**When generating user stories with personas**:
+
+- Review each persona's primary goal and pain points
+- Create user stories that directly address those goals/pain points
+- Include the persona's name and ID in the story context
+- Example:
+
+  ```markdown
+  ### User Story 1 - Quick Task Creation (Priority: P1) | Persona: P-001
+
+  As **Developer Dana (P-001)**, a Power User who needs efficiency...
+  ```
+
+**If NO personas.md found**:
+
+- Proceed normally without persona references
+- Use generic "As a user..." format for user stories
+- If the feature requires specific user types, use a default "Primary User" placeholder
 
 ## Outline
 

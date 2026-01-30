@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Research Command for Product Owners** (#052)
+  - New `/doit.researchit` slash command for pre-specification business requirements capture
+  - Interactive Q&A workflow: 12 guided questions across 4 phases (Problem, Users, Requirements, Metrics)
+  - No technology questions - focused purely on business value and user needs
+  - Generates 4 research artifacts:
+    - `research.md` - Problem statement, target users, business goals, success metrics
+    - `user-stories.md` - User stories in Given/When/Then format with persona references
+    - `interview-notes.md` - Stakeholder interview templates with suggested questions
+    - `competitive-analysis.md` - Competitor comparison framework
+  - Session resume support: Save progress mid-session and continue later
+  - Gap-aware feature numbering: Correctly handles directory number gaps
+  - Draft cleanup: Automatic removal of draft files after completion
+  - Integration with `/doit.specit`: Research artifacts auto-loaded for specification
+
+- **Specit Research Integration**
+  - `/doit.specit` now automatically loads research artifacts from prior `/doit.researchit` sessions
+  - Seamless handoff from Product Owner research to technical specification
+
 ## [0.1.14] - 2026-01-22
 
 ### Fixed

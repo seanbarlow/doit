@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-01-30
+
+### Fixed
+
+- **Windows symlink issue causing empty commands** (#658)
+  - Fixed `doit init` not creating Claude/Copilot commands on Windows
+  - Root cause: Git on Windows stores symlinks as text files when `core.symlinks=false`
+  - Solution: Moved templates into the package (`src/doit_cli/templates/`) eliminating symlink dependency
+  - Simplified `get_base_template_path()` to use package-relative paths
+  - Package is now fully self-contained and works on all platforms without symlink support
+  - `doit init` now correctly creates all 13 command templates on Windows
+
+### Added
+
+- Added `researchit` to `DOIT_COMMANDS` constant for consistency
+- Fixed UTF-8 encoding in test files for Windows compatibility
+
+## [0.1.15] - 2026-01-30
+
 ### Added
 
 - **Research Command for Product Owners** (#052)

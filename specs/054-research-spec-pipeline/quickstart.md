@@ -175,16 +175,17 @@ If `$ARGUMENTS` is empty:
 
 ### Files to Modify
 
-- [ ] `templates/commands/doit.researchit.md`
-  - [ ] Add --auto-continue flag detection
-  - [ ] Add Step 6: Handoff to Specification
-  - [ ] Add artifact validation
-  - [ ] Add handoff prompt
-  - [ ] Add resume instructions
+- [x] `templates/commands/doit.researchit.md`
+  - [x] Add --auto-continue flag detection
+  - [x] Add Step 5: Validate Research Artifacts
+  - [x] Add Step 7: Handoff to Specification
+  - [x] Add artifact validation
+  - [x] Add handoff prompt
+  - [x] Add resume instructions
 
-- [ ] `templates/commands/doit.specit.md`
-  - [ ] Add research context confirmation message
-  - [ ] Add recent feature suggestion when no args
+- [x] `templates/commands/doit.specit.md`
+  - [x] Add research context confirmation message
+  - [x] Add recent feature suggestion when no args
 
 ### No New Files Required
 

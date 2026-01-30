@@ -98,6 +98,28 @@ ls specs/*/research.md 2>/dev/null | head -5
 
 **If NO research artifacts found**: Proceed normally with user-provided feature description.
 
+### Research Context Confirmation
+
+**When research artifacts ARE loaded**, display a confirmation message to the user:
+
+```markdown
+## Research Context Loaded
+
+Found research artifacts from prior `/doit.researchit` session:
+
+| Artifact | Status |
+|----------|--------|
+| research.md | ✓ Loaded |
+| user-stories.md | [✓ Loaded or ✗ Not found] |
+| personas.md | [✓ Loaded or ✗ Not found] |
+| interview-notes.md | [✓ Loaded or ✗ Not found] |
+| competitive-analysis.md | [✓ Loaded or ✗ Not found] |
+
+These artifacts will inform the specification. Requirements from research.md will be mapped to functional requirements.
+```
+
+This confirmation helps users understand that their research is being used and provides transparency about which artifacts were found.
+
 ## Load Personas (if available)
 
 Check if comprehensive persona profiles exist from `/doit.researchit`:
@@ -197,7 +219,29 @@ Given that feature description, do this:
 4. Follow this execution flow:
 
     1. Parse user description from Input
-       If empty: ERROR "No feature description provided"
+       If empty, check for recent research:
+       ```bash
+       # Find most recently modified research.md
+       ls -t specs/*/research.md 2>/dev/null | head -1
+       ```
+
+       **If recent research found**:
+       - Extract the feature name from the directory path (e.g., `specs/054-my-feature/research.md` → `054-my-feature`)
+       - Present suggestion to user:
+         ```markdown
+         No feature specified. Did you mean to continue with **{feature-name}**?
+
+         Research artifacts were recently created for this feature.
+
+         - **Yes** - Continue with {feature-name}
+         - **No** - Enter a new feature description
+         ```
+       - Wait for user response
+       - If "Yes": Use the suggested feature name and load its research artifacts
+       - If "No": Prompt user for new feature description
+
+       **If NO recent research found**:
+       ERROR "No feature description provided"
     2. Extract key concepts from description
        Identify: actors, actions, data, constraints
     3. For unclear aspects:

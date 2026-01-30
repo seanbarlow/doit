@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Research-to-Spec Auto-Pipeline | P3 | 2026-01-30 | `054-research-spec-pipeline` | Seamless handoff from `/doit.researchit` to `/doit.specit` with context preservation. Handoff prompt with Continue/Later options, `--auto-continue` flag for batch workflows, artifact validation (Step 5), progress indicator, resume instructions. Template-only feature: doit.researchit.md, doit.specit.md. 11 tasks (100% complete), 4 user stories, 12 requirements |
 | Stakeholder Persona Templates | P3 | 2026-01-30 | `053-stakeholder-persona-templates` | Comprehensive persona template (17 fields vs 4), persona relationship mapping, unique IDs (P-NNN) for traceability, `/doit.researchit` Q&A integration, `/doit.specit` persona-story linking. Template-only feature: persona-template.md, personas-output-template.md. 10 tasks (100% complete), 4 user stories, 10 requirements |
 | Research command for Product Owners (`/doit.researchit`) | P2 | 2026-01-29 | `052-researchit-command` | Pre-specification Q&A workflow for capturing business requirements without technology decisions. 12-question interactive session across 4 phases (Problem, Users, Requirements, Metrics). Generates research.md, user-stories.md, interview-notes.md, competitive-analysis.md. Integrated with `/doit.specit` for automatic artifact loading. 15 tasks (100% complete), 5 user stories, 18 requirements covered |
 | macOS E2E testing infrastructure | P2 | 2026-01-28 | `050-macos-e2e-tests` | Comprehensive macOS testing: 112 automated tests across 20 test files, APFS/case-sensitivity, Unicode NFD/NFC normalization, BSD utilities validation, bash/zsh compatibility, extended attributes (xattr), symbolic links, GitHub Actions CI/CD with macOS runners (14, 15), 34 tasks (100% complete), 4 user stories |
@@ -63,10 +64,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 31
+- **Total Items Completed**: 32
 - **P1 Items Completed**: 5 (4 archived)
 - **P2 Items Completed**: 17 (6 archived)
-- **P3 Items Completed**: 7
+- **P3 Items Completed**: 8
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit)
 

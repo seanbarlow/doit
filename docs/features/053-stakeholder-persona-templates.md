@@ -1,0 +1,125 @@
+# Stakeholder Persona Templates
+
+**Completed**: 2026-01-30
+**Branch**: `053-stakeholder-persona-templates`
+**PR**: Pending
+
+## Overview
+
+Enhanced the `/doit.researchit` workflow with a dedicated stakeholder persona template system that provides comprehensive profile fields (17 vs current 4), persona relationship mapping, unique persona IDs (P-NNN) for traceability, and seamless integration with `/doit.specit` for user story generation.
+
+This is a **template-only feature** - implementation consists entirely of markdown template files with no Python code changes required.
+
+## Requirements Implemented
+
+| ID | Description | Status |
+|----|-------------|--------|
+| FR-001 | Template with 10+ comprehensive profile fields | Done |
+| FR-002 | Required fields: name, role, archetype, demographics, goals, pain points, tech proficiency, behavioral patterns | Done |
+| FR-003 | Relationship section for persona-to-persona mapping | Done |
+| FR-004 | `/doit.researchit` asks questions to populate all template fields | Done |
+| FR-005 | Generate `personas.md` artifact with all defined personas | Done |
+| FR-006 | Unique persona IDs (P-001, P-002, etc.) for story linking | Done |
+| FR-007 | `/doit.specit` loads `personas.md` when generating user stories | Done |
+| FR-008 | User stories reference persona IDs for traceability | Done |
+| FR-009 | Template usable standalone (copy and fill manually) | Done |
+| FR-010 | "Conflicts & Tensions" section for competing goals | Done |
+
+## Technical Details
+
+### Architecture
+
+```
+templates/
+├── persona-template.md           # Input template (17 fields)
+└── personas-output-template.md   # Output format for generated personas.md
+
+templates/commands/
+├── doit.researchit.md           # Updated: Phase 2 Q&A + personas.md generation
+└── doit.specit.md               # Updated: Load Personas section
+```
+
+### Key Design Decisions
+
+1. **Comprehensive Fields (17 total)**:
+   - Identity: Name, Role, Archetype
+   - Demographics: Experience Level, Team Size, Domain Expertise
+   - Goals: Primary, Secondary
+   - Pain Points: 3 prioritized items
+   - Behavioral Patterns: Tech Proficiency, Work Style, Decision Making
+   - Success Criteria, Usage Context
+   - Relationships, Conflicts & Tensions
+
+2. **Persona ID System**: P-NNN format enables cross-referencing between personas.md and user-stories.md
+
+3. **Bidirectional Relationships**: If A manages B, both profiles document the relationship
+
+4. **Archetype Classification**: Power User, Casual User, Administrator, Approver, Observer
+
+5. **Relationship Types**: manages, reports_to, collaborates, approves, blocks
+
+## Files Changed
+
+### New Files
+- `templates/persona-template.md` - Comprehensive persona input template
+- `templates/personas-output-template.md` - Output format for generated personas.md
+
+### Modified Files
+- `templates/commands/doit.researchit.md` - Added Phase 2 Q&A (Q2.1-Q2.7), Phase 2.5 relationships, personas.md generation
+- `templates/commands/doit.specit.md` - Added "Load Personas" section for story generation
+
+### Spec Artifacts
+- `specs/053-stakeholder-persona-templates/spec.md`
+- `specs/053-stakeholder-persona-templates/plan.md`
+- `specs/053-stakeholder-persona-templates/data-model.md`
+- `specs/053-stakeholder-persona-templates/quickstart.md`
+- `specs/053-stakeholder-persona-templates/tasks.md`
+- `specs/053-stakeholder-persona-templates/test-report.md`
+- `specs/053-stakeholder-persona-templates/review-report.md`
+
+## Testing
+
+### Automated Tests
+- Template validation: 10/10 passed
+- Data model compliance: All requirements met
+
+### Manual Tests
+- 9/9 tests passed (MT-001 through MT-009)
+- Verified: 17 profile fields, relationship mapping, standalone usage, persona-story linking
+
+## User Stories Delivered
+
+| Story | Description | Priority |
+|-------|-------------|----------|
+| US1 | Create Detailed Persona Profiles | P1 |
+| US2 | Persona Relationship Mapping | P2 |
+| US3 | Persona-Story Linking | P2 |
+| US4 | Standalone Template Usage | P3 |
+
+## Usage
+
+### With `/doit.researchit` (Recommended)
+1. Run `/doit.researchit [feature-name]`
+2. Answer persona questions in Phase 2 (Q2.1-Q2.7)
+3. For multiple personas, answer Phase 2.5 relationship questions
+4. `personas.md` is auto-generated with full profiles
+
+### Standalone (Brownfield Projects)
+1. Copy `templates/persona-template.md` to `specs/{feature}/personas.md`
+2. Fill in placeholders (marked with `{...}`)
+3. For multiple personas, duplicate the persona section
+4. Validate using the checklist at the bottom
+
+### With `/doit.specit`
+1. If `personas.md` exists, `/doit.specit` auto-loads it
+2. User stories are generated with `Persona: P-XXX` references
+3. Stories are matched to personas based on goals/pain points
+
+## Related Features
+
+- `052-researchit-command` - Pre-specification research workflow
+- `033-spec-task-crossrefs` - Cross-reference support
+
+---
+
+*Generated by `/doit.checkin` on 2026-01-30*

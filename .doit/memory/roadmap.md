@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-29 (Added: Research command for Product Owners)
+**Last Updated**: 2026-01-30 (Completed: Stakeholder Persona Templates)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -73,10 +73,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Automatic handoff from researchit → specit with context preservation. When research is complete, prompt to run `/doit.specit` with research artifacts pre-loaded.
   - **Aligns with**: Opinionated Workflow, researchit feature (`052-researchit-command`)
 
-- [ ] Stakeholder Persona Templates
-  - **Rationale**: Pre-built persona templates for common stakeholder types (end-user, admin, power-user). Helps Product Owners structure user research consistently with guided questions about goals, pain points, and success metrics.
-  - **Aligns with**: researchit Q&A mode, user-stories.md output
-
 - [ ] Requirements Traceability Matrix
   - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost.
   - **Aligns with**: Cross-reference support (`033-spec-task-crossrefs`), researchit feature
@@ -108,7 +104,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 | Version | Date       | Key Changes                                                                         |
 |---------|------------|-------------------------------------------------------------------------------------|
-| v0.1.14 | 2026-01-27 | Windows E2E Testing - 146 tests, PowerShell 7.x, cross-platform parity, CI/CD (#645) |
+| v0.1.14 | 2026-01-27 | Windows E2E Testing - 146 tests, PowerShell 7.x, cross-platform parity, CI/CD (#645)|
 | v0.1.13 | 2026-01-22 | GitLab Git Provider Support - full REST API implementation, tutorials (#637)        |
 | v0.1.12 | 2026-01-22 | Git provider configuration wizard - interactive setup for GitHub/ADO/GitLab (#636)  |
 | v0.1.11 | 2026-01-22 | Fixed CLI ModuleNotFoundError - included `doit_toolkit_cli` in wheel package (#598) |

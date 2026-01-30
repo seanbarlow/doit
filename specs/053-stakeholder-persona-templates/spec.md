@@ -158,6 +158,7 @@ erDiagram
 ## Technical Notes
 
 This is a **template-only feature** - implementation consists of:
+
 1. New `.doit/templates/persona-template.md` file
 2. Updates to `templates/commands/doit.researchit.md` to use the new template
 3. Updates to `templates/commands/doit.specit.md` to load and reference personas

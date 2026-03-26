@@ -473,6 +473,58 @@ Before any file modification:
 
 ---
 
+## Error Recovery
+
+### Missing Documentation Sources
+
+The documentation generator could not find expected source files.
+
+**ERROR** | If source files referenced by the documentation are not found:
+
+1. Check that all source directories exist: `ls src/ docs/ specs/`
+2. Verify the project structure matches what documentit expects
+3. If files were recently moved or renamed, update the documentation configuration
+4. Re-run `/doit.documentit` after fixing the source paths
+5. Verify: `ls src/ docs/ specs/` confirms all expected source directories exist
+
+> Prevention: Run `doit verify` before documentation generation to confirm project structure
+
+If the above steps don't resolve the issue: manually specify source directories when running the documentation command.
+
+### Index Generation Failure
+
+The documentation index could not be generated from the available content.
+
+**ERROR** | If the documentation index fails to generate:
+
+1. Check if the documentation directory exists and has content: `ls docs/`
+2. Verify no files have syntax errors that prevent parsing
+3. Try generating documentation for a single file to isolate the issue
+4. Re-run `/doit.documentit` after fixing any issues
+5. Verify: `ls docs/index.md` confirms the index file was generated
+
+> Prevention: Ensure all documentation files have valid markdown syntax before generating the index
+
+If the above steps don't resolve the issue: manually create the index file based on the available documentation structure.
+
+### Stale Cross-References
+
+The documentation contains links to files or sections that no longer exist.
+
+**WARNING** | If stale cross-references are detected:
+
+1. Review the list of broken references in the documentation output
+2. Update or remove references to files that have been moved or deleted
+3. Check for renamed files that need their references updated
+4. Re-run `/doit.documentit` to verify all references are valid
+5. Verify: no broken reference warnings appear in the output
+
+> Prevention: Update documentation references whenever you rename or move files
+
+If the above steps don't resolve the issue: use `grep -r "](.*\.md)" docs/` to find all markdown links and manually verify each one.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:

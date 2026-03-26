@@ -259,45 +259,80 @@ Findings:
 
 ### Workflow State Corruption
 
-If `.doit/state/fixit-{issue_id}.json` becomes corrupted:
+The workflow state file is unreadable or contains invalid data.
+
+**FATAL** | Your investigation progress may be lost if the state file is unrecoverable. If `.doit/state/fixit-{issue_id}.json` becomes corrupted:
 
 1. Run `doit fixit status {issue_id}` to see current state
 2. If unreadable, delete the state file and restart: `doit fixit start {issue_id}`
 3. Re-add key investigation findings manually
+4. Verify: `doit fixit status {issue_id}` shows valid workflow state
+
+> Prevention: Avoid manually editing state files in `.doit/state/`
+
+If the above steps don't resolve the issue: recreate the workflow from scratch and document previous findings in the GitHub issue comments.
 
 ### GitHub Issue Not Found
 
-If the issue was closed, deleted, or transferred:
+The referenced GitHub issue does not exist or is inaccessible.
+
+**ERROR** | If the issue was closed, deleted, or transferred:
 
 1. Check issue status: `gh issue view {issue_id}`
 2. If transferred, update the workflow with the new issue number
 3. If closed by mistake, reopen: `gh issue reopen {issue_id}`
+4. Verify: `gh issue view {issue_id}` shows the issue details
+
+> Prevention: Confirm the issue number before starting a workflow
+
+If the above steps don't resolve the issue: create a new issue describing the bug and start a fresh workflow.
 
 ### Branch Conflicts
 
-If the fix branch has merge conflicts with the base branch:
+The fix branch has merge conflicts with the base branch.
+
+**ERROR** | If the fix branch has merge conflicts with the base branch:
 
 1. Fetch latest: `git fetch origin`
 2. Rebase onto target: `git rebase origin/main` (or develop)
 3. Resolve conflicts, then continue the workflow
 4. Do NOT force-push without confirming with the team
+5. Verify: `git status` shows no merge conflicts remaining
+
+> Prevention: Rebase frequently against the base branch during long-running fixes
+
+If the above steps don't resolve the issue: consider creating a new branch from the latest base and cherry-picking your fix commits.
 
 ### Investigation Dead End
 
-If investigation doesn't reveal a root cause:
+The investigation did not identify a root cause for the bug.
+
+**WARNING** | If investigation doesn't reveal a root cause:
 
 1. Add a `hypothesis` finding documenting what was ruled out
 2. Run `doit fixit investigate --done` to close the investigation
 3. Add a comment to the GitHub issue requesting more information
 4. Consider running `doit fixit cancel {issue_id}` if the bug is not reproducible
+5. Verify: the GitHub issue has a comment summarizing investigation findings
+
+> Prevention: Set a time limit for investigation and request more context early if needed
+
+If the above steps don't resolve the issue: escalate by tagging relevant team members on the GitHub issue for additional input.
 
 ### Plan Rejected After Review
 
-If the fix plan needs revision:
+The fix plan was not approved and needs changes.
+
+**WARNING** | If the fix plan needs revision:
 
 1. The workflow stays in `reviewing` phase
 2. Run `doit fixit plan --generate` again with updated investigation findings
 3. Review the new plan with `doit fixit review`
+4. Verify: `doit fixit status {issue_id}` shows the workflow advanced past `reviewing`
+
+> Prevention: Include thorough investigation findings before generating the plan
+
+If the above steps don't resolve the issue: add more investigation findings to strengthen the root cause analysis before regenerating the plan.
 
 ---
 

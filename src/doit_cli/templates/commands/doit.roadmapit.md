@@ -345,51 +345,6 @@ Based on your roadmap and project context, here are some features you might cons
 
 ---
 
-### 6b. Generate Project-Level Personas
-
-After the roadmap is written or updated, generate or update `.doit/memory/personas.md` with project-level stakeholder personas.
-
-#### 6b.1 Check for Existing Personas
-
-```bash
-ls .doit/memory/personas.md 2>/dev/null
-```
-
-- **If file exists**: Load it and offer to update (add new personas, refine existing ones) rather than overwriting. Present the current persona summary table and ask if changes are needed.
-- **If file does NOT exist**: Generate new personas from scratch.
-
-#### 6b.2 Derive Personas from Project Context
-
-Use the constitution and roadmap to identify stakeholder types:
-
-1. **From constitution**: Extract stakeholder types mentioned in purpose, success criteria, and governance sections
-2. **From roadmap**: Identify user-facing features and who they serve (developers, product owners, maintainers, etc.)
-3. **From existing feature-level personas**: Check `specs/*/personas.md` for previously defined personas that should be elevated to project level
-
-#### 6b.3 Generate Personas File
-
-1. Load the persona output template: `.doit/templates/personas-output-template.md`
-2. Replace placeholders with derived persona data:
-   - Assign sequential IDs (P-001, P-002, etc.)
-   - Fill Identity, Demographics, Goals, Pain Points, Behavioral Patterns
-   - Document persona relationships if multiple personas exist
-3. Write to `.doit/memory/personas.md`
-
-**Skip conditions**: If no constitution exists or the project context is insufficient to derive meaningful personas, skip this step with a message: "Persona generation skipped — insufficient project context. Run `/doit.constitution` first."
-
-#### 6b.4 Report Persona Generation
-
-Include persona generation results in the completion report:
-
-```markdown
-### Personas
-- Generated/Updated: `.doit/memory/personas.md`
-- Persona count: [N]
-- Personas: [P-001: Name, P-002: Name, ...]
-```
-
----
-
 ### 7. Completion Report
 
 Output a summary of changes:
@@ -429,6 +384,57 @@ Output a summary of changes:
 - Use feature branch references `[###-feature-name]` for traceability
 - Maintain maximum 3-5 P1 items (truly critical only)
 - Back up malformed roadmaps before recreating
+
+---
+
+## Error Recovery
+
+### GitHub API Authentication Failure
+
+The roadmap could not be synced because GitHub authentication is invalid.
+
+**ERROR** | If GitHub API calls fail during roadmap sync:
+
+1. Check your authentication: `gh auth status`
+2. If expired or invalid, re-authenticate: `gh auth login`
+3. Verify repository access: `gh repo view`
+4. Retry: re-run `/doit.roadmapit`
+5. Verify: `gh issue list --limit 5` confirms API access is working
+
+> Prevention: Run `gh auth status` before starting roadmap operations
+
+If the above steps don't resolve the issue: proceed with local-only roadmap updates — GitHub sync can be done later.
+
+### Merge Conflict in Roadmap File
+
+The roadmap file has conflicting changes from concurrent edits.
+
+**ERROR** | If the roadmap file has merge conflicts:
+
+1. Open the roadmap file and look for conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+2. Resolve conflicts by choosing the correct content for each section
+3. After resolving, stage the file: `git add .doit/memory/roadmap.md`
+4. Verify: `cat .doit/memory/roadmap.md | grep -c "<<<<<<"` returns 0
+
+> Prevention: Pull latest changes before editing the roadmap: `git pull`
+
+If the above steps don't resolve the issue: back up your changes, reset the file to the remote version, and manually re-apply your updates.
+
+### Priority Conflict or Duplicate Items
+
+The roadmap contains duplicate entries or conflicting priority assignments.
+
+**WARNING** | If duplicate or conflicting roadmap items are detected:
+
+1. Review the roadmap for duplicate entries: check for items with similar names
+2. Merge duplicates by combining their descriptions and keeping the higher priority
+3. Resolve priority conflicts by reviewing the project goals and timeline
+4. Re-run `/doit.roadmapit` to validate the updated roadmap
+5. Verify: no duplicate items appear in the roadmap output
+
+> Prevention: Review existing roadmap items before adding new ones to avoid duplicates
+
+If the above steps don't resolve the issue: manually edit the roadmap file to remove duplicates and set clear priorities.
 
 ---
 

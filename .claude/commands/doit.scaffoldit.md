@@ -452,6 +452,56 @@ Before creating files:
 
 ---
 
+## Error Recovery
+
+### Directory Creation Failure
+
+The project structure could not be created due to permission or filesystem issues.
+
+**ERROR** | If directory creation fails:
+
+1. Check permissions on the target directory: `ls -la .`
+2. Verify you have write access to the current directory
+3. If permissions are insufficient, adjust them or choose a different location
+4. Retry: re-run `/doit.scaffoldit`
+5. Verify: `ls -la .doit/` confirms the directory structure was created
+
+> Prevention: Ensure you have write permissions in the target directory before scaffolding
+
+If the above steps don't resolve the issue: create the `.doit/` directory structure manually using `mkdir -p .doit/{templates,config,state,memory,scripts}`.
+
+### Template Copy Failure
+
+Template files could not be copied to the project directory.
+
+**ERROR** | If template files fail to copy:
+
+1. Check if the source templates exist: `python -c "import doit_cli; print(doit_cli.__file__)"`
+2. Verify the package installation: `pip show doit-toolkit-cli`
+3. If the package is corrupted, reinstall: `pip install --force-reinstall doit-toolkit-cli`
+4. Retry: re-run `/doit.scaffoldit`
+5. Verify: `ls .doit/templates/` shows template files
+
+If the above steps don't resolve the issue: run `doit init --force` to reinitialize from scratch.
+
+### Existing Project Conflict
+
+The target directory already contains a doit project structure.
+
+**WARNING** | If the directory already has a `.doit/` folder:
+
+1. Check the existing structure: `ls -la .doit/`
+2. If you want to preserve existing configuration, choose to merge rather than overwrite
+3. If you want a fresh start, back up first: `cp -r .doit/ .doit.backup/`
+4. Then reinitialize: `doit init --force`
+5. Verify: `doit verify` confirms the project structure is valid
+
+> Prevention: Check for existing `.doit/` directory before scaffolding a new project
+
+If the above steps don't resolve the issue: manually merge the old and new configurations by comparing `.doit.backup/` with the new `.doit/`.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:

@@ -678,6 +678,84 @@ If issues were skipped or failed, note the reason.
 
 ---
 
+## Error Recovery
+
+### Branch Creation Failure
+
+The feature branch could not be created from the current repository state.
+
+**ERROR** | If the branch creation script fails:
+
+1. Check if you have uncommitted changes: `git status`
+2. If there are conflicts, stash your changes: `git stash`
+3. Ensure the base branch is up to date: `git fetch origin && git pull`
+4. Retry branch creation by re-running `/doit.specit`
+5. Verify: `git branch --show-current` shows the new feature branch
+
+> Prevention: Commit or stash pending changes before starting a new specification
+
+If the above steps don't resolve the issue: manually create the branch with `git checkout -b {NNN-feature-name}` and create the spec file manually.
+
+### GitHub API Authentication Error
+
+GitHub issues could not be created because authentication failed.
+
+**ERROR** | If GitHub issue creation fails with an authentication error:
+
+1. Check your GitHub CLI authentication: `gh auth status`
+2. If not authenticated, log in: `gh auth login`
+3. Verify you have access to the repository: `gh repo view`
+4. Re-run `/doit.specit` — it will retry issue creation
+5. Verify: `gh issue list --limit 5` shows recent issues
+
+> Prevention: Run `gh auth status` before starting specification work
+
+If the above steps don't resolve the issue: add `--skip-issues` to skip GitHub issue creation and create issues manually later.
+
+### File Write Permission Denied
+
+The specification file could not be saved to the expected location.
+
+**ERROR** | If the spec file cannot be written:
+
+1. Check directory permissions: `ls -la specs/`
+2. Verify the feature directory exists: `ls -d specs/{NNN-feature-name}/`
+3. If the directory doesn't exist, create it: `mkdir -p specs/{NNN-feature-name}/`
+4. Check disk space: `df -h .`
+5. Verify: touch a test file in the directory: `touch specs/{NNN-feature-name}/test && rm specs/{NNN-feature-name}/test`
+
+If the above steps don't resolve the issue: check if the filesystem is read-only or if you need elevated permissions.
+
+### Missing Research Artifacts
+
+Research artifacts from a prior session were expected but not found.
+
+**WARNING** | If research.md or other artifacts are not found:
+
+1. Check if research was completed: `ls specs/*/research.md`
+2. If research exists in a different directory, verify the feature name matches
+3. If no research exists, proceed without it — the specification will be generated from the feature description alone
+4. Verify: the spec generation continues without errors
+
+> Prevention: Run `/doit.researchit` before `/doit.specit` for richer specifications
+
+If the above steps don't resolve the issue: provide a detailed feature description when running `/doit.specit` to compensate for missing research.
+
+### Ambiguity Resolution Timeout
+
+The interactive clarification session stalled or the user did not respond.
+
+**WARNING** | If the ambiguity resolution Q&A session times out or stalls:
+
+1. Note which question was being asked when the session stalled
+2. Re-run `/doit.specit` — it will regenerate the spec and present clarification questions again
+3. If you want to skip clarifications, the spec will use reasonable defaults (documented in the Assumptions section)
+4. Verify: the generated spec.md has no more than 3 `[NEEDS CLARIFICATION]` markers
+
+If the above steps don't resolve the issue: manually edit the spec.md to resolve any remaining `[NEEDS CLARIFICATION]` markers.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -714,18 +792,4 @@ If the spec contains [NEEDS CLARIFICATION] markers:
 └─────────────────────────────────────────────────────────────┘
 
 **Recommended**: Resolve N open questions in the spec before proceeding to planning.
-```
-
-### On Error
-
-If the command fails (e.g., branch creation failed):
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: [Brief description of what went wrong]
-
-**Recommended**: [Specific recovery action based on the error]
 ```

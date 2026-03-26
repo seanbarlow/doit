@@ -323,6 +323,57 @@ Before generating or modifying code:
 
 ---
 
+## Error Recovery
+
+### Missing Prerequisites
+
+Required files for review are not available.
+
+**ERROR** | If prerequisite files (spec.md, plan.md, tasks.md, or implementation files) are missing:
+
+1. Check which files are missing from the review prerequisites list
+2. If spec/plan/tasks are missing, run the appropriate command: `/doit.specit`, `/doit.planit`, or `/doit.taskit`
+3. If implementation files are missing, run `/doit.implementit` to complete remaining tasks
+4. Verify: `ls specs/*/spec.md specs/*/plan.md specs/*/tasks.md` confirms all required files exist
+
+> Prevention: Complete all implementation tasks before requesting a review
+
+If the above steps don't resolve the issue: manually verify which workflow steps were completed and re-run the missing ones.
+
+### Critical Findings Blocking Merge
+
+The review identified critical issues that must be fixed before the code can be merged.
+
+**ERROR** | If the review produces critical findings:
+
+1. Review each critical finding in the review output
+2. Address findings in priority order: security issues first, then correctness, then quality
+3. After fixing, re-run the specific checks that failed
+4. Re-request review: run `/doit.reviewit` again to verify all critical findings are resolved
+5. Verify: the review output shows no remaining critical findings
+
+> Prevention: Run `/doit.testit` before requesting review to catch issues early
+
+If the above steps don't resolve the issue: escalate to the team for a manual review of the contested findings.
+
+### Manual Test Failure
+
+A manual test scenario from the review checklist could not be verified.
+
+**WARNING** | If a manual test scenario fails during review:
+
+1. Identify which test scenario failed and the expected vs actual behavior
+2. Check if the failure is in the implementation or the test expectations
+3. If the implementation is wrong, fix it and re-test
+4. If the test expectations are wrong, update the acceptance scenarios in spec.md
+5. Verify: manually re-run the failing scenario and confirm it passes
+
+> Prevention: Review acceptance scenarios in spec.md before manual testing to set clear expectations
+
+If the above steps don't resolve the issue: document the failure in the review notes and create a follow-up issue for investigation.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -365,16 +416,3 @@ If the review found issues that need to be addressed:
 After fixing issues, run `/doit.reviewit` again to verify.
 ```
 
-### On Error (missing prerequisites)
-
-If required files are missing:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: Required files for review are missing.
-
-**Recommended**: Run `/doit.implementit` to complete the implementation first.
-```

@@ -221,6 +221,57 @@ Other commands access project configuration via `doit context show`, which loads
 
 ---
 
+## Error Recovery
+
+### Validation Failure
+
+The constitution content did not pass validation checks.
+
+**ERROR** | If constitution validation fails:
+
+1. Review the validation output for specific failing checks
+2. Common issues: missing required sections, invalid format, contradictory principles
+3. Edit the constitution to fix the flagged issues
+4. Re-run `/doit.constitution` to validate again
+5. Verify: validation passes with no errors
+
+> Prevention: Use the constitution template as a guide to ensure all required sections are present
+
+If the above steps don't resolve the issue: compare your constitution with the template at `.doit/templates/constitution-template.md` for structural guidance.
+
+### File Write Permission Denied
+
+The constitution file could not be saved to the project memory directory.
+
+**ERROR** | If the constitution file cannot be written:
+
+1. Check directory permissions: `ls -la .doit/memory/`
+2. Verify the memory directory exists: `ls -d .doit/memory/`
+3. If missing, create it: `mkdir -p .doit/memory/`
+4. Check disk space: `df -h .`
+5. Verify: `touch .doit/memory/test && rm .doit/memory/test` confirms write access
+
+> Prevention: Verify write permissions to `.doit/memory/` before making constitution changes
+
+If the above steps don't resolve the issue: check if the filesystem is read-only or if you need elevated permissions.
+
+### Dependent Templates Out of Sync
+
+Templates that depend on the constitution are outdated after a constitution change.
+
+**WARNING** | If dependent templates reference outdated constitution content:
+
+1. After updating the constitution, run `doit sync-prompts` to propagate changes
+2. Check if command templates reference the old tech stack or principles
+3. If specific templates are outdated, they will be updated on next sync
+4. Verify: `doit sync-prompts` completes without errors
+
+> Prevention: Always run `doit sync-prompts` after updating the constitution
+
+If the above steps don't resolve the issue: manually update the affected templates to reference the new constitution content.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -239,18 +290,4 @@ Display the following at the end of your output:
 **Recommended**: Run `/doit.scaffoldit` to generate project structure based on the tech stack in your constitution.
 
 **Alternative**: Run `/doit.specit [feature description]` to create a feature specification for your first feature.
-```
-
-### On Error (validation failed)
-
-If the constitution could not be validated:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: Constitution validation failed.
-
-**Recommended**: Review the errors above and correct the constitution content.
 ```

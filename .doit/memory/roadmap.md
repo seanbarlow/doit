@@ -22,10 +22,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Error recovery patterns in all commands
-  - **Rationale**: Only some commands document what to do when things fail. Add structured `## Error Recovery` section to each command template. Low effort, high impact — improves every workflow session
-  - **Aligns with**: Documentation quality, user experience, Opinionated Workflow principle (IV)
-
 - [ ] GitHub Copilot Coding Agent support
   - **Rationale**: GitHub's Copilot coding agent can create PRs autonomously and supports MCP and custom agents. Add `.github/agents/` configuration for Copilot coding agent to use doit workflows. Competitive advantage with MCP server (`055-mcp-server`) already built
   - **Aligns with**: AI-Native Design principle (V), MCP server feature

@@ -1,16 +1,24 @@
-# Doit Researchit
-
-Pre-specification research workflow for Product Owners to capture business requirements through interactive Q&A, generating research artifacts for handoff to technical specification.
+---
+description: Pre-specification research workflow for Product Owners to capture business requirements through interactive Q&A, generating research artifacts for handoff to technical specification.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs:
+  - label: Create Technical Specification
+    agent: doit.specit
+    prompt: Create a specification using the research artifacts from this session.
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty). The user input is the feature name or description they want to research.
 
 ### Flag Detection
 
-Check for the following flags in `the user's input`:
+Check for the following flags in `$ARGUMENTS`:
 
 - `--auto-continue`: Skip handoff prompt and automatically invoke `/doit.specit` after research completes
 - `--skip-issues`: Skip GitHub issue creation (existing behavior)
@@ -66,7 +74,7 @@ ls specs/*/research.md 2>/dev/null | grep -i "$FEATURE_NAME" || echo "No existin
 
 ### Step 2: Establish Feature Context
 
-If `the user's input` is empty, ask:
+If `$ARGUMENTS` is empty, ask:
 > "What feature or capability would you like to research? Please describe it in a sentence or two."
 
 Once you have the feature description:
@@ -514,6 +522,66 @@ When continuing to specification (either via auto-continue or user choice):
 3. **Report**: "Starting specification phase with research context from `specs/{feature}/`..."
 
 The specit command will automatically detect and load the research artifacts.
+
+---
+
+## Error Recovery
+
+### Session Interrupted
+
+The research Q&A session was interrupted before all questions were answered.
+
+**WARNING** | Your answers ARE preserved in the draft file. If the session is interrupted:
+
+1. Check for a saved draft: `ls specs/{feature}/.research-draft.md`
+2. If found, re-run `/doit.researchit {feature}` — it will offer to resume from where you left off
+3. Choose "Resume" to continue from the last unanswered question
+4. Verify: the session continues from the correct question
+
+> Prevention: Save your work frequently by answering one question at a time
+
+If the above steps don't resolve the issue: start a fresh session — your previous answers will be offered as a starting point.
+
+### Draft File Corruption
+
+The saved research draft has become unreadable or contains invalid data.
+
+**ERROR** | Your draft answers may be partially lost. If the draft file is corrupted:
+
+1. Check the draft file: `cat specs/{feature}/.research-draft.md`
+2. If unreadable, back it up: `cp specs/{feature}/.research-draft.md specs/{feature}/.research-draft.md.bak`
+3. Delete the corrupted draft: `rm specs/{feature}/.research-draft.md`
+4. Re-run `/doit.researchit {feature}` to start a fresh session
+5. Verify: the new session starts cleanly without errors
+
+If the above steps don't resolve the issue: manually create research.md by answering the research template questions directly.
+
+### Feature Directory Creation Failure
+
+The directory for research artifacts could not be created.
+
+**ERROR** | If the feature directory cannot be created:
+
+1. Check directory permissions: `ls -la specs/`
+2. Create the directory manually: `mkdir -p specs/{NNN-feature-name}/`
+3. Verify write access: `touch specs/{NNN-feature-name}/test && rm specs/{NNN-feature-name}/test`
+4. Re-run `/doit.researchit {feature}`
+5. Verify: `ls specs/{NNN-feature-name}/` shows the directory exists
+
+If the above steps don't resolve the issue: check filesystem permissions or disk space with `df -h .`
+
+### Resume vs Fresh Start Conflict
+
+Existing research artifacts were found but you're unsure whether to continue or start over.
+
+**WARNING** | If existing research is found and you're unsure how to proceed:
+
+1. Review the existing research: `cat specs/{feature}/research.md | head -20`
+2. If the existing research is still relevant, choose "Resume" to add to it
+3. If the research is outdated, choose "Start Fresh" — the old files will be backed up with `.bak` extension
+4. Verify: after your choice, the session proceeds without errors
+
+If the above steps don't resolve the issue: manually back up existing files and delete them, then start fresh.
 
 ---
 

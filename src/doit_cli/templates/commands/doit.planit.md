@@ -1,5 +1,7 @@
 ---
 description: Execute the implementation planning workflow using the plan template to generate design artifacts.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs: 
   - label: Create Tasks
     agent: doit.tasks

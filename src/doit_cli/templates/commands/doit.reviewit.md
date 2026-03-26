@@ -1,5 +1,7 @@
 ---
 description: Review implemented code for quality and completeness against specifications
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Run Tests
     agent: doit.test

@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-01-30 (Completed: Research-to-Spec Auto-Pipeline)
+**Last Updated**: 2026-03-26 (Comprehensive review and roadmap refresh)
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -21,6 +21,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
+
+- [ ] MCP server for doit operations
+  - **Rationale**: Expose doit operations (validate, status, list tasks, scaffold) as an MCP server. Both Claude Code and GitHub Copilot now support MCP natively, enabling tool-based programmatic interaction instead of template-only. Claude Code MCP Tool Search enables lazy loading with 95% context reduction
+  - **Aligns with**: AI integration strategy, Claude Code skills, GitHub Copilot agent mode
 
 - [ ] Cross-platform CI matrix testing
   - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection
@@ -73,6 +77,18 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost.
   - **Aligns with**: Cross-reference support (`033-spec-task-crossrefs`), researchit feature
 
+- [ ] GitHub Copilot Coding Agent support
+  - **Rationale**: GitHub's Copilot coding agent can create PRs autonomously and supports MCP and custom agents. Add `.github/agents/` configuration for Copilot coding agent to use doit workflows
+  - **Aligns with**: AI integration strategy, MCP server feature
+
+- [ ] Remote triggers / scheduled agents
+  - **Rationale**: Claude Code supports remote triggers that execute on cron schedules. Create triggers for automated spec validation, drift detection, or roadmap sync
+  - **Aligns with**: CI/CD integration, workflow automation
+
+- [ ] Error recovery patterns in all commands
+  - **Rationale**: Only some commands document what to do when things fail. Add structured `## Error Recovery` section to each command template
+  - **Aligns with**: Documentation quality, user experience
+
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
@@ -80,6 +96,14 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Research Version History
   - **Rationale**: Track iterations of research.md as understanding evolves. Requirements often change during discovery; version history shows how thinking evolved and supports "why" questions later.
   - **Aligns with**: Persistent Memory principle, researchit feature
+
+- [ ] Additional scaffolding templates (Rust, Kotlin, Swift, Next.js, Django)
+  - **Rationale**: Expand language/framework coverage beyond current 8 templates
+  - **Aligns with**: Community adoption, scaffoldit feature
+
+- [ ] Architecture Decision Records (ADRs)
+  - **Rationale**: Document key design decisions (multi-provider abstraction, template vs MCP, skills architecture) in `docs/adr/`
+  - **Aligns with**: Documentation quality, project governance
 
 - [ ] Web dashboard for project visualization
   - **Rationale**: Visual representation of project architecture and progress
@@ -100,10 +124,11 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 | Version | Date       | Key Changes                                                                         |
 |---------|------------|-------------------------------------------------------------------------------------|
+| v0.1.16 | 2026-01-30 | Windows symlink fix, researchit enhancements                                        |
+| v0.1.15 | 2026-01-30 | Research command for product owners                                                 |
 | v0.1.14 | 2026-01-27 | Windows E2E Testing - 146 tests, PowerShell 7.x, cross-platform parity, CI/CD (#645)|
 | v0.1.13 | 2026-01-22 | GitLab Git Provider Support - full REST API implementation, tutorials (#637)        |
 | v0.1.12 | 2026-01-22 | Git provider configuration wizard - interactive setup for GitHub/ADO/GitLab (#636)  |
-| v0.1.11 | 2026-01-22 | Fixed CLI ModuleNotFoundError - included `doit_toolkit_cli` in wheel package (#598) |
 
 ---
 

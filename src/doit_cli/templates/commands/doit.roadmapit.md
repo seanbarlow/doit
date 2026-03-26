@@ -1,5 +1,7 @@
 ---
 description: Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Create Specification
     agent: doit.specit

@@ -1,5 +1,7 @@
 ---
 description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Review Implementation
     agent: doit.review

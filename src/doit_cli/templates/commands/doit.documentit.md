@@ -1,5 +1,7 @@
 ---
 description: Organize, index, audit, and enhance project documentation aligned with scaffoldit conventions.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Run Scaffoldit
     agent: doit.scaffoldit

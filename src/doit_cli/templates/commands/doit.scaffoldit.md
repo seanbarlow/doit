@@ -1,5 +1,7 @@
 ---
 description: Generate project folder structure and starter files based on tech stack from constitution or user input.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Create Specification
     agent: doit.specit

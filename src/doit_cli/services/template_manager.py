@@ -71,6 +71,19 @@ class TemplateManager:
     COPILOT_SECTION_START = "<!-- DOIT INSTRUCTIONS START -->"
     COPILOT_SECTION_END = "<!-- DOIT INSTRUCTIONS END -->"
 
+    @staticmethod
+    def _safe_copy(source_path: Path, target_path: Path) -> bool:
+        """Copy file only if source and target are different files.
+
+        Returns True if copy was performed, False if skipped (same file).
+        Fixes #650: SameFileError when running doit init --update
+        inside the doit repository itself.
+        """
+        if source_path.resolve() == target_path.resolve():
+            return False
+        shutil.copy2(source_path, target_path)
+        return True
+
     def __init__(self, custom_source: Optional[Path] = None):
         """Initialize template manager.
 
@@ -508,13 +521,17 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result
 
@@ -565,13 +582,17 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result
 
@@ -613,13 +634,17 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result
 
@@ -661,13 +686,17 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result
 
@@ -709,13 +738,17 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result
 
@@ -757,13 +790,17 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result
 
@@ -805,12 +842,16 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 
             if target_path.exists():
                 if overwrite:
-                    shutil.copy2(source_path, target_path)
-                    result["updated"].append(target_path)
+                    if self._safe_copy(source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
                 else:
                     result["skipped"].append(target_path)
             else:
-                shutil.copy2(source_path, target_path)
-                result["created"].append(target_path)
+                if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
 
         return result

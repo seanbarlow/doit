@@ -1,5 +1,7 @@
 ---
 description: Finalize feature implementation, close issues, update roadmaps, and create pull request
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 ---
 
 ## User Input

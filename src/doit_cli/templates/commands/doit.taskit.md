@@ -1,5 +1,7 @@
 ---
 description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs: 
   - label: Analyze For Consistency
     agent: doit.analyze

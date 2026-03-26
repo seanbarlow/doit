@@ -1,5 +1,7 @@
 ---
 description: Execute automated tests and generate test reports with requirement mapping
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Check In
     agent: doit.checkin

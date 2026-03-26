@@ -1,5 +1,7 @@
 ---
 description: Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Build Technical Plan
     agent: doit.plan

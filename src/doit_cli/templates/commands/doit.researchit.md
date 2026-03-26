@@ -1,5 +1,7 @@
 ---
 description: Pre-specification research workflow for Product Owners to capture business requirements through interactive Q&A, generating research artifacts for handoff to technical specification.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Create Technical Specification
     agent: doit.specit

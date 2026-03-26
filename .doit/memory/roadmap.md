@@ -22,10 +22,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] MCP server for doit operations
-  - **Rationale**: Expose doit operations (validate, status, list tasks, scaffold) as an MCP server. Both Claude Code and GitHub Copilot now support MCP natively, enabling tool-based programmatic interaction instead of template-only. Claude Code MCP Tool Search enables lazy loading with 95% context reduction
-  - **Aligns with**: AI integration strategy, Claude Code skills, GitHub Copilot agent mode
-
 - [ ] Cross-platform CI matrix testing
   - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection
   - **Aligns with**: Windows E2E CI/CD integration (US4), Cross-platform parity goals

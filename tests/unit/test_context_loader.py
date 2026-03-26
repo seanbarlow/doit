@@ -583,3 +583,231 @@ class TestContextLoaderTechStack:
         markdown = context.to_markdown()
 
         assert "## Tech Stack" in markdown
+
+
+class TestContextLoaderPersonas:
+    """Tests for personas loading (Feature #056)."""
+
+    def test_load_personas(self, tmp_path: Path):
+        """Test loading personas.md file (FR-004)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        personas = memory_dir / "personas.md"
+        personas.write_text(
+            "# Personas\n\n"
+            "| ID | Name | Role |\n"
+            "|----|------|------|\n"
+            "| P-001 | Developer Dana | Senior Developer |\n"
+        )
+
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_personas()
+
+        assert source is not None
+        assert source.source_type == "personas"
+        assert "Developer Dana" in source.content
+        assert "P-001" in source.content
+        assert source.token_count > 0
+
+    def test_load_personas_missing(self, tmp_path: Path):
+        """Test loading missing personas returns None (FR-005)."""
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_personas()
+
+        assert source is None
+
+    def test_load_personas_empty_file(self, tmp_path: Path):
+        """Test loading empty personas file returns None (edge case)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("")
+
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_personas()
+
+        assert source is None
+
+    def test_load_personas_whitespace_only(self, tmp_path: Path):
+        """Test loading whitespace-only personas file returns None."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("   \n\n  \n")
+
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_personas()
+
+        assert source is None
+
+    def test_load_personas_no_truncation(self, tmp_path: Path):
+        """Test personas are never truncated (FR-012)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        # Create a large personas file
+        large_content = "# Personas\n\n" + ("Persona details. " * 500)
+        (memory_dir / "personas.md").write_text(large_content)
+
+        loader = ContextLoader(project_root=tmp_path)
+        source = loader.load_personas()
+
+        assert source is not None
+        assert source.truncated is False
+        assert source.original_tokens is None
+        assert source.content == large_content
+
+    def test_load_includes_personas(self, tmp_path: Path):
+        """Test that load() includes personas in results (FR-004)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001 Dana")
+
+        loader = ContextLoader(project_root=tmp_path)
+        context = loader.load()
+
+        assert context.has_source("constitution")
+        assert context.has_source("personas")
+
+    def test_personas_priority(self, tmp_path: Path):
+        """Test personas has priority 3 (after tech_stack, before roadmap)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "tech-stack.md").write_text("# Tech Stack")
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+        (memory_dir / "roadmap.md").write_text("# Roadmap")
+
+        loader = ContextLoader(project_root=tmp_path)
+        context = loader.load()
+
+        types = [s.source_type for s in context.sources]
+        assert "personas" in types
+        tech_idx = types.index("tech_stack")
+        personas_idx = types.index("personas")
+        road_idx = types.index("roadmap")
+        assert tech_idx < personas_idx < road_idx
+
+    def test_feature_level_personas_precedence(self, tmp_path: Path):
+        """Test feature-level personas override project-level (FR-010)."""
+        # Create project-level personas
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text(
+            "# Project Personas\n\nP-001 Project-Level Dana"
+        )
+
+        # Create feature-level personas
+        spec_dir = tmp_path / "specs" / "056-test-feature"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "personas.md").write_text(
+            "# Feature Personas\n\nP-001 Feature-Level Dana"
+        )
+
+        loader = ContextLoader(project_root=tmp_path)
+
+        with patch.object(loader, "get_current_branch", return_value="056-test-feature"):
+            source = loader.load_personas()
+
+        assert source is not None
+        assert "Feature-Level Dana" in source.content
+        assert "Project-Level" not in source.content
+
+    def test_project_level_when_no_feature_personas(self, tmp_path: Path):
+        """Test project-level personas used when no feature-level exists."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text(
+            "# Personas\n\nP-001 Project-Level Dana"
+        )
+
+        # Feature spec dir exists but no personas.md in it
+        spec_dir = tmp_path / "specs" / "056-test-feature"
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "spec.md").write_text("# Spec")
+
+        loader = ContextLoader(project_root=tmp_path)
+
+        with patch.object(loader, "get_current_branch", return_value="056-test-feature"):
+            source = loader.load_personas()
+
+        assert source is not None
+        assert "Project-Level Dana" in source.content
+
+    def test_taskit_command_disables_personas(self, tmp_path: Path):
+        """Test that taskit command disables personas loading (FR-009)."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+
+        # Load without command - should have personas
+        loader1 = ContextLoader(project_root=tmp_path)
+        context1 = loader1.load()
+        assert context1.has_source("personas")
+
+        # Load with taskit command - should not have personas
+        loader2 = ContextLoader(project_root=tmp_path, command="taskit")
+        context2 = loader2.load()
+        assert not context2.has_source("personas")
+
+    def test_specit_command_keeps_personas(self, tmp_path: Path):
+        """Test that specit command keeps personas enabled."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+
+        loader = ContextLoader(project_root=tmp_path, command="specit")
+        context = loader.load()
+        assert context.has_source("personas")
+
+    def test_planit_command_keeps_personas(self, tmp_path: Path):
+        """Test that planit command keeps personas enabled."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+
+        loader = ContextLoader(project_root=tmp_path, command="planit")
+        context = loader.load()
+        assert context.has_source("personas")
+
+    def test_constitution_command_disables_personas(self, tmp_path: Path):
+        """Test that constitution command disables personas loading."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "constitution.md").write_text("# Constitution")
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+
+        loader = ContextLoader(project_root=tmp_path, command="constitution")
+        context = loader.load()
+        assert context.has_source("constitution")
+        assert not context.has_source("personas")
+
+    def test_researchit_command_keeps_personas(self, tmp_path: Path):
+        """Test that researchit command keeps personas enabled."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+
+        loader = ContextLoader(project_root=tmp_path, command="researchit")
+        context = loader.load()
+        assert context.has_source("personas")
+
+    def test_implementit_command_disables_personas(self, tmp_path: Path):
+        """Test that implementit command disables personas loading."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001")
+
+        loader = ContextLoader(project_root=tmp_path, command="implementit")
+        context = loader.load()
+        assert not context.has_source("personas")
+
+    def test_personas_display_name(self, tmp_path: Path):
+        """Test personas appears with proper display name in markdown output."""
+        memory_dir = tmp_path / ".doit" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001 Dana")
+
+        loader = ContextLoader(project_root=tmp_path)
+        context = loader.load()
+        markdown = context.to_markdown()
+
+        assert "## Personas" in markdown

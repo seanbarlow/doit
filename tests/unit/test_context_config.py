@@ -42,6 +42,7 @@ class TestSourceConfig:
 
         assert "constitution" in sources
         assert "tech_stack" in sources
+        assert "personas" in sources
         assert "roadmap" in sources
         assert "current_spec" in sources
         assert "related_specs" in sources
@@ -49,10 +50,11 @@ class TestSourceConfig:
 
         assert sources["constitution"].priority == 1
         assert sources["tech_stack"].priority == 2
-        assert sources["roadmap"].priority == 3
-        assert sources["completed_roadmap"].priority == 4
-        assert sources["current_spec"].priority == 5
-        assert sources["related_specs"].priority == 6
+        assert sources["personas"].priority == 3
+        assert sources["roadmap"].priority == 4
+        assert sources["completed_roadmap"].priority == 5
+        assert sources["current_spec"].priority == 6
+        assert sources["related_specs"].priority == 7
         assert sources["related_specs"].max_count == 3
         assert sources["completed_roadmap"].max_count == 5
 
@@ -93,10 +95,19 @@ class TestContextConfig:
         assert config.max_tokens_per_source == 4000
         assert config.total_max_tokens == 16000
         assert "constitution" in config.sources
-        # Default command overrides for specit, constitution, roadmapit
+        # Default command overrides
         assert "specit" in config.commands
         assert "constitution" in config.commands
         assert "roadmapit" in config.commands
+        assert "taskit" in config.commands
+        assert "implementit" in config.commands
+        assert "testit" in config.commands
+        assert "reviewit" in config.commands
+        assert "checkin" in config.commands
+        # Personas disabled for non-target commands
+        assert config.commands["taskit"].sources["personas"].enabled is False
+        assert config.commands["constitution"].sources["personas"].enabled is False
+        assert config.commands["roadmapit"].sources["personas"].enabled is False
 
     def test_post_init_fixes_invalid_values(self):
         """Test __post_init__ fixes invalid token values."""
@@ -227,6 +238,54 @@ enabled: false
         """Test default config path."""
         path = ContextConfig.get_default_config_path()
         assert path == Path(".doit/config/context.yaml")
+
+    def test_yaml_command_merges_with_defaults(self, tmp_path: Path):
+        """Test that YAML command overrides merge with Python defaults."""
+        config_path = tmp_path / "context.yaml"
+        # YAML defines roadmapit with only current_spec disabled
+        # Python defaults also disable personas and related_specs for roadmapit
+        config_path.write_text("""
+version: 1
+commands:
+  roadmapit:
+    sources:
+      current_spec:
+        enabled: false
+""")
+        config = ContextConfig.from_yaml(config_path)
+
+        # YAML-specified override should be present
+        roadmapit = config.commands["roadmapit"]
+        assert roadmapit.sources["current_spec"].enabled is False
+
+        # Default overrides should also be preserved (merged, not replaced)
+        assert "personas" in roadmapit.sources
+        assert roadmapit.sources["personas"].enabled is False
+        assert "related_specs" in roadmapit.sources
+        assert roadmapit.sources["related_specs"].enabled is False
+
+    def test_yaml_preserves_unmentioned_default_commands(self, tmp_path: Path):
+        """Test that YAML with some commands preserves other default commands."""
+        config_path = tmp_path / "context.yaml"
+        config_path.write_text("""
+version: 1
+commands:
+  specit:
+    sources:
+      tech_stack:
+        enabled: false
+""")
+        config = ContextConfig.from_yaml(config_path)
+
+        # specit from YAML should work
+        assert "specit" in config.commands
+        assert config.commands["specit"].sources["tech_stack"].enabled is False
+
+        # Other default commands should still exist
+        assert "taskit" in config.commands
+        assert config.commands["taskit"].sources["personas"].enabled is False
+        assert "constitution" in config.commands
+        assert "roadmapit" in config.commands
 
 
 class TestContextSource:

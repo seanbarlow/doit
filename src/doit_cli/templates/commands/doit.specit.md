@@ -40,6 +40,7 @@ doit context show
 - Reference constitution principles when defining requirements
 - Align new features with roadmap priorities
 - Check for overlap with existing specifications
+- **Reference project personas** (if `.doit/memory/personas.md` is loaded in context): When generating user stories, include `Persona: P-NNN` references in each user story header matching the most relevant persona. If both project-level personas (from context) and feature-level personas (from `specs/{feature}/personas.md`) exist, feature-level personas take precedence.
 
 ## Code Quality Guidelines
 

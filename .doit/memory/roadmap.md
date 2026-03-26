@@ -22,84 +22,73 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Project-level personas in memory with context injection
-  - **Rationale**: Generate `.doit/memory/personas.md` during roadmap creation using the existing persona-output-template. Add personas as a context source so `/doit.researchit`, `/doit.planit`, and `/doit.specit` automatically reference project personas, making every workflow session persona-aware
-  - **Aligns with**: AI-Native Design principle (V), Persistent Memory principle (II), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
+- [ ] Persona-aware user story generation
+  - **Rationale**: When `/doit.specit` generates user stories, automatically map each story to the most relevant persona from `.doit/memory/personas.md` using existing P-NNN traceability IDs. Natural next step after `056-persona-context-injection` — completes the persona pipeline
+  - **Aligns with**: Project-level personas (`056-persona-context-injection`), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
 
-- [ ] Cross-platform CI matrix testing
-  - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection
-  - **Aligns with**: Windows E2E CI/CD integration (US4), Cross-platform parity goals
+- [ ] Error recovery patterns in all commands
+  - **Rationale**: Only some commands document what to do when things fail. Add structured `## Error Recovery` section to each command template. Low effort, high impact — improves every workflow session
+  - **Aligns with**: Documentation quality, user experience, Opinionated Workflow principle (IV)
+
+- [ ] GitHub Copilot Coding Agent support
+  - **Rationale**: GitHub's Copilot coding agent can create PRs autonomously and supports MCP and custom agents. Add `.github/agents/` configuration for Copilot coding agent to use doit workflows. Competitive advantage with MCP server (`055-mcp-server`) already built
+  - **Aligns with**: AI-Native Design principle (V), MCP server feature
 
 ### P3 - Medium Priority (Valuable)
 
 <!-- Items that add value but can wait for later iterations -->
 
-- [ ] Batch command execution
-  - **Rationale**: Run multiple specs through the workflow sequentially with a single command
-
-- [ ] Spec dependencies graph
-  - **Rationale**: Visualize spec dependencies to complement cross-references and Mermaid diagrams
-
-- [ ] CLI plugin architecture
-  - **Rationale**: Enable community extensions without core changes - prepares for VS Code extension
-
-- [ ] Template versioning and update notifications
-  - **Rationale**: Alerts users when command templates have newer versions available
-
-- [ ] VS Code extension for doit commands
-  - **Rationale**: Integrates workflow commands directly into the IDE
+- [ ] Cross-platform CI & test infrastructure
+  - **Rationale**: Expand GitHub Actions to run tests on Windows, Linux, and macOS in parallel with matrix strategy. Includes coverage reporting, performance benchmarking, and regression test suite across all platforms
+  - **Aligns with**: Windows E2E CI/CD integration (US4), Cross-platform parity goals
 
 - [ ] Workflow checkpoint validation
   - **Rationale**: Validate each workflow step completes successfully before allowing the next step (enforces opinionated workflow)
-
-- [ ] Hook configuration wizard
-  - **Rationale**: Interactive wizard for customizing git hook validation rules (exempt branches, require artifacts)
-
-- [ ] Hook bypass report in CI/CD
-  - **Rationale**: Surface bypass events in GitHub Actions as PR check for team visibility into workflow compliance
-
-- [ ] Template diff on version updates
-  - **Rationale**: Show diff view when unified templates are updated to help users understand changes
-
-- [ ] Test Coverage Reporting Dashboard
-  - **Rationale**: Generate comprehensive test coverage reports showing which Windows-specific features, edge cases, and platform behaviors are tested. Includes line coverage, branch coverage, and platform-specific code path analysis with visual dashboards for tracking coverage trends over time
-  - **Aligns with**: Windows E2E testing infrastructure (`049-e2e-windows-tests`), Test suite quality goals
-
-- [ ] Performance Benchmarking Suite
-  - **Rationale**: Automated performance testing to measure and track CLI command execution times, script performance, and resource usage across Windows/Linux/macOS. Establishes baseline metrics and detects performance regressions before they reach production
-  - **Aligns with**: Cross-platform testing, CI/CD quality gates
-
-- [ ] Automated Regression Test Suite
-  - **Rationale**: Dedicated regression test suite that runs on every commit to catch platform-specific issues early. Includes tests for previously fixed bugs, edge cases, and critical user workflows to prevent feature breakage
-  - **Aligns with**: Windows E2E testing (`049-e2e-windows-tests`), Continuous quality improvement
-
-- [ ] Persona-aware user story generation
-  - **Rationale**: When `/doit.specit` generates user stories, automatically map each story to the most relevant persona from `.doit/memory/personas.md` using existing P-NNN traceability IDs
-  - **Aligns with**: Requirements Traceability Matrix (P3), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
+  - **Aligns with**: Opinionated Workflow principle (IV)
 
 - [ ] Requirements Traceability Matrix
-  - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost.
+  - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost
   - **Aligns with**: Cross-reference support (`033-spec-task-crossrefs`), researchit feature
-
-- [ ] GitHub Copilot Coding Agent support
-  - **Rationale**: GitHub's Copilot coding agent can create PRs autonomously and supports MCP and custom agents. Add `.github/agents/` configuration for Copilot coding agent to use doit workflows
-  - **Aligns with**: AI integration strategy, MCP server feature
 
 - [ ] Remote triggers / scheduled agents
   - **Rationale**: Claude Code supports remote triggers that execute on cron schedules. Create triggers for automated spec validation, drift detection, or roadmap sync
   - **Aligns with**: CI/CD integration, workflow automation
 
-- [ ] Error recovery patterns in all commands
-  - **Rationale**: Only some commands document what to do when things fail. Add structured `## Error Recovery` section to each command template
-  - **Aligns with**: Documentation quality, user experience
+- [ ] Batch command execution
+  - **Rationale**: Run multiple specs through the workflow sequentially with a single command
+
+- [ ] CLI plugin architecture
+  - **Rationale**: Enable community extensions without core changes — prerequisite for VS Code extension and other integrations
+
+- [ ] Template versioning and update notifications
+  - **Rationale**: Alerts users when command templates have newer versions available
+
+- [ ] Template diff on version updates
+  - **Rationale**: Show diff view when unified templates are updated to help users understand changes
+
+- [ ] Workflow analytics and cycle time tracking
+  - **Rationale**: Measure how long each workflow phase takes (spec → plan → tasks → implement → test → checkin) across completed features. Surface bottlenecks and help prioritize process improvements using data from 33+ completed features
+  - **Aligns with**: Spec analytics dashboard (`036-spec-analytics-dashboard`), AI-Native Design principle (V)
+
+- [ ] `doit doctor` — project health check
+  - **Rationale**: Single command that audits the entire project: validates constitution, checks roadmap staleness, runs context audit, verifies template versions, detects orphaned specs/branches, and reports overall health score
+  - **Aligns with**: Workflow checkpoint validation (P3), Error recovery patterns (P2)
+
+- [ ] Interactive onboarding for new projects (`doit quickstart`)
+  - **Rationale**: Guided walkthrough of the first spec-plan-implement cycle for new projects. Walks users through constitution → first roadmap item → first spec → first plan to improve adoption
+  - **Aligns with**: Opinionated Workflow principle (IV), community adoption goals
 
 ### P4 - Low Priority (Nice to Have)
 
 <!-- Items in the backlog, considered for future development -->
 
+- [ ] VS Code extension for doit commands
+  - **Rationale**: Integrates workflow commands directly into the IDE. Depends on CLI plugin architecture (P3)
+  - **Aligns with**: AI-Native Design principle (V)
+
 - [ ] Research Version History
-  - **Rationale**: Track iterations of research.md as understanding evolves. Requirements often change during discovery; version history shows how thinking evolved and supports "why" questions later.
-  - **Aligns with**: Persistent Memory principle, researchit feature
+  - **Rationale**: Track iterations of research.md as understanding evolves. Requirements often change during discovery; version history shows how thinking evolved and supports "why" questions later
+  - **Aligns with**: Persistent Memory principle (II), researchit feature
 
 - [ ] Additional scaffolding templates (Rust, Kotlin, Swift, Next.js, Django)
   - **Rationale**: Expand language/framework coverage beyond current 8 templates
@@ -107,11 +96,11 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 - [ ] Persona impact analysis on roadmap changes
   - **Rationale**: When adding or reprioritizing roadmap items, show which personas are most affected by the change to help with prioritization decisions
-  - **Aligns with**: Project-level personas feature, AI-Native Design principle
+  - **Aligns with**: Project-level personas feature, AI-Native Design principle (V)
 
 - [ ] Context-aware persona refinement
   - **Rationale**: As features complete and research sessions accumulate, offer to refine `.doit/memory/personas.md` based on new learnings, keeping project personas current as understanding evolves
-  - **Aligns with**: Research Version History (P4), Persistent Memory principle
+  - **Aligns with**: Research Version History (P4), Persistent Memory principle (II)
 
 - [ ] Architecture Decision Records (ADRs)
   - **Rationale**: Document key design decisions (multi-provider abstraction, template vs MCP, skills architecture) in `docs/adr/`
@@ -126,9 +115,12 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items that were considered but intentionally deferred with reason -->
 
-| Item                         | Original Priority | Deferred Date | Reason                                       |
-|------------------------------|-------------------|---------------|----------------------------------------------|
-| Task management app features | P1-P3             | 2026-01-15    | Vision pivot to spec-driven development CLI  |
+| Item                         | Original Priority | Deferred Date | Reason                                                      |
+|------------------------------|-------------------|---------------|-------------------------------------------------------------|
+| Task management app features | P1-P3             | 2026-01-15    | Vision pivot to spec-driven development CLI                 |
+| Spec dependencies graph      | P3                | 2026-03-26    | Low demand; Mermaid diagrams cover most visualization needs  |
+| Hook configuration wizard    | P3                | 2026-03-26    | Current YAML config is sufficient for hook customization     |
+| Hook bypass report in CI/CD  | P3                | 2026-03-26    | Niche use case; can be added when specific need arises       |
 
 ---
 

@@ -37,6 +37,7 @@ doit context show
 - Identify connections to related specifications
 - Use tech stack information (already included in constitution/tech-stack context)
 - Review related_specs for integration points with other features
+- **Reference project personas** (if `.doit/memory/personas.md` is loaded in context): When making design decisions, reference persona characteristics (technical proficiency, usage patterns, experience level) to justify choices. For example, features targeting a "Power User" persona may warrant more advanced configuration options. If no personas are in context, proceed normally without persona references.
 
 **DO NOT read these files again** (already in context above):
 

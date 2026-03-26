@@ -30,7 +30,7 @@ class SummarizationConfig:
     enabled: bool = True
     threshold_percentage: float = 80.0
     source_priorities: list[str] = field(
-        default_factory=lambda: ["constitution", "tech_stack", "roadmap", "completed_roadmap", "current_spec"]
+        default_factory=lambda: ["constitution", "tech_stack", "personas", "roadmap", "completed_roadmap", "current_spec"]
     )
     timeout_seconds: float = 10.0
     fallback_to_truncation: bool = True
@@ -122,10 +122,11 @@ class SourceConfig:
         return {
             "constitution": cls(source_type="constitution", enabled=True, priority=1),
             "tech_stack": cls(source_type="tech_stack", enabled=True, priority=2),
-            "roadmap": cls(source_type="roadmap", enabled=True, priority=3),
-            "completed_roadmap": cls(source_type="completed_roadmap", enabled=True, priority=4, max_count=5),
-            "current_spec": cls(source_type="current_spec", enabled=True, priority=5),
-            "related_specs": cls(source_type="related_specs", enabled=True, priority=6, max_count=3),
+            "personas": cls(source_type="personas", enabled=True, priority=3),
+            "roadmap": cls(source_type="roadmap", enabled=True, priority=4),
+            "completed_roadmap": cls(source_type="completed_roadmap", enabled=True, priority=5, max_count=5),
+            "current_spec": cls(source_type="current_spec", enabled=True, priority=6),
+            "related_specs": cls(source_type="related_specs", enabled=True, priority=7, max_count=3),
         }
 
 
@@ -162,6 +163,7 @@ class CommandOverride:
                 command_name="constitution",
                 sources={
                     "tech_stack": SourceConfig(source_type="tech_stack", enabled=False),
+                    "personas": SourceConfig(source_type="personas", enabled=False),
                     "related_specs": SourceConfig(source_type="related_specs", enabled=False),
                     "current_spec": SourceConfig(source_type="current_spec", enabled=False),
                 },
@@ -169,8 +171,39 @@ class CommandOverride:
             "roadmapit": cls(
                 command_name="roadmapit",
                 sources={
+                    "personas": SourceConfig(source_type="personas", enabled=False),
                     "current_spec": SourceConfig(source_type="current_spec", enabled=False),
                     "related_specs": SourceConfig(source_type="related_specs", enabled=False),
+                },
+            ),
+            "taskit": cls(
+                command_name="taskit",
+                sources={
+                    "personas": SourceConfig(source_type="personas", enabled=False),
+                },
+            ),
+            "implementit": cls(
+                command_name="implementit",
+                sources={
+                    "personas": SourceConfig(source_type="personas", enabled=False),
+                },
+            ),
+            "testit": cls(
+                command_name="testit",
+                sources={
+                    "personas": SourceConfig(source_type="personas", enabled=False),
+                },
+            ),
+            "reviewit": cls(
+                command_name="reviewit",
+                sources={
+                    "personas": SourceConfig(source_type="personas", enabled=False),
+                },
+            ),
+            "checkin": cls(
+                command_name="checkin",
+                sources={
+                    "personas": SourceConfig(source_type="personas", enabled=False),
                 },
             ),
         }
@@ -256,15 +289,19 @@ class ContextConfig:
                            if k in SourceConfig.__dataclass_fields__}
                     )
 
-        # Parse command overrides
+        # Parse command overrides (start with defaults, then overlay YAML)
         commands_data = data.get("commands", {})
-        commands: dict[str, CommandOverride] = {}
+        commands: dict[str, CommandOverride] = CommandOverride.default_commands()
 
         for cmd_name, cmd_config in commands_data.items():
             if isinstance(cmd_config, dict):
-                cmd_sources: dict[str, SourceConfig] = {}
                 cmd_sources_data = cmd_config.get("sources", {})
 
+                # Start with existing default sources for this command (if any)
+                existing = commands.get(cmd_name)
+                cmd_sources: dict[str, SourceConfig] = dict(existing.sources) if existing else {}
+
+                # Overlay YAML source overrides
                 for source_type, source_config in cmd_sources_data.items():
                     if isinstance(source_config, dict):
                         cmd_sources[source_type] = SourceConfig(
@@ -296,7 +333,7 @@ class ContextConfig:
                 threshold_percentage=summarization_data.get("threshold_percentage", 80.0),
                 source_priorities=summarization_data.get(
                     "source_priorities",
-                    ["constitution", "tech_stack", "roadmap", "completed_roadmap", "current_spec"]
+                    ["constitution", "tech_stack", "personas", "roadmap", "completed_roadmap", "current_spec"]
                 ),
                 timeout_seconds=summarization_data.get("timeout_seconds", 10.0),
                 fallback_to_truncation=summarization_data.get("fallback_to_truncation", True),
@@ -437,6 +474,7 @@ class LoadedContext:
         display_names = {
             "constitution": "Constitution",
             "tech_stack": "Tech Stack",
+            "personas": "Personas",
             "roadmap": "Roadmap",
             "completed_roadmap": "Completed Roadmap",
             "current_spec": "Current Spec",

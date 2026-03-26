@@ -21,9 +21,9 @@ Quick reference for personas defined in [research.md](research.md):
 
 ## User Stories
 
-### US-001: {Story Title} (P1)
+### US-001: {Story Title} (P1) | Persona: P-NNN
 
-**Persona**: {Persona Name}
+**Persona**: {Persona Name} (P-NNN) — {Archetype}
 
 **Story**: As a {persona}, I want to {action} so that {benefit}.
 
@@ -41,9 +41,9 @@ Quick reference for personas defined in [research.md](research.md):
 
 ---
 
-### US-002: {Story Title} (P1)
+### US-002: {Story Title} (P1) | Persona: P-NNN
 
-**Persona**: {Persona Name}
+**Persona**: {Persona Name} (P-NNN) — {Archetype}
 
 **Story**: As a {persona}, I want to {action} so that {benefit}.
 
@@ -57,9 +57,9 @@ Quick reference for personas defined in [research.md](research.md):
 
 ---
 
-### US-003: {Story Title} (P2)
+### US-003: {Story Title} (P2) | Persona: P-NNN
 
-**Persona**: {Persona Name}
+**Persona**: {Persona Name} (P-NNN) — {Archetype}
 
 **Story**: As a {persona}, I want to {action} so that {benefit}.
 

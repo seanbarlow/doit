@@ -92,6 +92,8 @@ doit sync-prompts              # Sync templates to AI agents
 - File-based (markdown in `.doit/memory/`, JSON in `.doit/state/`) (055-mcp-server)
 - Python 3.11+ + Typer (CLI), Rich (output), PyYAML (config), httpx (HTTP) (056-persona-context-injection)
 - File-based — markdown in `.doit/memory/`, YAML in `.doit/config/` (056-persona-context-injection)
+- Python 3.11+ (constitution baseline), but this feature is template-only (Markdown) + None — changes are to Markdown command templates processed by AI assistants (057-persona-aware-user-story-generation)
+- File-based — Markdown files in `.doit/memory/` and `specs/{feature}/` (057-persona-aware-user-story-generation)
 
 ## Recent Changes
 - 055-mcp-server: Added Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output)

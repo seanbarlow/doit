@@ -135,9 +135,11 @@ ls specs/*/personas.md 2>/dev/null | head -5
 **If personas.md exists for this feature**:
 
 1. **Load personas.md** - Read the persona summary table and detailed profiles
-2. **Extract persona IDs and names**:
+2. **Extract persona data for matching**:
    - Parse the Persona Summary table for ID (P-001, P-002) and Name columns
-   - Store as a list: `[{id: "P-001", name: "Developer Dana", role: "Senior Developer"}, ...]`
+   - Parse the Detailed Profiles section for each persona's Goals (primary and secondary) and Pain Points fields
+   - Store as a list: `[{id: "P-001", name: "Developer Dana", role: "Senior Developer", archetype: "Power User", primary_goal: "...", pain_points: ["...", "..."], usage_context: "..."}, ...]`
+   - These fields are the primary inputs for persona matching (see Persona Matching Rules below)
 3. **Use personas for user story generation**:
    - Each user story MUST reference a persona ID in the header
    - Format: `### User Story N - [Title] (Priority: PN) | Persona: P-XXX`
@@ -152,13 +154,16 @@ ls specs/*/personas.md 2>/dev/null | head -5
 
 - Review each persona's primary goal and pain points
 - Create user stories that directly address those goals/pain points
-- Include the persona's name and ID in the story context
+- Include the persona's name, ID, archetype, and primary goal in the story context
+- After determining the matching persona, include the persona ID in the story header using the format from spec-template.md: `### User Story N - [Title] (Priority: PN) | Persona: P-NNN`
+- In the story body, reference the persona's name, archetype, and primary goal to give developers immediate context without cross-referencing personas.md
 - Example:
 
   ```markdown
   ### User Story 1 - Quick Task Creation (Priority: P1) | Persona: P-001
 
-  As **Developer Dana (P-001)**, a Power User who needs efficiency...
+  As **Developer Dana (P-001)**, a Power User whose primary goal is rapid task entry,
+  I want to create tasks with a single command so that I can stay in flow...
   ```
 
 **If NO personas.md found**:
@@ -166,6 +171,61 @@ ls specs/*/personas.md 2>/dev/null | head -5
 - Proceed normally without persona references
 - Use generic "As a user..." format for user stories
 - If the feature requires specific user types, use a default "Primary User" placeholder
+- If `personas.md` exists but contains no valid persona entries (no P-NNN IDs found), treat as no personas available
+
+**When No Personas Are Available**:
+
+- Skip all persona matching rules below
+- Generate stories using the standard header format without `| Persona: P-NNN` suffix
+- Skip the traceability table update step
+- Skip the persona coverage report
+- Do NOT raise errors or warnings about missing personas — this is a valid state
+
+## Persona Matching Rules (when personas loaded)
+
+When generating user stories with persona context available, follow these matching rules in priority order to assign the most relevant persona to each story:
+
+1. **Direct goal match**: If a story directly addresses a persona's primary goal, assign that persona. Confidence: High.
+2. **Pain point match**: If a story addresses one of the persona's top 3 pain points, assign that persona. Confidence: High.
+3. **Usage context match**: If a story fits the persona's described usage context but not a specific goal, assign that persona. Confidence: Medium.
+4. **Role/archetype match**: If a story aligns with the persona's role or archetype but not specific goals, assign that persona. Confidence: Medium.
+5. **Multi-persona**: If a story equally addresses the goals of 2 or more personas, list all relevant IDs comma-separated in the header: `| Persona: P-001, P-002`. In the story body, reference all matched personas. Limit multi-persona tagging to stories that genuinely serve multiple personas — most stories should map to a single primary persona.
+6. **No match**: If no persona clearly matches, generate the story without a Persona tag. Flag it in the coverage report as "unmapped."
+
+For each user story you generate, review the loaded personas and assign the persona whose goals/pain points are most directly addressed by the story.
+
+### Update Persona Traceability
+
+After generating all user stories with persona mappings:
+
+1. Read the feature's `specs/{feature}/personas.md` file (if it exists)
+2. Find the `## Traceability` → `### Persona Coverage` table
+3. Replace the table content with current mappings:
+   - For each persona, list all story IDs (from the spec) that reference it
+   - Include personas with zero mapped stories (empty "User Stories Addressing" column) to signal coverage gaps
+   - Set "Primary Focus" to the main theme of the mapped stories
+4. Write the updated personas.md
+
+This is a full replacement on each `/doit.specit` run — the table should always reflect the current spec state.
+
+### Persona Coverage Report
+
+After story generation and traceability update, display a Persona Coverage summary:
+
+```markdown
+## Persona Coverage
+
+| Persona | Stories | Coverage |
+| ------- | ------- | -------- |
+| P-001 (Name) | US-001, US-003 | ✓ Covered |
+| P-002 (Name) | US-002 | ✓ Covered |
+| P-003 (Name) | — | ⚠ Underserved |
+```
+
+- Mark personas with ≥1 mapped story as "✓ Covered"
+- Mark personas with 0 mapped stories as "⚠ Underserved"
+- If any personas are underserved, add: "> ⚠ {N} persona(s) have no user stories mapped. Consider adding stories that address their goals."
+- Only display this section when personas are available (skip when no personas loaded)
 
 ## Outline
 

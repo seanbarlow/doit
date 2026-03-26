@@ -64,7 +64,7 @@ The system will:
 
 ## Related Features
 
-- [GitHub Roadmap Sync](./github-roadmap-sync.md)
+- [GitHub Roadmap Sync](./039-github-roadmap-sync.md)
 - [GitHub Milestone Generation](./041-milestone-generation.md)
 
 ---

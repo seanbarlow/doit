@@ -68,6 +68,12 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Windows E2E Tests](./features/049-e2e-windows-tests.md) | Comprehensive Windows testing infrastructure with PowerShell 7.x validation... | 2026-01-27 |
 | [macOS E2E Tests](./features/050-macos-e2e-tests.md) | Comprehensive macOS testing with APFS, Unicode normalization, BSD utilities... | 2026-01-28 |
 | [Research Command](./features/052-researchit-command.md) | Pre-specification Q&A workflow for Product Owners to capture business requirements... | 2026-01-29 |
+| [Stakeholder Persona Templates](./features/053-stakeholder-persona-templates.md) | Enhanced researchit with comprehensive persona profiles and P-NNN traceability... | 2026-01-30 |
+| [Research-to-Spec Auto-Pipeline](./features/054-research-spec-pipeline.md) | Seamless automatic handoff from researchit to specit with context preservation... | 2026-01-30 |
+| [MCP Server for doit Operations](./features/055-mcp-server.md) | Expose doit operations as MCP tools for AI assistant integration... | 2026-03-26 |
+| [Project-Level Personas with Context Injection](./features/056-persona-context-injection.md) | Project-level personas as first-class context source in doit workflow... | 2026-03-26 |
+| [Persona-Aware User Story Generation](./features/057-persona-aware-user-story-generation.md) | Auto-map user stories to relevant personas using P-NNN traceability IDs... | 2026-03-26 |
+| [Error Recovery Patterns](./features/058-error-recovery-patterns.md) | Structured error recovery sections in all 13 command templates... | 2026-03-26 |
 | [AI Context Optimization](./features/ai-context-optimization.md) | Optimized AI context injection with double-injection elimination... | 2026-01-29 |
 | [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
 
@@ -86,6 +92,7 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Greenfield Tutorial](./tutorials/01-greenfield-tutorial.md) | Building a new project from scratch with Do-It... | 2026-01-14 |
 | [Existing Project Tutorial](./tutorials/02-existing-project-tutorial.md) | Adding Do-It to an existing codebase... | 2026-01-14 |
 | [Team Collaboration Tutorial](./tutorials/03-team-collaboration-tutorial.md) | Setting up multi-developer workflows with shared memory... | 2026-01-22 |
+| [GitLab Provider Tutorial](./tutorials/04-gitlab-provider-tutorial.md) | Configuring GitLab as your git provider with PAT setup... | 2026-01-22 |
 | [Creating Workflows Tutorial](./tutorials/creating-workflows.md) | Build custom interactive workflows... | 2026-01-16 |
 
 ## Templates

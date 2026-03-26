@@ -479,6 +479,16 @@ def run_init(
     result.updated_files.extend(hooks_result.get("updated", []))
     result.skipped_files.extend(hooks_result.get("skipped", []))
 
+    # Copy command templates to .doit/templates/commands/ for project-level customization
+    # These serve as the source for 'doit sync-prompts' and allow per-project overrides
+    command_templates_result = template_manager.copy_command_templates_to_project(
+        target_dir=project.doit_folder / "templates" / "commands",
+        overwrite=update or force,
+    )
+    result.created_files.extend(command_templates_result.get("created", []))
+    result.updated_files.extend(command_templates_result.get("updated", []))
+    result.skipped_files.extend(command_templates_result.get("skipped", []))
+
     # Copy workflow document templates (agent-file-template, etc.) to .doit/templates/
     doc_templates_result = template_manager.copy_workflow_document_templates(
         target_dir=project.doit_folder / "templates",

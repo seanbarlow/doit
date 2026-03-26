@@ -30,6 +30,131 @@ doit context show
 - Align new features with roadmap priorities
 - Check for overlap with existing specifications
 
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+**Context already loaded** (DO NOT read these files again):
+
+- Constitution principles and tech stack
+- Roadmap priorities
+- Current specification
+- Related specifications
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
+
+## Load Research Artifacts (if available)
+
+Before generating a specification, check if research artifacts exist from a prior `/doit.researchit` session:
+
+```bash
+# Check for research artifacts in the feature directory
+# Pattern: specs/{NNN-feature-name}/research.md
+ls specs/*/research.md 2>/dev/null | head -5
+```
+
+**If research.md exists for this feature**:
+
+1. **Load research.md** - Read the problem statement, target users, goals, and requirements
+2. **Load user-stories.md** (if exists) - Read the user stories to inform acceptance scenarios
+3. **Use research as context**:
+   - Map Problem Statement section to spec Summary
+   - Map Target Users/Personas to user story actors
+   - Map Must-Have requirements to P1 functional requirements
+   - Map Nice-to-Have requirements to P2/P3 functional requirements
+   - Map Success Metrics to spec Success Criteria
+   - Map Out of Scope items directly to spec Out of Scope section
+
+4. **Reference research in spec**: Add a "Research Reference" link at the top of the generated spec:
+
+   ```markdown
+   **Research**: [research.md](research.md) | [user-stories.md](user-stories.md)
+   ```
+
+**If research artifacts also include**:
+
+- `interview-notes.md`: Review for additional user insights and quote notable findings
+- `competitive-analysis.md`: Review for differentiation opportunities and market context
+- `personas.md`: Load comprehensive persona profiles for user story generation (see below)
+
+**If NO research artifacts found**: Proceed normally with user-provided feature description.
+
+### Research Context Confirmation
+
+**When research artifacts ARE loaded**, display a confirmation message to the user:
+
+```markdown
+## Research Context Loaded
+
+Found research artifacts from prior `/doit.researchit` session:
+
+| Artifact | Status |
+|----------|--------|
+| research.md | ✓ Loaded |
+| user-stories.md | [✓ Loaded or ✗ Not found] |
+| personas.md | [✓ Loaded or ✗ Not found] |
+| interview-notes.md | [✓ Loaded or ✗ Not found] |
+| competitive-analysis.md | [✓ Loaded or ✗ Not found] |
+
+These artifacts will inform the specification. Requirements from research.md will be mapped to functional requirements.
+```
+
+This confirmation helps users understand that their research is being used and provides transparency about which artifacts were found.
+
+## Load Personas (if available)
+
+Check if comprehensive persona profiles exist from `/doit.researchit`:
+
+```bash
+# Check for personas.md in the feature directory
+ls specs/*/personas.md 2>/dev/null | head -5
+```
+
+**If personas.md exists for this feature**:
+
+1. **Load personas.md** - Read the persona summary table and detailed profiles
+2. **Extract persona IDs and names**:
+   - Parse the Persona Summary table for ID (P-001, P-002) and Name columns
+   - Store as a list: `[{id: "P-001", name: "Developer Dana", role: "Senior Developer"}, ...]`
+3. **Use personas for user story generation**:
+   - Each user story MUST reference a persona ID in the header
+   - Format: `### User Story N - [Title] (Priority: PN) | Persona: P-XXX`
+   - Match user stories to the persona whose goals/pain points they address
+4. **Reference personas in spec**: Add a "Personas Reference" link at the top of the generated spec:
+
+   ```markdown
+   **Personas**: [personas.md](personas.md)
+   ```
+
+**When generating user stories with personas**:
+
+- Review each persona's primary goal and pain points
+- Create user stories that directly address those goals/pain points
+- Include the persona's name and ID in the story context
+- Example:
+
+  ```markdown
+  ### User Story 1 - Quick Task Creation (Priority: P1) | Persona: P-001
+
+  As **Developer Dana (P-001)**, a Power User who needs efficiency...
+  ```
+
+**If NO personas.md found**:
+
+- Proceed normally without persona references
+- Use generic "As a user..." format for user stories
+- If the feature requires specific user types, use a default "Primary User" placeholder
+
 ## Outline
 
 The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `the user's input` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
@@ -85,7 +210,29 @@ Given that feature description, do this:
 4. Follow this execution flow:
 
     1. Parse user description from Input
-       If empty: ERROR "No feature description provided"
+       If empty, check for recent research:
+       ```bash
+       # Find most recently modified research.md
+       ls -t specs/*/research.md 2>/dev/null | head -1
+       ```
+
+       **If recent research found**:
+       - Extract the feature name from the directory path (e.g., `specs/054-my-feature/research.md` → `054-my-feature`)
+       - Present suggestion to user:
+         ```markdown
+         No feature specified. Did you mean to continue with **{feature-name}**?
+
+         Research artifacts were recently created for this feature.
+
+         - **Yes** - Continue with {feature-name}
+         - **No** - Enter a new feature description
+         ```
+       - Wait for user response
+       - If "Yes": Use the suggested feature name and load its research artifacts
+       - If "No": Prompt user for new feature description
+
+       **If NO recent research found**:
+       ERROR "No feature description provided"
     2. Extract key concepts from description
        Identify: actors, actions, data, constraints
     3. For unclear aspects:

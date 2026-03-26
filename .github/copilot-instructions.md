@@ -55,3 +55,27 @@ specs/NNN-feature/  # Feature specifications with spec.md, plan.md, tasks.md
 - Constitution defines project-wide principles and tech stack
 - Roadmap items have P1-P4 priority levels
 - All features flow through: spec -> plan -> tasks -> implement -> test -> review -> checkin
+
+<!-- DOIT INSTRUCTIONS START -->
+## Doit Workflow Commands
+
+This project uses the Doit workflow for structured development. The following prompts are available in `.github/prompts/`:
+
+| Command | Description |
+|---------|-------------|
+| #doit-checkin | Finalize feature implementation, close issues, update roadmaps, and create pull request |
+| #doit-constitution | Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync. |
+| #doit-documentit | Organize, index, audit, and enhance project documentation aligned with scaffoldit conventions. |
+| #doit-fixit | Start and manage bug-fix workflows for GitHub issues |
+| #doit-implementit | Execute the implementation plan by processing and executing all tasks defined in tasks.md |
+| #doit-planit | Execute the implementation planning workflow using the plan template to generate design artifacts. |
+| #doit-researchit | Pre-specification research workflow for Product Owners to capture business requirements through interactive Q&A, generating research artifacts for handoff to technical specification. |
+| #doit-reviewit | Review implemented code for quality and completeness against specifications |
+| #doit-roadmapit | Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements. |
+| #doit-scaffoldit | Generate project folder structure and starter files based on tech stack from constitution or user input. |
+| #doit-specit | Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation. |
+| #doit-taskit | Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts. |
+| #doit-testit | Execute automated tests and generate test reports with requirement mapping |
+
+Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
+<!-- DOIT INSTRUCTIONS END -->

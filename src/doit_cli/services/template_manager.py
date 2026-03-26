@@ -420,6 +420,35 @@ class TemplateManager:
         target_path.write_text(template.content, encoding="utf-8")
         return target_path
 
+    def _build_copilot_command_table(self) -> str:
+        """Build markdown table of available doit commands from templates.
+
+        Dynamically generates the table from source templates so it stays
+        in sync with DOIT_COMMANDS. Falls back to generic descriptions
+        if templates cannot be loaded.
+
+        Returns:
+            Markdown table string with header and rows.
+        """
+        header = "| Command | Description |\n|---------|-------------|"
+        rows = []
+
+        templates = self._get_command_templates()
+        if templates:
+            for template in sorted(templates, key=lambda t: t.name):
+                try:
+                    cmd_template = CommandTemplate.from_path(template.source_path)
+                    desc = cmd_template.description or f"Run the {template.name} workflow"
+                except Exception:
+                    desc = f"Run the {template.name} workflow"
+                rows.append(f"| #doit-{template.name} | {desc} |")
+        else:
+            # Fallback: generate from DOIT_COMMANDS without descriptions
+            for name in sorted(DOIT_COMMANDS):
+                rows.append(f"| #doit-{name} | Run the {name} workflow |")
+
+        return header + "\n" + "\n".join(rows)
+
     def create_copilot_instructions(
         self,
         target_path: Path,
@@ -434,24 +463,13 @@ class TemplateManager:
         Returns:
             True if file was created/updated
         """
+        command_table = self._build_copilot_command_table()
         doit_section = f"""{self.COPILOT_SECTION_START}
 ## Doit Workflow Commands
 
 This project uses the Doit workflow for structured development. The following prompts are available in `.github/prompts/`:
 
-| Command | Description |
-|---------|-------------|
-| #doit-specit | Create feature specifications |
-| #doit-planit | Generate implementation plans |
-| #doit-taskit | Create task breakdowns |
-| #doit-implementit | Execute implementation tasks |
-| #doit-testit | Run tests and generate reports |
-| #doit-reviewit | Review code for quality |
-| #doit-checkin | Complete feature and create PR |
-| #doit-constitution | Manage project constitution |
-| #doit-scaffoldit | Scaffold new projects |
-| #doit-roadmapit | Manage feature roadmap |
-| #doit-documentit | Manage documentation |
+{command_table}
 
 Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
 {self.COPILOT_SECTION_END}"""
@@ -850,6 +868,56 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
                     result["skipped"].append(target_path)
             else:
                 if self._safe_copy(source_path, target_path):
+                    result["created"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+
+        return result
+
+    def copy_command_templates_to_project(
+        self,
+        target_dir: Path,
+        overwrite: bool = False,
+    ) -> dict:
+        """Copy command templates to project's .doit/templates/commands/ directory.
+
+        This creates the project-level customization layer. Users can edit
+        these files, then run 'doit sync-prompts' to push changes to agent
+        directories (.claude/commands/ and .github/prompts/).
+
+        Args:
+            target_dir: Destination directory (typically .doit/templates/commands/)
+            overwrite: Whether to overwrite existing files
+
+        Returns:
+            Dict with 'created', 'updated', 'skipped' lists of paths
+        """
+        result = {
+            "created": [],
+            "updated": [],
+            "skipped": [],
+        }
+
+        templates = self._get_command_templates()
+        if not templates:
+            return result
+
+        # Ensure target directory exists
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for template in templates:
+            target_path = target_dir / template.source_path.name
+
+            if target_path.exists():
+                if overwrite:
+                    if self._safe_copy(template.source_path, target_path):
+                        result["updated"].append(target_path)
+                    else:
+                        result["skipped"].append(target_path)
+                else:
+                    result["skipped"].append(target_path)
+            else:
+                if self._safe_copy(template.source_path, target_path):
                     result["created"].append(target_path)
                 else:
                     result["skipped"].append(target_path)

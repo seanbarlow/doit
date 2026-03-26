@@ -1,5 +1,7 @@
 ---
 description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Review Implementation
     agent: doit.review
@@ -215,6 +217,84 @@ Note: This command assumes a complete task breakdown exists in tasks.md. If task
 
 ---
 
+## Error Recovery
+
+### Missing Task List
+
+The task list needed for implementation was not found.
+
+**ERROR** | If `tasks.md` is not found in the feature specs directory:
+
+1. Check if the file exists: `ls specs/*/tasks.md`
+2. If missing, generate it: run `/doit.taskit` to create tasks from the plan
+3. If the file exists but in a different directory, verify you're on the correct feature branch: `git branch --show-current`
+4. Verify: `ls specs/$(git branch --show-current | sed 's/^[0-9]*-//')/tasks.md` should show the file
+
+> Prevention: Always run `/doit.taskit` before `/doit.implementit`
+
+If the above steps don't resolve the issue: verify the feature branch name matches the spec directory name.
+
+### Task Execution Failure
+
+A task failed during implementation, but your other completed work is safe.
+
+**ERROR** | Your progress IS preserved — completed tasks are saved in `.doit/state/`. If a task fails during execution:
+
+1. Note the failing task ID and error message
+2. Check if the failure is due to a missing dependency or file: review the error output
+3. Fix the underlying issue (install dependency, correct file path, etc.)
+4. Resume implementation — the workflow will continue from the failed task
+5. Verify: check the task is now marked complete in `tasks.md`
+
+If the above steps don't resolve the issue: skip the failing task by marking it `[x]` in tasks.md with a comment explaining why, then continue with the next task.
+
+### State File Corruption
+
+The workflow state file has become unreadable or corrupted.
+
+**FATAL** | Your progress in `.doit/state/` may be lost. If the workflow state file is corrupted:
+
+1. Check the state directory: `ls -la .doit/state/`
+2. If the JSON state file is unreadable, delete it: `rm .doit/state/workflow-*.json`
+3. Review `tasks.md` to identify which tasks are already marked `[x]` (completed)
+4. Re-run `/doit.implementit` — it will start from the first unchecked task
+5. Verify: `ls .doit/state/` shows a new, valid state file
+
+> Prevention: Avoid manually editing files in `.doit/state/` — let the workflow manage them
+
+If the above steps don't resolve the issue: back up your work with `git stash`, run `doit init` to reinitialize the project state, then `git stash pop` and restart implementation.
+
+### Test Failure During Implementation
+
+Tests are failing while implementing tasks, but you can continue working.
+
+**WARNING** | If tests fail during implementation:
+
+1. Review the test output to identify the failing test and the cause
+2. If the test failure is in code you just changed, fix the issue before proceeding
+3. If the test failure is pre-existing (not related to your changes), note it and continue
+4. Run the specific failing test in isolation: `pytest tests/path/to/test.py -x --tb=short`
+5. Verify: `pytest tests/ -x --tb=short` passes for your changed files
+
+> Prevention: Run tests after each task completion rather than waiting until the end
+
+If the above steps don't resolve the issue: run `/doit.testit` for a full test analysis and detailed failure report.
+
+### Interrupted Session
+
+The implementation session was interrupted before all tasks were completed.
+
+**WARNING** | Your progress IS preserved — completed tasks remain marked `[x]` in tasks.md. If the session was interrupted:
+
+1. Check current progress: review `tasks.md` for the last completed task (marked `[x]`)
+2. Note the next unchecked task — this is where implementation will resume
+3. Re-run `/doit.implementit` — it will automatically continue from the first unchecked task
+4. Verify: the previously completed tasks are still marked `[x]` and the next task begins execution
+
+If the above steps don't resolve the issue: manually review `tasks.md` and mark any tasks you know were completed as `[x]`, then re-run.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -257,32 +337,4 @@ If some tasks are still incomplete:
 **Recommended**: Continue with `/doit.implementit` to complete remaining tasks.
 
 **Alternative**: Run `/doit.testit` for partial verification of completed work.
-```
-
-### On Error (missing tasks.md)
-
-If the command fails because tasks.md is not found:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No task list found. The implementit command requires tasks.md to exist.
-
-**Recommended**: Run `/doit.taskit` to generate implementation tasks from the plan.
-```
-
-### On Error (other issues)
-
-If the command fails for another reason:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: [Brief description of what went wrong]
-
-**Recommended**: [Specific recovery action based on the error]
 ```

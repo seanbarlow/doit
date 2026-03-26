@@ -1,5 +1,7 @@
 ---
 description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs: 
   - label: Analyze For Consistency
     agent: doit.analyze
@@ -272,6 +274,68 @@ Every task MUST strictly follow this format:
 
 ---
 
+## Error Recovery
+
+### Missing Implementation Plan
+
+The plan needed for task generation was not found.
+
+**ERROR** | If `plan.md` is not found in the feature specs directory:
+
+1. Check if the plan exists: `ls specs/*/plan.md`
+2. If missing, create it: run `/doit.planit` to generate an implementation plan
+3. If the plan exists but in a different directory, verify your feature branch: `git branch --show-current`
+4. Verify: `cat specs/{feature}/plan.md | head -5` shows the plan header
+
+> Prevention: Always run `/doit.planit` before `/doit.taskit`
+
+If the above steps don't resolve the issue: verify the feature branch name matches the spec directory name.
+
+### Missing Feature Specification
+
+The specification file needed for user story extraction was not found.
+
+**ERROR** | If `spec.md` is not found:
+
+1. Check if the spec exists: `ls specs/*/spec.md`
+2. If missing, the full workflow must be followed: run `/doit.specit {feature}` first
+3. If found in a different directory, ensure you're on the correct branch
+4. Verify: `cat specs/{feature}/spec.md | head -5` shows the spec header
+
+> Prevention: Follow the workflow order: specit → planit → taskit
+
+If the above steps don't resolve the issue: run `/doit.specit` to create the specification, then `/doit.planit`, then retry `/doit.taskit`.
+
+### Circular Dependency Detected
+
+Tasks have dependencies that form a cycle, preventing a valid execution order.
+
+**ERROR** | If task generation detects circular dependencies:
+
+1. Review the dependency graph in the task output for the cycle
+2. Identify which task dependency should be broken (typically the least critical one)
+3. Restructure the task to remove the circular reference — consider splitting the task or reordering
+4. Re-run `/doit.taskit` to regenerate with the corrected dependencies
+5. Verify: the dependency flowchart in tasks.md shows no cycles
+
+If the above steps don't resolve the issue: simplify the task breakdown by merging interdependent tasks into a single task.
+
+### Task Count Exceeds Limit
+
+The generated task list is unusually large, suggesting the feature scope may be too broad.
+
+**WARNING** | If an excessive number of tasks are generated:
+
+1. Review the task list for duplicate or overly granular tasks
+2. Check if the feature scope in spec.md is well-bounded
+3. Consider splitting the feature into smaller features with separate specs
+4. Re-run `/doit.taskit` after adjusting the scope
+5. Verify: the task count is reasonable for the feature size (typically 10-30 tasks)
+
+If the above steps don't resolve the issue: consult the roadmap to determine if the feature should be broken into multiple releases.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -291,46 +355,4 @@ Display the following at the end of your output:
 └─────────────────────────────────────────────────────────────┘
 
 **Recommended**: Run `/doit.implementit` to start executing the implementation tasks.
-```
-
-### On Error (missing plan.md)
-
-If the command fails because plan.md is not found:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No implementation plan found. The taskit command requires plan.md to exist.
-
-**Recommended**: Run `/doit.planit` to create an implementation plan first.
-```
-
-### On Error (missing spec.md)
-
-If the command fails because spec.md is not found:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No feature specification found.
-
-**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
-```
-
-### On Error (other issues)
-
-If the command fails for another reason:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: [Brief description of what went wrong]
-
-**Recommended**: [Specific recovery action based on the error]
 ```

@@ -1,10 +1,23 @@
-# Doit Testit
-
-Execute automated tests and generate test reports with requirement mapping
+---
+description: Execute automated tests and generate test reports with requirement mapping
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs:
+  - label: Check In
+    agent: doit.checkin
+    prompt: Finalize feature and create pull request
+    send: true
+  - label: Review Again
+    agent: doit.review
+    prompt: Re-review code after test fixes
+    send: true
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -23,6 +36,29 @@ doit context show
 - Reference constitution principles when making decisions
 - Consider roadmap priorities
 - Identify connections to related specifications
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+**Context already loaded** (DO NOT read these files again):
+
+- Constitution principles and tech stack
+- Roadmap priorities
+- Current specification
+- Related specifications
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -130,7 +166,7 @@ doit context show
      ```
 
 8. **Record manual test results**:
-   - If the user's input contains `--manual`:
+   - If $ARGUMENTS contains `--manual`:
      - Present each manual test item
      - Ask for PASS/FAIL/SKIP result
      - Record notes for failed tests
@@ -209,6 +245,68 @@ doit context show
 
 ---
 
+## Error Recovery
+
+### No Test Framework Detected
+
+The test runner could not find a compatible testing framework in the project.
+
+**ERROR** | If no test framework is detected:
+
+1. Check if test dependencies are installed: `pip list | grep pytest` (or equivalent for your framework)
+2. If missing, install the test framework: `pip install pytest` (or as specified in dev dependencies)
+3. Check if test configuration exists: `ls pytest.ini pyproject.toml setup.cfg` for pytest config sections
+4. Verify: `pytest --version` confirms the framework is available
+
+> Prevention: Ensure test dependencies are listed in dev requirements and installed before running tests
+
+If the above steps don't resolve the issue: manually specify the test command in the template or project configuration.
+
+### Test Execution Failure
+
+One or more tests failed during the test run.
+
+**ERROR** | If tests fail during execution:
+
+1. Review the failure output to identify failing tests and error messages
+2. Run the failing test in isolation for detailed output: `pytest tests/path/to/failing_test.py -x -v --tb=long`
+3. Check if the failure is in your changes or pre-existing: `git stash && pytest tests/ && git stash pop`
+4. Fix the failing code or test, then re-run: `pytest tests/ -x --tb=short`
+5. Verify: `pytest tests/ --tb=short` shows all tests passing
+
+If the above steps don't resolve the issue: run `/doit.reviewit` to get a code review that may identify the root cause.
+
+### Missing Test Dependencies
+
+Required packages for testing are not installed.
+
+**ERROR** | If test dependencies are missing:
+
+1. Check for a requirements file: `ls requirements*.txt **/requirements*.txt setup.py pyproject.toml`
+2. Install dev dependencies: `pip install -e ".[dev]"` or `pip install -r requirements-dev.txt`
+3. If specific packages are missing, install them: `pip install {package-name}`
+4. Verify: `pip list | grep {package-name}` confirms installation
+
+> Prevention: Run `pip install -e ".[dev]"` at the start of each development session
+
+If the above steps don't resolve the issue: check if the dependency version is compatible with your Python version.
+
+### Coverage Threshold Not Met
+
+Tests pass but code coverage is below the expected threshold.
+
+**WARNING** | If coverage is below the target threshold:
+
+1. Review the coverage report to identify uncovered files and lines
+2. Check which files have the lowest coverage: review the coverage output or HTML report
+3. Add tests for the most critical uncovered paths first
+4. Re-run with coverage: `pytest tests/ --cov=src/ --cov-report=term-missing`
+5. Verify: coverage percentage meets or exceeds the project threshold
+
+If the above steps don't resolve the issue: document the coverage gap in the review notes and address it in a follow-up task.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -251,16 +349,3 @@ If some tests fail:
 **Recommended**: Run `/doit.implementit` to fix the failing tests.
 ```
 
-### On Error (no test framework detected)
-
-If no test framework is detected:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No test framework detected in this project.
-
-**Recommended**: Add tests to your project and run `/doit.testit` again, or proceed with `/doit.reviewit` for code review.
-```

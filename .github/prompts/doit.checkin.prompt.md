@@ -1,10 +1,14 @@
-# Doit Checkin
-
-Finalize feature implementation, close issues, update roadmaps, and create pull request
+---
+description: Finalize feature implementation, close issues, update roadmaps, and create pull request
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -21,8 +25,38 @@ doit context show
 **Use loaded context to**:
 
 - Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Consider roadmap priorities (roadmap content is already loaded)
 - Identify connections to related specifications
+- Determine if roadmap files exist (absence means empty context section)
+
+**DO NOT read these files again for context** (already loaded above):
+
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/roadmap.md` - content is in context (read for MODIFICATION only in step 6)
+- `.doit/memory/completed_roadmap.md` - content is in context
+
+**Legitimate explicit reads** (for modification, NOT in context show):
+
+- `specs/{feature}/spec.md` - feature details for documentation
+- `specs/{feature}/tasks.md` - completion status
+- `specs/{feature}/review-report.md` - code review status
+- `specs/{feature}/test-report.md` - test status
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -90,10 +124,10 @@ doit context show
 
    #### 6.2 Check and Update roadmap.md
 
-   - Check if `.doit/memory/roadmap.md` exists:
-     - If NOT exists: Log "No roadmap.md found, skipping roadmap archive"
-     - If exists:
-       1. Read the roadmap file
+   - Roadmap availability is known from context show (if section was empty, file doesn't exist)
+     - If no roadmap in context: Log "No roadmap.md found, skipping roadmap archive"
+     - If roadmap exists (was in context):
+       1. Read the roadmap file **for modification** (context has summary, need full file to edit)
        2. Search for items with matching feature branch reference `[###-feature-name]`
           - Pattern: Items containing backtick references like `` `008-feature-name` `` or `[008-feature-name]`
        3. For each matching item found:
@@ -103,7 +137,8 @@ doit context show
 
    #### 6.3 Archive to completed_roadmap.md
 
-   - Check if `.doit/memory/completed_roadmap.md` exists:
+   - completed_roadmap availability is known from context show
+   - Read file **for modification** if it exists:
      - If NOT exists:
        1. Copy template from `.doit/templates/completed-roadmap-template.md`
        2. Replace `[PROJECT_NAME]` with project name
@@ -214,7 +249,7 @@ doit context show
 
 9. **Create pull request**:
    - Determine target branch:
-     - Check the user's input for `--target [branch]` flag
+     - Check $ARGUMENTS for `--target [branch]` flag
      - If not specified, check for `develop` branch
      - If no `develop`, use `main` or `master`
    - Check for gh CLI:
@@ -302,6 +337,73 @@ doit context show
 
 ---
 
+## Error Recovery
+
+### Incomplete Issues
+
+Some GitHub issues linked to this feature are still open or incomplete.
+
+**ERROR** | If issues are flagged as incomplete during checkin:
+
+1. List open issues for this feature: `gh issue list --label "{feature-label}"`
+2. For each open issue, decide: close it (if done), or defer it to the roadmap
+3. Close completed issues: `gh issue close {issue_number}`
+4. If deferring, add a comment explaining the deferral: `gh issue comment {issue_number} --body "Deferred to next iteration"`
+5. Verify: re-run `/doit.checkin` and confirm all issues are resolved
+
+> Prevention: Review the issue status board before starting checkin
+
+If the above steps don't resolve the issue: use `--force` flag if available, or manually close all issues and re-run.
+
+### GitHub API Failure
+
+The pull request or issue updates could not be completed due to a GitHub API error.
+
+**ERROR** | If GitHub API calls fail during checkin:
+
+1. Check your authentication: `gh auth status`
+2. Check GitHub service status: visit github.com/status or run `gh api /rate_limit`
+3. If rate-limited, wait for the reset time shown in the rate limit response
+4. Retry the checkin: re-run `/doit.checkin`
+5. Verify: `gh pr list --head $(git branch --show-current)` shows the PR
+
+> Prevention: Run `gh auth status` before starting the checkin process
+
+If the above steps don't resolve the issue: create the PR manually with `gh pr create` and close issues by hand.
+
+### Branch Push Rejected
+
+The feature branch could not be pushed to the remote repository.
+
+**ERROR** | If `git push` is rejected:
+
+1. Fetch the latest remote state: `git fetch origin`
+2. Check if the remote branch has new commits: `git log HEAD..origin/$(git branch --show-current) --oneline`
+3. If behind, rebase: `git rebase origin/$(git branch --show-current)`
+4. Resolve any conflicts, then push: `git push origin $(git branch --show-current)`
+5. Verify: `git status` shows "Your branch is up to date"
+
+> Prevention: Pull/rebase before starting checkin to avoid push conflicts
+
+If the above steps don't resolve the issue: check repository permissions and branch protection rules.
+
+### PR Creation Conflict
+
+A pull request already exists for this branch or conflicts with an existing PR.
+
+**WARNING** | If PR creation fails due to a conflict:
+
+1. Check for existing PRs: `gh pr list --head $(git branch --show-current)`
+2. If a PR already exists, update it instead of creating a new one: `gh pr edit {pr_number}`
+3. If the existing PR is outdated, close it and create a new one: `gh pr close {pr_number} && gh pr create`
+4. Verify: `gh pr view` shows the correct PR with updated content
+
+> Prevention: Check for existing PRs with `gh pr list --head $(git branch --show-current)` before creating new ones
+
+If the above steps don't resolve the issue: manually create the PR through the GitHub web interface.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -344,18 +446,4 @@ If the PR was created but not yet merged:
 **Status**: PR created and awaiting merge.
 
 **Next**: Merge the PR when ready, then run `/doit.roadmapit` to update the project roadmap.
-```
-
-### On Error (issues incomplete)
-
-If some issues or tasks are still incomplete:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: Some tasks or issues are still open.
-
-**Recommended**: Complete the outstanding tasks with `/doit.implementit`, or use `--force` flag to proceed anyway.
 ```

@@ -1,10 +1,21 @@
-# Doit Roadmapit
-
-Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements.
+---
+description: Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs:
+  - label: Create Specification
+    agent: doit.specit
+    prompt: Create a feature specification for the top roadmap item...
+  - label: Update Constitution
+    agent: doit.constitution
+    prompt: Update the project constitution based on roadmap priorities...
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -20,9 +31,38 @@ doit context show
 
 **Use loaded context to**:
 
-- Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Reference constitution principles when making decisions (constitution is in context)
+- Review completed_roadmap for historical context (already loaded)
 - Identify connections to related specifications
+
+**Note**: Roadmap content is intentionally NOT loaded by context show for this command (to avoid circular reference when modifying). Read roadmap.md directly for modification.
+
+**DO NOT read these files again** (already in context above):
+
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/completed_roadmap.md` - history is in context
+
+**Legitimate explicit reads** (for modification):
+
+- `.doit/memory/roadmap.md` - must read to modify
+- `README.md` - for project description (if no constitution)
+- `package.json` or `pyproject.toml` - for project metadata
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -30,7 +70,7 @@ This command creates or updates the project roadmap at `.doit/memory/roadmap.md`
 
 ### 1. Parse Command Arguments
 
-Extract the operation and details from `the user's input`:
+Extract the operation and details from `$ARGUMENTS`:
 
 | Pattern | Operation | Example |
 |---------|-----------|---------|
@@ -38,6 +78,8 @@ Extract the operation and details from `the user's input`:
 | `add [item]` | Add item to roadmap | `/doit.roadmapit add user authentication` |
 | `defer [item]` | Move item to deferred | `/doit.roadmapit defer social login` |
 | `reprioritize` | Review and change priorities | `/doit.roadmapit reprioritize` |
+| `sync-milestones` | Sync priorities to GitHub milestones | `/doit.roadmapit sync-milestones` |
+| `sync-milestones --dry-run` | Preview milestone sync | `/doit.roadmapit sync-milestones --dry-run` |
 | (empty or `update`) | Interactive update | `/doit.roadmapit` |
 
 If no arguments provided or unrecognized pattern, proceed to step 2 for detection.
@@ -59,9 +101,13 @@ mkdir -p .doit/memory
 
 #### 3.2 Gather Project Context
 
-Read these files if they exist to understand project context:
+Use project context already loaded from `doit context show`:
 
-- `.doit/memory/constitution.md` - Project principles and tech stack
+- Constitution principles and tech stack (already in context)
+- Completed roadmap history (already in context)
+
+If constitution is not available, read these files for project metadata:
+
 - `README.md` - Project description
 - `package.json` or `pyproject.toml` - Project metadata
 
@@ -178,6 +224,24 @@ Based on the parsed operation from Step 1:
    - Ask for rationale for the change
 4. Update items in their new sections
 
+**Sync Milestones Operation (`sync-milestones` or `sync-milestones --dry-run`)**:
+
+1. Execute the milestone sync command:
+
+   ```bash
+   doit roadmapit sync-milestones [--dry-run]
+   ```
+
+2. The command will:
+   - Create GitHub milestones for each priority level (P1-P4) if they don't exist
+   - Assign roadmap epics to their corresponding priority milestones
+   - Display a summary of changes made
+3. After sync completes, show:
+   - Milestones created count
+   - Epics assigned count
+   - Link to view milestones on GitHub
+4. **Complete this operation** - Do not proceed to other steps
+
 **Interactive Update (no specific operation)**:
 1. Ask: "What would you like to do?"
    - A. Add a new item
@@ -185,6 +249,7 @@ Based on the parsed operation from Step 1:
    - C. Reprioritize items
    - D. Update the vision statement
    - E. Mark an item as complete (moves to completed_roadmap.md)
+   - F. Sync priorities to GitHub milestones
 2. Execute the selected operation
 
 #### 4.4 Preserve Unmodified Content
@@ -241,11 +306,11 @@ After any create or update operation, analyze the roadmap and project context to
 
 #### 6.1 Gather Context
 
-Read additional context if available:
+Use context already loaded from `doit context show`:
 
-- `.doit/memory/constitution.md` - Project principles
-- `.doit/memory/completed_roadmap.md` - Past completed items
-- Current roadmap items and gaps
+- Constitution principles (already in context)
+- Completed roadmap history (already in context)
+- Current roadmap items and gaps (from roadmap file read in step 4.1)
 
 #### 6.2 Generate Suggestions
 
@@ -319,6 +384,57 @@ Output a summary of changes:
 - Use feature branch references `[###-feature-name]` for traceability
 - Maintain maximum 3-5 P1 items (truly critical only)
 - Back up malformed roadmaps before recreating
+
+---
+
+## Error Recovery
+
+### GitHub API Authentication Failure
+
+The roadmap could not be synced because GitHub authentication is invalid.
+
+**ERROR** | If GitHub API calls fail during roadmap sync:
+
+1. Check your authentication: `gh auth status`
+2. If expired or invalid, re-authenticate: `gh auth login`
+3. Verify repository access: `gh repo view`
+4. Retry: re-run `/doit.roadmapit`
+5. Verify: `gh issue list --limit 5` confirms API access is working
+
+> Prevention: Run `gh auth status` before starting roadmap operations
+
+If the above steps don't resolve the issue: proceed with local-only roadmap updates — GitHub sync can be done later.
+
+### Merge Conflict in Roadmap File
+
+The roadmap file has conflicting changes from concurrent edits.
+
+**ERROR** | If the roadmap file has merge conflicts:
+
+1. Open the roadmap file and look for conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+2. Resolve conflicts by choosing the correct content for each section
+3. After resolving, stage the file: `git add .doit/memory/roadmap.md`
+4. Verify: `cat .doit/memory/roadmap.md | grep -c "<<<<<<"` returns 0
+
+> Prevention: Pull latest changes before editing the roadmap: `git pull`
+
+If the above steps don't resolve the issue: back up your changes, reset the file to the remote version, and manually re-apply your updates.
+
+### Priority Conflict or Duplicate Items
+
+The roadmap contains duplicate entries or conflicting priority assignments.
+
+**WARNING** | If duplicate or conflicting roadmap items are detected:
+
+1. Review the roadmap for duplicate entries: check for items with similar names
+2. Merge duplicates by combining their descriptions and keeping the higher priority
+3. Resolve priority conflicts by reviewing the project goals and timeline
+4. Re-run `/doit.roadmapit` to validate the updated roadmap
+5. Verify: no duplicate items appear in the roadmap output
+
+> Prevention: Review existing roadmap items before adding new ones to avoid duplicates
+
+If the above steps don't resolve the issue: manually edit the roadmap file to remove duplicates and set clear priorities.
 
 ---
 

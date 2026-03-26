@@ -1,5 +1,7 @@
 ---
 description: Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Build Technical Plan
     agent: doit.plan
@@ -38,6 +40,7 @@ doit context show
 - Reference constitution principles when defining requirements
 - Align new features with roadmap priorities
 - Check for overlap with existing specifications
+- **Reference project personas** (if `.doit/memory/personas.md` is loaded in context): When generating user stories, include `Persona: P-NNN` references in each user story header matching the most relevant persona. If both project-level personas (from context) and feature-level personas (from `specs/{feature}/personas.md`) exist, feature-level personas take precedence.
 
 ## Code Quality Guidelines
 
@@ -132,9 +135,11 @@ ls specs/*/personas.md 2>/dev/null | head -5
 **If personas.md exists for this feature**:
 
 1. **Load personas.md** - Read the persona summary table and detailed profiles
-2. **Extract persona IDs and names**:
+2. **Extract persona data for matching**:
    - Parse the Persona Summary table for ID (P-001, P-002) and Name columns
-   - Store as a list: `[{id: "P-001", name: "Developer Dana", role: "Senior Developer"}, ...]`
+   - Parse the Detailed Profiles section for each persona's Goals (primary and secondary) and Pain Points fields
+   - Store as a list: `[{id: "P-001", name: "Developer Dana", role: "Senior Developer", archetype: "Power User", primary_goal: "...", pain_points: ["...", "..."], usage_context: "..."}, ...]`
+   - These fields are the primary inputs for persona matching (see Persona Matching Rules below)
 3. **Use personas for user story generation**:
    - Each user story MUST reference a persona ID in the header
    - Format: `### User Story N - [Title] (Priority: PN) | Persona: P-XXX`
@@ -149,13 +154,16 @@ ls specs/*/personas.md 2>/dev/null | head -5
 
 - Review each persona's primary goal and pain points
 - Create user stories that directly address those goals/pain points
-- Include the persona's name and ID in the story context
+- Include the persona's name, ID, archetype, and primary goal in the story context
+- After determining the matching persona, include the persona ID in the story header using the format from spec-template.md: `### User Story N - [Title] (Priority: PN) | Persona: P-NNN`
+- In the story body, reference the persona's name, archetype, and primary goal to give developers immediate context without cross-referencing personas.md
 - Example:
 
   ```markdown
   ### User Story 1 - Quick Task Creation (Priority: P1) | Persona: P-001
 
-  As **Developer Dana (P-001)**, a Power User who needs efficiency...
+  As **Developer Dana (P-001)**, a Power User whose primary goal is rapid task entry,
+  I want to create tasks with a single command so that I can stay in flow...
   ```
 
 **If NO personas.md found**:
@@ -163,6 +171,61 @@ ls specs/*/personas.md 2>/dev/null | head -5
 - Proceed normally without persona references
 - Use generic "As a user..." format for user stories
 - If the feature requires specific user types, use a default "Primary User" placeholder
+- If `personas.md` exists but contains no valid persona entries (no P-NNN IDs found), treat as no personas available
+
+**When No Personas Are Available**:
+
+- Skip all persona matching rules below
+- Generate stories using the standard header format without `| Persona: P-NNN` suffix
+- Skip the traceability table update step
+- Skip the persona coverage report
+- Do NOT raise errors or warnings about missing personas — this is a valid state
+
+## Persona Matching Rules (when personas loaded)
+
+When generating user stories with persona context available, follow these matching rules in priority order to assign the most relevant persona to each story:
+
+1. **Direct goal match**: If a story directly addresses a persona's primary goal, assign that persona. Confidence: High.
+2. **Pain point match**: If a story addresses one of the persona's top 3 pain points, assign that persona. Confidence: High.
+3. **Usage context match**: If a story fits the persona's described usage context but not a specific goal, assign that persona. Confidence: Medium.
+4. **Role/archetype match**: If a story aligns with the persona's role or archetype but not specific goals, assign that persona. Confidence: Medium.
+5. **Multi-persona**: If a story equally addresses the goals of 2 or more personas, list all relevant IDs comma-separated in the header: `| Persona: P-001, P-002`. In the story body, reference all matched personas. Limit multi-persona tagging to stories that genuinely serve multiple personas — most stories should map to a single primary persona.
+6. **No match**: If no persona clearly matches, generate the story without a Persona tag. Flag it in the coverage report as "unmapped."
+
+For each user story you generate, review the loaded personas and assign the persona whose goals/pain points are most directly addressed by the story.
+
+### Update Persona Traceability
+
+After generating all user stories with persona mappings:
+
+1. Read the feature's `specs/{feature}/personas.md` file (if it exists)
+2. Find the `## Traceability` → `### Persona Coverage` table
+3. Replace the table content with current mappings:
+   - For each persona, list all story IDs (from the spec) that reference it
+   - Include personas with zero mapped stories (empty "User Stories Addressing" column) to signal coverage gaps
+   - Set "Primary Focus" to the main theme of the mapped stories
+4. Write the updated personas.md
+
+This is a full replacement on each `/doit.specit` run — the table should always reflect the current spec state.
+
+### Persona Coverage Report
+
+After story generation and traceability update, display a Persona Coverage summary:
+
+```markdown
+## Persona Coverage
+
+| Persona | Stories | Coverage |
+| ------- | ------- | -------- |
+| P-001 (Name) | US-001, US-003 | ✓ Covered |
+| P-002 (Name) | US-002 | ✓ Covered |
+| P-003 (Name) | — | ⚠ Underserved |
+```
+
+- Mark personas with ≥1 mapped story as "✓ Covered"
+- Mark personas with 0 mapped stories as "⚠ Underserved"
+- If any personas are underserved, add: "> ⚠ {N} persona(s) have no user stories mapped. Consider adding stories that address their goals."
+- Only display this section when personas are available (skip when no personas loaded)
 
 ## Outline
 
@@ -615,6 +678,84 @@ If issues were skipped or failed, note the reason.
 
 ---
 
+## Error Recovery
+
+### Branch Creation Failure
+
+The feature branch could not be created from the current repository state.
+
+**ERROR** | If the branch creation script fails:
+
+1. Check if you have uncommitted changes: `git status`
+2. If there are conflicts, stash your changes: `git stash`
+3. Ensure the base branch is up to date: `git fetch origin && git pull`
+4. Retry branch creation by re-running `/doit.specit`
+5. Verify: `git branch --show-current` shows the new feature branch
+
+> Prevention: Commit or stash pending changes before starting a new specification
+
+If the above steps don't resolve the issue: manually create the branch with `git checkout -b {NNN-feature-name}` and create the spec file manually.
+
+### GitHub API Authentication Error
+
+GitHub issues could not be created because authentication failed.
+
+**ERROR** | If GitHub issue creation fails with an authentication error:
+
+1. Check your GitHub CLI authentication: `gh auth status`
+2. If not authenticated, log in: `gh auth login`
+3. Verify you have access to the repository: `gh repo view`
+4. Re-run `/doit.specit` — it will retry issue creation
+5. Verify: `gh issue list --limit 5` shows recent issues
+
+> Prevention: Run `gh auth status` before starting specification work
+
+If the above steps don't resolve the issue: add `--skip-issues` to skip GitHub issue creation and create issues manually later.
+
+### File Write Permission Denied
+
+The specification file could not be saved to the expected location.
+
+**ERROR** | If the spec file cannot be written:
+
+1. Check directory permissions: `ls -la specs/`
+2. Verify the feature directory exists: `ls -d specs/{NNN-feature-name}/`
+3. If the directory doesn't exist, create it: `mkdir -p specs/{NNN-feature-name}/`
+4. Check disk space: `df -h .`
+5. Verify: touch a test file in the directory: `touch specs/{NNN-feature-name}/test && rm specs/{NNN-feature-name}/test`
+
+If the above steps don't resolve the issue: check if the filesystem is read-only or if you need elevated permissions.
+
+### Missing Research Artifacts
+
+Research artifacts from a prior session were expected but not found.
+
+**WARNING** | If research.md or other artifacts are not found:
+
+1. Check if research was completed: `ls specs/*/research.md`
+2. If research exists in a different directory, verify the feature name matches
+3. If no research exists, proceed without it — the specification will be generated from the feature description alone
+4. Verify: the spec generation continues without errors
+
+> Prevention: Run `/doit.researchit` before `/doit.specit` for richer specifications
+
+If the above steps don't resolve the issue: provide a detailed feature description when running `/doit.specit` to compensate for missing research.
+
+### Ambiguity Resolution Timeout
+
+The interactive clarification session stalled or the user did not respond.
+
+**WARNING** | If the ambiguity resolution Q&A session times out or stalls:
+
+1. Note which question was being asked when the session stalled
+2. Re-run `/doit.specit` — it will regenerate the spec and present clarification questions again
+3. If you want to skip clarifications, the spec will use reasonable defaults (documented in the Assumptions section)
+4. Verify: the generated spec.md has no more than 3 `[NEEDS CLARIFICATION]` markers
+
+If the above steps don't resolve the issue: manually edit the spec.md to resolve any remaining `[NEEDS CLARIFICATION]` markers.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -651,18 +792,4 @@ If the spec contains [NEEDS CLARIFICATION] markers:
 └─────────────────────────────────────────────────────────────┘
 
 **Recommended**: Resolve N open questions in the spec before proceeding to planning.
-```
-
-### On Error
-
-If the command fails (e.g., branch creation failed):
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: [Brief description of what went wrong]
-
-**Recommended**: [Specific recovery action based on the error]
 ```

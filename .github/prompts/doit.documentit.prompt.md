@@ -1,10 +1,21 @@
-# Doit Documentit
-
-Organize, index, audit, and enhance project documentation aligned with scaffoldit conventions.
+---
+description: Organize, index, audit, and enhance project documentation aligned with scaffoldit conventions.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs:
+  - label: Run Scaffoldit
+    agent: doit.scaffoldit
+    prompt: Scaffold project structure and generate tech-stack.md...
+  - label: Create Specification
+    agent: doit.specit
+    prompt: Create a feature specification...
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -24,6 +35,29 @@ doit context show
 - Consider roadmap priorities
 - Identify connections to related specifications
 
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+**Context already loaded** (DO NOT read these files again):
+
+- Constitution principles and tech stack
+- Roadmap priorities
+- Current specification
+- Related specifications
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
+
 ## Outline
 
 You are managing project documentation. This command supports multiple operations:
@@ -38,7 +72,7 @@ If no subcommand is provided, show an interactive menu.
 
 ## Subcommand Detection
 
-Parse the user's input to detect the operation:
+Parse $ARGUMENTS to detect the operation:
 
 1. **If empty**: Show interactive menu (step 1)
 2. **If starts with "organize"**: Execute organize workflow (step 2)
@@ -436,6 +470,58 @@ Before any file modification:
 - Binary files (images, PDFs) are cataloged but content is not analyzed
 - Symlinks are followed for reading but flagged in audit
 - Large files (>1MB markdown) are skipped with warning
+
+---
+
+## Error Recovery
+
+### Missing Documentation Sources
+
+The documentation generator could not find expected source files.
+
+**ERROR** | If source files referenced by the documentation are not found:
+
+1. Check that all source directories exist: `ls src/ docs/ specs/`
+2. Verify the project structure matches what documentit expects
+3. If files were recently moved or renamed, update the documentation configuration
+4. Re-run `/doit.documentit` after fixing the source paths
+5. Verify: `ls src/ docs/ specs/` confirms all expected source directories exist
+
+> Prevention: Run `doit verify` before documentation generation to confirm project structure
+
+If the above steps don't resolve the issue: manually specify source directories when running the documentation command.
+
+### Index Generation Failure
+
+The documentation index could not be generated from the available content.
+
+**ERROR** | If the documentation index fails to generate:
+
+1. Check if the documentation directory exists and has content: `ls docs/`
+2. Verify no files have syntax errors that prevent parsing
+3. Try generating documentation for a single file to isolate the issue
+4. Re-run `/doit.documentit` after fixing any issues
+5. Verify: `ls docs/index.md` confirms the index file was generated
+
+> Prevention: Ensure all documentation files have valid markdown syntax before generating the index
+
+If the above steps don't resolve the issue: manually create the index file based on the available documentation structure.
+
+### Stale Cross-References
+
+The documentation contains links to files or sections that no longer exist.
+
+**WARNING** | If stale cross-references are detected:
+
+1. Review the list of broken references in the documentation output
+2. Update or remove references to files that have been moved or deleted
+3. Check for renamed files that need their references updated
+4. Re-run `/doit.documentit` to verify all references are valid
+5. Verify: no broken reference warnings appear in the output
+
+> Prevention: Update documentation references whenever you rename or move files
+
+If the above steps don't resolve the issue: use `grep -r "](.*\.md)" docs/` to find all markdown links and manually verify each one.
 
 ---
 

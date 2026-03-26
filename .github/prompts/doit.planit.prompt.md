@@ -1,10 +1,22 @@
-# Doit Planit
-
-Execute the implementation planning workflow using the plan template to generate design artifacts.
+---
+description: Execute the implementation planning workflow using the plan template to generate design artifacts.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs: 
+  - label: Create Tasks
+    agent: doit.tasks
+    prompt: Break the plan into tasks
+    send: true
+  - label: Create Checklist
+    agent: doit.checklist
+    prompt: Create a checklist for the following domain...
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -23,24 +35,49 @@ doit context show
 - Reference constitution principles when making decisions
 - Consider roadmap priorities
 - Identify connections to related specifications
+- Use tech stack information (already included in constitution/tech-stack context)
+- Review related_specs for integration points with other features
 
-**For this command specifically**:
+**DO NOT read these files again** (already in context above):
 
-- Use tech stack from constitution as baseline for architecture
-- Flag any technology choices that deviate from constitution
-- Reference related specifications for integration points
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context
+- `.doit/memory/roadmap.md` - priorities are in context
+- Current feature spec - available as current_spec in context
+
+**Legitimate explicit reads** (NOT in context show):
+
+- `specs/{feature}/research.md` - if research phase complete
+- `specs/{feature}/data-model.md` - if already generated
+- `specs/{feature}/contracts/*.yaml` - API contract files
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
 1. **Setup**: Run `.doit/scripts/bash/setup-plan.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **Load context**: Read FEATURE_SPEC and `.doit/memory/constitution.md`. Load IMPL_PLAN template (already copied).
+2. **Load context**: Load IMPL_PLAN template (already copied). Feature spec and constitution are already available from `doit context show` above.
 
-3. **Extract Constitution Tech Stack**:
-   - Read Tech Stack section from constitution.md
+3. **Extract Tech Stack from loaded context**:
+   - Tech stack is already loaded in context (from tech-stack.md or constitution.md)
    - Extract: PRIMARY_LANGUAGE, FRAMEWORKS, KEY_LIBRARIES
-   - Read Infrastructure section: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
-   - Read Deployment section: CICD_PIPELINE, DEPLOYMENT_STRATEGY
+   - Extract: HOSTING_PLATFORM, CLOUD_PROVIDER, DATABASE
+   - Extract: CICD_PIPELINE, DEPLOYMENT_STRATEGY
    - Store these values for architecture alignment validation
 
 4. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
@@ -183,6 +220,69 @@ doit context show
 
 ---
 
+## Error Recovery
+
+### Missing Feature Specification
+
+The specification file needed for planning was not found.
+
+**ERROR** | If `spec.md` is not found in the feature specs directory:
+
+1. Check if the spec exists: `ls specs/*/spec.md`
+2. If missing, create it: run `/doit.specit {feature-description}` to generate a specification
+3. If the spec exists but in a different directory, verify your feature branch: `git branch --show-current`
+4. Verify: `cat specs/{feature}/spec.md | head -5` shows the spec header
+
+> Prevention: Always run `/doit.specit` before `/doit.planit`
+
+If the above steps don't resolve the issue: verify the feature branch name matches the spec directory name.
+
+### Tech Stack Mismatch
+
+The planned technology choices conflict with the project constitution.
+
+**WARNING** | If the constitution check flags a tech stack deviation:
+
+1. Review the flagged deviation in the plan output
+2. Check the constitution: `cat .doit/memory/constitution.md | grep -A5 "Tech Stack"`
+3. If the deviation is intentional, add justification in the Complexity Tracking section of plan.md
+4. If unintentional, update the Technical Context to align with the constitution
+5. Verify: re-run `/doit.planit` and confirm the constitution check passes
+
+> Prevention: Review the constitution tech stack before introducing new technologies
+
+If the above steps don't resolve the issue: amend the constitution via `/doit.constitution` if the new technology should become standard.
+
+### Research File Not Found
+
+Research artifacts were expected but could not be loaded.
+
+**WARNING** | If research.md is not found during Phase 0:
+
+1. Check if research exists: `ls specs/{feature}/research.md`
+2. If missing, planning will proceed without research context — tech decisions will rely on spec.md alone
+3. If you want research context, run `/doit.researchit` first, then re-run `/doit.planit`
+4. Verify: plan.md is generated with or without research context
+
+> Prevention: Complete `/doit.researchit` and `/doit.specit` before running `/doit.planit`
+
+If the above steps don't resolve the issue: proceed without research — the plan can be updated later when research is available.
+
+### Agent Context Update Failure
+
+The AI agent context file could not be updated after planning.
+
+**WARNING** | If the agent context update script fails:
+
+1. Check if the script exists: `ls .doit/scripts/bash/update-agent-context.sh`
+2. Try running it manually: `bash .doit/scripts/bash/update-agent-context.sh claude`
+3. If the script fails, the plan itself is still valid — only the agent context file is affected
+4. Verify: `cat CLAUDE.md | tail -20` to check if new technology was added
+
+If the above steps don't resolve the issue: manually add new technology references to CLAUDE.md under the Active Technologies section.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -223,30 +323,3 @@ If `tasks.md` already exists in the specs directory:
 **Alternative**: Run `/doit.taskit` to regenerate tasks based on the updated plan.
 ```
 
-### On Error (missing spec.md)
-
-If the command fails because spec.md is not found:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No feature specification found. The planit command requires spec.md to exist.
-
-**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
-```
-
-### On Error (other issues)
-
-If the command fails for another reason:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: [Brief description of what went wrong]
-
-**Recommended**: [Specific recovery action based on the error]
-```

@@ -15,6 +15,7 @@ from .cli.roadmapit_command import app as roadmapit_app
 from .cli.status_command import status_command
 from .cli.sync_prompts_command import sync_prompts_command
 from .cli.team_command import app as team_app
+from .cli.update_command import update_command
 from .cli.validate_command import validate_command
 from .cli.verify_command import verify_command
 from .cli.xref_command import xref_app
@@ -31,6 +32,7 @@ app = typer.Typer(
 app.command(name="init")(init_command)
 app.command(name="status")(status_command)
 app.command(name="sync-prompts")(sync_prompts_command)
+app.command(name="update")(update_command)
 app.command(name="validate")(validate_command)
 app.command(name="verify")(verify_command)
 
@@ -46,6 +48,11 @@ app.add_typer(provider_app, name="provider")
 app.add_typer(roadmapit_app, name="roadmapit")
 app.add_typer(team_app, name="team")
 app.add_typer(xref_app, name="xref")
+
+# MCP subcommand - availability checked at runtime in serve_command()
+from .cli.mcp_command import app as mcp_app  # noqa: E402
+
+app.add_typer(mcp_app, name="mcp")
 
 
 def main():

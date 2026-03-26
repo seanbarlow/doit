@@ -170,16 +170,83 @@ def _fetch_github_epics(refresh: bool):
 def _load_local_roadmap() -> list[RoadmapItem]:
     """Load roadmap items from local .doit/memory/roadmap.md file.
 
+    Parses the markdown roadmap format, extracting items under priority
+    headers (### P1, ### P2, ### P3, ### P4) with their rationale and
+    status (checkbox state).
+
     Returns:
         List of RoadmapItem instances from local file
-
-    Note:
-        This is a placeholder implementation. Full parsing of roadmap.md
-        would be implemented here in production.
     """
-    # TODO: Implement full roadmap.md parser
-    # For now, return empty list (GitHub epics will be shown)
-    return []
+    import re
+
+    roadmap_path = Path(".doit/memory/roadmap.md")
+    if not roadmap_path.exists():
+        return []
+
+    content = roadmap_path.read_text(encoding="utf-8")
+    items: list[RoadmapItem] = []
+    current_priority = None
+
+    # Match priority headers like "### P1 - Critical (Must Have for MVP)"
+    priority_pattern = re.compile(r"^###\s+(P[1-4])\s+-\s+", re.MULTILINE)
+
+    lines = content.split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        # Check for priority header
+        priority_match = priority_pattern.match(line)
+        if priority_match:
+            current_priority = priority_match.group(1)
+            i += 1
+            continue
+
+        # Check for roadmap item: "- [ ] Title" or "- [x] Title"
+        if current_priority and re.match(r"^- \[[ xX]\] ", line):
+            checked = line[3].lower() == "x"
+            title = line[6:].strip()
+            # Remove bold markers
+            title = title.replace("**", "")
+
+            rationale = ""
+            description_lines = []
+
+            # Collect sub-lines (indented with 2+ spaces)
+            j = i + 1
+            while j < len(lines) and lines[j].startswith("  "):
+                sub = lines[j].strip()
+                if sub.startswith("- **Rationale**:"):
+                    rationale = sub.replace("- **Rationale**:", "").strip()
+                elif sub.startswith("- **Aligns with**:"):
+                    description_lines.append(sub)
+                elif sub:
+                    description_lines.append(sub)
+                j += 1
+
+            status = "completed" if checked else "pending"
+            description = rationale or " ".join(description_lines)
+
+            items.append(
+                RoadmapItem(
+                    title=title,
+                    priority=current_priority,
+                    description=description,
+                    rationale=rationale,
+                    status=status,
+                    source="local",
+                )
+            )
+            i = j
+            continue
+
+        # Stop parsing at "## Deferred Items" or similar non-active sections
+        if line.startswith("## Deferred") or line.startswith("## Recent Releases"):
+            break
+
+        i += 1
+
+    return items
 
 
 def _display_roadmap(

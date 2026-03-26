@@ -1,12 +1,47 @@
-# Doit Constitution
-
-Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
+---
+description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs:
+  - label: Build Specification
+    agent: doit.doit
+    prompt: Implement the feature specification based on the updated constitution. I want to build...
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
+
+## Cleanup Subcommand
+
+If the user requests "cleanup" or "separate tech stack", use the CLI command:
+
+```bash
+# Preview what would be changed
+doit constitution cleanup --dry-run
+
+# Perform the cleanup (creates backup automatically)
+doit constitution cleanup
+
+# Merge with existing tech-stack.md if it already exists
+doit constitution cleanup --merge
+```
+
+The cleanup command:
+
+- Analyzes constitution.md for tech-stack sections (Tech Stack, Infrastructure, Deployment)
+- Creates a timestamped backup of constitution.md
+- Extracts tech sections to a new tech-stack.md
+- Adds cross-references between both files
+
+After running cleanup, inform the user about the two files:
+
+- `.doit/memory/constitution.md` - Principles, governance, quality standards, workflow
+- `.doit/memory/tech-stack.md` - Languages, frameworks, libraries, infrastructure, deployment
 
 ## Load Project Context
 
@@ -20,9 +55,39 @@ doit context show
 
 **Use loaded context to**:
 
-- Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Reference existing constitution principles (if updating existing constitution)
+- Consider roadmap priorities (already in context)
 - Identify connections to related specifications
+
+**Note**: Constitution is the source file being modified, so reading it for modification is legitimate.
+
+**DO NOT read these files again** (already in context above):
+
+- `.doit/memory/roadmap.md` - priorities are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context (unless modifying it)
+
+**Legitimate explicit reads** (for template sync validation in step 6):
+
+- `.doit/templates/plan-template.md` - for consistency check
+- `.doit/templates/spec-template.md` - for consistency check
+- `.doit/templates/tasks-template.md` - for consistency check
+- `.doit/templates/commands/*.md` - for consistency check
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -124,25 +189,86 @@ If critical info missing (e.g., ratification date truly unknown), insert `TODO(<
 
 Do not create a new template; always operate on the existing `.doit/memory/constitution.md` file.
 
-## Constitution Reading Utility
+## Context Sources Reference
 
-Other commands can read and utilize the constitution by:
+Other commands access project configuration via `doit context show`, which loads:
 
-1. **Loading the constitution**: Read `.doit/memory/constitution.md`
-2. **Extracting tech stack**: Parse the Tech Stack section for language, framework, and library information
-3. **Extracting infrastructure**: Parse the Infrastructure section for hosting and cloud provider details
-4. **Extracting deployment**: Parse the Deployment section for CI/CD and environment configuration
-5. **Checking principles**: Parse Core Principles for project constraints and requirements
+**Constitution** (`.doit/memory/constitution.md`):
+
+- Purpose & Goals - Project purpose and success criteria
+- Core Principles - Non-negotiable project rules
+- Quality Standards - Testing and quality requirements
+- Development Workflow - Step-by-step process
+- Governance - Amendment rules and compliance
+
+**Tech Stack** (`.doit/memory/tech-stack.md`):
+
+- Languages - Primary and secondary languages
+- Frameworks - Application frameworks
+- Libraries - Key dependencies
+- Infrastructure - Hosting, cloud provider, database
+- Deployment - CI/CD, strategy, environments
 
 **Usage in other commands**:
 
 ```text
 # At the start of any command that needs project context:
-1. Check if `.doit/memory/constitution.md` exists
-2. If exists, read and parse relevant sections
-3. Use extracted values to inform command behavior (e.g., scaffold uses tech stack, plan uses constraints)
-4. If constitution is incomplete or missing, prompt user or proceed with defaults
+1. Run `doit context show` - this loads constitution, tech-stack, roadmap automatically
+2. Use the loaded context directly - DO NOT read memory files again
+3. Only read files explicitly when they need to be MODIFIED (not just referenced)
+4. Feature-specific artifacts (plan.md, spec.md, contracts/) require explicit reads
 ```
+
+---
+
+## Error Recovery
+
+### Validation Failure
+
+The constitution content did not pass validation checks.
+
+**ERROR** | If constitution validation fails:
+
+1. Review the validation output for specific failing checks
+2. Common issues: missing required sections, invalid format, contradictory principles
+3. Edit the constitution to fix the flagged issues
+4. Re-run `/doit.constitution` to validate again
+5. Verify: validation passes with no errors
+
+> Prevention: Use the constitution template as a guide to ensure all required sections are present
+
+If the above steps don't resolve the issue: compare your constitution with the template at `.doit/templates/constitution-template.md` for structural guidance.
+
+### File Write Permission Denied
+
+The constitution file could not be saved to the project memory directory.
+
+**ERROR** | If the constitution file cannot be written:
+
+1. Check directory permissions: `ls -la .doit/memory/`
+2. Verify the memory directory exists: `ls -d .doit/memory/`
+3. If missing, create it: `mkdir -p .doit/memory/`
+4. Check disk space: `df -h .`
+5. Verify: `touch .doit/memory/test && rm .doit/memory/test` confirms write access
+
+> Prevention: Verify write permissions to `.doit/memory/` before making constitution changes
+
+If the above steps don't resolve the issue: check if the filesystem is read-only or if you need elevated permissions.
+
+### Dependent Templates Out of Sync
+
+Templates that depend on the constitution are outdated after a constitution change.
+
+**WARNING** | If dependent templates reference outdated constitution content:
+
+1. After updating the constitution, run `doit sync-prompts` to propagate changes
+2. Check if command templates reference the old tech stack or principles
+3. If specific templates are outdated, they will be updated on next sync
+4. Verify: `doit sync-prompts` completes without errors
+
+> Prevention: Always run `doit sync-prompts` after updating the constitution
+
+If the above steps don't resolve the issue: manually update the affected templates to reference the new constitution content.
 
 ---
 
@@ -164,18 +290,4 @@ Display the following at the end of your output:
 **Recommended**: Run `/doit.scaffoldit` to generate project structure based on the tech stack in your constitution.
 
 **Alternative**: Run `/doit.specit [feature description]` to create a feature specification for your first feature.
-```
-
-### On Error (validation failed)
-
-If the constitution could not be validated:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: Constitution validation failed.
-
-**Recommended**: Review the errors above and correct the constitution content.
 ```

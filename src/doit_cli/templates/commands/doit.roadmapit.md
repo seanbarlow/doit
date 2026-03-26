@@ -1,5 +1,7 @@
 ---
 description: Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
 handoffs:
   - label: Create Specification
     agent: doit.specit
@@ -382,6 +384,57 @@ Output a summary of changes:
 - Use feature branch references `[###-feature-name]` for traceability
 - Maintain maximum 3-5 P1 items (truly critical only)
 - Back up malformed roadmaps before recreating
+
+---
+
+## Error Recovery
+
+### GitHub API Authentication Failure
+
+The roadmap could not be synced because GitHub authentication is invalid.
+
+**ERROR** | If GitHub API calls fail during roadmap sync:
+
+1. Check your authentication: `gh auth status`
+2. If expired or invalid, re-authenticate: `gh auth login`
+3. Verify repository access: `gh repo view`
+4. Retry: re-run `/doit.roadmapit`
+5. Verify: `gh issue list --limit 5` confirms API access is working
+
+> Prevention: Run `gh auth status` before starting roadmap operations
+
+If the above steps don't resolve the issue: proceed with local-only roadmap updates — GitHub sync can be done later.
+
+### Merge Conflict in Roadmap File
+
+The roadmap file has conflicting changes from concurrent edits.
+
+**ERROR** | If the roadmap file has merge conflicts:
+
+1. Open the roadmap file and look for conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+2. Resolve conflicts by choosing the correct content for each section
+3. After resolving, stage the file: `git add .doit/memory/roadmap.md`
+4. Verify: `cat .doit/memory/roadmap.md | grep -c "<<<<<<"` returns 0
+
+> Prevention: Pull latest changes before editing the roadmap: `git pull`
+
+If the above steps don't resolve the issue: back up your changes, reset the file to the remote version, and manually re-apply your updates.
+
+### Priority Conflict or Duplicate Items
+
+The roadmap contains duplicate entries or conflicting priority assignments.
+
+**WARNING** | If duplicate or conflicting roadmap items are detected:
+
+1. Review the roadmap for duplicate entries: check for items with similar names
+2. Merge duplicates by combining their descriptions and keeping the higher priority
+3. Resolve priority conflicts by reviewing the project goals and timeline
+4. Re-run `/doit.roadmapit` to validate the updated roadmap
+5. Verify: no duplicate items appear in the roadmap output
+
+> Prevention: Review existing roadmap items before adding new ones to avoid duplicates
+
+If the above steps don't resolve the issue: manually edit the roadmap file to remove duplicates and set clear priorities.
 
 ---
 

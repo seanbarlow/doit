@@ -1,10 +1,23 @@
-# Doit Taskit
-
-Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
+---
+description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs: 
+  - label: Analyze For Consistency
+    agent: doit.analyze
+    prompt: Run a project analysis for consistency
+    send: true
+  - label: Implement Project
+    agent: doit.implement
+    prompt: Start the implementation in phases
+    send: true
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -23,6 +36,37 @@ doit context show
 - Reference constitution principles when making decisions
 - Consider roadmap priorities
 - Identify connections to related specifications
+- Use tech stack info for accurate file paths and framework-specific tasks (already in context)
+
+**DO NOT read these files again** (already in context above):
+
+- `.doit/memory/constitution.md` - principles are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context
+- `.doit/memory/roadmap.md` - priorities are in context
+
+**Legitimate explicit reads** (NOT in context show):
+
+- `specs/{feature}/plan.md` - detailed implementation plan
+- `specs/{feature}/spec.md` - user stories with priorities
+- `specs/{feature}/data-model.md` - entities to map
+- `specs/{feature}/contracts/*.yaml` - API endpoints to map
+- `specs/{feature}/research.md` - decisions for setup tasks
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -34,7 +78,8 @@ doit context show
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
-   - Load plan.md and extract tech stack, libraries, project structure
+   - Use tech stack from loaded context (already available from doit context show)
+   - Load plan.md and extract project structure
    - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
    - If data-model.md exists: Extract entities and map to user stories
    - If contracts/ exists: Map endpoints to user stories
@@ -140,7 +185,7 @@ doit context show
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
 7. **GitHub Issue Integration**:
-   - Check for `--skip-issues` in the user's input - if present, skip issue creation
+   - Check for `--skip-issues` in $ARGUMENTS - if present, skip issue creation
    - Detect GitHub remote: `git remote get-url origin`
    - If GitHub remote found and not skipped:
      - For each generated task, create a GitHub Task issue using the task.yml template
@@ -151,7 +196,7 @@ doit context show
    - If GitHub unavailable or API fails: Log warning and continue without issues
    - Report: Number of issues created, any linking errors
 
-Context for task generation: the user's input
+Context for task generation: $ARGUMENTS
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
 
@@ -229,6 +274,68 @@ Every task MUST strictly follow this format:
 
 ---
 
+## Error Recovery
+
+### Missing Implementation Plan
+
+The plan needed for task generation was not found.
+
+**ERROR** | If `plan.md` is not found in the feature specs directory:
+
+1. Check if the plan exists: `ls specs/*/plan.md`
+2. If missing, create it: run `/doit.planit` to generate an implementation plan
+3. If the plan exists but in a different directory, verify your feature branch: `git branch --show-current`
+4. Verify: `cat specs/{feature}/plan.md | head -5` shows the plan header
+
+> Prevention: Always run `/doit.planit` before `/doit.taskit`
+
+If the above steps don't resolve the issue: verify the feature branch name matches the spec directory name.
+
+### Missing Feature Specification
+
+The specification file needed for user story extraction was not found.
+
+**ERROR** | If `spec.md` is not found:
+
+1. Check if the spec exists: `ls specs/*/spec.md`
+2. If missing, the full workflow must be followed: run `/doit.specit {feature}` first
+3. If found in a different directory, ensure you're on the correct branch
+4. Verify: `cat specs/{feature}/spec.md | head -5` shows the spec header
+
+> Prevention: Follow the workflow order: specit → planit → taskit
+
+If the above steps don't resolve the issue: run `/doit.specit` to create the specification, then `/doit.planit`, then retry `/doit.taskit`.
+
+### Circular Dependency Detected
+
+Tasks have dependencies that form a cycle, preventing a valid execution order.
+
+**ERROR** | If task generation detects circular dependencies:
+
+1. Review the dependency graph in the task output for the cycle
+2. Identify which task dependency should be broken (typically the least critical one)
+3. Restructure the task to remove the circular reference — consider splitting the task or reordering
+4. Re-run `/doit.taskit` to regenerate with the corrected dependencies
+5. Verify: the dependency flowchart in tasks.md shows no cycles
+
+If the above steps don't resolve the issue: simplify the task breakdown by merging interdependent tasks into a single task.
+
+### Task Count Exceeds Limit
+
+The generated task list is unusually large, suggesting the feature scope may be too broad.
+
+**WARNING** | If an excessive number of tasks are generated:
+
+1. Review the task list for duplicate or overly granular tasks
+2. Check if the feature scope in spec.md is well-bounded
+3. Consider splitting the feature into smaller features with separate specs
+4. Re-run `/doit.taskit` after adjusting the scope
+5. Verify: the task count is reasonable for the feature size (typically 10-30 tasks)
+
+If the above steps don't resolve the issue: consult the roadmap to determine if the feature should be broken into multiple releases.
+
+---
+
 ## Next Steps
 
 After completing this command, display a recommendation section based on the outcome:
@@ -248,46 +355,4 @@ Display the following at the end of your output:
 └─────────────────────────────────────────────────────────────┘
 
 **Recommended**: Run `/doit.implementit` to start executing the implementation tasks.
-```
-
-### On Error (missing plan.md)
-
-If the command fails because plan.md is not found:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No implementation plan found. The taskit command requires plan.md to exist.
-
-**Recommended**: Run `/doit.planit` to create an implementation plan first.
-```
-
-### On Error (missing spec.md)
-
-If the command fails because spec.md is not found:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: No feature specification found.
-
-**Recommended**: Run `/doit.specit [feature description]` to create a feature specification first.
-```
-
-### On Error (other issues)
-
-If the command fails for another reason:
-
-```markdown
----
-
-## Next Steps
-
-**Issue**: [Brief description of what went wrong]
-
-**Recommended**: [Specific recovery action based on the error]
 ```

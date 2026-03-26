@@ -12,6 +12,10 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Error recovery patterns in all commands | P2 | 2026-03-26 | `058-error-recovery-patterns` | Structured `## Error Recovery` sections added to all 13 command templates. 3-5 error scenarios per template with plain-language summaries, severity indicators, numbered recovery steps, verification steps, prevention tips, and escalation paths. Migrated 9 existing On Error sections, wrote 3 from scratch, aligned fixit reference. 159 new tests, 12 FR requirements, 8 user stories. Documentation-only feature (no Python code changes). |
+| Persona-aware user story generation | P2 | 2026-03-26 | `057-persona-aware-user-story-generation` | Auto-map stories to personas using P-NNN IDs during `/doit.specit`. 6-level matching rules (goal, pain point, context, role, multi-persona, no match). Traceability table auto-update in personas.md. Coverage report. Graceful fallback when no personas. Template-only: specit.md, spec-template.md, user-stories-template.md. 54 tests, 13 FR requirements, 8 user stories |
+| Project-level personas with context injection | P2 | 2026-03-26 | `056-persona-context-injection` | Personas as first-class context source (priority 3). `load_personas()` in ContextLoader with feature-level precedence. Roadmapit generates `.doit/memory/personas.md`. Persona context injected into researchit, specit, planit. Per-command overrides disable for non-target commands. Fixed `_from_dict` command merge bug. 127 tests (16 new personas + 2 merge tests), 12 FR requirements, 6 user stories |
+| MCP Server for doit Operations | P2 | 2026-03-26 | `055-mcp-server` | Exposes 6 MCP tools (validate, status, tasks, context, scaffold, verify) + 3 resources via FastMCP with stdio transport. Optional dependency `mcp`. 30 tests (15 unit + 4 integration + 11 automated manual), 13 FR requirements covered. |
 | Research-to-Spec Auto-Pipeline | P3 | 2026-01-30 | `054-research-spec-pipeline` | Seamless handoff from `/doit.researchit` to `/doit.specit` with context preservation. Handoff prompt with Continue/Later options, `--auto-continue` flag for batch workflows, artifact validation (Step 5), progress indicator, resume instructions. Template-only feature: doit.researchit.md, doit.specit.md. 11 tasks (100% complete), 4 user stories, 12 requirements |
 | Stakeholder Persona Templates | P3 | 2026-01-30 | `053-stakeholder-persona-templates` | Comprehensive persona template (17 fields vs 4), persona relationship mapping, unique IDs (P-NNN) for traceability, `/doit.researchit` Q&A integration, `/doit.specit` persona-story linking. Template-only feature: persona-template.md, personas-output-template.md. 10 tasks (100% complete), 4 user stories, 10 requirements |
 | Research command for Product Owners (`/doit.researchit`) | P2 | 2026-01-29 | `052-researchit-command` | Pre-specification Q&A workflow for capturing business requirements without technology decisions. 12-question interactive session across 4 phases (Problem, Users, Requirements, Metrics). Generates research.md, user-stories.md, interview-notes.md, competitive-analysis.md. Integrated with `/doit.specit` for automatic artifact loading. 15 tasks (100% complete), 5 user stories, 18 requirements covered |
@@ -28,15 +32,6 @@
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
 | Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` | GitHub epic state display (open/closed), synced with roadmap items, part of GitHub integration |
 | Auto-create GitHub Epics from Roadmap Items | P3 | 2026-01-21 | `039-github-roadmap-sync` | `doit roadmapit add` creates GitHub epics with priority labels, descriptions, and custom labels |
-| GitHub epic and issue integration for roadmap command | P2 | 2026-01-21 | `039-github-roadmap-sync` | Display GitHub epics in roadmap (P1), link feature issues (P2), auto-create epics (P3), 30-min cache, smart merge, 152 tests |
-| Context roadmap summary and AI context condensation | P2 | 2026-01-20 | `038-context-roadmap-summary` | Intelligent roadmap summarization by priority, completed items context, AI-powered condensation with guidance prompts |
-| Documentation audit and link fixes | — | 2026-01-17 | — | Fixed 2 broken links, audited 43 docs, verified all headers |
-| Memory search and query across project context | P2 | 2026-01-16 | `037-memory-search-query` | Keyword search, natural language queries, result display, source filtering, search history |
-| Spec analytics and metrics dashboard | P3 | 2026-01-16 | `036-spec-analytics-dashboard` | Completion metrics, cycle time analysis, velocity trends, report export (Markdown/JSON) |
-| Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` | User journey flowcharts, ER diagrams, architecture diagrams, syntax validation, CLI integration |
-| Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` | Structured bug-fix workflow with GitHub integration, AI-assisted investigation, fix planning, review process |
-| Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` | Bidirectional traceability, coverage reports, validation rules, CLI commands |
-
 ---
 
 ## Archive
@@ -48,6 +43,14 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
+| GitHub epic and issue integration for roadmap command | P2 | 2026-01-21 | `039-github-roadmap-sync` |
+| Context roadmap summary and AI context condensation | P2 | 2026-01-20 | `038-context-roadmap-summary` |
+| Documentation audit and link fixes | — | 2026-01-17 | — |
+| Memory search and query across project context | P2 | 2026-01-16 | `037-memory-search-query` |
+| Spec analytics and metrics dashboard | P3 | 2026-01-16 | `036-spec-analytics-dashboard` |
+| Automatic Mermaid diagram generation from specs | P2 | 2026-01-16 | `035-auto-mermaid-diagrams` |
+| Bug-fix workflow command (doit.fixit) | P1 | 2026-01-16 | `034-fixit-workflow` |
+| Cross-reference support between specs and tasks | P2 | 2026-01-16 | `033-spec-task-crossrefs` |
 | Spec status dashboard command | P2 | 2026-01-16 | `032-status-dashboard` |
 | Init command workflow integration | P2 | 2026-01-16 | `031-init-workflow-integration` |
 | Interactive guided workflows with validation | P2 | 2026-01-16 | `030-guided-workflows` |
@@ -64,12 +67,12 @@
 
 ## Statistics
 
-- **Total Items Completed**: 32
-- **P1 Items Completed**: 5 (4 archived)
-- **P2 Items Completed**: 17 (6 archived)
-- **P3 Items Completed**: 8
+- **Total Items Completed**: 33
+- **P1 Items Completed**: 5 (5 archived)
+- **P2 Items Completed**: 18 (9 archived)
+- **P3 Items Completed**: 8 (1 archived)
 - **P4 Items Completed**: 2
-- **Other**: 1 (documentation audit)
+- **Other**: 1 (documentation audit, archived)
 
 ---
 

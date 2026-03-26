@@ -1,4 +1,4 @@
-"""Sync-prompts command for synchronizing GitHub Copilot prompts with doit commands."""
+"""Sync-prompts command for synchronizing agent commands with doit command templates."""
 
 import json
 from pathlib import Path
@@ -8,7 +8,9 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from ..models.sync_models import OperationType, SyncResult
+from ..models.agent import Agent
+from ..models.sync_models import FileOperation, OperationType, SyncResult
+from ..services.command_writer import CommandWriter
 from ..services.prompt_writer import PromptWriter
 from ..services.template_reader import TemplateReader
 
@@ -40,6 +42,48 @@ ForceFlag = Annotated[
     )
 ]
 
+AgentOption = Annotated[
+    Optional[str],
+    typer.Option(
+        "--agent", "-a",
+        help="Target agent(s): copilot (default), claude, or both"
+    )
+]
+
+
+def parse_sync_agents(agent_str: Optional[str]) -> list[Agent]:
+    """Parse agent string for sync command.
+
+    Defaults to Copilot-only for backward compatibility.
+
+    Args:
+        agent_str: Agent string from CLI option.
+
+    Returns:
+        List of target agents.
+
+    Raises:
+        typer.BadParameter: If invalid agent name provided.
+    """
+    if not agent_str:
+        return [Agent.COPILOT]
+
+    agents = []
+    for name in agent_str.lower().split(","):
+        name = name.strip()
+        if name == "claude":
+            agents.append(Agent.CLAUDE)
+        elif name == "copilot":
+            agents.append(Agent.COPILOT)
+        elif name == "both":
+            return [Agent.CLAUDE, Agent.COPILOT]
+        else:
+            raise typer.BadParameter(
+                f"Unknown agent: {name}. Use 'copilot', 'claude', or 'both'"
+            )
+
+    return agents
+
 
 def get_operation_style(operation_type: OperationType) -> str:
     """Get rich style for operation type."""
@@ -63,11 +107,12 @@ def get_operation_symbol(operation_type: OperationType) -> str:
     return symbols.get(operation_type, "?")
 
 
-def display_sync_result(result: SyncResult) -> None:
+def display_sync_result(result: SyncResult, title: str = "Prompt Synchronization Results") -> None:
     """Display sync result with rich formatting.
 
     Args:
         result: The sync result to display.
+        title: Table title.
     """
     if not result.operations:
         console.print("[yellow]No command templates found to sync.[/yellow]")
@@ -77,7 +122,7 @@ def display_sync_result(result: SyncResult) -> None:
     table = Table(
         show_header=True,
         header_style="bold cyan",
-        title="Prompt Synchronization Results",
+        title=title,
     )
     table.add_column("Status", width=10, justify="center")
     table.add_column("File", width=40)
@@ -114,11 +159,11 @@ def display_sync_result(result: SyncResult) -> None:
     console.print()
     if result.success:
         if result.synced > 0:
-            console.print("[bold green]Prompts synchronized successfully[/bold green]")
+            console.print("[bold green]Commands synchronized successfully[/bold green]")
         else:
-            console.print("[green]All prompts are up-to-date[/green]")
+            console.print("[green]All commands are up-to-date[/green]")
     else:
-        console.print("[bold red]Some prompts failed to sync[/bold red]")
+        console.print("[bold red]Some commands failed to sync[/bold red]")
 
 
 def display_json_result(result: SyncResult) -> None:
@@ -147,6 +192,70 @@ def display_json_result(result: SyncResult) -> None:
     print(json.dumps(output, indent=2))
 
 
+def _merge_results(results: list[SyncResult]) -> SyncResult:
+    """Merge multiple SyncResult objects into one.
+
+    Args:
+        results: List of SyncResult objects.
+
+    Returns:
+        Combined SyncResult.
+    """
+    merged = SyncResult()
+    for r in results:
+        merged.total_commands += r.total_commands
+        for op in r.operations:
+            merged.add_operation(op)
+    return merged
+
+
+def _check_agent_status(
+    templates,
+    writer,
+    get_path_fn,
+) -> SyncResult:
+    """Check sync status for a specific agent without making changes.
+
+    Args:
+        templates: List of command templates.
+        writer: Writer instance (PromptWriter or CommandWriter).
+        get_path_fn: Function to get target path from template.
+
+    Returns:
+        SyncResult with status information.
+    """
+    result = SyncResult(total_commands=len(templates))
+    for template in templates:
+        target_path = get_path_fn(template)
+
+        if not target_path.exists():
+            result.add_operation(FileOperation(
+                file_path=str(target_path),
+                operation_type=OperationType.FAILED,
+                success=False,
+                message="Missing - needs sync",
+            ))
+        else:
+            target_mtime = target_path.stat().st_mtime
+            template_mtime = template.modified_at.timestamp()
+
+            if target_mtime < template_mtime:
+                result.add_operation(FileOperation(
+                    file_path=str(target_path),
+                    operation_type=OperationType.UPDATED,
+                    success=True,
+                    message="Out-of-sync - needs update",
+                ))
+            else:
+                result.add_operation(FileOperation(
+                    file_path=str(target_path),
+                    operation_type=OperationType.SKIPPED,
+                    success=True,
+                    message="Up-to-date",
+                ))
+    return result
+
+
 def sync_prompts_command(
     command_name: Annotated[
         Optional[str],
@@ -154,6 +263,7 @@ def sync_prompts_command(
             help="Specific command to sync (e.g., 'doit.checkin')"
         )
     ] = None,
+    agent: AgentOption = None,
     check: CheckFlag = False,
     force: ForceFlag = False,
     json_output: JsonFlag = False,
@@ -165,24 +275,36 @@ def sync_prompts_command(
         )
     ] = Path("."),
 ) -> None:
-    """Synchronize GitHub Copilot prompts with doit command templates.
+    """Synchronize agent commands with doit command templates.
 
     Reads command templates from .doit/templates/commands/ and generates
-    corresponding prompt files in .github/prompts/ with naming convention
-    doit.<name>.prompt.md.
+    corresponding files for the specified agent(s). Defaults to Copilot only.
+
+    For Copilot: writes to .github/prompts/ as doit.<name>.prompt.md
+    For Claude: writes to .claude/commands/ as doit.<name>.md
 
     Examples:
-        doit sync-prompts                     # Sync all commands
-        doit sync-prompts doit.checkin        # Sync specific command
-        doit sync-prompts --check             # Check sync status only
-        doit sync-prompts --force             # Force re-sync all
-        doit sync-prompts --json              # Output as JSON
+        doit sync-prompts                          # Sync Copilot prompts
+        doit sync-prompts --agent claude           # Sync Claude commands
+        doit sync-prompts --agent both             # Sync both agents
+        doit sync-prompts doit.checkin             # Sync specific command
+        doit sync-prompts --check                  # Check sync status only
+        doit sync-prompts --force                  # Force re-sync all
+        doit sync-prompts --json                   # Output as JSON
     """
     project_root = path.resolve()
 
+    # Parse target agents
+    try:
+        target_agents = parse_sync_agents(agent)
+    except typer.BadParameter as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
     # Initialize services
     reader = TemplateReader(project_root=project_root)
-    writer = PromptWriter(project_root=project_root)
+    prompt_writer = PromptWriter(project_root=project_root)
+    command_writer = CommandWriter(project_root=project_root)
 
     # Read templates
     templates = reader.scan_templates(filter_name=command_name)
@@ -199,50 +321,42 @@ def sync_prompts_command(
             console.print(f"[red]Error:[/red] {msg}")
         raise typer.Exit(1)
 
-    # Check mode - just report status without making changes
-    if check:
-        result = SyncResult(total_commands=len(templates))
-        for template in templates:
-            prompt_path = writer.get_prompt_path(template)
+    all_results = []
 
-            if not prompt_path.exists():
-                from ..models.sync_models import FileOperation
-                result.add_operation(FileOperation(
-                    file_path=str(prompt_path),
-                    operation_type=OperationType.FAILED,
-                    success=False,
-                    message="Missing - needs sync",
-                ))
+    for target_agent in target_agents:
+        if check:
+            # Check mode - report status without making changes
+            if target_agent == Agent.COPILOT:
+                result = _check_agent_status(
+                    templates, prompt_writer, prompt_writer.get_prompt_path
+                )
             else:
-                prompt_mtime = prompt_path.stat().st_mtime
-                template_mtime = template.modified_at.timestamp()
+                result = _check_agent_status(
+                    templates, command_writer, command_writer.get_command_path
+                )
+        else:
+            # Perform actual sync
+            if target_agent == Agent.COPILOT:
+                result = prompt_writer.write_prompts(templates, force=force)
+            else:
+                result = command_writer.write_commands(templates, force=force)
 
-                if prompt_mtime < template_mtime:
-                    from ..models.sync_models import FileOperation
-                    result.add_operation(FileOperation(
-                        file_path=str(prompt_path),
-                        operation_type=OperationType.UPDATED,
-                        success=True,
-                        message="Out-of-sync - needs update",
-                    ))
-                else:
-                    from ..models.sync_models import FileOperation
-                    result.add_operation(FileOperation(
-                        file_path=str(prompt_path),
-                        operation_type=OperationType.SKIPPED,
-                        success=True,
-                        message="Up-to-date",
-                    ))
+        if not json_output and len(target_agents) > 1:
+            display_sync_result(result, title=f"{target_agent.display_name} Sync Results")
+
+        all_results.append(result)
+
+    # Display combined results
+    if len(target_agents) == 1:
+        combined = all_results[0]
     else:
-        # Perform actual sync
-        result = writer.write_prompts(templates, force=force)
+        combined = _merge_results(all_results)
 
-    # Display results
     if json_output:
-        display_json_result(result)
-    else:
-        display_sync_result(result)
+        display_json_result(combined)
+    elif len(target_agents) == 1:
+        display_sync_result(combined)
 
     # Exit with appropriate code
-    if not result.success:
+    if not combined.success:
         raise typer.Exit(1)

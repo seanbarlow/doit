@@ -576,7 +576,7 @@ class ContextLoader:
         # Get source configs sorted by priority
         source_configs = [
             (name, self.config.get_source_config(name, self.command))
-            for name in ["constitution", "tech_stack", "roadmap", "completed_roadmap", "current_spec", "related_specs"]
+            for name in ["constitution", "tech_stack", "personas", "roadmap", "completed_roadmap", "current_spec", "related_specs"]
         ]
         source_configs.sort(key=lambda x: x[1].priority)
 
@@ -599,6 +599,11 @@ class ContextLoader:
                     total_tokens += source.token_count
             elif source_name == "tech_stack":
                 source = self.load_tech_stack(max_tokens=max_for_source)
+                if source:
+                    sources.append(source)
+                    total_tokens += source.token_count
+            elif source_name == "personas":
+                source = self.load_personas(max_tokens=max_for_source)
                 if source:
                     sources.append(source)
                     total_tokens += source.token_count
@@ -778,6 +783,59 @@ class ContextLoader:
             token_count=token_count,
             truncated=was_truncated,
             original_tokens=original_tokens if was_truncated else None,
+        )
+
+    def load_personas(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+        """Load personas.md if enabled and exists.
+
+        Checks for feature-level personas first (specs/{feature}/personas.md),
+        falling back to project-level (.doit/memory/personas.md). Feature-level
+        personas take precedence when both exist.
+
+        Content is always loaded in full without truncation.
+
+        Args:
+            max_tokens: Ignored — personas are never truncated. Accepted for
+                        interface consistency with other load_* methods.
+
+        Returns:
+            ContextSource for personas or None if not available.
+        """
+        # Check for feature-level personas first (takes precedence)
+        branch = self.get_current_branch()
+        feature_name = self.extract_feature_name(branch) if branch else None
+        path = None
+
+        if feature_name:
+            feature_personas = self.project_root / "specs" / feature_name / "personas.md"
+            if feature_personas.exists():
+                path = feature_personas
+                self._log_debug(f"Using feature-level personas: {path}")
+
+        # Fall back to project-level personas
+        if path is None:
+            path = self.project_root / ".doit" / "memory" / "personas.md"
+
+        content = self._read_file(path)
+        if content is None:
+            self._log_debug("Personas not found")
+            return None
+
+        if not content.strip():
+            self._log_debug("Personas file is empty, skipping")
+            return None
+
+        token_count = estimate_tokens(content)
+
+        self._log_debug(f"Loaded personas: {token_count} tokens")
+
+        return ContextSource(
+            source_type="personas",
+            path=path,
+            content=content,
+            token_count=token_count,
+            truncated=False,
+            original_tokens=None,
         )
 
     def load_roadmap(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
@@ -1017,8 +1075,7 @@ class ContextLoader:
     def get_memory_files(self) -> list[Path]:
         """Get list of governance memory files.
 
-        Returns paths to constitution.md, roadmap.md, and completed_roadmap.md
-        if they exist.
+        Returns paths to all context-source memory files if they exist.
 
         Returns:
             List of paths to governance memory files.
@@ -1028,6 +1085,8 @@ class ContextLoader:
 
         governance_files = [
             "constitution.md",
+            "tech-stack.md",
+            "personas.md",
             "roadmap.md",
             "completed_roadmap.md",
         ]

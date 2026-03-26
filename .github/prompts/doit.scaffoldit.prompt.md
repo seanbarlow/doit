@@ -1,10 +1,24 @@
-# Doit Scaffoldit
-
-Generate project folder structure and starter files based on tech stack from constitution or user input.
+---
+description: Generate project folder structure and starter files based on tech stack from constitution or user input.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+effort: high
+handoffs:
+  - label: Create Specification
+    agent: doit.specit
+    prompt: Create a feature specification for this scaffolded project. I want to build...
+  - label: Update Constitution
+    agent: doit.constitution
+    prompt: Update the project constitution with additional details...
+  - label: Organize Documentation
+    agent: doit.documentit
+    prompt: Organize and index the project documentation...
+---
 
 ## User Input
 
-Consider any arguments or options the user provides.
+```text
+$ARGUMENTS
+```
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -20,9 +34,38 @@ doit context show
 
 **Use loaded context to**:
 
-- Reference constitution principles when making decisions
-- Consider roadmap priorities
+- Reference constitution principles when making decisions (already in context)
+- Consider roadmap priorities (already in context)
+- Use tech stack information from constitution/tech-stack (already in context)
 - Identify connections to related specifications
+
+**DO NOT read these files again** (already in context above):
+
+- `.doit/memory/constitution.md` - principles and tech stack are in context
+- `.doit/memory/tech-stack.md` - tech decisions are in context
+- `.doit/memory/roadmap.md` - priorities are in context
+
+**Legitimate explicit reads** (NOT in context show):
+
+- `README.md` - for project description (if no constitution)
+- `package.json` or `pyproject.toml` - for existing project metadata
+- Existing project files for structure analysis
+
+## Code Quality Guidelines
+
+Before generating or modifying code:
+
+1. **Search for existing implementations** - Use Glob/Grep to find similar functionality before creating new code
+2. **Follow established patterns** - Match existing code style, naming conventions, and architecture
+3. **Avoid duplication** - Reference or extend existing utilities rather than recreating them
+4. **Check imports** - Verify required dependencies already exist in the project
+
+## Artifact Storage
+
+- **Temporary scripts**: Save to `.doit/temp/{purpose}-{timestamp}.sh` (or .py/.ps1)
+- **Status reports**: Save to `specs/{feature}/reports/{command}-report-{timestamp}.md`
+- **Create directories if needed**: Use `mkdir -p` before writing files
+- Note: `.doit/temp/` is gitignored - temporary files will not be committed
 
 ## Outline
 
@@ -30,15 +73,15 @@ You are generating a project folder structure based on the tech stack defined in
 
 Follow this execution flow:
 
-### 1. Load Constitution
+### 1. Extract Tech Stack from Context
 
-Read `.doit/memory/constitution.md` and extract:
+Tech stack information is already loaded from `doit context show`. Extract from context:
 
 - **Tech Stack**: Languages, Frameworks, Libraries
 - **Infrastructure**: Hosting platform, Cloud provider, Database
 - **Deployment**: CI/CD pipeline, Strategy, Environments
 
-If constitution doesn't exist or has incomplete tech stack info, proceed to step 2.
+If constitution/tech-stack context is not available or has incomplete tech stack info, proceed to step 2.
 
 ### 2. Tech Stack Clarification
 
@@ -406,6 +449,56 @@ Before creating files:
 - Use appropriate naming conventions for the tech stack (camelCase, snake_case, PascalCase)
 - Include comments in generated config files explaining key settings
 - Respect existing project structure when adding new directories
+
+---
+
+## Error Recovery
+
+### Directory Creation Failure
+
+The project structure could not be created due to permission or filesystem issues.
+
+**ERROR** | If directory creation fails:
+
+1. Check permissions on the target directory: `ls -la .`
+2. Verify you have write access to the current directory
+3. If permissions are insufficient, adjust them or choose a different location
+4. Retry: re-run `/doit.scaffoldit`
+5. Verify: `ls -la .doit/` confirms the directory structure was created
+
+> Prevention: Ensure you have write permissions in the target directory before scaffolding
+
+If the above steps don't resolve the issue: create the `.doit/` directory structure manually using `mkdir -p .doit/{templates,config,state,memory,scripts}`.
+
+### Template Copy Failure
+
+Template files could not be copied to the project directory.
+
+**ERROR** | If template files fail to copy:
+
+1. Check if the source templates exist: `python -c "import doit_cli; print(doit_cli.__file__)"`
+2. Verify the package installation: `pip show doit-toolkit-cli`
+3. If the package is corrupted, reinstall: `pip install --force-reinstall doit-toolkit-cli`
+4. Retry: re-run `/doit.scaffoldit`
+5. Verify: `ls .doit/templates/` shows template files
+
+If the above steps don't resolve the issue: run `doit init --force` to reinitialize from scratch.
+
+### Existing Project Conflict
+
+The target directory already contains a doit project structure.
+
+**WARNING** | If the directory already has a `.doit/` folder:
+
+1. Check the existing structure: `ls -la .doit/`
+2. If you want to preserve existing configuration, choose to merge rather than overwrite
+3. If you want a fresh start, back up first: `cp -r .doit/ .doit.backup/`
+4. Then reinitialize: `doit init --force`
+5. Verify: `doit verify` confirms the project structure is valid
+
+> Prevention: Check for existing `.doit/` directory before scaffolding a new project
+
+If the above steps don't resolve the issue: manually merge the old and new configurations by comparing `.doit.backup/` with the new `.doit/`.
 
 ---
 

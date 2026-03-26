@@ -1,61 +1,57 @@
-# Release Notes - v0.1.15
+# Release Notes - v0.1.17
 
-**Release Date**: 2026-01-30
+**Release Date**: 2026-03-26
 
 ## Highlights
 
-This release introduces the **Research Command** (`/doit.researchit`), a new pre-specification workflow stage designed for Product Owners to capture business requirements through interactive AI-assisted Q&A.
+This release introduces **MCP server integration**, **project-level personas**, and **error recovery documentation** across all command templates — completing the persona pipeline and significantly improving developer experience.
 
 ## What's New
 
-### Research Command for Product Owners
+### MCP Server for doit Operations (#055)
 
-The `/doit.researchit` command is a template-based slash command that guides Product Owners through a structured Q&A session to capture business requirements **before** technical specification begins.
+Expose doit CLI operations as MCP (Model Context Protocol) tools, enabling AI assistants to call doit directly from the conversation.
 
 **Key Features**:
 
-- **12-question interactive workflow** across 4 phases:
-  - Phase 1: Problem Understanding (what problem, who experiences it, current state)
-  - Phase 2: Users and Goals (personas, success criteria, user types)
-  - Phase 3: Requirements and Constraints (must-haves, nice-to-haves, boundaries)
-  - Phase 4: Success Metrics (how to measure success and failure)
+- Tools exposed: `doit_validate`, `doit_status`, `doit_verify`, and more
+- Built on official MCP Python SDK with FastMCP
+- Zero-config auto-discovery in Claude Code via `.claude/settings.json`
+- Structured JSON responses optimized for AI consumption
 
-- **Business-focused**: No technology questions - keeps focus on user value and business outcomes
+### Project-Level Personas with Context Injection (#056)
 
-- **4 research artifacts generated**:
-  - `research.md` - Problem statement, target users, business goals
-  - `user-stories.md` - Given/When/Then user stories with personas
-  - `interview-notes.md` - Stakeholder interview templates
-  - `competitive-analysis.md` - Competitor comparison framework
+Personas are now a first-class context source in the doit workflow.
 
-- **Session resume support**: Save progress mid-session and continue later
+**Key Features**:
 
-- **Seamless specit integration**: Research artifacts automatically loaded by `/doit.specit`
+- Auto-generates `.doit/memory/personas.md` during `/doit.roadmapit`
+- Registered in `context.yaml` at priority 3
+- Automatically injected into `/doit.researchit`, `/doit.planit`, and `/doit.specit`
 
-### Workflow Enhancement
+### Persona-Aware User Story Generation (#057)
 
-The Do-It workflow now includes an optional pre-specification stage:
+`/doit.specit` now auto-maps user stories to the most relevant persona using P-NNN traceability IDs.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  doit Workflow (NEW stage)                                      │
-│  ● researchit → ○ specit → ○ planit → ○ taskit → ○ implementit │
-└─────────────────────────────────────────────────────────────────┘
-```
+**Key Features**:
 
-## Usage
+- Automatic persona matching from project-level or feature-level persona files
+- Completes the full persona pipeline: templates (053) → context injection (056) → story mapping (057)
 
-### For Product Owners
+### Error Recovery Patterns in All Commands (#058)
 
-```
-/doit.researchit customer-feedback
-```
+All 13 command templates now include structured `## Error Recovery` sections.
 
-The AI assistant will guide you through the Q&A session, then generate all research artifacts in `specs/{feature-name}/`.
+**Key Features**:
 
-### For Developers
+- 3-5 documented error scenarios per command
+- Severity indicators (ERROR/WARNING)
+- Numbered recovery steps with verification commands
+- Prevention tips and escalation paths
 
-After research is complete, run `/doit.specit` as usual - it will automatically load the research artifacts as context for specification generation.
+### Update/Upgrade Flow Improvements
+
+- Fixed `doit init --update` to sync all commands to both Claude and Copilot
 
 ## Breaking Changes
 
@@ -64,16 +60,18 @@ None.
 ## Upgrade Instructions
 
 1. Update to the latest version:
+
    ```bash
    pip install --upgrade doit-toolkit-cli
    ```
 
-2. Run init update to get new templates:
+2. Run init update to get new templates and MCP server:
+
    ```bash
    doit init --update
    ```
 
-3. Start using `/doit.researchit` in your AI assistant
+3. Configure MCP server in your AI assistant (see docs for setup)
 
 ## Contributors
 

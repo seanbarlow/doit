@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-03-26
+
+### Added
+
+- **MCP Server for doit Operations** (#055)
+  - Expose doit CLI operations as MCP tools for AI assistant integration
+  - Built on official MCP Python SDK with FastMCP
+  - Tools: `doit_validate`, `doit_status`, `doit_verify`, and more
+  - Zero-config auto-discovery via `.claude/settings.json`
+
+- **Project-Level Personas with Context Injection** (#056)
+  - Personas as first-class context source in doit workflow
+  - Auto-generates `.doit/memory/personas.md` during roadmap creation
+  - Registered in `context.yaml` at priority 3 for automatic injection
+
+- **Persona-Aware User Story Generation** (#057)
+  - `/doit.specit` auto-maps user stories to relevant personas
+  - Uses P-NNN traceability IDs from persona templates
+  - Completes the persona pipeline (specs 053 → 056 → 057)
+
+- **Error Recovery Patterns in All Commands** (#058)
+  - Structured `## Error Recovery` sections in all 13 command templates
+  - 3-5 documented error scenarios per command with severity indicators
+  - Numbered recovery steps, verification commands, and prevention tips
+
+- **Update/Upgrade Flow Improvements**
+  - Fixed `doit init --update` to sync all commands to Claude and Copilot
+
 ## [0.1.16] - 2026-01-30
 
 ### Fixed

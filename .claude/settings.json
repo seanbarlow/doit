@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(pip install:*)",
+      "Bash(/Users/seanbarlow/Projects/GitHub/doit/.venv/bin/pip install:*)",
+      "Bash(/Users/seanbarlow/Projects/GitHub/doit/.venv/bin/python -m pip install -e \".[dev]\")",
+      "Bash(/Users/seanbarlow/Projects/GitHub/doit/.venv/bin/python -m ensurepip)",
+      "Bash(brew install:*)",
+      "Bash(uv tool:*)",
+      "Bash(brew info:*)",
+      "Bash(/Users/seanbarlow/.pyenv/versions/3.11.9/bin/python -c \"import ssl; print\\(ssl.OPENSSL_VERSION\\)\")",
+      "Bash(/Users/seanbarlow/.pyenv/versions/3.11.9/bin/python -c \"import hashlib; print\\(hashlib.algorithms_available\\)\")"
+    ]
+  }
+}

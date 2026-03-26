@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-03-26 (Comprehensive review and roadmap refresh)
+**Last Updated**: 2026-03-26
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -21,6 +21,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 ### P2 - High Priority (Significant Business Value)
 
 <!-- Items with high business value, scheduled for near-term delivery -->
+
+- [ ] Project-level personas in memory with context injection
+  - **Rationale**: Generate `.doit/memory/personas.md` during roadmap creation using the existing persona-output-template. Add personas as a context source so `/doit.researchit`, `/doit.planit`, and `/doit.specit` automatically reference project personas, making every workflow session persona-aware
+  - **Aligns with**: AI-Native Design principle (V), Persistent Memory principle (II), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
 
 - [ ] Cross-platform CI matrix testing
   - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection
@@ -69,6 +73,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - **Rationale**: Dedicated regression test suite that runs on every commit to catch platform-specific issues early. Includes tests for previously fixed bugs, edge cases, and critical user workflows to prevent feature breakage
   - **Aligns with**: Windows E2E testing (`049-e2e-windows-tests`), Continuous quality improvement
 
+- [ ] Persona-aware user story generation
+  - **Rationale**: When `/doit.specit` generates user stories, automatically map each story to the most relevant persona from `.doit/memory/personas.md` using existing P-NNN traceability IDs
+  - **Aligns with**: Requirements Traceability Matrix (P3), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
+
 - [ ] Requirements Traceability Matrix
   - **Rationale**: Auto-generate traceability from research → spec → tasks → code. Track how business requirements flow through the entire workflow for audits, compliance, and ensuring nothing is lost.
   - **Aligns with**: Cross-reference support (`033-spec-task-crossrefs`), researchit feature
@@ -96,6 +104,14 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 - [ ] Additional scaffolding templates (Rust, Kotlin, Swift, Next.js, Django)
   - **Rationale**: Expand language/framework coverage beyond current 8 templates
   - **Aligns with**: Community adoption, scaffoldit feature
+
+- [ ] Persona impact analysis on roadmap changes
+  - **Rationale**: When adding or reprioritizing roadmap items, show which personas are most affected by the change to help with prioritization decisions
+  - **Aligns with**: Project-level personas feature, AI-Native Design principle
+
+- [ ] Context-aware persona refinement
+  - **Rationale**: As features complete and research sessions accumulate, offer to refine `.doit/memory/personas.md` based on new learnings, keeping project personas current as understanding evolves
+  - **Aligns with**: Research Version History (P4), Persistent Memory principle
 
 - [ ] Architecture Decision Records (ADRs)
   - **Rationale**: Document key design decisions (multi-provider abstraction, template vs MCP, skills architecture) in `docs/adr/`

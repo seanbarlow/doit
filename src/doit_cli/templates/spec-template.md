@@ -20,7 +20,11 @@
   - Demonstrated to users independently
 -->
 
-### User Story 1 - [Brief Title] (Priority: P1)
+### User Story 1 - [Brief Title] (Priority: P1) | Persona: P-NNN
+
+<!-- Note: The "| Persona: P-NNN" suffix is optional. It is only included when
+     personas are loaded in context (from .doit/memory/personas.md or specs/{feature}/personas.md).
+     When no personas are available, omit the suffix and use the standard header format. -->
 
 [Describe this user journey in plain language]
 
@@ -35,7 +39,7 @@
 
 ---
 
-### User Story 2 - [Brief Title] (Priority: P2)
+### User Story 2 - [Brief Title] (Priority: P2) | Persona: P-NNN
 
 [Describe this user journey in plain language]
 
@@ -49,7 +53,7 @@
 
 ---
 
-### User Story 3 - [Brief Title] (Priority: P3)
+### User Story 3 - [Brief Title] (Priority: P3) | Persona: P-NNN
 
 [Describe this user journey in plain language]
 

@@ -22,10 +22,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Persona-aware user story generation
-  - **Rationale**: When `/doit.specit` generates user stories, automatically map each story to the most relevant persona from `.doit/memory/personas.md` using existing P-NNN traceability IDs. Natural next step after `056-persona-context-injection` — completes the persona pipeline
-  - **Aligns with**: Project-level personas (`056-persona-context-injection`), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
-
 - [ ] Error recovery patterns in all commands
   - **Rationale**: Only some commands document what to do when things fail. Add structured `## Error Recovery` section to each command template. Low effort, high impact — improves every workflow session
   - **Aligns with**: Documentation quality, user experience, Opinionated Workflow principle (IV)

@@ -22,10 +22,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items with high business value, scheduled for near-term delivery -->
 
-- [ ] Project-level personas in memory with context injection
-  - **Rationale**: Generate `.doit/memory/personas.md` during roadmap creation using the existing persona-output-template. Add personas as a context source so `/doit.researchit`, `/doit.planit`, and `/doit.specit` automatically reference project personas, making every workflow session persona-aware
-  - **Aligns with**: AI-Native Design principle (V), Persistent Memory principle (II), Stakeholder Persona Templates (`053-stakeholder-persona-templates`)
-
 - [ ] Cross-platform CI matrix testing
   - **Rationale**: Expand GitHub Actions workflow to run tests on Windows, Linux, and macOS in parallel, ensuring comprehensive platform validation on every PR. Matrix strategy with parallel execution, unified reporting, and platform-specific artifact collection
   - **Aligns with**: Windows E2E CI/CD integration (US4), Cross-platform parity goals

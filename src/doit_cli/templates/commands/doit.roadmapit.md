@@ -345,6 +345,51 @@ Based on your roadmap and project context, here are some features you might cons
 
 ---
 
+### 6b. Generate Project-Level Personas
+
+After the roadmap is written or updated, generate or update `.doit/memory/personas.md` with project-level stakeholder personas.
+
+#### 6b.1 Check for Existing Personas
+
+```bash
+ls .doit/memory/personas.md 2>/dev/null
+```
+
+- **If file exists**: Load it and offer to update (add new personas, refine existing ones) rather than overwriting. Present the current persona summary table and ask if changes are needed.
+- **If file does NOT exist**: Generate new personas from scratch.
+
+#### 6b.2 Derive Personas from Project Context
+
+Use the constitution and roadmap to identify stakeholder types:
+
+1. **From constitution**: Extract stakeholder types mentioned in purpose, success criteria, and governance sections
+2. **From roadmap**: Identify user-facing features and who they serve (developers, product owners, maintainers, etc.)
+3. **From existing feature-level personas**: Check `specs/*/personas.md` for previously defined personas that should be elevated to project level
+
+#### 6b.3 Generate Personas File
+
+1. Load the persona output template: `.doit/templates/personas-output-template.md`
+2. Replace placeholders with derived persona data:
+   - Assign sequential IDs (P-001, P-002, etc.)
+   - Fill Identity, Demographics, Goals, Pain Points, Behavioral Patterns
+   - Document persona relationships if multiple personas exist
+3. Write to `.doit/memory/personas.md`
+
+**Skip conditions**: If no constitution exists or the project context is insufficient to derive meaningful personas, skip this step with a message: "Persona generation skipped — insufficient project context. Run `/doit.constitution` first."
+
+#### 6b.4 Report Persona Generation
+
+Include persona generation results in the completion report:
+
+```markdown
+### Personas
+- Generated/Updated: `.doit/memory/personas.md`
+- Persona count: [N]
+- Personas: [P-001: Name, P-002: Name, ...]
+```
+
+---
+
 ### 7. Completion Report
 
 Output a summary of changes:

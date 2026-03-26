@@ -44,6 +44,7 @@ doit context show
 - Reference constitution principles when capturing requirements
 - Consider roadmap priorities when discussing scope
 - Identify connections to related features
+- **Reference project personas** (if `.doit/memory/personas.md` is loaded in context): During Phase 2 (Users and Goals), use existing persona names and IDs (P-NNN) as starting points rather than asking from scratch. Identify gaps where new personas may be needed that differ from existing project-level personas.
 
 ## Outline
 

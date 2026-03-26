@@ -31,7 +31,7 @@ jobs:
         run: ruff check src/ tests/ --exit-zero
 
       - name: Run ruff format check
-        run: ruff format --check src/ tests/ --exit-zero
+        run: ruff format --check src/ tests/ || true
 
   test:
     name: Test (Python ${{ matrix.python-version }})
@@ -60,7 +60,6 @@ jobs:
           pytest tests/unit/ tests/integration/ tests/contract/ \
             -v \
             --tb=short \
-            -x \
             --junit-xml=test-results/junit-py${{ matrix.python-version }}.xml
 
       - name: Upload test results

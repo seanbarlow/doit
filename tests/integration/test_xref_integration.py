@@ -224,7 +224,9 @@ class TestXrefLocateCommand:
 
         assert result.returncode == 0
         assert "FR-001" in result.stdout
-        assert "spec.md" in result.stdout
+        # Allow for Rich terminal line wrapping in CI (narrow terminal)
+        output_joined = result.stdout.replace("\n", "")
+        assert "spec.md" in output_joined
 
     def test_locate_json_format(self, xref_project):
         """Test locate with JSON output."""

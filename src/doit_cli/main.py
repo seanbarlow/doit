@@ -47,6 +47,11 @@ app.add_typer(roadmapit_app, name="roadmapit")
 app.add_typer(team_app, name="team")
 app.add_typer(xref_app, name="xref")
 
+# MCP subcommand - availability checked at runtime in serve_command()
+from .cli.mcp_command import app as mcp_app  # noqa: E402
+
+app.add_typer(mcp_app, name="mcp")
+
 
 def main():
     """Main entry point for the CLI."""

@@ -86,3 +86,10 @@ doit sync-prompts              # Sync templates to AI agents
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
+
+## Active Technologies
+- Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output) (055-mcp-server)
+- File-based (markdown in `.doit/memory/`, JSON in `.doit/state/`) (055-mcp-server)
+
+## Recent Changes
+- 055-mcp-server: Added Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output)

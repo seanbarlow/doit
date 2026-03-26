@@ -2,7 +2,6 @@
 
 import json
 import pytest
-from pathlib import Path
 
 from doit_cli.mcp import MCP_AVAILABLE
 

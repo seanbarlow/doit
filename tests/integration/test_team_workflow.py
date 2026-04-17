@@ -1,11 +1,9 @@
 """Integration tests for team collaboration workflow."""
 
 import json
-import pytest
-from pathlib import Path
-from typer.testing import CliRunner
-from unittest.mock import patch
 
+import pytest
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
@@ -48,7 +46,6 @@ def team_project(git_project):
 
     with runner.isolated_filesystem():
         # Copy git_project to isolated filesystem
-        import shutil
         import os
 
         # Change to git_project directory for the test
@@ -70,8 +67,9 @@ class TestTeamInit:
 
     def test_team_init_creates_config(self, git_project):
         """Test that team init creates team.yaml config."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
@@ -91,8 +89,9 @@ class TestTeamInit:
 
     def test_team_init_uses_git_email_as_default(self, git_project):
         """Test that team init defaults to git user.email for owner."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
@@ -107,17 +106,16 @@ class TestTeamInit:
 
     def test_team_init_rejects_duplicate(self, git_project):
         """Test that team init fails if already initialized."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
             # First init
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             # Second init should fail
             result = runner.invoke(
@@ -135,17 +133,16 @@ class TestTeamMemberManagement:
 
     def test_add_member(self, git_project):
         """Test adding a team member."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
             # Initialize team
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             # Add member
             result = runner.invoke(app, ["team", "add", "member@example.com"])
@@ -157,20 +154,17 @@ class TestTeamMemberManagement:
 
     def test_add_member_with_role(self, git_project):
         """Test adding a team member with owner role."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
-            result = runner.invoke(
-                app, ["team", "add", "member@example.com", "--role", "owner"]
-            )
+            result = runner.invoke(app, ["team", "add", "member@example.com", "--role", "owner"])
 
             assert result.exit_code == 0
             assert "owner" in result.output.lower()
@@ -179,16 +173,15 @@ class TestTeamMemberManagement:
 
     def test_add_member_read_only(self, git_project):
         """Test adding a read-only team member."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             result = runner.invoke(
                 app, ["team", "add", "member@example.com", "--permission", "read-only"]
@@ -201,16 +194,15 @@ class TestTeamMemberManagement:
 
     def test_add_duplicate_member_fails(self, git_project):
         """Test that adding duplicate member fails."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
             runner.invoke(app, ["team", "add", "member@example.com"])
 
             result = runner.invoke(app, ["team", "add", "member@example.com"])
@@ -222,16 +214,15 @@ class TestTeamMemberManagement:
 
     def test_list_members(self, git_project):
         """Test listing team members."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
             runner.invoke(app, ["team", "add", "member@example.com"])
 
             result = runner.invoke(app, ["team", "list"])
@@ -244,16 +235,15 @@ class TestTeamMemberManagement:
 
     def test_list_members_json_format(self, git_project):
         """Test listing members in JSON format."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             result = runner.invoke(app, ["team", "list", "--format", "json"])
 
@@ -267,21 +257,18 @@ class TestTeamMemberManagement:
 
     def test_remove_member(self, git_project):
         """Test removing a team member."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
             runner.invoke(app, ["team", "add", "member@example.com"])
 
-            result = runner.invoke(
-                app, ["team", "remove", "member@example.com", "--force"]
-            )
+            result = runner.invoke(app, ["team", "remove", "member@example.com", "--force"])
 
             assert result.exit_code == 0
             assert "removed" in result.output.lower()
@@ -294,8 +281,9 @@ class TestTeamStatus:
 
     def test_status_shows_team_info(self, git_project):
         """Test that status shows team information."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
@@ -318,16 +306,15 @@ class TestTeamNotifications:
 
     def test_notify_list_empty(self, git_project):
         """Test listing notifications when empty."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             result = runner.invoke(app, ["team", "notify", "list"])
 
@@ -338,16 +325,15 @@ class TestTeamNotifications:
 
     def test_notify_config_show(self, git_project):
         """Test showing notification config."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             result = runner.invoke(app, ["team", "notify", "config"])
 
@@ -362,8 +348,9 @@ class TestTeamConfig:
 
     def test_config_shows_settings(self, git_project):
         """Test that config shows team settings."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
@@ -383,16 +370,15 @@ class TestTeamConfig:
 
     def test_config_json_format(self, git_project):
         """Test config in JSON format."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             result = runner.invoke(app, ["team", "config", "--format", "json"])
 
@@ -409,16 +395,15 @@ class TestTeamConflicts:
 
     def test_conflict_list_empty(self, git_project):
         """Test listing conflicts when none exist."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
 
         try:
-            runner.invoke(
-                app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"]
-            )
+            runner.invoke(app, ["team", "init", "--name", "Team", "--owner", "owner@example.com"])
 
             result = runner.invoke(app, ["team", "conflict", "list"])
 
@@ -433,8 +418,9 @@ class TestUninitializedTeam:
 
     def test_add_fails_without_init(self, git_project):
         """Test that add fails without team init."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)
@@ -449,8 +435,9 @@ class TestUninitializedTeam:
 
     def test_list_fails_without_init(self, git_project):
         """Test that list fails without team init."""
-        from doit_cli.main import app
         import os
+
+        from doit_cli.main import app
 
         old_cwd = os.getcwd()
         os.chdir(git_project)

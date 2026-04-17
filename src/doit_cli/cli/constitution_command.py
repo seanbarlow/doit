@@ -4,8 +4,9 @@ This module provides the constitution command and subcommands
 for the doit CLI tool.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -33,7 +34,7 @@ def main() -> None:
 
 @app.command("cleanup")
 def cleanup(
-    path: Optional[Path] = typer.Argument(
+    path: Path | None = typer.Argument(
         None,
         help="Project root directory (default: current directory)",
     ),
@@ -75,9 +76,7 @@ def cleanup(
     # Validate project directory
     memory_dir = project_root / ".doit" / "memory"
     if not memory_dir.exists():
-        console.print(
-            f"[red]Error:[/red] No .doit/memory directory found at {project_root}"
-        )
+        console.print(f"[red]Error:[/red] No .doit/memory directory found at {project_root}")
         console.print("Run [cyan]doit init[/cyan] to initialize the project first.")
         raise typer.Exit(code=1)
 
@@ -85,9 +84,7 @@ def cleanup(
     constitution_path = service.constitution_path
 
     if not constitution_path.exists():
-        console.print(
-            f"[red]Error:[/red] Constitution not found at {constitution_path}"
-        )
+        console.print(f"[red]Error:[/red] Constitution not found at {constitution_path}")
         raise typer.Exit(code=1)
 
     # Analyze content first
@@ -95,9 +92,7 @@ def cleanup(
     analysis = service.analyze()
 
     if not analysis.has_tech_content:
-        console.print(
-            "\n[green]✓[/green] No tech-stack sections found in constitution.md"
-        )
+        console.print("\n[green]✓[/green] No tech-stack sections found in constitution.md")
         console.print("Constitution is already clean - no changes needed.")
         raise typer.Exit(code=0)
 
@@ -110,9 +105,7 @@ def cleanup(
 
     # Check for existing tech-stack.md
     if service.tech_stack_path.exists() and not merge:
-        console.print(
-            f"\n[yellow]Warning:[/yellow] {service.tech_stack_path.name} already exists."
-        )
+        console.print(f"\n[yellow]Warning:[/yellow] {service.tech_stack_path.name} already exists.")
         console.print("Use [cyan]--merge[/cyan] to combine content, or remove the existing file.")
         raise typer.Exit(code=1)
 

@@ -1,9 +1,10 @@
 """Backup service for preserving files during updates."""
 
+from __future__ import annotations
+
+import shutil
 from datetime import datetime
 from pathlib import Path
-import shutil
-from typing import Optional
 
 
 class BackupService:
@@ -25,8 +26,8 @@ class BackupService:
     def create_backup(
         self,
         files: list[Path],
-        backup_name: Optional[str] = None,
-    ) -> Optional[Path]:
+        backup_name: str | None = None,
+    ) -> Path | None:
         """Create a timestamped backup of specified files.
 
         Args:
@@ -68,7 +69,7 @@ class BackupService:
 
         return backup_dir
 
-    def create_doit_backup(self, include_memory: bool = False) -> Optional[Path]:
+    def create_doit_backup(self, include_memory: bool = False) -> Path | None:
         """Create a backup of doit-managed files.
 
         Args:
@@ -112,8 +113,7 @@ class BackupService:
             return []
 
         backups = [
-            d for d in self.backups_folder.iterdir()
-            if d.is_dir() and not d.name.startswith(".")
+            d for d in self.backups_folder.iterdir() if d.is_dir() and not d.name.startswith(".")
         ]
 
         # Sort by name (timestamp format ensures chronological order)

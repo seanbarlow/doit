@@ -3,13 +3,14 @@
 Tests the interactive prompting functionality for guided workflows.
 """
 
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 from doit_cli.models.workflow_models import (
-    WorkflowStep,
-    ValidationResult,
     NavigationCommand,
+    ValidationResult,
+    WorkflowStep,
 )
 
 
@@ -77,7 +78,7 @@ class TestInteractivePrompt:
 
     def test_prompt_displays_prompt_text(self, prompt, text_step):
         """Test that prompt shows the step's prompt text."""
-        with patch.object(prompt, "_get_input", return_value="test") as mock_input:
+        with patch.object(prompt, "_get_input", return_value="test"):
             with patch.object(prompt, "_display_prompt") as mock_display:
                 prompt.prompt(text_step)
                 mock_display.assert_called()
@@ -112,9 +113,7 @@ class TestInteractivePrompt:
             "Name too short", "Use at least 3 characters"
         )
 
-        with patch.object(
-            prompt, "_get_input", side_effect=["ab", "abc"]
-        ) as mock_input:
+        with patch.object(prompt, "_get_input", side_effect=["ab", "abc"]):
             with patch.object(prompt, "_show_validation_error") as mock_error:
                 # Second attempt with valid input
                 validator.validate.side_effect = [
@@ -152,9 +151,7 @@ class TestInteractivePrompt:
 
     def test_prompt_choice_rejects_invalid_option(self, prompt, choice_step):
         """Test that invalid options are rejected and user is re-prompted."""
-        with patch.object(
-            prompt, "_get_choice_input", side_effect=["invalid", "react"]
-        ):
+        with patch.object(prompt, "_get_choice_input", side_effect=["invalid", "react"]):
             with patch.object(prompt, "_show_invalid_choice") as mock_error:
                 result = prompt.prompt_choice(choice_step, choice_step.options)
                 mock_error.assert_called_once()

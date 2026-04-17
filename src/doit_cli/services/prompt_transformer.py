@@ -1,5 +1,7 @@
 """Service to transform command templates to GitHub Copilot prompt format."""
 
+from __future__ import annotations
+
 import re
 
 from ..models.sync_models import CommandTemplate
@@ -53,7 +55,7 @@ class PromptTransformer:
         try:
             end_idx = content.index("---", 3)
             # Skip the closing --- and any trailing newline
-            return content[end_idx + 3:].lstrip("\n")
+            return content[end_idx + 3 :].lstrip("\n")
         except ValueError:
             # No closing ---, return original
             return content

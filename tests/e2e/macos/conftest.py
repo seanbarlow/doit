@@ -2,22 +2,22 @@
 
 import os
 import platform
-import shutil
-import tempfile
-from pathlib import Path
-from typing import Generator
-
-import pytest
 
 # Import utility classes
 import sys
+import tempfile
+from collections.abc import Generator
+from pathlib import Path
+
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "utils" / "macos"))
 
-from filesystem_utils import FilesystemValidator
-from unicode_utils import test_unicode_sample_strings, create_nfd_filename, create_nfc_filename
 from bsd_utils import BSDCommandWrapper
-from xattr_utils import ExtendedAttributeHandler
 from comparison_utils import ComparisonTools
+from filesystem_utils import FilesystemValidator
+from unicode_utils import create_nfc_filename, create_nfd_filename, test_unicode_sample_strings
+from xattr_utils import ExtendedAttributeHandler
 
 
 @pytest.fixture(scope="session")
@@ -117,7 +117,7 @@ def unicode_test_files(tmp_path: Path, macos_test_env: dict) -> dict:
     samples = test_unicode_sample_strings()
 
     # Create files with NFD normalization (macOS default)
-    for name, sample in samples.items():
+    for name, _sample in samples.items():
         nfd_file = create_nfd_filename(str(unicode_dir), f"test_{name}_nfd.txt")
         test_files[f"{name}_nfd"] = str(nfd_file)
 
@@ -212,12 +212,15 @@ def git_repo(tmp_path: Path) -> Generator[Path, None, None]:
 
     # Initialize git repo
     import subprocess
+
     original_cwd = os.getcwd()
     os.chdir(repo_dir)
 
     try:
         subprocess.run(["git", "init"], check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.email", "test@example.com"], check=True, capture_output=True)
+        subprocess.run(
+            ["git", "config", "user.email", "test@example.com"], check=True, capture_output=True
+        )
         subprocess.run(["git", "config", "user.name", "Test User"], check=True, capture_output=True)
 
         yield repo_dir
@@ -286,33 +289,22 @@ def skip_if_not_apfs(case_sensitive_volume: dict):
 # Configure pytest markers
 def pytest_configure(config):
     """Configure custom pytest markers."""
-    config.addinivalue_line(
-        "markers", "macos: mark test as requiring macOS"
-    )
-    config.addinivalue_line(
-        "markers", "filesystem: mark test as filesystem-specific"
-    )
-    config.addinivalue_line(
-        "markers", "bsd: mark test as BSD utility compatibility test"
-    )
-    config.addinivalue_line(
-        "markers", "unicode: mark test as Unicode handling test"
-    )
+    config.addinivalue_line("markers", "macos: mark test as requiring macOS")
+    config.addinivalue_line("markers", "filesystem: mark test as filesystem-specific")
+    config.addinivalue_line("markers", "bsd: mark test as BSD utility compatibility test")
+    config.addinivalue_line("markers", "unicode: mark test as Unicode handling test")
     config.addinivalue_line(
         "markers", "case_sensitive: mark test as requiring case-sensitive filesystem"
     )
-    config.addinivalue_line(
-        "markers", "apfs: mark test as requiring APFS filesystem"
-    )
+    config.addinivalue_line("markers", "apfs: mark test as requiring APFS filesystem")
 
 
 # Auto-skip tests based on markers
 def pytest_runtest_setup(item):
     """Auto-skip tests based on platform markers."""
     # Skip macOS tests on non-macOS platforms
-    if "macos" in item.keywords:
-        if platform.system() != "Darwin":
-            pytest.skip("Test requires macOS")
+    if "macos" in item.keywords and platform.system() != "Darwin":
+        pytest.skip("Test requires macOS")
 
     # Skip case-sensitive tests on case-insensitive filesystems
     if "case_sensitive" in item.keywords:

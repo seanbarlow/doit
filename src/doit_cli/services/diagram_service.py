@@ -1,13 +1,13 @@
 """Main orchestration service for diagram generation."""
 
+from __future__ import annotations
+
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from ..models.diagram_models import (
     DiagramResult,
-    DiagramSection,
     DiagramType,
     GeneratedDiagram,
     ValidationResult,
@@ -58,7 +58,7 @@ class DiagramService:
     def generate(
         self,
         file_path: Path,
-        diagram_types: Optional[list[DiagramType]] = None,
+        diagram_types: list[DiagramType] | None = None,
         insert: bool = True,
     ) -> DiagramResult:
         """Generate diagrams for a specification file.
@@ -99,24 +99,22 @@ class DiagramService:
             diagram = self._generate_diagram(content, diagram_type)
             if diagram:
                 # Validate
-                validation = self.validator.validate(
-                    diagram.mermaid_content, diagram_type
-                )
+                validation = self.validator.validate(diagram.mermaid_content, diagram_type)
                 diagram.validation = validation
                 diagram.is_valid = validation.passed
 
                 if self.strict and not validation.passed:
                     result.success = False
-                    result.error = f"Validation failed for {diagram_type.value}: {validation.errors}"
+                    result.error = (
+                        f"Validation failed for {diagram_type.value}: {validation.errors}"
+                    )
                     return result
 
                 result.diagrams.append(diagram)
 
         # Insert diagrams into file if requested
         if insert and result.diagrams:
-            updated_content, sections_updated = self._insert_diagrams(
-                content, result.diagrams
-            )
+            updated_content, sections_updated = self._insert_diagrams(content, result.diagrams)
             result.sections_updated = sections_updated
 
             if sections_updated:
@@ -130,9 +128,7 @@ class DiagramService:
 
         return result
 
-    def validate(
-        self, content: str, diagram_type: Optional[DiagramType] = None
-    ) -> ValidationResult:
+    def validate(self, content: str, diagram_type: DiagramType | None = None) -> ValidationResult:
         """Validate Mermaid diagram syntax.
 
         Args:
@@ -144,9 +140,7 @@ class DiagramService:
         """
         return self.validator.validate(content, diagram_type)
 
-    def insert_diagram(
-        self, file_path: Path, section_name: str, diagram_content: str
-    ) -> bool:
+    def insert_diagram(self, file_path: Path, section_name: str, diagram_content: str) -> bool:
         """Insert or replace diagram in AUTO-GENERATED section.
 
         Args:
@@ -197,9 +191,7 @@ class DiagramService:
 
         return types
 
-    def _generate_diagram(
-        self, content: str, diagram_type: DiagramType
-    ) -> Optional[GeneratedDiagram]:
+    def _generate_diagram(self, content: str, diagram_type: DiagramType) -> GeneratedDiagram | None:
         """Generate a single diagram type.
 
         Args:
@@ -309,9 +301,7 @@ class DiagramService:
             if temp_path.exists():
                 temp_path.unlink()
 
-    def get_diagram_content(
-        self, file_path: Path, diagram_type: DiagramType
-    ) -> Optional[str]:
+    def get_diagram_content(self, file_path: Path, diagram_type: DiagramType) -> str | None:
         """Get existing diagram content from a file.
 
         Args:

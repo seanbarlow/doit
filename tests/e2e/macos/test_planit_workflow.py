@@ -8,7 +8,6 @@ Tests the planning workflow including:
 """
 
 import subprocess
-from pathlib import Path
 
 import pytest
 

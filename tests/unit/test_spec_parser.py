@@ -1,17 +1,19 @@
 """Unit tests for spec file parser."""
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
+
+import pytest
+
 from doit_cli.utils.spec_parser import (
     SpecFrontmatter,
-    parse_spec_file,
-    update_spec_frontmatter,
     add_epic_reference,
-    remove_epic_reference,
     get_epic_reference,
-    write_spec_file
+    parse_spec_file,
+    remove_epic_reference,
+    update_spec_frontmatter,
+    write_spec_file,
 )
 
 
@@ -67,7 +69,7 @@ class TestSpecFrontmatter:
             "Feature": "Test",
             "Branch": "[001-test]",
             "Created": "2026-01-22",
-            "Status": "Draft"
+            "Status": "Draft",
         }
         fm = SpecFrontmatter(data)
         assert fm.feature_name == "Test"
@@ -103,7 +105,7 @@ class TestSpecFrontmatter:
             "Feature": "Test",
             "Branch": "[001-test]",
             "Created": "2026-01-22",
-            "Status": "Draft"
+            "Status": "Draft",
         }
         fm = SpecFrontmatter(data)
         yaml_dict = fm.to_yaml_dict()
@@ -125,11 +127,7 @@ class TestSpecFrontmatter:
 
     def test_to_yaml_dict_removes_epic_when_cleared(self):
         """Test that epic fields are removed when cleared."""
-        data = {
-            "Feature": "Test",
-            "Epic": "[#123](url)",
-            "Epic URL": "url"
-        }
+        data = {"Feature": "Test", "Epic": "[#123](url)", "Epic URL": "url"}
         fm = SpecFrontmatter(data)
         fm.epic_number = None
         fm.epic_url = None
@@ -157,7 +155,7 @@ class TestParseSpecFile:
         spec_path = temp_spec_dir / "spec.md"
         spec_path.write_text(sample_spec_with_epic)
 
-        frontmatter, body = parse_spec_file(spec_path)
+        frontmatter, _body = parse_spec_file(spec_path)
         assert frontmatter.epic_number == 123
         assert frontmatter.epic_url == "https://github.com/owner/repo/issues/123"
         assert frontmatter.priority == "P1"
@@ -210,10 +208,7 @@ class TestUpdateSpecFrontmatter:
         spec_path = temp_spec_dir / "spec.md"
         spec_path.write_text(sample_spec_content)
 
-        updates = {
-            "Status": "Complete",
-            "Priority": "P1"
-        }
+        updates = {"Status": "Complete", "Priority": "P1"}
         update_spec_frontmatter(spec_path, updates)
 
         frontmatter, _ = parse_spec_file(spec_path)
@@ -254,7 +249,7 @@ class TestAddEpicReference:
             spec_path,
             epic_number=123,
             epic_url="https://github.com/owner/repo/issues/123",
-            priority="P1"
+            priority="P1",
         )
 
         frontmatter, _ = parse_spec_file(spec_path)
@@ -288,7 +283,7 @@ class TestAddEpicReference:
                 spec_path,
                 epic_number=123,
                 epic_url="https://github.com/owner/repo/issues/123",
-                priority="P5"
+                priority="P5",
             )
 
 
@@ -349,7 +344,7 @@ class TestWriteSpecFile:
             "Feature": "New Feature",
             "Branch": "[002-new]",
             "Created": "2026-01-22",
-            "Status": "Draft"
+            "Status": "Draft",
         }
         frontmatter = SpecFrontmatter(data)
         body = "# New Feature\n\nContent here."

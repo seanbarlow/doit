@@ -1,8 +1,9 @@
 """StatusReporter service for aggregating and filtering spec statuses."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
 
 from ..models.status_models import SpecState, SpecStatus, StatusReport
 from .spec_scanner import SpecScanner
@@ -17,7 +18,7 @@ class StatusReporter:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
+        project_root: Path | None = None,
         validate: bool = True,
     ) -> None:
         """Initialize reporter with project root.
@@ -32,9 +33,9 @@ class StatusReporter:
 
     def generate_report(
         self,
-        status_filter: Optional[SpecState] = None,
+        status_filter: SpecState | None = None,
         blocking_only: bool = False,
-        recent_days: Optional[int] = None,
+        recent_days: int | None = None,
     ) -> StatusReport:
         """Generate a status report with optional filtering.
 
@@ -66,9 +67,9 @@ class StatusReporter:
     def _apply_filters(
         self,
         specs: list[SpecStatus],
-        status_filter: Optional[SpecState] = None,
+        status_filter: SpecState | None = None,
         blocking_only: bool = False,
-        recent_days: Optional[int] = None,
+        recent_days: int | None = None,
     ) -> list[SpecStatus]:
         """Apply filters to spec list.
 

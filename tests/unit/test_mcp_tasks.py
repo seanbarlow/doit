@@ -1,8 +1,8 @@
 """Tests for the doit_tasks MCP tool."""
 
 import json
+
 import pytest
-from pathlib import Path
 
 from doit_cli.mcp import MCP_AVAILABLE
 
@@ -15,8 +15,9 @@ class TestTasksTool:
         monkeypatch.chdir(tmp_path)
         (tmp_path / "specs" / "test-feature").mkdir(parents=True)
 
-        from doit_cli.mcp.tools.tasks_tool import register_tasks_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.tasks_tool import register_tasks_tool
 
         mcp = FastMCP("test")
         register_tasks_tool(mcp)
@@ -40,8 +41,9 @@ class TestTasksTool:
             encoding="utf-8",
         )
 
-        from doit_cli.mcp.tools.tasks_tool import register_tasks_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.tasks_tool import register_tasks_tool
 
         mcp = FastMCP("test")
         register_tasks_tool(mcp)

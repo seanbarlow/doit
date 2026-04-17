@@ -3,15 +3,14 @@
 Tests the progress visualization functionality for guided workflows.
 """
 
-import pytest
-from unittest.mock import Mock, patch
 from io import StringIO
 
+import pytest
 from rich.console import Console
 
 from doit_cli.models.workflow_models import (
-    WorkflowStep,
     ValidationResult,
+    WorkflowStep,
 )
 
 
@@ -201,10 +200,7 @@ class TestProgressDisplayShowError:
 
     def test_show_error_displays_suggestion(self, progress, step):
         """Test that suggestion is displayed."""
-        error = ValidationResult.failure(
-            "Invalid format",
-            suggestion="Use format: name@domain.com"
-        )
+        error = ValidationResult.failure("Invalid format", suggestion="Use format: name@domain.com")
         progress.show_error(step, error)
         output = progress._output.getvalue()
         assert "domain.com" in output
@@ -301,7 +297,9 @@ class TestProgressDisplayIntegration:
         """Test complete workflow progress sequence."""
         steps = [
             WorkflowStep(id="s1", name="Step 1", prompt_text=":", required=True, order=0),
-            WorkflowStep(id="s2", name="Step 2", prompt_text=":", required=False, order=1, default_value="d"),
+            WorkflowStep(
+                id="s2", name="Step 2", prompt_text=":", required=False, order=1, default_value="d"
+            ),
             WorkflowStep(id="s3", name="Step 3", prompt_text=":", required=True, order=2),
         ]
 

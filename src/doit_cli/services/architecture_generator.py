@@ -1,8 +1,9 @@
 """Generator for Architecture diagrams from plan.md files."""
 
+from __future__ import annotations
+
 import re
 from dataclasses import dataclass, field
-from typing import Optional
 
 from ..models.diagram_models import DiagramType, GeneratedDiagram
 
@@ -32,9 +33,7 @@ class ArchitectureGenerator:
     """
 
     # Pattern for project structure code blocks
-    STRUCTURE_PATTERN = re.compile(
-        r"```(?:text)?\s*\n((?:src/|tests/).*?)```", re.DOTALL
-    )
+    STRUCTURE_PATTERN = re.compile(r"```(?:text)?\s*\n((?:src/|tests/).*?)```", re.DOTALL)
 
     # Pattern for extracting file paths from structure
     FILE_PATTERN = re.compile(r"^[\s│├└─]*([a-zA-Z_][a-zA-Z0-9_/]*\.py)", re.MULTILINE)
@@ -172,9 +171,7 @@ class ArchitectureGenerator:
                 # Determine layer
                 layer = self._classify_layer(file_path)
 
-                components.append(
-                    ComponentInfo(name=name, layer=layer, description="")
-                )
+                components.append(ComponentInfo(name=name, layer=layer, description=""))
 
         return components
 
@@ -221,9 +218,7 @@ class ArchitectureGenerator:
         clean = re.sub(r"[^A-Za-z0-9]", "", name)
         return clean
 
-    def _infer_connections(
-        self, components: list[ComponentInfo]
-    ) -> list[tuple[str, str]]:
+    def _infer_connections(self, components: list[ComponentInfo]) -> list[tuple[str, str]]:
         """Infer connections between components based on naming patterns.
 
         Args:
@@ -269,8 +264,8 @@ class ArchitectureGenerator:
 
     def generate_from_sections(
         self,
-        tech_context: Optional[str] = None,
-        project_structure: Optional[str] = None,
+        tech_context: str | None = None,
+        project_structure: str | None = None,
     ) -> str:
         """Generate architecture diagram from specific sections.
 

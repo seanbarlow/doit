@@ -1,15 +1,14 @@
 """Template manager service for copying bundled templates."""
 
-import importlib.resources
-from pathlib import Path
-from typing import Optional
+from __future__ import annotations
+
 import shutil
+from pathlib import Path
 
 from ..models.agent import Agent
-from ..models.template import Template, DOIT_COMMANDS
 from ..models.sync_models import CommandTemplate
+from ..models.template import DOIT_COMMANDS, Template
 from .prompt_transformer import PromptTransformer
-
 
 # Workflow templates to copy to .doit/templates/
 WORKFLOW_TEMPLATES = [
@@ -84,7 +83,7 @@ class TemplateManager:
         shutil.copy2(source_path, target_path)
         return True
 
-    def __init__(self, custom_source: Optional[Path] = None):
+    def __init__(self, custom_source: Path | None = None):
         """Initialize template manager.
 
         Args:
@@ -216,9 +215,8 @@ class TemplateManager:
         claude_result = self.validate_template_source(Agent.CLAUDE)
         copilot_result = self.validate_template_source(Agent.COPILOT)
 
-        has_any_templates = (
-            claude_result.get("source_exists", False) or
-            copilot_result.get("source_exists", False)
+        has_any_templates = claude_result.get("source_exists", False) or copilot_result.get(
+            "source_exists", False
         )
 
         return {
@@ -359,9 +357,7 @@ class TemplateManager:
 
         if agent.needs_transformation:
             # Copilot: Transform command templates to prompt format
-            return self._transform_and_write_templates(
-                templates, target_dir, overwrite
-            )
+            return self._transform_and_write_templates(templates, target_dir, overwrite)
 
         # Claude: Direct copy with correct filename
         result = {
@@ -394,7 +390,7 @@ class TemplateManager:
         template_name: str,
         target_dir: Path,
         overwrite: bool = False,
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Copy a single template.
 
         Args:

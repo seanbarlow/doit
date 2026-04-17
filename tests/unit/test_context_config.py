@@ -1,14 +1,13 @@
 """Unit tests for ContextConfig model."""
 
-import pytest
 from pathlib import Path
 
 from doit_cli.models.context_config import (
-    SourceConfig,
     CommandOverride,
     ContextConfig,
     ContextSource,
     LoadedContext,
+    SourceConfig,
 )
 
 

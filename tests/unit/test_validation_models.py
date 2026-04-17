@@ -1,6 +1,5 @@
 """Unit tests for validation models."""
 
-import pytest
 from datetime import datetime
 
 from doit_cli.models.validation_models import (

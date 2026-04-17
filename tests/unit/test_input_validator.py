@@ -3,16 +3,12 @@
 Tests the input validation functionality for guided workflows.
 """
 
-import os
-import re
 import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch
 
 from doit_cli.models.workflow_models import (
-    WorkflowStep,
     StepResponse,
     ValidationResult,
+    WorkflowStep,
 )
 
 
@@ -161,7 +157,7 @@ class TestChoiceValidator:
 
     def test_case_insensitive_matching(self, validator, step):
         """Test that choice matching is case-insensitive."""
-        result = validator.validate("REACT", step, {})
+        validator.validate("REACT", step, {})
         # Should either pass (case-insensitive) or fail with helpful message
         # Implementation choice - test based on actual behavior
 
@@ -179,9 +175,7 @@ class TestPatternValidator:
         """Create a PatternValidator for email."""
         from doit_cli.services.input_validator import PatternValidator
 
-        return PatternValidator(
-            pattern=r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-        )
+        return PatternValidator(pattern=r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
     @pytest.fixture
     def step(self):
@@ -249,8 +243,8 @@ class TestValidatorRegistry:
         """Test registering a custom validator."""
         from doit_cli.services.input_validator import (
             InputValidator,
-            register_validator,
             get_validator,
+            register_validator,
         )
 
         class CustomValidator(InputValidator):
@@ -279,8 +273,8 @@ class TestCompositeValidation:
     def test_chain_validators(self, step):
         """Test that validators can be chained."""
         from doit_cli.services.input_validator import (
-            RequiredValidator,
             PatternValidator,
+            RequiredValidator,
             chain_validators,
         )
 
@@ -329,9 +323,7 @@ class TestContextAwareValidation:
                 previous = context.get(self.previous_step_id)
                 if previous and previous.value == value:
                     return ValidationResult.success()
-                return ValidationResult.failure(
-                    "Value does not match previous entry"
-                )
+                return ValidationResult.failure("Value does not match previous entry")
 
         context = {
             "project-name": StepResponse(

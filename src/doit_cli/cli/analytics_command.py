@@ -8,10 +8,11 @@ Provides CLI commands for viewing spec analytics:
 - export: Export analytics report
 """
 
+from __future__ import annotations
+
 import json
 from datetime import date, datetime
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -50,9 +51,7 @@ def main(ctx: typer.Context):
 
 @app.command()
 def show(
-    json_output: bool = typer.Option(
-        False, "--json", help="Output as JSON instead of table"
-    ),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON instead of table"),
 ) -> None:
     """Display completion metrics summary for all specs.
 
@@ -71,9 +70,7 @@ def show(
             if json_output:
                 print(json.dumps({"success": False, "error": "No specs found"}))
             else:
-                console.print(
-                    "[yellow]No specifications found in specs/ directory.[/yellow]"
-                )
+                console.print("[yellow]No specifications found in specs/ directory.[/yellow]")
             raise typer.Exit(code=1)
 
         if json_output:
@@ -141,9 +138,7 @@ def _print_completion_summary(summary: dict) -> None:
 @app.command()
 def cycles(
     days: int = typer.Option(30, "--days", "-d", help="Filter to last N days"),
-    since: Optional[str] = typer.Option(
-        None, "--since", "-s", help="Filter since date (YYYY-MM-DD)"
-    ),
+    since: str | None = typer.Option(None, "--since", "-s", help="Filter since date (YYYY-MM-DD)"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
     """Display cycle time statistics for completed specs.
@@ -159,17 +154,15 @@ def cycles(
         service = AnalyticsService()
 
         # Parse since date if provided
-        since_date: Optional[date] = None
-        filter_days: Optional[int] = days
+        since_date: date | None = None
+        filter_days: int | None = days
 
         if since:
             try:
                 since_date = datetime.strptime(since, "%Y-%m-%d").date()
                 filter_days = None  # since overrides days
             except ValueError:
-                console.print(
-                    f"[red]Error:[/red] Invalid date format '{since}'. Use YYYY-MM-DD."
-                )
+                console.print(f"[red]Error:[/red] Invalid date format '{since}'. Use YYYY-MM-DD.")
                 raise typer.Exit(code=2)
 
         stats, records = service.get_cycle_time_stats(days=filter_days, since=since_date)
@@ -178,9 +171,7 @@ def cycles(
             if json_output:
                 print(json.dumps({"success": False, "error": "No completed specs in period"}))
             else:
-                console.print(
-                    "[yellow]No completed specs found in the specified period.[/yellow]"
-                )
+                console.print("[yellow]No completed specs found in the specified period.[/yellow]")
             raise typer.Exit(code=1)
 
         if json_output:
@@ -222,7 +213,7 @@ def _print_cycles_json(stats, records) -> None:
     print(json.dumps(output, indent=2))
 
 
-def _print_cycles_tables(stats, records, days: Optional[int], since: Optional[str]) -> None:
+def _print_cycles_tables(stats, records, days: int | None, since: str | None) -> None:
     """Print cycle time data in Rich tables."""
     console.print()
 
@@ -401,11 +392,15 @@ def spec(
             matches = [n for n in available if spec_name.lower() in n.lower()]
 
             if json_output:
-                print(json.dumps({
-                    "success": False,
-                    "error": f"Spec '{spec_name}' not found",
-                    "suggestions": matches[:5] if matches else available[:5],
-                }))
+                print(
+                    json.dumps(
+                        {
+                            "success": False,
+                            "error": f"Spec '{spec_name}' not found",
+                            "suggestions": matches[:5] if matches else available[:5],
+                        }
+                    )
+                )
             else:
                 console.print(f"[red]Error:[/red] Spec '{spec_name}' not found.")
                 if matches:
@@ -514,9 +509,7 @@ def export(
     format_type: str = typer.Option(
         "markdown", "--format", "-f", help="Export format: markdown, json"
     ),
-    output_path: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Output file path"
-    ),
+    output_path: Path | None = typer.Option(None, "--output", "-o", help="Output file path"),
 ) -> None:
     """Export analytics report to file.
 
@@ -556,7 +549,7 @@ def export(
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(code=2)
-    except (OSError, IOError) as e:
+    except OSError as e:
         console.print(f"[red]Error:[/red] Failed to export report: {e}")
         raise typer.Exit(code=1)
 
@@ -577,39 +570,45 @@ def _generate_markdown_report(report) -> str:
     if report.cycle_stats:
         lines.append(f"- Average Cycle Time: {report.cycle_stats.average_days} days")
 
-    lines.extend([
-        "",
-        "## Status Breakdown",
-        "",
-        "| Status | Count |",
-        "|--------|-------|",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Status Breakdown",
+            "",
+            "| Status | Count |",
+            "|--------|-------|",
+        ]
+    )
 
     for status, count in report.by_status.items():
         lines.append(f"| {status.display_name} | {count} |")
 
     if report.cycle_stats:
-        lines.extend([
-            "",
-            "## Cycle Time Statistics",
-            "",
-            "| Metric | Value |",
-            "|--------|-------|",
-            f"| Average | {report.cycle_stats.average_days} days |",
-            f"| Median | {report.cycle_stats.median_days} days |",
-            f"| Min | {report.cycle_stats.min_days} days |",
-            f"| Max | {report.cycle_stats.max_days} days |",
-            f"| Sample Size | {report.cycle_stats.sample_count} |",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Cycle Time Statistics",
+                "",
+                "| Metric | Value |",
+                "|--------|-------|",
+                f"| Average | {report.cycle_stats.average_days} days |",
+                f"| Median | {report.cycle_stats.median_days} days |",
+                f"| Min | {report.cycle_stats.min_days} days |",
+                f"| Max | {report.cycle_stats.max_days} days |",
+                f"| Sample Size | {report.cycle_stats.sample_count} |",
+            ]
+        )
 
     if report.velocity:
-        lines.extend([
-            "",
-            "## Velocity Trends",
-            "",
-            "| Week | Completed |",
-            "|------|-----------|",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Velocity Trends",
+                "",
+                "| Week | Completed |",
+                "|------|-----------|",
+            ]
+        )
         for v in report.velocity[:12]:
             lines.append(f"| {v.week_key} | {v.specs_completed} |")
 

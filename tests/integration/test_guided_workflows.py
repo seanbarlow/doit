@@ -3,19 +3,19 @@
 Tests complete workflow scenarios end-to-end.
 """
 
+from unittest.mock import Mock
+
 import pytest
-from pathlib import Path
-from unittest.mock import patch, Mock
 
 from doit_cli.models.workflow_models import (
     Workflow,
-    WorkflowStep,
     WorkflowState,
     WorkflowStatus,
+    WorkflowStep,
 )
-from doit_cli.services.workflow_engine import WorkflowEngine
-from doit_cli.services.state_manager import StateManager
 from doit_cli.prompts.interactive import InteractivePrompt, ProgressDisplay
+from doit_cli.services.state_manager import StateManager
+from doit_cli.services.workflow_engine import WorkflowEngine
 
 
 class TestWorkflowEndToEnd:
@@ -305,16 +305,26 @@ class TestProgressVisualization:
             interactive=True,
             steps=[
                 WorkflowStep(
-                    id="step1", name="Step 1", prompt_text="1:",
-                    required=True, order=0,
+                    id="step1",
+                    name="Step 1",
+                    prompt_text="1:",
+                    required=True,
+                    order=0,
                 ),
                 WorkflowStep(
-                    id="step2", name="Step 2", prompt_text="2:",
-                    required=False, order=1, default_value="default",
+                    id="step2",
+                    name="Step 2",
+                    prompt_text="2:",
+                    required=False,
+                    order=1,
+                    default_value="default",
                 ),
                 WorkflowStep(
-                    id="step3", name="Step 3", prompt_text="3:",
-                    required=True, order=2,
+                    id="step3",
+                    name="Step 3",
+                    prompt_text="3:",
+                    required=True,
+                    order=2,
                 ),
             ],
         )
@@ -334,6 +344,6 @@ class TestProgressVisualization:
 
         # Check step numbers (1-indexed)
         for i, call in enumerate(calls):
-            step, current, total = call[0]
+            _step, current, total = call[0]
             assert current == i + 1
             assert total == 3

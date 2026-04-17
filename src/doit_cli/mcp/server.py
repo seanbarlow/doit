@@ -3,17 +3,19 @@
 Registers all doit tools and resources with FastMCP for AI assistant access.
 """
 
+from __future__ import annotations
+
 import importlib.metadata
 import logging
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-from .tools.validate_tool import register_validate_tool
-from .tools.status_tool import register_status_tool
-from .tools.tasks_tool import register_tasks_tool
 from .tools.context_tool import register_context_tool
 from .tools.scaffold_tool import register_scaffold_tool
+from .tools.status_tool import register_status_tool
+from .tools.tasks_tool import register_tasks_tool
+from .tools.validate_tool import register_validate_tool
 from .tools.verify_tool import register_verify_tool
 
 logger = logging.getLogger(__name__)

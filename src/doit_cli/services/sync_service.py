@@ -4,26 +4,25 @@ This module provides the SyncService class for synchronizing
 shared memory files between team members via Git.
 """
 
+from __future__ import annotations
+
 import json
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
-import uuid
 
 from doit_cli.models.team_models import (
-    SharedMemory,
     SyncOperationType,
     SyncStatus,
 )
+from doit_cli.services.access_service import AccessAction, AccessDeniedError, AccessService
 from doit_cli.services.git_utils import (
     GitConflictError,
     GitError,
     add,
     commit,
     fetch,
-    get_conflicting_files,
-    get_current_branch,
     get_file_last_modified_by,
     get_latest_commit_hash,
     get_status,
@@ -33,7 +32,6 @@ from doit_cli.services.git_utils import (
     push,
 )
 from doit_cli.services.team_service import TeamService
-from doit_cli.services.access_service import AccessService, AccessAction, AccessDeniedError
 
 
 class SyncError(Exception):
@@ -74,9 +72,9 @@ class SyncOperation:
     status: SyncStatus
     files_affected: list[str] = field(default_factory=list)
     started_at: datetime = field(default_factory=datetime.now)
-    completed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
-    conflict_id: Optional[str] = None
+    completed_at: datetime | None = None
+    error_message: str | None = None
+    conflict_id: str | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -93,7 +91,7 @@ class SyncOperation:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SyncOperation":
+    def from_dict(cls, data: dict) -> SyncOperation:
         """Create from dictionary."""
         return cls(
             id=data["id"],
@@ -118,8 +116,8 @@ class SyncResult:
     pulled_files: list[str] = field(default_factory=list)
     pushed_files: list[str] = field(default_factory=list)
     conflicts: list[str] = field(default_factory=list)
-    error_message: Optional[str] = None
-    operation_id: Optional[str] = None
+    error_message: str | None = None
+    operation_id: str | None = None
 
 
 @dataclass
@@ -127,7 +125,7 @@ class SyncState:
     """Current sync state from team-sync.json."""
 
     operations: list[SyncOperation] = field(default_factory=list)
-    last_sync: Optional[datetime] = None
+    last_sync: datetime | None = None
     pending_operations: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -139,13 +137,11 @@ class SyncState:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SyncState":
+    def from_dict(cls, data: dict) -> SyncState:
         """Create from dictionary."""
         return cls(
             operations=[SyncOperation.from_dict(op) for op in data.get("operations", [])],
-            last_sync=datetime.fromisoformat(data["last_sync"])
-            if data.get("last_sync")
-            else None,
+            last_sync=datetime.fromisoformat(data["last_sync"]) if data.get("last_sync") else None,
             pending_operations=data.get("pending_operations", []),
         )
 
@@ -159,7 +155,7 @@ class SyncService:
     - Managing sync state
     """
 
-    def __init__(self, team_service: TeamService, project_root: Path = None):
+    def __init__(self, team_service: TeamService, project_root: Path | None = None):
         """Initialize SyncService.
 
         Args:
@@ -168,7 +164,7 @@ class SyncService:
         """
         self.team_service = team_service
         self.project_root = project_root or Path.cwd()
-        self._state: Optional[SyncState] = None
+        self._state: SyncState | None = None
         self._access_service = AccessService(self.project_root)
 
     @property
@@ -185,7 +181,7 @@ class SyncService:
         """Load sync state from file."""
         if self.state_path.exists():
             try:
-                with open(self.state_path, "r", encoding="utf-8") as f:
+                with open(self.state_path, encoding="utf-8") as f:
                     data = json.load(f)
                 return SyncState.from_dict(data)
             except (json.JSONDecodeError, KeyError):
@@ -208,9 +204,9 @@ class SyncService:
         self,
         operation_type: SyncOperationType,
         status: SyncStatus,
-        files_affected: list[str] = None,
-        error_message: str = None,
-        conflict_id: str = None,
+        files_affected: list[str] | None = None,
+        error_message: str | None = None,
+        conflict_id: str | None = None,
     ) -> SyncOperation:
         """Record a sync operation."""
         current_user = self.team_service.get_current_user_email() or "unknown"
@@ -272,12 +268,14 @@ class SyncService:
             else:
                 status = "synced"
 
-            file_statuses.append({
-                "path": sf.path,
-                "status": status,
-                "modified_by": sf.modified_by,
-                "modified_at": sf.modified_at,
-            })
+            file_statuses.append(
+                {
+                    "path": sf.path,
+                    "status": status,
+                    "modified_by": sf.modified_by,
+                    "modified_at": sf.modified_at,
+                }
+            )
 
         return {
             "is_online": self.check_remote(),
@@ -308,11 +306,13 @@ class SyncService:
             if modified.startswith(".doit/memory/"):
                 rel_path = modified.replace(".doit/memory/", "")
                 if rel_path in shared_paths:
-                    changes.append(FileChange(
-                        path=rel_path,
-                        status="modified",
-                        local_modified=True,
-                    ))
+                    changes.append(
+                        FileChange(
+                            path=rel_path,
+                            status="modified",
+                            local_modified=True,
+                        )
+                    )
 
         # Check staged files
         for staged in git_status.staged_files:
@@ -322,11 +322,13 @@ class SyncService:
                     # Don't duplicate if already in changes
                     existing = next((c for c in changes if c.path == rel_path), None)
                     if not existing:
-                        changes.append(FileChange(
-                            path=rel_path,
-                            status="staged",
-                            local_modified=True,
-                        ))
+                        changes.append(
+                            FileChange(
+                                path=rel_path,
+                                status="staged",
+                                local_modified=True,
+                            )
+                        )
 
         return changes
 
@@ -365,9 +367,7 @@ class SyncService:
             raise NoRemoteError("No Git remote configured. Push your repository first.")
 
         if not is_online(cwd=self.project_root):
-            raise NetworkError(
-                "Cannot reach remote repository. Check your network connection."
-            )
+            raise NetworkError("Cannot reach remote repository. Check your network connection.")
 
         result = SyncResult(success=False)
         shared_files = self.team_service.get_shared_files()
@@ -378,7 +378,7 @@ class SyncService:
             if not push_only:
                 try:
                     fetch(cwd=self.project_root)
-                    pull_result = pull(cwd=self.project_root)
+                    pull(cwd=self.project_root)
 
                     # Check which shared files were updated
                     for sf in shared_files:
@@ -388,6 +388,7 @@ class SyncService:
                     if force:
                         # Force keep local on conflict
                         from doit_cli.services.git_utils import checkout_ours
+
                         for conflict_file in e.conflicting_files:
                             checkout_ours([conflict_file], self.project_root)
                             add([conflict_file], self.project_root)
@@ -409,7 +410,10 @@ class SyncService:
                 files_to_stage = []
                 for memory_file in memory_files:
                     rel_path = memory_file
-                    if rel_path in git_status.modified_files or rel_path in git_status.untracked_files:
+                    if (
+                        rel_path in git_status.modified_files
+                        or rel_path in git_status.untracked_files
+                    ):
                         files_to_stage.append(rel_path)
 
                 if files_to_stage:
@@ -444,7 +448,7 @@ class SyncService:
 
     def _update_shared_file_metadata(self) -> None:
         """Update shared file metadata after sync."""
-        current_user = self.team_service.get_current_user_email() or ""
+        self.team_service.get_current_user_email() or ""
         current_commit = get_latest_commit_hash(cwd=self.project_root) or ""
 
         for sf in self.team_service.config.shared_files:
@@ -455,9 +459,7 @@ class SyncService:
                 sf.size_bytes = file_path.stat().st_size
 
                 # Get last modifier
-                modifier = get_file_last_modified_by(
-                    str(sf.full_path), self.project_root
-                )
+                modifier = get_file_last_modified_by(str(sf.full_path), self.project_root)
                 if modifier:
                     sf.modified_by = modifier
 
@@ -483,11 +485,13 @@ class SyncService:
             files: List of affected files
         """
         state = self.get_state()
-        state.pending_operations.append({
-            "type": operation_type,
-            "files": files,
-            "queued_at": datetime.now().isoformat(),
-        })
+        state.pending_operations.append(
+            {
+                "type": operation_type,
+                "files": files,
+                "queued_at": datetime.now().isoformat(),
+            }
+        )
         self._save_state(state)
 
     def process_pending_operations(self) -> list[SyncResult]:

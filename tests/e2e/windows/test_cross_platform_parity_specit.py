@@ -1,6 +1,6 @@
 """Cross-platform parity tests for 'doit specit' command."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -154,7 +154,7 @@ Content here.
 
     # Read and verify frontmatter
     read_content = spec_file.read_text(encoding="utf-8")
-    normalized = comparison_tools.normalize_output(read_content)
+    comparison_tools.normalize_output(read_content)
 
     assert "---" in read_content
     assert "title: Test Feature" in read_content

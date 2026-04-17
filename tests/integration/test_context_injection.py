@@ -4,8 +4,9 @@ Tests end-to-end context loading functionality for doit commands.
 """
 
 import subprocess
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 class TestContextShowCommand:
@@ -138,10 +139,7 @@ class TestContextStatusCommand:
         # Create context.yaml config
         config = config_dir / "context.yaml"
         config.write_text(
-            "version: 1\n"
-            "enabled: true\n"
-            "max_tokens_per_source: 4000\n"
-            "total_max_tokens: 16000\n"
+            "version: 1\nenabled: true\nmax_tokens_per_source: 4000\ntotal_max_tokens: 16000\n"
         )
 
         # Create constitution
@@ -286,11 +284,7 @@ class TestContextLoadingEndToEnd:
 
         # Create roadmap
         roadmap = memory_dir / "roadmap.md"
-        roadmap.write_text(
-            "# Roadmap\n\n"
-            "## P1 - Critical\n\n"
-            "- [ ] Core functionality\n"
-        )
+        roadmap.write_text("# Roadmap\n\n## P1 - Critical\n\n- [ ] Core functionality\n")
 
         # Create config
         config = config_dir / "context.yaml"
@@ -340,10 +334,7 @@ class TestContextLoadingEndToEnd:
         # Set a low token limit in config
         config = full_project / ".doit" / "config" / "context.yaml"
         config.write_text(
-            "version: 1\n"
-            "enabled: true\n"
-            "max_tokens_per_source: 100\n"
-            "total_max_tokens: 200\n"
+            "version: 1\nenabled: true\nmax_tokens_per_source: 100\ntotal_max_tokens: 200\n"
         )
 
         result = subprocess.run(
@@ -361,10 +352,7 @@ class TestContextLoadingEndToEnd:
         """Test that disabled context shows appropriate message."""
         # Disable context in config
         config = full_project / ".doit" / "config" / "context.yaml"
-        config.write_text(
-            "version: 1\n"
-            "enabled: false\n"
-        )
+        config.write_text("version: 1\nenabled: false\n")
 
         result = subprocess.run(
             ["doit", "context", "show"],
@@ -467,11 +455,7 @@ class TestContextSummarization:
         # Create config
         config = config_dir / "context.yaml"
         config.write_text(
-            "version: 1\n"
-            "enabled: true\n"
-            "sources:\n"
-            "  completed_roadmap:\n"
-            "    enabled: true\n"
+            "version: 1\nenabled: true\nsources:\n  completed_roadmap:\n    enabled: true\n"
         )
 
         return tmp_path
@@ -491,9 +475,7 @@ class TestContextSummarization:
         # Should show summarization section
         assert "Summarization" in result.stdout or "summariz" in result.stdout.lower()
 
-    def test_context_show_roadmap_is_summarized(
-        self, project_with_roadmap_priorities: Path
-    ):
+    def test_context_show_roadmap_is_summarized(self, project_with_roadmap_priorities: Path):
         """Test that roadmap shows as summarized when summarization enabled."""
         result = subprocess.run(
             ["doit", "context", "show"],
@@ -507,9 +489,7 @@ class TestContextSummarization:
         # Should show summarized status
         assert "summarized" in result.stdout.lower()
 
-    def test_context_show_includes_completed_roadmap(
-        self, project_with_completed_roadmap: Path
-    ):
+    def test_context_show_includes_completed_roadmap(self, project_with_completed_roadmap: Path):
         """Test that completed_roadmap source is loaded."""
         result = subprocess.run(
             ["doit", "context", "show"],
@@ -551,9 +531,7 @@ class TestContextSummarization:
         # Should show summarized roadmap content with priority sections
         output = result.stdout
         # Either high priority or P1/P2 markers should be present
-        assert ("High Priority" in output or
-                "[P1]" in output or
-                "Critical" in output.lower())
+        assert "High Priority" in output or "[P1]" in output or "Critical" in output.lower()
 
 
 class TestContextWithSpecDirectory:

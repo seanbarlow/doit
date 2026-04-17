@@ -4,12 +4,13 @@ This module provides the AccessService class for managing
 team member access levels and permission checks.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
-from doit_cli.models.team_models import TeamMember, TeamPermission, TeamRole
+from doit_cli.models.team_models import TeamMember
 from doit_cli.services.git_utils import get_user_email
 from doit_cli.services.team_config import (
     TeamNotInitializedError,
@@ -33,7 +34,9 @@ class AccessAction(str, Enum):
 class AccessDeniedError(Exception):
     """Access denied for the requested action."""
 
-    def __init__(self, action: str, required_permission: str = None, message: str = None):
+    def __init__(
+        self, action: str, required_permission: str | None = None, message: str | None = None
+    ):
         self.action = action
         self.required_permission = required_permission
         if message:
@@ -49,8 +52,8 @@ class AccessDeniedError(Exception):
 class AccessContext:
     """Context for access checking with user and team info."""
 
-    user_email: Optional[str]
-    member: Optional[TeamMember]
+    user_email: str | None
+    member: TeamMember | None
     is_owner: bool
     can_write: bool
 
@@ -91,20 +94,20 @@ class AccessService:
         AccessAction.DELETE_TEAM: "owner",
     }
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path | None = None):
         """Initialize AccessService.
 
         Args:
             project_root: Project root directory. Defaults to cwd.
         """
         self.project_root = project_root or Path.cwd()
-        self._context: Optional[AccessContext] = None
+        self._context: AccessContext | None = None
 
     def is_team_initialized(self) -> bool:
         """Check if team collaboration is initialized."""
         return team_exists(self.project_root)
 
-    def get_current_user_email(self) -> Optional[str]:
+    def get_current_user_email(self) -> str | None:
         """Get current user's email from Git config."""
         return get_user_email(self.project_root)
 
@@ -143,7 +146,7 @@ class AccessService:
         )
         return self._context
 
-    def get_current_user(self) -> Optional[TeamMember]:
+    def get_current_user(self) -> TeamMember | None:
         """Get current user's team membership.
 
         Returns:
@@ -177,7 +180,7 @@ class AccessService:
     def require_permission(
         self,
         action: AccessAction,
-        custom_message: str = None,
+        custom_message: str | None = None,
     ) -> None:
         """Require permission for an action.
 
@@ -255,8 +258,5 @@ class AccessService:
             "user_email": context.user_email,
             "is_member": context.is_member,
             "permission_level": context.permission_level,
-            "actions": {
-                action.value: self.can_perform(action)
-                for action in AccessAction
-            },
+            "actions": {action.value: self.can_perform(action) for action in AccessAction},
         }

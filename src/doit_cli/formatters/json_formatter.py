@@ -1,5 +1,7 @@
 """JSON formatter for status output."""
 
+from __future__ import annotations
+
 import json
 from datetime import datetime
 from typing import Any
@@ -48,11 +50,10 @@ class JsonFormatter(StatusFormatter):
                 "approved": report.by_status.get(SpecState.APPROVED, 0),
             },
             "blocking": report.blocking_count,
-            "validation_pass": sum(
-                1 for s in report.specs if s.validation_passed
-            ),
+            "validation_pass": sum(1 for s in report.specs if s.validation_passed),
             "validation_fail": sum(
-                1 for s in report.specs
+                1
+                for s in report.specs
                 if s.validation_result is not None and not s.validation_passed
             ),
             "completion_percentage": round(report.completion_percentage, 2),

@@ -11,14 +11,13 @@ import platform
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Dict, Optional
 
 
 class FilesystemValidator:
     """Validates macOS-specific filesystem characteristics."""
 
     @staticmethod
-    def detect_volume_type(path: str = ".") -> Optional[str]:
+    def detect_volume_type(path: str = ".") -> str | None:
         """Detect the filesystem type for the given path.
 
         Args:
@@ -34,10 +33,7 @@ class FilesystemValidator:
             # Use diskutil to get filesystem info
             abs_path = os.path.abspath(path)
             result = subprocess.run(
-                ["diskutil", "info", abs_path],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["diskutil", "info", abs_path], capture_output=True, text=True, timeout=5
             )
 
             if result.returncode == 0:
@@ -102,14 +98,15 @@ class FilesystemValidator:
             finally:
                 # Clean up
                 import shutil
+
                 shutil.rmtree(test_dir, ignore_errors=True)
 
-        except (OSError, IOError):
+        except OSError:
             # If we can't test, assume case-insensitive (macOS default)
             return False
 
     @staticmethod
-    def check_apfs_features(path: str = ".") -> Dict[str, bool]:
+    def check_apfs_features(path: str = ".") -> dict[str, bool]:
         """Check which APFS features are available/enabled.
 
         Args:
@@ -152,19 +149,16 @@ class FilesystemValidator:
         try:
             abs_path = os.path.abspath(path)
             result = subprocess.run(
-                ["diskutil", "info", abs_path],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["diskutil", "info", abs_path], capture_output=True, text=True, timeout=5
             )
 
             if result.returncode == 0:
                 output = result.stdout.lower()
                 # Look for encryption indicators
                 features["is_encrypted"] = (
-                    "encrypted: yes" in output or
-                    "filevault: yes" in output or
-                    "encryption" in output
+                    "encrypted: yes" in output
+                    or "filevault: yes" in output
+                    or "encryption" in output
                 )
 
         except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
@@ -173,7 +167,7 @@ class FilesystemValidator:
         return features
 
     @staticmethod
-    def get_volume_info(path: str = ".") -> Dict[str, str]:
+    def get_volume_info(path: str = ".") -> dict[str, str]:
         """Get detailed volume information for the given path.
 
         Args:
@@ -192,10 +186,7 @@ class FilesystemValidator:
             try:
                 abs_path = os.path.abspath(path)
                 result = subprocess.run(
-                    ["diskutil", "info", abs_path],
-                    capture_output=True,
-                    text=True,
-                    timeout=5
+                    ["diskutil", "info", abs_path], capture_output=True, text=True, timeout=5
                 )
 
                 if result.returncode == 0:

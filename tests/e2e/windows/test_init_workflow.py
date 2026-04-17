@@ -1,7 +1,7 @@
 """End-to-end tests for 'doit init' command on Windows."""
-import sys
+
 import subprocess
-from pathlib import Path
+import sys
 
 import pytest
 
@@ -21,6 +21,7 @@ def test_init_creates_doit_directory(temp_project_dir, windows_test_env):
 
     # Execute doit init in non-interactive mode
     import os
+
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
 
@@ -32,8 +33,8 @@ def test_init_creates_doit_directory(temp_project_dir, windows_test_env):
     )
 
     # Decode output with error handling for Windows encoding issues
-    stdout = result.stdout.decode('utf-8', errors='replace') if result.stdout else ""
-    stderr = result.stderr.decode('utf-8', errors='replace') if result.stderr else ""
+    result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
+    stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
 
     # Verify command succeeded
     assert result.returncode == 0, f"doit init failed: {stderr}"
@@ -62,6 +63,7 @@ def test_init_handles_windows_paths_with_spaces(temp_project_dir, windows_test_e
 
     # Execute doit init
     import os
+
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
 
@@ -73,8 +75,8 @@ def test_init_handles_windows_paths_with_spaces(temp_project_dir, windows_test_e
     )
 
     # Decode output with error handling for Windows encoding issues
-    stdout = result.stdout.decode('utf-8', errors='replace') if result.stdout else ""
-    stderr = result.stderr.decode('utf-8', errors='replace') if result.stderr else ""
+    result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
+    stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
 
     # Verify success despite spaces in path
     assert result.returncode == 0, f"doit init failed with spaces in path: {stderr}"
@@ -95,10 +97,11 @@ def test_init_creates_constitution_with_crlf(temp_project_dir, windows_test_env)
     When: Developer runs 'doit init'
     Then: Generated markdown files use CRLF line endings
     """
-    from tests.utils.windows.line_ending_utils import detect_line_ending
-
     # Execute doit init in non-interactive mode with UTF-8 encoding
     import os
+
+    from tests.utils.windows.line_ending_utils import detect_line_ending
+
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
 
@@ -110,8 +113,8 @@ def test_init_creates_constitution_with_crlf(temp_project_dir, windows_test_env)
     )
 
     # Decode output with error handling for Windows encoding issues
-    stdout = result.stdout.decode('utf-8', errors='replace') if result.stdout else ""
-    stderr = result.stderr.decode('utf-8', errors='replace') if result.stderr else ""
+    result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
+    stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
 
     assert result.returncode == 0, f"doit init failed: {stderr}"
 
@@ -145,6 +148,7 @@ def test_init_with_absolute_windows_path(temp_project_dir, windows_test_env):
 
     # Execute doit init with absolute path
     import os
+
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
 
@@ -156,8 +160,8 @@ def test_init_with_absolute_windows_path(temp_project_dir, windows_test_env):
     )
 
     # Decode output with error handling for Windows encoding issues
-    stdout = result.stdout.decode('utf-8', errors='replace') if result.stdout else ""
-    stderr = result.stderr.decode('utf-8', errors='replace') if result.stderr else ""
+    result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
+    stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
 
     assert result.returncode == 0, f"doit init failed with absolute path: {stderr}"
 
@@ -180,6 +184,7 @@ def test_init_full_workflow_on_windows(temp_project_dir, windows_test_env):
     """
     # Execute doit init in non-interactive mode with UTF-8 encoding
     import os
+
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
 
@@ -191,8 +196,8 @@ def test_init_full_workflow_on_windows(temp_project_dir, windows_test_env):
     )
 
     # Decode output with error handling for Windows encoding issues
-    stdout = result.stdout.decode('utf-8', errors='replace') if result.stdout else ""
-    stderr = result.stderr.decode('utf-8', errors='replace') if result.stderr else ""
+    result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
+    stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
 
     assert result.returncode == 0, f"doit init failed: {stderr}"
 

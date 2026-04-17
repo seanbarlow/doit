@@ -4,7 +4,7 @@ This module provides Rich-based interactive prompts
 for the bug-fix workflow user interactions.
 """
 
-from typing import Optional
+from __future__ import annotations
 
 from rich.console import Console
 from rich.panel import Panel
@@ -27,7 +27,7 @@ console = Console()
 # =============================================================================
 
 
-def prompt_select_issue(bugs: list[GitHubIssue]) -> Optional[GitHubIssue]:
+def prompt_select_issue(bugs: list[GitHubIssue]) -> GitHubIssue | None:
     """Display bugs and prompt user to select one.
 
     Args:
@@ -165,7 +165,9 @@ def display_investigation_findings(findings: list[InvestigationFinding]) -> None
 
         table.add_row(
             finding.finding_type.value,
-            finding.description[:50] + "..." if len(finding.description) > 50 else finding.description,
+            finding.description[:50] + "..."
+            if len(finding.description) > 50
+            else finding.description,
             location,
         )
 

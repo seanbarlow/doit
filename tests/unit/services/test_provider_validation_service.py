@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, patch
 
 import httpx
-import pytest
 
 from src.doit_cli.models.wizard_models import WizardStep
 from src.doit_cli.services.provider_validation_service import ProviderValidationService

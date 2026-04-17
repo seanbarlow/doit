@@ -1,5 +1,7 @@
 """CLI commands for Git hook management."""
 
+from __future__ import annotations
+
 import sys
 
 import typer
@@ -101,9 +103,13 @@ def hooks_status() -> None:
     config_path = HookConfig.get_default_config_path()
     console.print(f"\n[bold]Configuration:[/bold] {config_path}")
 
-    pre_commit_status = "[green]enabled[/green]" if config.pre_commit.enabled else "[red]disabled[/red]"
+    pre_commit_status = (
+        "[green]enabled[/green]" if config.pre_commit.enabled else "[red]disabled[/red]"
+    )
     pre_push_status = "[green]enabled[/green]" if config.pre_push.enabled else "[red]disabled[/red]"
-    bypass_status = "[green]enabled[/green]" if config.logging.log_bypasses else "[red]disabled[/red]"
+    bypass_status = (
+        "[green]enabled[/green]" if config.logging.log_bypasses else "[red]disabled[/red]"
+    )
 
     console.print(f"  Pre-commit validation: {pre_commit_status}")
     console.print(f"  Pre-push validation:   {pre_push_status}")
@@ -111,7 +117,9 @@ def hooks_status() -> None:
 
     # Show exempt branches
     if config.pre_commit.exempt_branches:
-        console.print(f"\n[bold]Exempt Branches:[/bold] {', '.join(config.pre_commit.exempt_branches)}")
+        console.print(
+            f"\n[bold]Exempt Branches:[/bold] {', '.join(config.pre_commit.exempt_branches)}"
+        )
 
     # Show exempt paths
     if config.pre_commit.exempt_paths:
@@ -146,9 +154,7 @@ def restore_hooks(
 
 @hooks_app.command("validate")
 def validate_hook(
-    hook_type: str = typer.Argument(
-        ..., help="Type of hook to validate (pre-commit or pre-push)"
-    ),
+    hook_type: str = typer.Argument(..., help="Type of hook to validate (pre-commit or pre-push)"),
 ) -> None:
     """Validate workflow compliance for the specified hook type."""
     valid_types = ["pre-commit", "pre-push"]

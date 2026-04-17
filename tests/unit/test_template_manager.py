@@ -1,8 +1,5 @@
 """Unit tests for TemplateManager service."""
 
-import pytest
-from pathlib import Path
-
 from doit_cli.models.agent import Agent
 from doit_cli.models.template import DOIT_COMMANDS
 from doit_cli.services.template_manager import TemplateManager
@@ -145,9 +142,7 @@ class TestTemplateManager:
         manager.copy_templates_for_agent(Agent.CLAUDE, target_dir)
 
         # Copy second time with overwrite
-        result = manager.copy_templates_for_agent(
-            Agent.CLAUDE, target_dir, overwrite=True
-        )
+        result = manager.copy_templates_for_agent(Agent.CLAUDE, target_dir, overwrite=True)
 
         assert len(result["updated"]) > 0
         assert len(result["skipped"]) == 0
@@ -224,7 +219,6 @@ class TestCopyScripts:
 
     def test_copy_scripts_creates_new_files(self, temp_dir):
         """Test scripts are created when target dir is empty."""
-        from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
 
         manager = TemplateManager()
         target_dir = temp_dir / ".doit" / "scripts" / "bash"

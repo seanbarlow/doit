@@ -1,7 +1,8 @@
 """Parser for Key Entities section from spec.md files."""
 
+from __future__ import annotations
+
 import re
-from typing import Optional
 
 from ..models.diagram_models import (
     Cardinality,
@@ -24,9 +25,7 @@ class EntityParser:
     )
 
     # Pattern for entity bullet: - **EntityName**: Description
-    ENTITY_PATTERN = re.compile(
-        r"^[-*]\s+\*\*([A-Za-z][A-Za-z0-9_]*)\*\*:\s*(.+)$", re.MULTILINE
-    )
+    ENTITY_PATTERN = re.compile(r"^[-*]\s+\*\*([A-Za-z][A-Za-z0-9_]*)\*\*:\s*(.+)$", re.MULTILINE)
 
     # Patterns for inferring relationships
     RELATIONSHIP_PATTERNS = [
@@ -43,11 +42,21 @@ class EntityParser:
     ATTRIBUTE_TYPE_PATTERNS = [
         (re.compile(r"\b(id|uuid|identifier)\b", re.IGNORECASE), "uuid", True, False),
         (re.compile(r"\b(email)\b", re.IGNORECASE), "string", False, False),
-        (re.compile(r"\b(name|title|description|text|label)\b", re.IGNORECASE), "string", False, False),
+        (
+            re.compile(r"\b(name|title|description|text|label)\b", re.IGNORECASE),
+            "string",
+            False,
+            False,
+        ),
         (re.compile(r"\b(password|hash|token|secret)\b", re.IGNORECASE), "string", False, False),
         (re.compile(r"\b(count|number|quantity|amount)\b", re.IGNORECASE), "int", False, False),
         (re.compile(r"\b(price|cost|rate)\b", re.IGNORECASE), "decimal", False, False),
-        (re.compile(r"\b(date|time|timestamp|created|updated)\b", re.IGNORECASE), "datetime", False, False),
+        (
+            re.compile(r"\b(date|time|timestamp|created|updated)\b", re.IGNORECASE),
+            "datetime",
+            False,
+            False,
+        ),
         (re.compile(r"\b(status|state|type)\b", re.IGNORECASE), "string", False, False),
         (re.compile(r"\b(active|enabled|is_|has_)\b", re.IGNORECASE), "boolean", False, False),
         (re.compile(r"\b(\w+)_id\b", re.IGNORECASE), "uuid", False, True),  # FK pattern
@@ -84,7 +93,7 @@ class EntityParser:
             attributes = self._extract_attributes(entity_name, description)
 
             # Parse relationships from description
-            relationships = self._extract_relationships(entity_name, description, entity_names)
+            self._extract_relationships(entity_name, description, entity_names)
 
             entity = ParsedEntity(
                 name=entity_name,
@@ -100,7 +109,7 @@ class EntityParser:
 
         return entities
 
-    def _extract_key_entities_section(self, content: str) -> Optional[str]:
+    def _extract_key_entities_section(self, content: str) -> str | None:
         """Extract the Key Entities section from content.
 
         Args:
@@ -138,16 +147,24 @@ class EntityParser:
         found_attrs: set[str] = set()
 
         # Always add an id attribute as PK
-        attributes.append(
-            EntityAttribute(name="id", attr_type="uuid", is_pk=True, is_fk=False)
-        )
+        attributes.append(EntityAttribute(name="id", attr_type="uuid", is_pk=True, is_fk=False))
         found_attrs.add("id")
 
         # Look for attribute mentions in description
         words = re.findall(r"\b([a-z][a-z0-9_]*)\b", description.lower())
 
         for word in words:
-            if word in found_attrs or word in ("the", "and", "or", "with", "for", "has", "is", "a", "an"):
+            if word in found_attrs or word in (
+                "the",
+                "and",
+                "or",
+                "with",
+                "for",
+                "has",
+                "is",
+                "a",
+                "an",
+            ):
                 continue
 
             for pattern, attr_type, is_pk, is_fk in self.ATTRIBUTE_TYPE_PATTERNS:

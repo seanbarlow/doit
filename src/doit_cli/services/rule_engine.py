@@ -1,8 +1,10 @@
 """Rule engine for evaluating validation rules against spec content."""
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ..models.validation_models import (
     Severity,
@@ -13,13 +15,13 @@ from ..models.validation_models import (
 from ..rules.builtin_rules import get_builtin_rules
 
 if TYPE_CHECKING:
-    from .crossref_service import CrossReferenceService
+    pass
 
 
 class RuleEngine:
     """Evaluates validation rules against spec content."""
 
-    def __init__(self, config: Optional[ValidationConfig] = None) -> None:
+    def __init__(self, config: ValidationConfig | None = None) -> None:
         """Initialize rule engine.
 
         Args:
@@ -290,9 +292,7 @@ class RuleEngine:
                 has_scenarios = False
 
             # Detect acceptance scenarios
-            if current_story and re.search(
-                r"\*\*Given\*\*.*\*\*When\*\*.*\*\*Then\*\*", line
-            ):
+            if current_story and re.search(r"\*\*Given\*\*.*\*\*When\*\*.*\*\*Then\*\*", line):
                 has_scenarios = True
 
             # Detect next section (non-user story)

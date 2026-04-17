@@ -135,9 +135,7 @@ class TestContextAuditor:
         assert result.has_context_show is True
         assert result.has_explicit_reads is True
         assert result.is_double_injection is True
-        double_findings = [
-            f for f in result.findings if f.finding_type == "double_injection"
-        ]
+        double_findings = [f for f in result.findings if f.finding_type == "double_injection"]
         assert len(double_findings) >= 1
 
     def test_audit_explicit_read_without_context_show(self, tmp_path):
@@ -158,9 +156,7 @@ class TestContextAuditor:
     def test_audit_missing_code_quality(self, tmp_path):
         template = tmp_path / "doit.missing.md"
         template.write_text(
-            "# Template\n\n"
-            "## Artifact Storage\n\n"
-            "Store artifacts.\n",
+            "# Template\n\n## Artifact Storage\n\nStore artifacts.\n",
             encoding="utf-8",
         )
         auditor = ContextAuditor(templates_dir=tmp_path)
@@ -168,8 +164,7 @@ class TestContextAuditor:
         missing = [
             f
             for f in result.findings
-            if f.finding_type == "missing_instruction"
-            and "Code Quality" in f.description
+            if f.finding_type == "missing_instruction" and "Code Quality" in f.description
         ]
         assert len(missing) == 1
         assert missing[0].severity == "major"
@@ -177,9 +172,7 @@ class TestContextAuditor:
     def test_audit_missing_artifact_storage(self, tmp_path):
         template = tmp_path / "doit.noartifact.md"
         template.write_text(
-            "# Template\n\n"
-            "## Code Quality Guidelines\n\n"
-            "Follow rules.\n",
+            "# Template\n\n## Code Quality Guidelines\n\nFollow rules.\n",
             encoding="utf-8",
         )
         auditor = ContextAuditor(templates_dir=tmp_path)
@@ -187,8 +180,7 @@ class TestContextAuditor:
         missing = [
             f
             for f in result.findings
-            if f.finding_type == "missing_instruction"
-            and "Artifact Storage" in f.description
+            if f.finding_type == "missing_instruction" and "Artifact Storage" in f.description
         ]
         assert len(missing) == 1
 
@@ -226,8 +218,7 @@ class TestContextAuditor:
 
     def test_audit_all_counts_double_injections(self, tmp_path):
         (tmp_path / "doit.bad.md").write_text(
-            "Run `doit context show`.\n"
-            "Read `.doit/memory/constitution.md`\n",
+            "Run `doit context show`.\nRead `.doit/memory/constitution.md`\n",
             encoding="utf-8",
         )
         auditor = ContextAuditor(templates_dir=tmp_path)

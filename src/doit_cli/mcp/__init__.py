@@ -6,6 +6,8 @@ as MCP tools accessible by AI assistants like Claude Code and GitHub Copilot.
 Requires the 'mcp' optional dependency: pip install doit-toolkit-cli[mcp]
 """
 
+from __future__ import annotations
+
 try:
     from mcp.server.fastmcp import FastMCP  # noqa: F401
 

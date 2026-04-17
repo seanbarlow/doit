@@ -1,12 +1,11 @@
 """Integration tests for validate command."""
 
 import json
+
 import pytest
-from pathlib import Path
 from typer.testing import CliRunner
 
 from doit_cli.main import app
-
 
 runner = CliRunner()
 

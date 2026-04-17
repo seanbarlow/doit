@@ -1,10 +1,11 @@
 """Tests for CoverageCalculator service."""
 
-import pytest
 from pathlib import Path
 
-from doit_cli.services.coverage_calculator import CoverageCalculator
+import pytest
+
 from doit_cli.models.crossref_models import CoverageStatus
+from doit_cli.services.coverage_calculator import CoverageCalculator
 
 
 class TestCoverageCalculator:
@@ -103,7 +104,7 @@ class TestCoverageCalculator:
         report = calculator.calculate(spec_file, tasks_file)
 
         assert len(report.orphaned_references) == 1
-        task, ref_id = report.orphaned_references[0]
+        _task, ref_id = report.orphaned_references[0]
         assert ref_id == "FR-999"
 
     def test_calculate_multiple_tasks_per_requirement(self, tmp_path: Path) -> None:

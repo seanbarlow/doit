@@ -4,12 +4,13 @@ This module contains dataclasses for workflow definitions, state management,
 and validation results, along with the exception hierarchy for workflow errors.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Literal
-
 
 # =============================================================================
 # Enums
@@ -57,9 +58,7 @@ class WorkflowStep:
     def __post_init__(self) -> None:
         """Validate step configuration."""
         if not self.required and self.default_value is None:
-            raise ValueError(
-                f"Optional step '{self.id}' must have a default_value"
-            )
+            raise ValueError(f"Optional step '{self.id}' must have a default_value")
 
 
 @dataclass
@@ -141,7 +140,7 @@ class StepResponse:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "StepResponse":
+    def from_dict(cls, data: dict) -> StepResponse:
         """Create from dictionary (JSON deserialization)."""
         return cls(
             step_id=data["step_id"],
@@ -210,14 +209,11 @@ class WorkflowState:
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "responses": {
-                step_id: resp.to_dict()
-                for step_id, resp in self.responses.items()
-            },
+            "responses": {step_id: resp.to_dict() for step_id, resp in self.responses.items()},
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "WorkflowState":
+    def from_dict(cls, data: dict) -> WorkflowState:
         """Create from dictionary (JSON deserialization)."""
         responses = {
             step_id: StepResponse.from_dict(resp_data)
@@ -256,14 +252,12 @@ class ValidationResult:
     suggestion: str | None = None
 
     @classmethod
-    def success(cls) -> "ValidationResult":
+    def success(cls) -> ValidationResult:
         """Create a successful validation result."""
         return cls(passed=True)
 
     @classmethod
-    def failure(
-        cls, error_message: str, suggestion: str | None = None
-    ) -> "ValidationResult":
+    def failure(cls, error_message: str, suggestion: str | None = None) -> ValidationResult:
         """Create a failed validation result."""
         return cls(passed=False, error_message=error_message, suggestion=suggestion)
 

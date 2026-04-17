@@ -83,7 +83,7 @@ class TestMemorySearchService:
         """Test that keyword search finds matching terms."""
         service = MemorySearchService(temp_project)
 
-        results, sources, query = service.search("authentication")
+        results, _sources, _query = service.search("authentication")
 
         assert len(results) > 0
         assert any("authentication" in r.matched_text.lower() for r in results)
@@ -92,7 +92,7 @@ class TestMemorySearchService:
         """Test that search returns empty for non-existent terms."""
         service = MemorySearchService(temp_project)
 
-        results, sources, query = service.search("xyznonexistent123")
+        results, _sources, _query = service.search("xyznonexistent123")
 
         assert len(results) == 0
 
@@ -111,12 +111,8 @@ class TestMemorySearchService:
         """Test case-sensitive search."""
         service = MemorySearchService(temp_project)
 
-        results_exact, _, _ = service.search(
-            "authentication", case_sensitive=True
-        )
-        results_upper, _, _ = service.search(
-            "AUTHENTICATION", case_sensitive=True
-        )
+        results_exact, _, _ = service.search("authentication", case_sensitive=True)
+        results_upper, _, _ = service.search("AUTHENTICATION", case_sensitive=True)
 
         # Only exact case should match
         assert len(results_exact) > 0
@@ -145,7 +141,7 @@ class TestMemorySearchService:
         """Test filtering to governance files only."""
         service = MemorySearchService(temp_project)
 
-        results, sources, _ = service.search(
+        _results, sources, _ = service.search(
             "authentication",
             source_filter=SourceFilter.GOVERNANCE,
         )
@@ -158,7 +154,7 @@ class TestMemorySearchService:
         """Test filtering to spec files only."""
         service = MemorySearchService(temp_project)
 
-        results, sources, _ = service.search(
+        _results, sources, _ = service.search(
             "login",
             source_filter=SourceFilter.SPECS,
         )

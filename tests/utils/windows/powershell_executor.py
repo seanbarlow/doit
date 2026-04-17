@@ -1,8 +1,8 @@
 """PowerShell script execution utilities for Windows testing."""
+
 import subprocess
 import time
 from pathlib import Path
-from typing import Optional
 
 from tests.utils.windows.data_structures import PowerShellScriptResult
 
@@ -39,9 +39,7 @@ class PowerShellExecutor:
             if result.returncode != 0:
                 raise RuntimeError("PowerShell Core (pwsh) not available")
         except FileNotFoundError:
-            raise RuntimeError(
-                "PowerShell Core (pwsh) not found. Please install PowerShell 7.x"
-            )
+            raise RuntimeError("PowerShell Core (pwsh) not found. Please install PowerShell 7.x")
         except subprocess.TimeoutExpired:
             raise RuntimeError("PowerShell verification timed out")
 
@@ -49,8 +47,8 @@ class PowerShellExecutor:
         self,
         script_path: Path | str,
         *args,
-        env: Optional[dict] = None,
-        timeout: Optional[int] = None,
+        env: dict | None = None,
+        timeout: int | None = None,
     ) -> PowerShellScriptResult:
         """
         Execute a PowerShell script file.
@@ -73,11 +71,12 @@ class PowerShellExecutor:
             raise FileNotFoundError(f"PowerShell script not found: {script_path}")
 
         # Build command
-        cmd = ["pwsh", "-File", str(script_path)] + list(args)
+        cmd = ["pwsh", "-File", str(script_path), *list(args)]
 
         # Merge custom env with system environment
         if env:
             import os
+
             merged_env = os.environ.copy()
             merged_env.update(env)
         else:
@@ -123,8 +122,8 @@ class PowerShellExecutor:
     def run_command(
         self,
         command: str,
-        env: Optional[dict] = None,
-        timeout: Optional[int] = None,
+        env: dict | None = None,
+        timeout: int | None = None,
     ) -> PowerShellScriptResult:
         """
         Execute a PowerShell command directly.
@@ -143,6 +142,7 @@ class PowerShellExecutor:
         # Merge custom env with system environment
         if env:
             import os
+
             merged_env = os.environ.copy()
             merged_env.update(env)
         else:
@@ -224,7 +224,7 @@ class PowerShellExecutor:
         except subprocess.TimeoutExpired:
             return False, "Syntax validation timed out"
         except Exception as e:
-            return False, f"Validation error: {str(e)}"
+            return False, f"Validation error: {e!s}"
 
     def get_powershell_version(self) -> str:
         """

@@ -1,7 +1,6 @@
 """Tests for PowerShell environment variable handling on Windows."""
+
 import sys
-import os
-from pathlib import Path
 
 import pytest
 
@@ -300,7 +299,7 @@ Write-Host "myvar = $env:myvar"
     assert result.exit_code == 0, f"Script failed: {result.stderr}"
     # On Windows, environment variables are case-insensitive
     # All three should show the same value
-    output_lines = result.stdout.split("\n")
+    result.stdout.split("\n")
     # At least the exact case should match
     assert "MyVar = test_value" in result.stdout
 

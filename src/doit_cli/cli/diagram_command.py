@@ -1,7 +1,8 @@
 """CLI commands for diagram generation."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -20,7 +21,7 @@ app = typer.Typer(
 console = Console()
 
 
-def _resolve_file_path(file: Optional[Path]) -> Optional[Path]:
+def _resolve_file_path(file: Path | None) -> Path | None:
     """Resolve file path, auto-detecting if not provided.
 
     Args:
@@ -70,7 +71,7 @@ def _parse_diagram_types(type_str: str) -> list[DiagramType]:
 
 @app.command(name="generate")
 def generate_command(
-    file: Optional[Path] = typer.Argument(
+    file: Path | None = typer.Argument(
         None,
         help="Path to spec.md or plan.md file",
         exists=False,
@@ -92,7 +93,7 @@ def generate_command(
         "-t",
         help="Diagram type: user-journey, er-diagram, architecture, all",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -113,7 +114,9 @@ def generate_command(
     # Resolve file path
     resolved_path = _resolve_file_path(file)
     if not resolved_path:
-        console.print("[red]Error:[/red] No spec file found. Provide a path or run from a spec directory.")
+        console.print(
+            "[red]Error:[/red] No spec file found. Provide a path or run from a spec directory."
+        )
         raise typer.Exit(code=1)
 
     if not resolved_path.exists():
@@ -151,7 +154,11 @@ def generate_command(
         table.add_column("Nodes")
 
         for diagram in result.diagrams:
-            status = "[green]✅ Generated[/green]" if diagram.is_valid else "[yellow]⚠️ Generated (warnings)[/yellow]"
+            status = (
+                "[green]✅ Generated[/green]"
+                if diagram.is_valid
+                else "[yellow]⚠️ Generated (warnings)[/yellow]"
+            )
             table.add_row(
                 diagram.diagram_type.value,
                 status,
@@ -188,13 +195,15 @@ def generate_command(
                 console.print(f"\n[bold]## {diagram.diagram_type.value}[/bold]\n")
                 console.print(diagram.wrapped_content)
     else:
-        console.print("[yellow]No diagrams generated.[/yellow] Check that the spec has User Stories or Key Entities.")
+        console.print(
+            "[yellow]No diagrams generated.[/yellow] Check that the spec has User Stories or Key Entities."
+        )
         raise typer.Exit(code=3)
 
 
 @app.command(name="validate")
 def validate_command(
-    file: Optional[Path] = typer.Argument(
+    file: Path | None = typer.Argument(
         None,
         help="Path to file containing Mermaid diagrams",
         exists=False,

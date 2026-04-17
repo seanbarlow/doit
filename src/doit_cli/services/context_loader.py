@@ -4,20 +4,20 @@ This module provides the ContextLoader service that loads and aggregates
 project context (constitution, roadmap, specs) for injection into doit commands.
 """
 
+from __future__ import annotations
+
 import logging
 import os
 import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from ..models.context_config import (
     CompletedItem,
     ContextConfig,
     ContextSource,
     LoadedContext,
-    SourceConfig,
     SummarizationConfig,
 )
 from .roadmap_summarizer import RoadmapSummarizer
@@ -26,10 +26,10 @@ logger = logging.getLogger(__name__)
 
 # Cache for loaded tiktoken encoding
 _tiktoken_encoding = None
-_tiktoken_available: Optional[bool] = None
+_tiktoken_available: bool | None = None
 
 # Cache for sklearn availability
-_sklearn_available: Optional[bool] = None
+_sklearn_available: bool | None = None
 
 
 def _has_tiktoken() -> bool:
@@ -38,6 +38,7 @@ def _has_tiktoken() -> bool:
     if _tiktoken_available is None:
         try:
             import tiktoken  # noqa: F401
+
             _tiktoken_available = True
         except ImportError:
             _tiktoken_available = False
@@ -51,6 +52,7 @@ def _has_sklearn() -> bool:
         try:
             from sklearn.feature_extraction.text import TfidfVectorizer  # noqa: F401
             from sklearn.metrics.pairwise import cosine_similarity  # noqa: F401
+
             _sklearn_available = True
         except ImportError:
             _sklearn_available = False
@@ -73,6 +75,7 @@ def estimate_tokens(text: str) -> int:
     if _has_tiktoken():
         try:
             import tiktoken
+
             if _tiktoken_encoding is None:
                 _tiktoken_encoding = tiktoken.get_encoding("cl100k_base")
             return len(_tiktoken_encoding.encode(text))
@@ -114,7 +117,7 @@ def truncate_content(content: str, max_tokens: int, path: Path) -> tuple[str, bo
 
     # Find title (first H1)
     title_line = None
-    for i, line in enumerate(lines):
+    for line in lines:
         if line.startswith("# ") and not line.startswith("## "):
             title_line = line
             break
@@ -180,7 +183,9 @@ def truncate_content(content: str, max_tokens: int, path: Path) -> tuple[str, bo
 
     # Add truncation notice
     result_lines.append("")
-    result_lines.append(f"<!-- Content truncated from {original_tokens} to ~{max_tokens} tokens. Full file at: {path} -->")
+    result_lines.append(
+        f"<!-- Content truncated from {original_tokens} to ~{max_tokens} tokens. Full file at: {path} -->"
+    )
 
     truncated_content = "\n".join(result_lines)
     return truncated_content, True, original_tokens
@@ -197,17 +202,107 @@ def extract_keywords(text: str) -> set[str]:
     """
     # Common stop words to exclude
     stop_words = {
-        "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-        "of", "with", "by", "from", "as", "is", "was", "are", "were", "been",
-        "be", "have", "has", "had", "do", "does", "did", "will", "would",
-        "could", "should", "may", "might", "must", "shall", "can", "need",
-        "this", "that", "these", "those", "it", "its", "they", "them",
-        "their", "we", "our", "you", "your", "i", "my", "me", "he", "she",
-        "his", "her", "him", "who", "what", "which", "when", "where", "why",
-        "how", "all", "each", "every", "both", "few", "more", "most", "other",
-        "some", "such", "no", "not", "only", "own", "same", "so", "than",
-        "too", "very", "just", "also", "now", "new", "first", "last", "long",
-        "great", "little", "old", "big", "small", "high", "low", "good", "bad",
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "in",
+        "on",
+        "at",
+        "to",
+        "for",
+        "of",
+        "with",
+        "by",
+        "from",
+        "as",
+        "is",
+        "was",
+        "are",
+        "were",
+        "been",
+        "be",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "could",
+        "should",
+        "may",
+        "might",
+        "must",
+        "shall",
+        "can",
+        "need",
+        "this",
+        "that",
+        "these",
+        "those",
+        "it",
+        "its",
+        "they",
+        "them",
+        "their",
+        "we",
+        "our",
+        "you",
+        "your",
+        "i",
+        "my",
+        "me",
+        "he",
+        "she",
+        "his",
+        "her",
+        "him",
+        "who",
+        "what",
+        "which",
+        "when",
+        "where",
+        "why",
+        "how",
+        "all",
+        "each",
+        "every",
+        "both",
+        "few",
+        "more",
+        "most",
+        "other",
+        "some",
+        "such",
+        "no",
+        "not",
+        "only",
+        "own",
+        "same",
+        "so",
+        "than",
+        "too",
+        "very",
+        "just",
+        "also",
+        "now",
+        "new",
+        "first",
+        "last",
+        "long",
+        "great",
+        "little",
+        "old",
+        "big",
+        "small",
+        "high",
+        "low",
+        "good",
+        "bad",
     }
 
     # Extract words (alphanumeric sequences)
@@ -219,9 +314,7 @@ def extract_keywords(text: str) -> set[str]:
     return keywords
 
 
-def compute_similarity_scores(
-    current_text: str, candidate_texts: list[str]
-) -> list[float]:
+def compute_similarity_scores(current_text: str, candidate_texts: list[str]) -> list[float]:
     """Compute similarity scores between current text and candidates.
 
     Uses TF-IDF and cosine similarity if scikit-learn is available,
@@ -242,7 +335,7 @@ def compute_similarity_scores(
             from sklearn.feature_extraction.text import TfidfVectorizer
             from sklearn.metrics.pairwise import cosine_similarity
 
-            all_texts = [current_text] + candidate_texts
+            all_texts = [current_text, *candidate_texts]
             vectorizer = TfidfVectorizer(stop_words="english", max_features=1000)
             tfidf_matrix = vectorizer.fit_transform(all_texts)
 
@@ -290,9 +383,7 @@ class ContextCondenser:
         """
         self.config = config
 
-    def check_threshold(
-        self, total_tokens: int, max_tokens: int
-    ) -> tuple[bool, bool]:
+    def check_threshold(self, total_tokens: int, max_tokens: int) -> tuple[bool, bool]:
         """Check if context exceeds soft or hard thresholds.
 
         Args:
@@ -308,7 +399,7 @@ class ContextCondenser:
     def add_guidance_prompt(
         self,
         content: str,
-        current_feature: Optional[str] = None,
+        current_feature: str | None = None,
     ) -> str:
         """Add AI guidance prompt when context exceeds soft threshold.
 
@@ -333,21 +424,23 @@ class ContextCondenser:
                 f"- **Pay special attention** to items related to: `{current_feature}`"
             )
 
-        guidance_lines.extend([
-            "- Treat P3/P4 items as background context only",
-            "- Use completed roadmap items for pattern reference and consistency",
-            "<!-- END GUIDANCE -->",
-            "",
-        ])
+        guidance_lines.extend(
+            [
+                "- Treat P3/P4 items as background context only",
+                "- Use completed roadmap items for pattern reference and consistency",
+                "<!-- END GUIDANCE -->",
+                "",
+            ]
+        )
 
         return "\n".join(guidance_lines) + content
 
     def truncate_if_needed(
         self,
-        sources: list["ContextSource"],
+        sources: list[ContextSource],
         max_tokens: int,
         source_priorities: list[str],
-    ) -> tuple[list["ContextSource"], int]:
+    ) -> tuple[list[ContextSource], int]:
         """Truncate sources based on priority when exceeding hard limit.
 
         Removes lowest-priority sources first until under limit.
@@ -440,22 +533,28 @@ def parse_completed_roadmap(content: str) -> list[CompletedItem]:
                 if date_str:
                     try:
                         # Try common formats
-                        for fmt in ["%Y-%m-%d", "%m/%d/%Y", "%d-%m-%Y"]:
+                        for _fmt in ["%Y-%m-%d", "%m/%d/%Y", "%d-%m-%Y"]:
                             try:
-                                completion_date = date_type.fromisoformat(date_str) if "-" in date_str and len(date_str) == 10 else None
+                                completion_date = (
+                                    date_type.fromisoformat(date_str)
+                                    if "-" in date_str and len(date_str) == 10
+                                    else None
+                                )
                                 break
                             except ValueError:
                                 continue
                     except Exception:
                         pass
 
-                items.append(CompletedItem(
-                    text=text,
-                    priority=priority,
-                    completion_date=completion_date,
-                    feature_branch=branch,
-                    relevance_score=0.0,
-                ))
+                items.append(
+                    CompletedItem(
+                        text=text,
+                        priority=priority,
+                        completion_date=completion_date,
+                        feature_branch=branch,
+                        relevance_score=0.0,
+                    )
+                )
 
     return items
 
@@ -506,8 +605,8 @@ class ContextLoader:
     def __init__(
         self,
         project_root: Path,
-        config: Optional[ContextConfig] = None,
-        command: Optional[str] = None,
+        config: ContextConfig | None = None,
+        command: str | None = None,
     ):
         """Initialize context loader.
 
@@ -538,7 +637,7 @@ class ContextLoader:
         if self._is_debug_enabled():
             print(f"[context] {message}")
 
-    def _read_file(self, path: Path) -> Optional[str]:
+    def _read_file(self, path: Path) -> str | None:
         """Read file content with caching.
 
         Args:
@@ -576,7 +675,15 @@ class ContextLoader:
         # Get source configs sorted by priority
         source_configs = [
             (name, self.config.get_source_config(name, self.command))
-            for name in ["constitution", "tech_stack", "personas", "roadmap", "completed_roadmap", "current_spec", "related_specs"]
+            for name in [
+                "constitution",
+                "tech_stack",
+                "personas",
+                "roadmap",
+                "completed_roadmap",
+                "current_spec",
+                "related_specs",
+            ]
         ]
         source_configs.sort(key=lambda x: x[1].priority)
 
@@ -646,9 +753,7 @@ class ContextLoader:
 
         return self._check_and_apply_condensation(context)
 
-    def _check_and_apply_condensation(
-        self, context: LoadedContext
-    ) -> LoadedContext:
+    def _check_and_apply_condensation(self, context: LoadedContext) -> LoadedContext:
         """Apply condensation if context exceeds token thresholds.
 
         Uses a two-tier approach:
@@ -713,13 +818,11 @@ class ContextLoader:
                 current_feature = self.extract_feature_name(branch)
 
             # Store guidance flag in context for to_markdown to use
-            context._guidance_prompt = condenser.add_guidance_prompt(
-                "", current_feature
-            ).rstrip()
+            context._guidance_prompt = condenser.add_guidance_prompt("", current_feature).rstrip()
 
         return context
 
-    def load_constitution(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+    def load_constitution(self, max_tokens: int | None = None) -> ContextSource | None:
         """Load constitution.md if enabled and exists.
 
         Args:
@@ -752,7 +855,7 @@ class ContextLoader:
             original_tokens=original_tokens if was_truncated else None,
         )
 
-    def load_tech_stack(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+    def load_tech_stack(self, max_tokens: int | None = None) -> ContextSource | None:
         """Load tech-stack.md if enabled and exists.
 
         Args:
@@ -785,7 +888,7 @@ class ContextLoader:
             original_tokens=original_tokens if was_truncated else None,
         )
 
-    def load_personas(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+    def load_personas(self, max_tokens: int | None = None) -> ContextSource | None:
         """Load personas.md if enabled and exists.
 
         Checks for feature-level personas first (specs/{feature}/personas.md),
@@ -838,7 +941,7 @@ class ContextLoader:
             original_tokens=None,
         )
 
-    def load_roadmap(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+    def load_roadmap(self, max_tokens: int | None = None) -> ContextSource | None:
         """Load roadmap.md if enabled and exists.
 
         If summarization is enabled AND the roadmap exceeds max_tokens,
@@ -881,9 +984,7 @@ class ContextLoader:
             original_tokens=original_tokens if was_truncated else None,
         )
 
-    def _summarize_roadmap(
-        self, path: Path, content: str, max_tokens: int
-    ) -> ContextSource:
+    def _summarize_roadmap(self, path: Path, content: str, max_tokens: int) -> ContextSource:
         """Summarize roadmap content by priority.
 
         Args:
@@ -922,9 +1023,7 @@ class ContextLoader:
             original_tokens=original_tokens if was_summarized else None,
         )
 
-    def load_completed_roadmap(
-        self, max_tokens: Optional[int] = None
-    ) -> Optional[ContextSource]:
+    def load_completed_roadmap(self, max_tokens: int | None = None) -> ContextSource | None:
         """Load completed_roadmap.md and format for AI context.
 
         Parses the completed roadmap items and formats them for semantic
@@ -980,7 +1079,7 @@ class ContextLoader:
             original_tokens=original_tokens if was_truncated else None,
         )
 
-    def get_current_branch(self) -> Optional[str]:
+    def get_current_branch(self) -> str | None:
         """Get current git branch name.
 
         Returns:
@@ -1000,7 +1099,7 @@ class ContextLoader:
             pass
         return None
 
-    def extract_feature_name(self, branch: str) -> Optional[str]:
+    def extract_feature_name(self, branch: str) -> str | None:
         """Extract feature name from branch name.
 
         Expects branch format like '026-ai-context-injection' or 'feature/026-name'.
@@ -1025,7 +1124,7 @@ class ContextLoader:
 
         return None
 
-    def load_current_spec(self, max_tokens: Optional[int] = None) -> Optional[ContextSource]:
+    def load_current_spec(self, max_tokens: int | None = None) -> ContextSource | None:
         """Load current feature spec based on branch name.
 
         Args:
@@ -1130,7 +1229,7 @@ class ContextLoader:
     def find_related_specs(
         self,
         max_count: int = 3,
-        max_tokens_per_spec: Optional[int] = None,
+        max_tokens_per_spec: int | None = None,
         similarity_threshold: float = 0.3,
     ) -> list[ContextSource]:
         """Find specs related to current feature.
@@ -1184,7 +1283,7 @@ class ContextLoader:
         # Filter by threshold and sort by score
         scored_specs = [
             (score, path, text)
-            for score, (path, text) in zip(scores, candidate_specs)
+            for score, (path, text) in zip(scores, candidate_specs, strict=False)
             if score >= similarity_threshold
         ]
         scored_specs.sort(key=lambda x: x[0], reverse=True)

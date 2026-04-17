@@ -1,8 +1,10 @@
 """Verify command for checking doit project setup."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -14,24 +16,14 @@ from ..models.project import Project
 from ..models.results import VerifyResult, VerifyStatus
 from ..services.validator import Validator
 
-
 console = Console()
 
 # Type aliases for CLI options
-JsonFlag = Annotated[
-    bool,
-    typer.Option(
-        "--json", "-j",
-        help="Output results as JSON"
-    )
-]
+JsonFlag = Annotated[bool, typer.Option("--json", "-j", help="Output results as JSON")]
 
 AgentOption = Annotated[
-    Optional[str],
-    typer.Option(
-        "--agent", "-a",
-        help="Specific agent to check: claude, copilot, or both"
-    )
+    str | None,
+    typer.Option("--agent", "-a", help="Specific agent to check: claude, copilot, or both"),
 ]
 
 
@@ -114,8 +106,7 @@ def display_verify_result(result: VerifyResult) -> None:
 
     # Show suggestions if there are warnings or failures
     suggestions = [
-        c.suggestion for c in result.checks
-        if c.suggestion and c.status != VerifyStatus.PASS
+        c.suggestion for c in result.checks if c.suggestion and c.status != VerifyStatus.PASS
     ]
 
     if suggestions:
@@ -152,11 +143,8 @@ def display_json_result(result: VerifyResult) -> None:
 def verify_command(
     path: Annotated[
         Path,
-        typer.Argument(
-            default=...,
-            help="Project directory path (use '.' for current directory)"
-        )
-    ] = Path("."),
+        typer.Argument(default=..., help="Project directory path (use '.' for current directory)"),
+    ] = Path(),
     agent: AgentOption = None,
     json_output: JsonFlag = False,
 ) -> None:

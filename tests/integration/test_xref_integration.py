@@ -3,7 +3,6 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -162,9 +161,7 @@ class TestXrefCoverageCommand:
 
     def test_coverage_json_format(self, xref_project):
         """Test coverage with JSON output."""
-        result = run_xref_command(
-            xref_project, "coverage", "033-test-feature", "--format", "json"
-        )
+        result = run_xref_command(xref_project, "coverage", "033-test-feature", "--format", "json")
 
         assert result.returncode == 0
 
@@ -198,9 +195,7 @@ class TestXrefCoverageCommand:
 
     def test_coverage_strict_mode(self, xref_project_uncovered):
         """Test coverage strict mode fails with uncovered requirements."""
-        result = run_xref_command(
-            xref_project_uncovered, "coverage", "test-uncovered", "--strict"
-        )
+        result = run_xref_command(xref_project_uncovered, "coverage", "test-uncovered", "--strict")
 
         # Should fail with exit code 1 due to uncovered requirements
         assert result.returncode == 1
@@ -218,9 +213,7 @@ class TestXrefLocateCommand:
 
     def test_locate_requirement(self, xref_project):
         """Test locating a requirement."""
-        result = run_xref_command(
-            xref_project, "locate", "FR-001", "--spec", "033-test-feature"
-        )
+        result = run_xref_command(xref_project, "locate", "FR-001", "--spec", "033-test-feature")
 
         assert result.returncode == 0
         assert "FR-001" in result.stdout
@@ -252,9 +245,7 @@ class TestXrefLocateCommand:
 
     def test_locate_not_found(self, xref_project):
         """Test locating a non-existent requirement."""
-        result = run_xref_command(
-            xref_project, "locate", "FR-999", "--spec", "033-test-feature"
-        )
+        result = run_xref_command(xref_project, "locate", "FR-999", "--spec", "033-test-feature")
 
         assert result.returncode == 1
         assert "not found" in result.stdout.lower()
@@ -265,9 +256,7 @@ class TestXrefTasksCommand:
 
     def test_tasks_for_requirement(self, xref_project):
         """Test listing tasks for a requirement."""
-        result = run_xref_command(
-            xref_project, "tasks", "FR-001", "--spec", "033-test-feature"
-        )
+        result = run_xref_command(xref_project, "tasks", "FR-001", "--spec", "033-test-feature")
 
         assert result.returncode == 0
         assert "T001" in result.stdout or "Initialize project" in result.stdout
@@ -324,9 +313,7 @@ class TestXrefValidateCommand:
 
     def test_validate_strict_mode(self, xref_project_uncovered):
         """Test validate strict mode treats warnings as errors."""
-        result = run_xref_command(
-            xref_project_uncovered, "validate", "test-uncovered", "--strict"
-        )
+        result = run_xref_command(xref_project_uncovered, "validate", "test-uncovered", "--strict")
 
         # Should fail in strict mode due to uncovered requirements
         assert result.returncode == 1
@@ -372,9 +359,7 @@ class TestXrefEndToEndWorkflow:
         assert len(tasks["tasks"]) >= 1
 
         # 4. Validate cross-references
-        validate_result = run_xref_command(
-            xref_project, "validate", "033-test-feature"
-        )
+        validate_result = run_xref_command(xref_project, "validate", "033-test-feature")
         assert validate_result.returncode == 0
 
     def test_workflow_with_issues(self, xref_project_with_orphans):

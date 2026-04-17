@@ -105,9 +105,7 @@ class TestMergeRoadmapItems:
         self, merge_service, local_item_with_branch, github_epic_matching
     ):
         """Test merge when local item matches GitHub epic by feature branch."""
-        result = merge_service.merge_roadmap_items(
-            [local_item_with_branch], [github_epic_matching]
-        )
+        result = merge_service.merge_roadmap_items([local_item_with_branch], [github_epic_matching])
 
         assert len(result) == 1
         merged_item = result[0]
@@ -169,15 +167,9 @@ class TestMergeRoadmapItems:
 
     def test_merge_sorts_by_priority(self, merge_service):
         """Test merge sorts results by priority."""
-        local_p3 = RoadmapItem(
-            title="P3 Item", priority="P3", description="Desc", source="local"
-        )
-        local_p1 = RoadmapItem(
-            title="P1 Item", priority="P1", description="Desc", source="local"
-        )
-        local_p2 = RoadmapItem(
-            title="P2 Item", priority="P2", description="Desc", source="local"
-        )
+        local_p3 = RoadmapItem(title="P3 Item", priority="P3", description="Desc", source="local")
+        local_p1 = RoadmapItem(title="P1 Item", priority="P1", description="Desc", source="local")
+        local_p2 = RoadmapItem(title="P2 Item", priority="P2", description="Desc", source="local")
 
         result = merge_service.merge_roadmap_items([local_p3, local_p1, local_p2], [])
 
@@ -187,15 +179,9 @@ class TestMergeRoadmapItems:
 
     def test_merge_sorts_by_title_within_priority(self, merge_service):
         """Test merge sorts by title within same priority."""
-        item_c = RoadmapItem(
-            title="C Item", priority="P1", description="Desc", source="local"
-        )
-        item_a = RoadmapItem(
-            title="A Item", priority="P1", description="Desc", source="local"
-        )
-        item_b = RoadmapItem(
-            title="B Item", priority="P1", description="Desc", source="local"
-        )
+        item_c = RoadmapItem(title="C Item", priority="P1", description="Desc", source="local")
+        item_a = RoadmapItem(title="A Item", priority="P1", description="Desc", source="local")
+        item_b = RoadmapItem(title="B Item", priority="P1", description="Desc", source="local")
 
         result = merge_service.merge_roadmap_items([item_c, item_a, item_b], [])
 
@@ -490,8 +476,6 @@ class TestPrioritySortKey:
     def test_priority_ordering(self, merge_service):
         """Test that priorities are ordered correctly."""
         priorities = ["P4", "P1", "P3", "P2", "unknown"]
-        sorted_priorities = sorted(
-            priorities, key=lambda p: merge_service._priority_sort_key(p)
-        )
+        sorted_priorities = sorted(priorities, key=lambda p: merge_service._priority_sort_key(p))
 
         assert sorted_priorities == ["P1", "P2", "P3", "P4", "unknown"]

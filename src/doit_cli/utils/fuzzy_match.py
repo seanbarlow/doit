@@ -4,8 +4,9 @@ This module provides fuzzy string matching capabilities for finding similar stri
 based on Levenshtein distance. Used primarily for matching feature names to roadmap items.
 """
 
+from __future__ import annotations
+
 from difflib import SequenceMatcher
-from typing import List, Tuple
 
 
 def calculate_similarity(str1: str, str2: str) -> float:
@@ -35,10 +36,8 @@ def calculate_similarity(str1: str, str2: str) -> float:
 
 
 def find_best_match(
-    target: str,
-    candidates: List[str],
-    threshold: float = 0.8
-) -> Tuple[str, float] | None:
+    target: str, candidates: list[str], threshold: float = 0.8
+) -> tuple[str, float] | None:
     """Find the best matching string from a list of candidates.
 
     Args:
@@ -72,10 +71,8 @@ def find_best_match(
 
 
 def find_all_matches(
-    target: str,
-    candidates: List[str],
-    threshold: float = 0.8
-) -> List[Tuple[str, float]]:
+    target: str, candidates: list[str], threshold: float = 0.8
+) -> list[tuple[str, float]]:
     """Find all matching strings above the threshold.
 
     Args:

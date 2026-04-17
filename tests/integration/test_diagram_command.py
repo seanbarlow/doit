@@ -1,11 +1,9 @@
 """Integration tests for diagram CLI commands."""
 
 import pytest
-from pathlib import Path
 from typer.testing import CliRunner
 
 from doit_cli.main import app
-
 
 runner = CliRunner()
 
@@ -123,9 +121,7 @@ class TestDiagramGenerateCommand:
 
     def test_generate_er_diagram_type(self, spec_file):
         """Test generating ER diagram type."""
-        result = runner.invoke(
-            app, ["diagram", "generate", str(spec_file), "--type", "er-diagram"]
-        )
+        result = runner.invoke(app, ["diagram", "generate", str(spec_file), "--type", "er-diagram"])
 
         # May succeed or return exit code 3 if no entities found
         assert result.exit_code in [0, 3]
@@ -136,11 +132,7 @@ class TestDiagramGenerateCommand:
 
         result = runner.invoke(
             app,
-            [
-                "diagram", "generate", str(spec_file),
-                "--no-insert",
-                "--output", str(output_file)
-            ]
+            ["diagram", "generate", str(spec_file), "--no-insert", "--output", str(output_file)],
         )
 
         assert result.exit_code == 0
@@ -150,18 +142,14 @@ class TestDiagramGenerateCommand:
 
     def test_generate_strict_mode(self, spec_file):
         """Test generate with --strict flag."""
-        result = runner.invoke(
-            app, ["diagram", "generate", str(spec_file), "--strict"]
-        )
+        result = runner.invoke(app, ["diagram", "generate", str(spec_file), "--strict"])
 
         # Should succeed if diagrams are valid
         assert result.exit_code in [0, 2]  # 0 = success, 2 = validation error
 
     def test_generate_nonexistent_file(self, tmp_path):
         """Test generate with nonexistent file."""
-        result = runner.invoke(
-            app, ["diagram", "generate", str(tmp_path / "nonexistent.md")]
-        )
+        result = runner.invoke(app, ["diagram", "generate", str(tmp_path / "nonexistent.md")])
 
         assert result.exit_code != 0
         assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()

@@ -4,12 +4,13 @@ This module provides the CleanupService that analyzes constitution.md,
 extracts tech-stack sections, and creates a separate tech-stack.md file.
 """
 
+from __future__ import annotations
+
 import logging
 import re
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from ..models.cleanup_models import AnalysisResult, CleanupResult
 
@@ -40,8 +41,7 @@ CONSTITUTION_CROSS_REF = (
 
 # Cross-reference text to add to tech-stack
 TECH_STACK_CROSS_REF = (
-    "\n> **See also**: [Constitution](constitution.md) for project "
-    "principles and governance.\n"
+    "\n> **See also**: [Constitution](constitution.md) for project principles and governance.\n"
 )
 
 # Tech-stack template header
@@ -160,7 +160,7 @@ class CleanupService:
         keyword_count = sum(1 for kw in TECH_KEYWORDS if kw in combined)
         return 1 <= keyword_count < 3
 
-    def create_backup(self) -> Optional[Path]:
+    def create_backup(self) -> Path | None:
         """Create timestamped backup of constitution.md.
 
         Returns:
@@ -297,7 +297,7 @@ class CleanupService:
         self,
         project_name: str,
         tech_sections: dict[str, str],
-        existing_content: Optional[str] = None,
+        existing_content: str | None = None,
     ) -> str:
         """Build tech-stack.md content.
 
@@ -354,7 +354,7 @@ class CleanupService:
         if header:
             # Insert cross-reference after first H1
             header_lines = header.split("\n")
-            for i, line in enumerate(header_lines):
+            for _i, line in enumerate(header_lines):
                 lines.append(line)
                 if line.startswith("# ") and not line.startswith("## "):
                     lines.append(CONSTITUTION_CROSS_REF)

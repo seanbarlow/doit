@@ -1,8 +1,9 @@
 """Hook configuration models for workflow enforcement."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -20,9 +21,7 @@ class HookRule:
     allowed_statuses: list[str] = field(
         default_factory=lambda: ["In Progress", "Complete", "Approved"]
     )
-    exempt_branches: list[str] = field(
-        default_factory=lambda: ["main", "develop"]
-    )
+    exempt_branches: list[str] = field(default_factory=lambda: ["main", "develop"])
     exempt_paths: list[str] = field(default_factory=list)
 
 
@@ -45,7 +44,7 @@ class HookConfig:
     logging: LoggingConfig = field(default_factory=LoggingConfig)
 
     @classmethod
-    def load_from_file(cls, config_path: Path) -> "HookConfig":
+    def load_from_file(cls, config_path: Path) -> HookConfig:
         """Load configuration from YAML file.
 
         Args:
@@ -67,7 +66,7 @@ class HookConfig:
         return cls._from_dict(data)
 
     @classmethod
-    def _from_dict(cls, data: dict) -> "HookConfig":
+    def _from_dict(cls, data: dict) -> HookConfig:
         """Create HookConfig from dictionary."""
         pre_commit_data = data.get("pre_commit", {})
         pre_push_data = data.get("pre_push", {})
@@ -75,28 +74,27 @@ class HookConfig:
 
         # Handle alternate key names
         if "require_spec_status" in pre_commit_data:
-            pre_commit_data["allowed_statuses"] = pre_commit_data.pop(
-                "require_spec_status"
-            )
+            pre_commit_data["allowed_statuses"] = pre_commit_data.pop("require_spec_status")
         if "require_spec_status" in pre_push_data:
-            pre_push_data["allowed_statuses"] = pre_push_data.pop(
-                "require_spec_status"
-            )
+            pre_push_data["allowed_statuses"] = pre_push_data.pop("require_spec_status")
 
         return cls(
             version=data.get("version", 1),
-            pre_commit=HookRule(**{
-                k: v for k, v in pre_commit_data.items()
-                if k in HookRule.__dataclass_fields__
-            }) if pre_commit_data else HookRule(),
-            pre_push=HookRule(**{
-                k: v for k, v in pre_push_data.items()
-                if k in HookRule.__dataclass_fields__
-            }) if pre_push_data else HookRule(),
-            logging=LoggingConfig(**{
-                k: v for k, v in logging_data.items()
-                if k in LoggingConfig.__dataclass_fields__
-            }) if logging_data else LoggingConfig(),
+            pre_commit=HookRule(
+                **{k: v for k, v in pre_commit_data.items() if k in HookRule.__dataclass_fields__}
+            )
+            if pre_commit_data
+            else HookRule(),
+            pre_push=HookRule(
+                **{k: v for k, v in pre_push_data.items() if k in HookRule.__dataclass_fields__}
+            )
+            if pre_push_data
+            else HookRule(),
+            logging=LoggingConfig(
+                **{k: v for k, v in logging_data.items() if k in LoggingConfig.__dataclass_fields__}
+            )
+            if logging_data
+            else LoggingConfig(),
         )
 
     @classmethod
@@ -105,11 +103,11 @@ class HookConfig:
         return Path(".doit/config/hooks.yaml")
 
     @classmethod
-    def load_default(cls) -> "HookConfig":
+    def load_default(cls) -> HookConfig:
         """Load configuration from default location."""
         return cls.load_from_file(cls.get_default_config_path())
 
-    def get_rule_for_hook(self, hook_type: str) -> Optional[HookRule]:
+    def get_rule_for_hook(self, hook_type: str) -> HookRule | None:
         """Get the rule configuration for a specific hook type.
 
         Args:

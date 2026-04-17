@@ -4,17 +4,14 @@ This service parses the roadmap markdown file and uses fuzzy matching to find
 roadmap items that correspond to user-provided feature names.
 """
 
+from __future__ import annotations
+
 import re
-from pathlib import Path
-from typing import List, Optional
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 
-from ..utils.fuzzy_match import (
-    find_best_match,
-    find_all_matches,
-    is_exact_match
-)
+from ..utils.fuzzy_match import find_all_matches, find_best_match, is_exact_match
 
 
 @dataclass
@@ -24,10 +21,10 @@ class RoadmapItem:
     title: str
     priority: str  # P1, P2, P3, P4
     feature_branch: str  # [###-feature-name]
-    github_number: Optional[int]
-    github_url: Optional[str]
+    github_number: int | None
+    github_url: str | None
     status: str  # Planned, In Progress, Complete, Deferred
-    category: Optional[str]
+    category: str | None
 
     def __post_init__(self):
         """Validate roadmap item fields."""
@@ -59,8 +56,8 @@ class RoadmapMatcherService:
         """
         self.roadmap_path = roadmap_path
 
-    @lru_cache(maxsize=1)
-    def parse_roadmap(self) -> List[RoadmapItem]:
+    @lru_cache(maxsize=1)  # noqa: B019 — matcher is short-lived, self does not outlive cache
+    def parse_roadmap(self) -> list[RoadmapItem]:
         """Parse roadmap.md file into structured roadmap items.
 
         This method is cached to avoid repeated file reads.
@@ -75,14 +72,14 @@ class RoadmapMatcherService:
         if not self.roadmap_path.exists():
             raise FileNotFoundError(f"Roadmap file not found: {self.roadmap_path}")
 
-        with open(self.roadmap_path, "r", encoding="utf-8") as f:
+        with open(self.roadmap_path, encoding="utf-8") as f:
             content = f.read()
 
         items = []
 
         # Find all markdown tables in the roadmap
         # Table format: | Title | Priority | Branch | GitHub | Status | Category |
-        table_pattern = r'\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|'
+        table_pattern = r"\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|"
 
         for line in content.splitlines():
             # Skip header rows and separator rows
@@ -105,7 +102,7 @@ class RoadmapMatcherService:
                     github_url = None
                     if github and github != "":
                         # Format: [#123](url)
-                        github_match = re.search(r'\[#(\d+)\]\(([^)]+)\)', github)
+                        github_match = re.search(r"\[#(\d+)\]\(([^)]+)\)", github)
                         if github_match:
                             github_number = int(github_match.group(1))
                             github_url = github_match.group(2)
@@ -118,7 +115,7 @@ class RoadmapMatcherService:
                             github_number=github_number,
                             github_url=github_url,
                             status=status,
-                            category=category if category else None
+                            category=category if category else None,
                         )
                         items.append(item)
                     except ValueError as e:
@@ -131,11 +128,7 @@ class RoadmapMatcherService:
 
         return items
 
-    def find_best_match(
-        self,
-        feature_name: str,
-        threshold: float = 0.8
-    ) -> Optional[MatchResult]:
+    def find_best_match(self, feature_name: str, threshold: float = 0.8) -> MatchResult | None:
         """Find the best matching roadmap item for a feature name.
 
         Args:
@@ -161,11 +154,7 @@ class RoadmapMatcherService:
         # Check for exact match first
         for item in items:
             if is_exact_match(feature_name, item.title):
-                return MatchResult(
-                    item=item,
-                    similarity_score=1.0,
-                    is_exact_match=True
-                )
+                return MatchResult(item=item, similarity_score=1.0, is_exact_match=True)
 
         # Try fuzzy matching
         match = find_best_match(feature_name, titles, threshold=threshold)
@@ -174,19 +163,11 @@ class RoadmapMatcherService:
             # Find the corresponding item
             for item in items:
                 if item.title == matched_title:
-                    return MatchResult(
-                        item=item,
-                        similarity_score=score,
-                        is_exact_match=False
-                    )
+                    return MatchResult(item=item, similarity_score=score, is_exact_match=False)
 
         return None
 
-    def find_all_matches(
-        self,
-        feature_name: str,
-        threshold: float = 0.8
-    ) -> List[MatchResult]:
+    def find_all_matches(self, feature_name: str, threshold: float = 0.8) -> list[MatchResult]:
         """Find all roadmap items matching a feature name above the threshold.
 
         Args:
@@ -220,11 +201,13 @@ class RoadmapMatcherService:
         for matched_title, score in matches:
             for item in items:
                 if item.title == matched_title:
-                    results.append(MatchResult(
-                        item=item,
-                        similarity_score=score,
-                        is_exact_match=is_exact_match(feature_name, matched_title)
-                    ))
+                    results.append(
+                        MatchResult(
+                            item=item,
+                            similarity_score=score,
+                            is_exact_match=is_exact_match(feature_name, matched_title),
+                        )
+                    )
                     break
 
         return results

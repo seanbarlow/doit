@@ -1,7 +1,7 @@
 """Windows path handling utilities for testing."""
+
 import sys
 from pathlib import Path, PurePosixPath
-from typing import Optional
 
 
 class WindowsPathInfo:
@@ -12,12 +12,12 @@ class WindowsPathInfo:
         original_path: str,
         normalized_path: str,
         is_absolute: bool,
-        drive_letter: Optional[str],
+        drive_letter: str | None,
         is_unc: bool,
         length: int,
         exceeds_max_path: bool,
         contains_reserved_name: bool,
-        reserved_name: Optional[str],
+        reserved_name: str | None,
     ):
         self.original_path = original_path
         self.normalized_path = normalized_path

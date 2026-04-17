@@ -3,8 +3,9 @@
 Provides statistical analysis of spec completion cycle times.
 """
 
+from __future__ import annotations
+
 from datetime import date, timedelta
-from typing import Optional
 
 from ..models.analytics_models import (
     CycleTimeRecord,
@@ -27,7 +28,7 @@ class CycleTimeCalculator:
             specs: List of SpecMetadata objects to analyze
         """
         self.specs = specs
-        self._records: Optional[list[CycleTimeRecord]] = None
+        self._records: list[CycleTimeRecord] | None = None
 
     @property
     def records(self) -> list[CycleTimeRecord]:
@@ -46,9 +47,9 @@ class CycleTimeCalculator:
 
     def calculate_stats(
         self,
-        days: Optional[int] = None,
-        since: Optional[date] = None,
-    ) -> Optional[CycleTimeStats]:
+        days: int | None = None,
+        since: date | None = None,
+    ) -> CycleTimeStats | None:
         """Calculate cycle time statistics.
 
         Args:
@@ -63,8 +64,8 @@ class CycleTimeCalculator:
 
     def filter_records(
         self,
-        days: Optional[int] = None,
-        since: Optional[date] = None,
+        days: int | None = None,
+        since: date | None = None,
     ) -> list[CycleTimeRecord]:
         """Filter cycle time records by time period.
 

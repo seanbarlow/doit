@@ -4,6 +4,8 @@ This package contains the provider abstraction layer for git hosting platforms
 including GitHub, Azure DevOps, and GitLab.
 """
 
+from __future__ import annotations
+
 from .base import GitProvider, ProviderType
 from .exceptions import (
     AuthenticationError,
@@ -15,12 +17,12 @@ from .exceptions import (
 )
 
 __all__ = [
-    "GitProvider",
-    "ProviderType",
-    "ProviderError",
     "AuthenticationError",
+    "GitProvider",
+    "NetworkError",
+    "ProviderError",
+    "ProviderType",
     "RateLimitError",
     "ResourceNotFoundError",
     "ValidationError",
-    "NetworkError",
 ]

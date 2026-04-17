@@ -1,7 +1,7 @@
 """Comprehensive edge case tests for Windows E2E testing."""
-import sys
+
 import os
-import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -23,14 +23,18 @@ def test_powershell_execution_policy_detection():
     executor = PowerShellExecutor()
     policy = executor.check_execution_policy()
     assert policy != "not available", "PowerShell should be available"
-    assert policy in [
-        "Restricted",
-        "AllSigned",
-        "RemoteSigned",
-        "Unrestricted",
-        "Bypass",
-        "Undefined",
-    ] or policy != "unknown", f"Unexpected policy: {policy}"
+    assert (
+        policy
+        in [
+            "Restricted",
+            "AllSigned",
+            "RemoteSigned",
+            "Unrestricted",
+            "Bypass",
+            "Undefined",
+        ]
+        or policy != "unknown"
+    ), f"Unexpected policy: {policy}"
 
 
 @pytest.mark.windows
@@ -101,14 +105,16 @@ def test_max_path_length_limit(temp_project_dir, path_validator):
     # Path just under limit (should pass)
     # "C:/" (3) + "a" * 240 (240) + "/test.txt" (9) = 252 chars
     short_path = "C:/" + "a" * 240 + "/test.txt"
-    assert not path_validator.exceeds_max_path(short_path), \
+    assert not path_validator.exceeds_max_path(short_path), (
         f"Path under 260 chars should not exceed limit (length: {len(short_path)})"
+    )
 
     # Path over limit (should fail)
     # "C:/" (3) + "a" * 270 (270) + "/test.txt" (9) = 282 chars
     long_path = "C:/" + "a" * 270 + "/test.txt"
-    assert path_validator.exceeds_max_path(long_path), \
+    assert path_validator.exceeds_max_path(long_path), (
         f"Path over 260 chars should exceed limit (length: {len(long_path)})"
+    )
 
 
 @pytest.mark.windows
@@ -126,16 +132,19 @@ def test_reserved_filename_handling(path_validator, reserved_name):
     Then: Reserved name is detected
     """
     # Test exact match
-    assert path_validator.is_reserved_name(reserved_name), \
+    assert path_validator.is_reserved_name(reserved_name), (
         f"{reserved_name} should be detected as reserved"
+    )
 
     # Test with extension
-    assert path_validator.is_reserved_name(f"{reserved_name}.txt"), \
+    assert path_validator.is_reserved_name(f"{reserved_name}.txt"), (
         f"{reserved_name}.txt should be detected as reserved"
+    )
 
     # Test case insensitivity
-    assert path_validator.is_reserved_name(reserved_name.lower()), \
+    assert path_validator.is_reserved_name(reserved_name.lower()), (
         f"{reserved_name.lower()} should be detected as reserved"
+    )
 
 
 @pytest.mark.windows
@@ -184,8 +193,9 @@ def test_trailing_dot_filename():
             # Check if file exists without the dot
             file_without_dot = Path(tmpdir) / "file"
             # Either the original name or name without dot should exist
-            assert file_with_dot.exists() or file_without_dot.exists(), \
+            assert file_with_dot.exists() or file_without_dot.exists(), (
                 "File should exist (possibly with dot removed)"
+            )
         except (OSError, ValueError):
             # Some operations may reject trailing dots
             pytest.skip("Trailing dot in filename not supported")

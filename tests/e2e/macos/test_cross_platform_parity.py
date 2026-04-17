@@ -1,7 +1,6 @@
 """E2E tests for cross-platform parity between macOS, Windows, and Linux."""
 
 import pytest
-import platform
 
 
 @pytest.mark.macos
@@ -19,14 +18,11 @@ def test_output_comparison_with_windows_normalization(comparison_tools, macos_te
 
     # Compare with normalization
     are_equal, differences = comparison_tools.compare_outputs(
-        macos_output,
-        windows_output,
-        normalize=True
+        macos_output, windows_output, normalize=True
     )
 
     # After normalization, outputs should be equivalent
-    assert are_equal or len(differences) <= 1, \
-        f"Outputs differ after normalization: {differences}"
+    assert are_equal or len(differences) <= 1, f"Outputs differ after normalization: {differences}"
 
 
 @pytest.mark.macos
@@ -41,9 +37,7 @@ def test_output_comparison_with_linux(comparison_tools, macos_test_env):
     linux_output = "File: /home/user/project/spec.md\nStatus: complete\n"
 
     are_equal, differences = comparison_tools.compare_outputs(
-        macos_output,
-        linux_output,
-        normalize=True
+        macos_output, linux_output, normalize=True
     )
 
     assert are_equal, f"macOS and Linux outputs should match: {differences}"
@@ -88,7 +82,7 @@ def test_platform_specific_difference_documentation(comparison_tools, macos_test
     # Document differences
     differences = {
         "path_separator": "/",  # Same as Linux, different from Windows
-        "line_ending": "LF",    # Same as Linux, different from Windows
+        "line_ending": "LF",  # Same as Linux, different from Windows
         "unicode_norm": "NFD",  # Different from both Windows and Linux (NFC)
         "case_sensitive": "varies",  # Depends on filesystem
     }
@@ -105,7 +99,7 @@ def test_unicode_normalization_parity(comparison_tools, macos_test_env):
     if not macos_test_env["is_macos"]:
         pytest.skip("Test requires macOS")
 
-    from tests.utils.macos.unicode_utils import normalize_nfd, normalize_nfc
+    from tests.utils.macos.unicode_utils import normalize_nfc, normalize_nfd
 
     # Test string with accented characters
     test_string = "café"
@@ -119,9 +113,7 @@ def test_unicode_normalization_parity(comparison_tools, macos_test_env):
     # They may look the same but have different byte representations
     # Test that comparison tools handle this
     are_equal, explanation = comparison_tools.handle_unicode_differences(
-        nfd_form,
-        nfc_form,
-        auto_normalize=True
+        nfd_form, nfc_form, auto_normalize=True
     )
 
     assert are_equal, f"Unicode forms should normalize to equal: {explanation}"
@@ -159,11 +151,7 @@ def test_comparison_report_generation(comparison_tools, macos_test_env):
     output2 = "Test output 2\nSuccess\n"
 
     report = comparison_tools.create_comparison_report(
-        "Test Comparison",
-        output1,
-        output2,
-        platform1="macOS",
-        platform2="Linux"
+        "Test Comparison", output1, output2, platform1="macOS", platform2="Linux"
     )
 
     assert "Test Comparison" in report

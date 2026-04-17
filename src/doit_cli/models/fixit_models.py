@@ -4,11 +4,11 @@ This module contains all data models, enums, and dataclasses
 for the doit fixit command workflow.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
-
 
 # =============================================================================
 # Enums (T004-T007)
@@ -84,14 +84,15 @@ class GitHubIssue:
     body: str = ""
     state: IssueState = IssueState.OPEN
     labels: list[str] = field(default_factory=list)
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> "GitHubIssue":
+    def from_dict(cls, data: dict) -> GitHubIssue:
         """Create GitHubIssue from gh CLI JSON output."""
         state = IssueState(data.get("state", "open").lower())
-        labels = [label["name"] if isinstance(label, dict) else label
-                  for label in data.get("labels", [])]
+        labels = [
+            label["name"] if isinstance(label, dict) else label for label in data.get("labels", [])
+        ]
         return cls(
             number=data["number"],
             title=data["title"],
@@ -135,7 +136,7 @@ class FixWorkflow:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "FixWorkflow":
+    def from_dict(cls, data: dict) -> FixWorkflow:
         """Create FixWorkflow from dictionary."""
         return cls(
             id=data["id"],
@@ -155,8 +156,8 @@ class InvestigationFinding:
     finding_type: FindingType
     description: str
     evidence: str = ""
-    file_path: Optional[str] = None
-    line_number: Optional[int] = None
+    file_path: str | None = None
+    line_number: int | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -170,7 +171,7 @@ class InvestigationFinding:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "InvestigationFinding":
+    def from_dict(cls, data: dict) -> InvestigationFinding:
         """Create InvestigationFinding from dictionary."""
         return cls(
             id=data["id"],
@@ -201,7 +202,7 @@ class InvestigationCheckpoint:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "InvestigationCheckpoint":
+    def from_dict(cls, data: dict) -> InvestigationCheckpoint:
         """Create InvestigationCheckpoint from dictionary."""
         return cls(
             id=data["id"],
@@ -234,18 +235,19 @@ class InvestigationPlan:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "InvestigationPlan":
+    def from_dict(cls, data: dict) -> InvestigationPlan:
         """Create InvestigationPlan from dictionary."""
         return cls(
             id=data["id"],
             workflow_id=data["workflow_id"],
             keywords=data.get("keywords", []),
-            checkpoints=[InvestigationCheckpoint.from_dict(cp)
-                        for cp in data.get("checkpoints", [])],
-            findings=[InvestigationFinding.from_dict(f)
-                     for f in data.get("findings", [])],
+            checkpoints=[
+                InvestigationCheckpoint.from_dict(cp) for cp in data.get("checkpoints", [])
+            ],
+            findings=[InvestigationFinding.from_dict(f) for f in data.get("findings", [])],
             created_at=datetime.fromisoformat(data["created_at"])
-                       if "created_at" in data else datetime.now(),
+            if "created_at" in data
+            else datetime.now(),
         )
 
 
@@ -266,7 +268,7 @@ class FileChange:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "FileChange":
+    def from_dict(cls, data: dict) -> FileChange:
         """Create FileChange from dictionary."""
         return cls(
             file_path=data["file_path"],
@@ -287,7 +289,7 @@ class FixPlan:
     status: PlanStatus = PlanStatus.DRAFT
     affected_files: list[FileChange] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
-    approved_at: Optional[datetime] = None
+    approved_at: datetime | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -304,7 +306,7 @@ class FixPlan:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "FixPlan":
+    def from_dict(cls, data: dict) -> FixPlan:
         """Create FixPlan from dictionary."""
         return cls(
             id=data["id"],
@@ -313,12 +315,13 @@ class FixPlan:
             proposed_solution=data.get("proposed_solution", ""),
             risk_level=RiskLevel(data.get("risk_level", "low")),
             status=PlanStatus(data.get("status", "draft")),
-            affected_files=[FileChange.from_dict(f)
-                           for f in data.get("affected_files", [])],
+            affected_files=[FileChange.from_dict(f) for f in data.get("affected_files", [])],
             created_at=datetime.fromisoformat(data["created_at"])
-                       if "created_at" in data else datetime.now(),
+            if "created_at" in data
+            else datetime.now(),
             approved_at=datetime.fromisoformat(data["approved_at"])
-                       if data.get("approved_at") else None,
+            if data.get("approved_at")
+            else None,
         )
 
 
@@ -327,9 +330,9 @@ class FixitWorkflowState:
     """Complete state for a fixit workflow, used for persistence."""
 
     workflow: FixWorkflow
-    issue: Optional[GitHubIssue] = None
-    investigation_plan: Optional[InvestigationPlan] = None
-    fix_plan: Optional[FixPlan] = None
+    issue: GitHubIssue | None = None
+    investigation_plan: InvestigationPlan | None = None
+    fix_plan: FixPlan | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -337,19 +340,19 @@ class FixitWorkflowState:
             "workflow": self.workflow.to_dict(),
             "issue": self.issue.to_dict() if self.issue else None,
             "investigation_plan": self.investigation_plan.to_dict()
-                                 if self.investigation_plan else None,
+            if self.investigation_plan
+            else None,
             "fix_plan": self.fix_plan.to_dict() if self.fix_plan else None,
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "FixitWorkflowState":
+    def from_dict(cls, data: dict) -> FixitWorkflowState:
         """Create FixitWorkflowState from dictionary."""
         return cls(
             workflow=FixWorkflow.from_dict(data["workflow"]),
-            issue=GitHubIssue.from_dict(data["issue"])
-                  if data.get("issue") else None,
+            issue=GitHubIssue.from_dict(data["issue"]) if data.get("issue") else None,
             investigation_plan=InvestigationPlan.from_dict(data["investigation_plan"])
-                              if data.get("investigation_plan") else None,
-            fix_plan=FixPlan.from_dict(data["fix_plan"])
-                    if data.get("fix_plan") else None,
+            if data.get("investigation_plan")
+            else None,
+            fix_plan=FixPlan.from_dict(data["fix_plan"]) if data.get("fix_plan") else None,
         )

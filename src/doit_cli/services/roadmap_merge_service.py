@@ -4,7 +4,7 @@ This service implements smart merging logic to combine local roadmap items
 with GitHub epics, matching by feature branch reference and preserving local data.
 """
 
-from typing import List, Optional
+from __future__ import annotations
 
 from ..models.github_epic import GitHubEpic
 from ..models.roadmap import RoadmapItem
@@ -23,8 +23,8 @@ class RoadmapMergeService:
     """
 
     def merge_roadmap_items(
-        self, local_items: List[RoadmapItem], github_epics: List[GitHubEpic]
-    ) -> List[RoadmapItem]:
+        self, local_items: list[RoadmapItem], github_epics: list[GitHubEpic]
+    ) -> list[RoadmapItem]:
         """Merge local roadmap items with GitHub epics.
 
         Args:
@@ -81,8 +81,8 @@ class RoadmapMergeService:
         return sorted(merged, key=lambda x: (self._priority_sort_key(x.priority), x.title))
 
     def _find_epic_by_branch(
-        self, epics: List[GitHubEpic], feature_branch: Optional[str]
-    ) -> Optional[GitHubEpic]:
+        self, epics: list[GitHubEpic], feature_branch: str | None
+    ) -> GitHubEpic | None:
         """Find GitHub epic matching the feature branch reference.
 
         Args:
@@ -123,9 +123,7 @@ class RoadmapMergeService:
 
         return None
 
-    def _create_merged_item(
-        self, local_item: RoadmapItem, github_epic: GitHubEpic
-    ) -> RoadmapItem:
+    def _create_merged_item(self, local_item: RoadmapItem, github_epic: GitHubEpic) -> RoadmapItem:
         """Create merged roadmap item from local and GitHub data.
 
         Prioritizes local data (user edits) while enriching with GitHub metadata.
@@ -168,7 +166,9 @@ class RoadmapMergeService:
             source="merged",  # Mark as merged
             github_number=github_epic.number,  # Add GitHub metadata
             github_url=github_epic.url,  # Add GitHub URL
-            features=github_epic.features if hasattr(github_epic, 'features') else [],  # Add linked features
+            features=github_epic.features
+            if hasattr(github_epic, "features")
+            else [],  # Add linked features
         )
 
     def _priority_sort_key(self, priority: str) -> int:

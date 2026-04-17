@@ -4,7 +4,7 @@ This module provides commands for configuring and managing
 git provider settings.
 """
 
-from typing import Optional
+from __future__ import annotations
 
 import typer
 from rich.console import Console
@@ -30,19 +30,19 @@ console = Console()
 
 @app.command(name="configure")
 def configure_command(
-    provider: Optional[str] = typer.Option(
+    provider: str | None = typer.Option(
         None,
         "--provider",
         "-p",
         help="Provider to configure: github, azure_devops, gitlab",
     ),
-    organization: Optional[str] = typer.Option(
+    organization: str | None = typer.Option(
         None,
         "--organization",
         "-o",
         help="Azure DevOps organization name",
     ),
-    project: Optional[str] = typer.Option(
+    project: str | None = typer.Option(
         None,
         "--project",
         help="Azure DevOps project name",
@@ -77,12 +77,8 @@ def configure_command(
             config.provider = ProviderType(provider.lower())
             config.auto_detected = False
         except ValueError:
-            console.print(
-                f"[red]Error: Unknown provider '{provider}'[/red]"
-            )
-            console.print(
-                "Valid providers: github, azure_devops, gitlab"
-            )
+            console.print(f"[red]Error: Unknown provider '{provider}'[/red]")
+            console.print("Valid providers: github, azure_devops, gitlab")
             raise typer.Exit(code=1)
 
     elif auto_detect or not provider:
@@ -97,9 +93,7 @@ def configure_command(
             )
         else:
             # Interactive selection
-            console.print(
-                "[yellow]Could not auto-detect provider from git remote.[/yellow]"
-            )
+            console.print("[yellow]Could not auto-detect provider from git remote.[/yellow]")
             console.print("\nAvailable providers:")
             console.print("  1. GitHub")
             console.print("  2. Azure DevOps")
@@ -154,7 +148,9 @@ def configure_command(
     if config.provider == ProviderType.GITHUB:
         console.print("  • Ensure you're authenticated: gh auth status")
     elif config.provider == ProviderType.AZURE_DEVOPS:
-        console.print("  • Set AZURE_DEVOPS_PAT environment variable with your Personal Access Token")
+        console.print(
+            "  • Set AZURE_DEVOPS_PAT environment variable with your Personal Access Token"
+        )
     elif config.provider == ProviderType.GITLAB:
         console.print("  • [yellow]Note: GitLab support is not fully implemented yet[/yellow]")
         console.print("  • Set GITLAB_TOKEN environment variable when available")
@@ -191,10 +187,7 @@ def status_command() -> None:
         try:
             provider = ProviderFactory.create(config)
             available = provider.is_available
-            table.add_row(
-                "Available",
-                "[green]✓ Yes[/green]" if available else "[red]✗ No[/red]"
-            )
+            table.add_row("Available", "[green]✓ Yes[/green]" if available else "[red]✗ No[/red]")
         except Exception as e:
             table.add_row("Available", f"[red]✗ Error: {e}[/red]")
     else:
@@ -203,9 +196,7 @@ def status_command() -> None:
     console.print(table)
 
     # Show configuration file path
-    console.print(
-        f"\n[dim]Configuration file: {ProviderConfig.CONFIG_PATH}[/dim]"
-    )
+    console.print(f"\n[dim]Configuration file: {ProviderConfig.CONFIG_PATH}[/dim]")
 
 
 @app.command(name="detect")
@@ -223,19 +214,13 @@ def detect_command() -> None:
             ProviderType.AZURE_DEVOPS: "Azure DevOps",
             ProviderType.GITLAB: "GitLab",
         }
-        console.print(
-            f"[green]Detected provider: {names.get(detected, detected.value)}[/green]"
-        )
+        console.print(f"[green]Detected provider: {names.get(detected, detected.value)}[/green]")
         console.print(
             "\n[dim]Run 'doit provider configure --auto-detect' to save this configuration.[/dim]"
         )
     else:
-        console.print(
-            "[yellow]Could not detect provider from git remote URL.[/yellow]"
-        )
-        console.print(
-            "\n[dim]Run 'doit provider configure' to manually select a provider.[/dim]"
-        )
+        console.print("[yellow]Could not detect provider from git remote URL.[/yellow]")
+        console.print("\n[dim]Run 'doit provider configure' to manually select a provider.[/dim]")
 
 
 @app.command(name="wizard")

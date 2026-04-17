@@ -9,8 +9,6 @@ import os
 import platform
 import shutil
 import subprocess
-from pathlib import Path
-from typing import List, Optional, Tuple
 
 
 class BSDCommandWrapper:
@@ -21,7 +19,7 @@ class BSDCommandWrapper:
         self.is_macos = platform.system() == "Darwin"
         self.gnu_prefix = self._detect_gnu_prefix()
 
-    def _detect_gnu_prefix(self) -> Optional[str]:
+    def _detect_gnu_prefix(self) -> str | None:
         """Detect if GNU utilities are installed (e.g., via Homebrew).
 
         Returns:
@@ -45,12 +43,8 @@ class BSDCommandWrapper:
         return self.gnu_prefix is not None
 
     def sed_inplace(
-        self,
-        pattern: str,
-        replacement: str,
-        filepath: str,
-        use_gnu: bool = False
-    ) -> Tuple[bool, str]:
+        self, pattern: str, replacement: str, filepath: str, use_gnu: bool = False
+    ) -> tuple[bool, str]:
         """Execute sed in-place replacement, handling BSD vs GNU differences.
 
         BSD sed requires an extension argument for -i, GNU sed does not.
@@ -78,12 +72,7 @@ class BSDCommandWrapper:
                 # GNU sed on Linux
                 cmd = ["sed", "-i", f"s/{pattern}/{replacement}/g", filepath]
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 return True, "Success"
@@ -94,11 +83,8 @@ class BSDCommandWrapper:
             return False, str(e)
 
     def grep_extended(
-        self,
-        pattern: str,
-        filepath: str,
-        use_gnu: bool = False
-    ) -> Tuple[bool, List[str]]:
+        self, pattern: str, filepath: str, use_gnu: bool = False
+    ) -> tuple[bool, list[str]]:
         """Execute grep with extended regex, handling BSD vs GNU differences.
 
         Args:
@@ -120,12 +106,7 @@ class BSDCommandWrapper:
                 # Both BSD and GNU grep support -E
                 cmd = ["grep", "-E", pattern, filepath]
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
 
             # grep returns 1 if no matches found (not an error)
             if result.returncode in (0, 1):
@@ -137,12 +118,7 @@ class BSDCommandWrapper:
         except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError) as e:
             return False, [str(e)]
 
-    def awk_posix(
-        self,
-        script: str,
-        filepath: str,
-        use_gnu: bool = False
-    ) -> Tuple[bool, str]:
+    def awk_posix(self, script: str, filepath: str, use_gnu: bool = False) -> tuple[bool, str]:
         """Execute awk in POSIX mode, handling BSD vs GNU differences.
 
         Args:
@@ -164,12 +140,7 @@ class BSDCommandWrapper:
                 # BSD awk
                 cmd = ["awk", script, filepath]
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 return True, result.stdout
@@ -182,10 +153,10 @@ class BSDCommandWrapper:
     def find_bsd(
         self,
         directory: str,
-        name_pattern: Optional[str] = None,
-        type_filter: Optional[str] = None,
-        use_gnu: bool = False
-    ) -> Tuple[bool, List[str]]:
+        name_pattern: str | None = None,
+        type_filter: str | None = None,
+        use_gnu: bool = False,
+    ) -> tuple[bool, list[str]]:
         """Execute find command, handling BSD vs GNU differences.
 
         Args:
@@ -215,12 +186,7 @@ class BSDCommandWrapper:
             if name_pattern:
                 cmd.extend(["-name", name_pattern])
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 paths = result.stdout.strip().split("\n") if result.stdout.strip() else []
@@ -242,10 +208,7 @@ class BSDCommandWrapper:
         """
         try:
             result = subprocess.run(
-                [command, "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5
+                [command, "--version"], capture_output=True, text=True, timeout=5
             )
 
             output = (result.stdout + result.stderr).lower()
@@ -314,7 +277,7 @@ def is_zsh_default() -> bool:
     return get_shell_type() == "zsh"
 
 
-def run_bash_script(script_path: str, args: Optional[List[str]] = None) -> Tuple[bool, str, str]:
+def run_bash_script(script_path: str, args: list[str] | None = None) -> tuple[bool, str, str]:
     """Run a bash script, ensuring bash interpreter is used.
 
     Args:
@@ -332,12 +295,7 @@ def run_bash_script(script_path: str, args: Optional[List[str]] = None) -> Tuple
         cmd.extend(args)
 
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=60
-        )
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
 
         return result.returncode == 0, result.stdout, result.stderr
 

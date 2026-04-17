@@ -1,6 +1,5 @@
 """Unit tests for WizardService."""
 
-from datetime import datetime, UTC
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -253,9 +252,13 @@ class TestReconfigurationFlow:
         mock_backup.backup_id = "20260122_120000"
         mock_backup_service.create_backup.return_value = mock_backup
 
-        with patch.object(wizard, "detect_provider", return_value=(ProviderType.GITHUB, "git_remote")):
+        with patch.object(
+            wizard, "detect_provider", return_value=(ProviderType.GITHUB, "git_remote")
+        ):
             with patch.object(wizard, "select_provider", return_value=ProviderType.GITHUB):
-                with patch.object(wizard, "collect_github_config", return_value={"auth_method": "gh_cli"}):
+                with patch.object(
+                    wizard, "collect_github_config", return_value={"auth_method": "gh_cli"}
+                ):
                     validation_result = ValidationResult.passed(
                         WizardStep.GITHUB_VALIDATE,
                         details={"authenticated_user": "testuser", "has_repo_access": True},
@@ -287,9 +290,13 @@ class TestReconfigurationFlow:
         with patch("src.doit_cli.services.wizard_service.Confirm") as mock_confirm:
             mock_confirm.ask.return_value = True  # Confirm reconfigure
 
-            with patch.object(wizard, "detect_provider", return_value=(ProviderType.GITHUB, "git_remote")):
+            with patch.object(
+                wizard, "detect_provider", return_value=(ProviderType.GITHUB, "git_remote")
+            ):
                 with patch.object(wizard, "select_provider", return_value=ProviderType.GITHUB):
-                    with patch.object(wizard, "collect_github_config", return_value={"auth_method": "gh_cli"}):
+                    with patch.object(
+                        wizard, "collect_github_config", return_value={"auth_method": "gh_cli"}
+                    ):
                         validation_result = ValidationResult.passed(
                             WizardStep.GITHUB_VALIDATE,
                             details={"authenticated_user": "testuser", "has_repo_access": True},

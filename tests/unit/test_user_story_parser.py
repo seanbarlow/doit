@@ -14,7 +14,7 @@ def parser():
 @pytest.fixture
 def valid_spec_content():
     """Sample spec content with user stories."""
-    return '''# Feature Spec
+    return """# Feature Spec
 
 ## User Stories
 
@@ -34,13 +34,13 @@ As a new user, I want to register.
 ## Other Section
 
 Some other content here.
-'''
+"""
 
 
 @pytest.fixture
 def empty_spec_content():
     """Spec content without user stories."""
-    return '''# Feature Spec
+    return """# Feature Spec
 
 ## Overview
 
@@ -49,7 +49,7 @@ This is a feature without user stories.
 ## Requirements
 
 Some requirements here.
-'''
+"""
 
 
 class TestUserStoryParser:
@@ -109,21 +109,21 @@ class TestUserStoryParser:
 
     def test_malformed_story_header(self, parser):
         """Test handling malformed story headers."""
-        content = '''
+        content = """
 ### User Story - Missing Number (Priority: P1)
 
 Description here.
-'''
+"""
         stories = parser.parse(content)
         assert len(stories) == 0
 
     def test_alternative_priority_formats(self, parser):
         """Test various priority formats."""
-        content = '''
+        content = """
 ### User Story 1 - Test (Priority: p1)
 
 Description.
-'''
+"""
         stories = parser.parse(content)
         assert len(stories) == 1
         assert stories[0].priority == "P1"

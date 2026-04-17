@@ -132,35 +132,27 @@ class TestMemorySearchCommand:
 
     def test_search_with_source_filter_governance(self, runner, temp_project):
         """Test search with governance source filter."""
-        result = runner.invoke(
-            app, ["memory", "search", "vision", "--source", "governance"]
-        )
+        result = runner.invoke(app, ["memory", "search", "vision", "--source", "governance"])
         assert result.exit_code == 0
         # Should find results in constitution.md or roadmap.md
         assert "Memory Search Results" in result.output or "No results found" in result.output
 
     def test_search_with_source_filter_specs(self, runner, temp_project):
         """Test search with specs source filter."""
-        result = runner.invoke(
-            app, ["memory", "search", "FR-001", "--source", "specs"]
-        )
+        result = runner.invoke(app, ["memory", "search", "FR-001", "--source", "specs"])
         assert result.exit_code == 0
         # Should find results in spec files
         assert "Memory Search Results" in result.output or "results" in result.output.lower()
 
     def test_search_with_invalid_source(self, runner, temp_project):
         """Test search with invalid source filter."""
-        result = runner.invoke(
-            app, ["memory", "search", "test", "--source", "invalid"]
-        )
+        result = runner.invoke(app, ["memory", "search", "test", "--source", "invalid"])
         assert result.exit_code == 1
         assert "Invalid source filter" in result.output
 
     def test_search_with_query_type_phrase(self, runner, temp_project):
         """Test search with phrase query type."""
-        result = runner.invoke(
-            app, ["memory", "search", "task management", "--type", "phrase"]
-        )
+        result = runner.invoke(app, ["memory", "search", "task management", "--type", "phrase"])
         assert result.exit_code == 0
 
     def test_search_with_query_type_natural(self, runner, temp_project):
@@ -175,54 +167,40 @@ class TestMemorySearchCommand:
 
     def test_search_with_query_type_regex(self, runner, temp_project):
         """Test search with regex query type."""
-        result = runner.invoke(
-            app, ["memory", "search", "FR-00[1-3]", "--type", "regex"]
-        )
+        result = runner.invoke(app, ["memory", "search", "FR-00[1-3]", "--type", "regex"])
         assert result.exit_code == 0
 
     def test_search_with_invalid_regex(self, runner, temp_project):
         """Test search with invalid regex pattern."""
-        result = runner.invoke(
-            app, ["memory", "search", "[invalid(regex", "--regex"]
-        )
+        result = runner.invoke(app, ["memory", "search", "[invalid(regex", "--regex"])
         assert result.exit_code == 3
         assert "Invalid regex" in result.output or "Error" in result.output
 
     def test_search_with_invalid_query_type(self, runner, temp_project):
         """Test search with invalid query type."""
-        result = runner.invoke(
-            app, ["memory", "search", "test", "--type", "invalid"]
-        )
+        result = runner.invoke(app, ["memory", "search", "test", "--type", "invalid"])
         assert result.exit_code == 1
         assert "Invalid query type" in result.output
 
     def test_search_with_max_results(self, runner, temp_project):
         """Test search with max results limit."""
-        result = runner.invoke(
-            app, ["memory", "search", "task", "--max", "5"]
-        )
+        result = runner.invoke(app, ["memory", "search", "task", "--max", "5"])
         assert result.exit_code == 0
 
     def test_search_with_invalid_max_results(self, runner, temp_project):
         """Test search with invalid max results value."""
-        result = runner.invoke(
-            app, ["memory", "search", "test", "--max", "500"]
-        )
+        result = runner.invoke(app, ["memory", "search", "test", "--max", "500"])
         assert result.exit_code == 1
         assert "Max results must be between 1 and 100" in result.output
 
     def test_search_case_sensitive(self, runner, temp_project):
         """Test case-sensitive search."""
-        result = runner.invoke(
-            app, ["memory", "search", "AUTHENTICATION", "--case-sensitive"]
-        )
+        result = runner.invoke(app, ["memory", "search", "AUTHENTICATION", "--case-sensitive"])
         assert result.exit_code == 0
 
     def test_search_json_output(self, runner, temp_project):
         """Test search with JSON output."""
-        result = runner.invoke(
-            app, ["memory", "search", "task", "--json"]
-        )
+        result = runner.invoke(app, ["memory", "search", "task", "--json"])
         assert result.exit_code == 0
         # Verify output is valid JSON
         try:

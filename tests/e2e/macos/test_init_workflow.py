@@ -7,7 +7,6 @@ Tests the initialization workflow including:
 - Constitution.md creation
 """
 
-import os
 import subprocess
 from pathlib import Path
 
@@ -20,12 +19,7 @@ import pytest
 def test_init_creates_doit_directory(temp_project_dir, macos_test_env, comparison_tools):
     """Test that doit init creates .doit directory on macOS."""
     # Run doit init
-    result = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=temp_project_dir
-    )
+    result = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=temp_project_dir)
 
     # Check command succeeded
     assert result.returncode == 0, f"doit init failed: {result.stderr}"
@@ -56,12 +50,7 @@ def test_init_handles_macos_paths_with_spaces(tmp_path, macos_test_env):
     project_dir.mkdir(parents=True, exist_ok=True)
 
     # Run doit init
-    result = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=project_dir
-    )
+    result = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=project_dir)
 
     # Check command succeeded
     assert result.returncode == 0, f"doit init failed with spaces in path: {result.stderr}"
@@ -76,12 +65,7 @@ def test_init_handles_macos_paths_with_spaces(tmp_path, macos_test_env):
 def test_init_creates_constitution_with_lf_line_endings(temp_project_dir, comparison_tools):
     """Test that constitution.md is created with LF line endings on macOS."""
     # Run doit init
-    result = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=temp_project_dir
-    )
+    result = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=temp_project_dir)
 
     assert result.returncode == 0, f"doit init failed: {result.stderr}"
 
@@ -103,16 +87,14 @@ def test_init_handles_library_paths(macos_test_env, macos_path_samples):
 
     # Create test directory in temporary location (not actual ~/Library to avoid pollution)
     import tempfile
+
     with tempfile.TemporaryDirectory(prefix="doit_test_library_") as tmpdir:
         library_style_path = Path(tmpdir) / "Application Support" / "doit_test"
         library_style_path.mkdir(parents=True, exist_ok=True)
 
         # Run doit init
         result = subprocess.run(
-            ["doit", "init"],
-            capture_output=True,
-            text=True,
-            cwd=library_style_path
+            ["doit", "init"], capture_output=True, text=True, cwd=library_style_path
         )
 
         # Check command succeeded
@@ -128,12 +110,7 @@ def test_init_handles_library_paths(macos_test_env, macos_path_samples):
 def test_init_preserves_existing_git_config(temp_project_dir, git_repo):
     """Test that doit init doesn't interfere with existing git configuration."""
     # Use git_repo fixture which already has git initialized
-    result = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=git_repo
-    )
+    result = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=git_repo)
 
     assert result.returncode == 0, f"doit init failed in git repo: {result.stderr}"
 
@@ -143,10 +120,7 @@ def test_init_preserves_existing_git_config(temp_project_dir, git_repo):
 
     # Check git config is still intact
     git_config_result = subprocess.run(
-        ["git", "config", "user.email"],
-        capture_output=True,
-        text=True,
-        cwd=git_repo
+        ["git", "config", "user.email"], capture_output=True, text=True, cwd=git_repo
     )
 
     assert git_config_result.returncode == 0, "Git config was corrupted"
@@ -158,12 +132,7 @@ def test_init_preserves_existing_git_config(temp_project_dir, git_repo):
 def test_init_creates_all_required_files(temp_project_dir):
     """Test that doit init creates all required files and directories."""
     # Run doit init
-    result = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=temp_project_dir
-    )
+    result = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=temp_project_dir)
 
     assert result.returncode == 0, f"doit init failed: {result.stderr}"
 
@@ -194,12 +163,7 @@ def test_init_handles_unicode_in_project_path(tmp_path, macos_test_env):
     project_dir.mkdir(parents=True, exist_ok=True)
 
     # Run doit init
-    result = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=project_dir
-    )
+    result = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=project_dir)
 
     # Check command succeeded
     assert result.returncode == 0, f"doit init failed with Unicode in path: {result.stderr}"
@@ -214,22 +178,12 @@ def test_init_handles_unicode_in_project_path(tmp_path, macos_test_env):
 def test_init_idempotent(temp_project_dir):
     """Test that running doit init multiple times is safe (idempotent)."""
     # Run doit init first time
-    result1 = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=temp_project_dir
-    )
+    result1 = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=temp_project_dir)
 
     assert result1.returncode == 0, f"First doit init failed: {result1.stderr}"
 
     # Run doit init second time
-    result2 = subprocess.run(
-        ["doit", "init"],
-        capture_output=True,
-        text=True,
-        cwd=temp_project_dir
-    )
+    result2 = subprocess.run(["doit", "init"], capture_output=True, text=True, cwd=temp_project_dir)
 
     # Should succeed or gracefully handle existing .doit directory
     assert result2.returncode in (0, 1), f"Second doit init had unexpected error: {result2.stderr}"

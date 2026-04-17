@@ -8,14 +8,12 @@ and Unicode normalization.
 import os
 import platform
 import re
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 try:
-    from .unicode_utils import normalize_nfc, normalize_nfd, compare_normalized
+    from .unicode_utils import compare_normalized, normalize_nfc
 except ImportError:
     # Fallback for when module is imported via sys.path.insert
-    from unicode_utils import normalize_nfc, normalize_nfd, compare_normalized
+    from unicode_utils import compare_normalized, normalize_nfc  # type: ignore[no-redef]
 
 
 class ComparisonTools:
@@ -33,7 +31,7 @@ class ComparisonTools:
         normalize_paths: bool = True,
         normalize_line_endings: bool = True,
         normalize_unicode: bool = True,
-        target_platform: Optional[str] = None
+        target_platform: str | None = None,
     ) -> str:
         """Normalize output for cross-platform comparison.
 
@@ -64,7 +62,7 @@ class ComparisonTools:
 
         return result
 
-    def normalize_path(self, path_or_text: str, target_platform: Optional[str] = None) -> str:
+    def normalize_path(self, path_or_text: str, target_platform: str | None = None) -> str:
         """Normalize path separators in text.
 
         Args:
@@ -83,12 +81,8 @@ class ComparisonTools:
         return path_or_text
 
     def compare_outputs(
-        self,
-        output1: str,
-        output2: str,
-        normalize: bool = True,
-        ignore_whitespace: bool = False
-    ) -> Tuple[bool, List[str]]:
+        self, output1: str, output2: str, normalize: bool = True, ignore_whitespace: bool = False
+    ) -> tuple[bool, list[str]]:
         """Compare two outputs, optionally normalizing them first.
 
         Args:
@@ -125,16 +119,13 @@ class ComparisonTools:
             line2 = lines2[i] if i < len(lines2) else ""
 
             if line1 != line2:
-                differences.append(f"Line {i+1}: '{line1}' vs '{line2}'")
+                differences.append(f"Line {i + 1}: '{line1}' vs '{line2}'")
 
         return False, differences[:10]  # Limit to first 10 differences
 
     def handle_unicode_differences(
-        self,
-        text1: str,
-        text2: str,
-        auto_normalize: bool = True
-    ) -> Tuple[bool, str]:
+        self, text1: str, text2: str, auto_normalize: bool = True
+    ) -> tuple[bool, str]:
         """Handle Unicode normalization differences between texts.
 
         Args:
@@ -159,7 +150,7 @@ class ComparisonTools:
 
         return False, "Texts differ even after Unicode normalization"
 
-    def extract_paths_from_output(self, output: str) -> List[str]:
+    def extract_paths_from_output(self, output: str) -> list[str]:
         """Extract file paths from output text.
 
         Args:
@@ -170,10 +161,10 @@ class ComparisonTools:
         """
         # Common path patterns
         patterns = [
-            r'[A-Za-z]:[/\\][^\s:]+',  # Windows absolute paths
-            r'/[^\s:]+',  # Unix absolute paths
-            r'\./[^\s:]+',  # Relative paths starting with ./
-            r'[^\s/\\:]+/[^\s:]+',  # Paths with at least one /
+            r"[A-Za-z]:[/\\][^\s:]+",  # Windows absolute paths
+            r"/[^\s:]+",  # Unix absolute paths
+            r"\./[^\s:]+",  # Relative paths starting with ./
+            r"[^\s/\\:]+/[^\s:]+",  # Paths with at least one /
         ]
 
         paths = []
@@ -194,11 +185,8 @@ class ComparisonTools:
         return unique_paths
 
     def compare_file_contents(
-        self,
-        filepath1: str,
-        filepath2: str,
-        normalize: bool = True
-    ) -> Tuple[bool, List[str]]:
+        self, filepath1: str, filepath2: str, normalize: bool = True
+    ) -> tuple[bool, list[str]]:
         """Compare contents of two files.
 
         Args:
@@ -216,16 +204,16 @@ class ComparisonTools:
             return False, [f"File not found: {filepath2}"]
 
         try:
-            with open(filepath1, "r", encoding="utf-8") as f1:
+            with open(filepath1, encoding="utf-8") as f1:
                 content1 = f1.read()
 
-            with open(filepath2, "r", encoding="utf-8") as f2:
+            with open(filepath2, encoding="utf-8") as f2:
                 content2 = f2.read()
 
             return self.compare_outputs(content1, content2, normalize=normalize)
 
-        except (IOError, UnicodeDecodeError) as e:
-            return False, [f"Error reading files: {str(e)}"]
+        except (OSError, UnicodeDecodeError) as e:
+            return False, [f"Error reading files: {e!s}"]
 
     def verify_line_endings(self, filepath: str) -> str:
         """Detect line ending type in a file.
@@ -261,10 +249,10 @@ class ComparisonTools:
 
             return "NONE"
 
-        except (IOError, OSError):
+        except OSError:
             return "NONE"
 
-    def get_platform_info(self) -> Dict[str, any]:
+    def get_platform_info(self) -> dict[str, any]:
         """Get information about the current platform for comparison.
 
         Returns:
@@ -289,7 +277,7 @@ class ComparisonTools:
         output1: str,
         output2: str,
         platform1: str = "current",
-        platform2: str = "expected"
+        platform2: str = "expected",
     ) -> str:
         """Create a detailed comparison report.
 
@@ -307,11 +295,11 @@ class ComparisonTools:
 
         report = [
             f"# Comparison Report: {name}",
-            f"",
+            "",
             f"**Platform 1**: {platform1}",
             f"**Platform 2**: {platform2}",
             f"**Result**: {'✓ MATCH' if are_equal else '✗ MISMATCH'}",
-            f"",
+            "",
         ]
 
         if not are_equal:

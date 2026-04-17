@@ -1,26 +1,28 @@
 """CLI commands for doit-cli."""
 
-from .init_command import init_command, run_init, parse_agent_string
+from __future__ import annotations
+
+from .init_command import init_command, parse_agent_string, run_init
 from .memory_command import memory_app
 from .verify_command import verify_command
 from .workflow_mixin import (
     WorkflowMixin,
-    non_interactive_option,
-    workflow_command_options,
-    validate_required_defaults,
     create_non_interactive_workflow,
+    non_interactive_option,
+    validate_required_defaults,
+    workflow_command_options,
 )
 
 __all__ = [
-    "init_command",
-    "run_init",
-    "parse_agent_string",
-    "memory_app",
-    "verify_command",
     # Workflow support
     "WorkflowMixin",
-    "non_interactive_option",
-    "workflow_command_options",
-    "validate_required_defaults",
     "create_non_interactive_workflow",
+    "init_command",
+    "memory_app",
+    "non_interactive_option",
+    "parse_agent_string",
+    "run_init",
+    "validate_required_defaults",
+    "verify_command",
+    "workflow_command_options",
 ]

@@ -3,7 +3,6 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -130,9 +129,7 @@ class TestAnalyticsCyclesCommand:
 
     def test_cycles_with_days_filter(self, doit_project_with_analytics):
         """Test cycles command with days filter."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "cycles", "--days", "30"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "cycles", "--days", "30")
 
         assert result.returncode == 0
 
@@ -165,9 +162,7 @@ class TestAnalyticsVelocityCommand:
 
     def test_velocity_with_weeks_filter(self, doit_project_with_analytics):
         """Test velocity command with weeks filter."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "velocity", "--weeks", "4"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "velocity", "--weeks", "4")
 
         # Returns 0 on success, 1 on insufficient data
         assert result.returncode in [0, 1]
@@ -175,9 +170,7 @@ class TestAnalyticsVelocityCommand:
 
     def test_velocity_json_format(self, doit_project_with_analytics):
         """Test velocity command with JSON format."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "velocity", "--format", "json"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "velocity", "--format", "json")
 
         # Returns 0 on success, 1 on insufficient data
         assert result.returncode in [0, 1]
@@ -188,9 +181,7 @@ class TestAnalyticsVelocityCommand:
 
     def test_velocity_csv_format(self, doit_project_with_analytics):
         """Test velocity command with CSV format."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "velocity", "--format", "csv"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "velocity", "--format", "csv")
 
         # Returns 0 on success, 1 on insufficient data
         assert result.returncode in [0, 1]
@@ -202,18 +193,14 @@ class TestAnalyticsSpecCommand:
 
     def test_spec_existing(self, doit_project_with_analytics):
         """Test spec command with existing spec."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "spec", "001-complete-spec"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "spec", "001-complete-spec")
 
         assert result.returncode == 0
         assert "001-complete-spec" in result.stdout
 
     def test_spec_not_found(self, doit_project_with_analytics):
         """Test spec command with non-existent spec."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "spec", "999-nonexistent"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "spec", "999-nonexistent")
 
         assert result.returncode == 1
         assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()
@@ -254,9 +241,7 @@ class TestAnalyticsExportCommand:
 
     def test_export_json(self, doit_project_with_analytics):
         """Test export command creates JSON file."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "export", "--format", "json"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "export", "--format", "json")
 
         assert result.returncode == 0
         # Should indicate file was created
@@ -307,9 +292,7 @@ class TestAnalyticsExitCodes:
 
     def test_exit_code_1_not_found(self, doit_project_with_analytics):
         """Test exit code 1 when spec not found."""
-        result = run_analytics_command(
-            doit_project_with_analytics, "spec", "nonexistent"
-        )
+        result = run_analytics_command(doit_project_with_analytics, "spec", "nonexistent")
         assert result.returncode == 1
 
     def test_exit_code_2_error(self, non_doit_project):

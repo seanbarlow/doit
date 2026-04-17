@@ -5,7 +5,7 @@ Supports various label formats including standard (priority:P1), short form (P1)
 semantic (critical, high, medium, low), and slash format (priority/critical).
 """
 
-from typing import List
+from __future__ import annotations
 
 # Priority mapping table covering common GitHub label patterns
 PRIORITY_MAP = {
@@ -50,7 +50,7 @@ PRIORITY_MAP = {
 DEFAULT_PRIORITY = "P3"
 
 
-def map_labels_to_priority(labels: List[str]) -> str:
+def map_labels_to_priority(labels: list[str]) -> str:
     """Map GitHub issue labels to roadmap priority.
 
     Searches through the provided labels and returns the first matching priority.
@@ -82,7 +82,7 @@ def map_labels_to_priority(labels: List[str]) -> str:
     return DEFAULT_PRIORITY
 
 
-def get_supported_label_formats() -> List[str]:
+def get_supported_label_formats() -> list[str]:
     """Get list of all supported label formats for documentation.
 
     Returns:

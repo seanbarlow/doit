@@ -1,5 +1,7 @@
 """Data models for GitHub Copilot prompt synchronization."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -40,7 +42,7 @@ class CommandTemplate:
         return f"{self.name}.prompt.md"
 
     @classmethod
-    def from_path(cls, path: Path) -> "CommandTemplate":
+    def from_path(cls, path: Path) -> CommandTemplate:
         """Create a CommandTemplate from a file path."""
         content = path.read_text(encoding="utf-8")
         modified_at = datetime.fromtimestamp(path.stat().st_mtime)
@@ -82,7 +84,7 @@ class PromptFile:
     content: str = field(default="", repr=False)
 
     @classmethod
-    def from_path(cls, path: Path) -> "PromptFile":
+    def from_path(cls, path: Path) -> PromptFile:
         """Create a PromptFile from an existing file path."""
         content = path.read_text(encoding="utf-8")
         generated_at = datetime.fromtimestamp(path.stat().st_mtime)
@@ -131,9 +133,10 @@ class SyncResult:
     def add_operation(self, operation: FileOperation) -> None:
         """Add a file operation to the result."""
         self.operations.append(operation)
-        if operation.operation_type == OperationType.CREATED:
-            self.synced += 1
-        elif operation.operation_type == OperationType.UPDATED:
+        if (
+            operation.operation_type == OperationType.CREATED
+            or operation.operation_type == OperationType.UPDATED
+        ):
             self.synced += 1
         elif operation.operation_type == OperationType.SKIPPED:
             self.skipped += 1

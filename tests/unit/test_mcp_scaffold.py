@@ -1,6 +1,7 @@
 """Tests for the doit_scaffold and doit_verify MCP tools."""
 
 import json
+
 import pytest
 
 from doit_cli.mcp import MCP_AVAILABLE
@@ -13,8 +14,9 @@ class TestScaffoldTool:
     def test_scaffold_returns_json(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
 
-        from doit_cli.mcp.tools.scaffold_tool import register_scaffold_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.scaffold_tool import register_scaffold_tool
 
         mcp = FastMCP("test")
         register_scaffold_tool(mcp)
@@ -35,8 +37,9 @@ class TestVerifyTool:
     def test_verify_no_doit_folder(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
 
-        from doit_cli.mcp.tools.verify_tool import register_verify_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.verify_tool import register_verify_tool
 
         mcp = FastMCP("test")
         register_verify_tool(mcp)
@@ -57,8 +60,9 @@ class TestVerifyTool:
         (tmp_path / ".doit" / "config").mkdir(parents=True)
         (tmp_path / ".doit" / "logs").mkdir(parents=True)
 
-        from doit_cli.mcp.tools.verify_tool import register_verify_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.verify_tool import register_verify_tool
 
         mcp = FastMCP("test")
         register_verify_tool(mcp)

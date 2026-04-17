@@ -1,6 +1,6 @@
 """Tests for PowerShell error handling on Windows."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -53,8 +53,9 @@ Write-Host "After error (should not reach)"
 
     # Verify error captured
     assert result.exit_code != 0, "Script with error should have non-zero exit code"
-    assert len(result.stderr) > 0 or "cannot find" in result.stdout.lower(), \
+    assert len(result.stderr) > 0 or "cannot find" in result.stdout.lower(), (
         "Error message should be captured"
+    )
 
 
 @pytest.mark.windows
@@ -90,8 +91,7 @@ Write-Host "You chose: $Choice"
     result = powershell_executor.run_script(param_script, "-Choice", "InvalidOption")
 
     # Verify error (either non-zero exit or error message)
-    assert result.exit_code != 0 or len(result.stderr) > 0, \
-        "Invalid parameter should produce error"
+    assert result.exit_code != 0 or len(result.stderr) > 0, "Invalid parameter should produce error"
 
 
 @pytest.mark.windows
@@ -151,8 +151,9 @@ Write-Host "Completed (should not reach)"
 
     # Verify timeout handling
     assert result.exit_code == -1, "Timeout should result in exit code -1"
-    assert "Timeout" in result.stderr or "timeout" in result.stderr.lower(), \
+    assert "Timeout" in result.stderr or "timeout" in result.stderr.lower(), (
         "Timeout error should be indicated in stderr"
+    )
 
 
 @pytest.mark.windows
@@ -174,11 +175,10 @@ def test_exit_code_propagation(temp_project_dir, powershell_executor):
 
     for code in test_codes:
         script = scripts_dir / f"exit-{code}.ps1"
-        script.write_text(f'exit {code}', encoding="utf-8")
+        script.write_text(f"exit {code}", encoding="utf-8")
 
         result = powershell_executor.run_script(script)
-        assert result.exit_code == code, \
-            f"Expected exit code {code}, got {result.exit_code}"
+        assert result.exit_code == code, f"Expected exit code {code}, got {result.exit_code}"
 
 
 @pytest.mark.windows

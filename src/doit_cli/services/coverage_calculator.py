@@ -1,7 +1,8 @@
 """Calculator for requirement coverage metrics."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 from ..models.crossref_models import (
     CoverageReport,
@@ -22,8 +23,8 @@ class CoverageCalculator:
 
     def __init__(
         self,
-        requirement_parser: Optional[RequirementParser] = None,
-        task_parser: Optional[TaskParser] = None,
+        requirement_parser: RequirementParser | None = None,
+        task_parser: TaskParser | None = None,
     ) -> None:
         """Initialize calculator with optional parsers.
 
@@ -37,7 +38,7 @@ class CoverageCalculator:
     def calculate(
         self,
         spec_path: Path,
-        tasks_path: Optional[Path] = None,
+        tasks_path: Path | None = None,
     ) -> CoverageReport:
         """Calculate coverage for a specification.
 

@@ -7,6 +7,8 @@ language questions into search queries by:
 3. Identifying section hints for targeted searching
 """
 
+from __future__ import annotations
+
 import re
 from dataclasses import dataclass, field
 from enum import Enum
@@ -248,9 +250,7 @@ class QueryInterpreter:
         search_terms = self._generate_search_terms(keywords, question_type)
 
         # Calculate overall confidence
-        confidence = self._calculate_confidence(
-            keywords, section_hints, type_confidence
-        )
+        confidence = self._calculate_confidence(keywords, section_hints, type_confidence)
 
         return InterpretedQuery(
             original_query=query,
@@ -295,11 +295,7 @@ class QueryInterpreter:
         words = cleaned.split()
 
         # Filter stop words and short words
-        keywords = [
-            word
-            for word in words
-            if word not in self.stop_words and len(word) > 2
-        ]
+        keywords = [word for word in words if word not in self.stop_words and len(word) > 2]
 
         # Preserve order but remove duplicates
         seen = set()
@@ -334,9 +330,7 @@ class QueryInterpreter:
 
         return list(hints)
 
-    def _generate_search_terms(
-        self, keywords: list[str], question_type: QuestionType
-    ) -> list[str]:
+    def _generate_search_terms(self, keywords: list[str], question_type: QuestionType) -> list[str]:
         """Generate optimized search terms from keywords.
 
         Args:

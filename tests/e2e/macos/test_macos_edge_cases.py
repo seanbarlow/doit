@@ -1,8 +1,8 @@
 """E2E tests for macOS-specific edge cases."""
 
-import subprocess
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 @pytest.mark.macos
@@ -149,7 +149,6 @@ def test_concurrent_file_access(tmp_path, macos_test_env):
         pytest.skip("Test requires macOS")
 
     import threading
-    import time
 
     test_file = tmp_path / "concurrent.txt"
     test_file.write_text("Initial\n")
@@ -185,7 +184,7 @@ def test_file_locking_behavior(tmp_path, macos_test_env):
 
     # macOS supports advisory locking
     # Just verify basic operations work
-    with open(test_file, 'r') as f:
+    with open(test_file) as f:
         content = f.read()
         assert content == "Content\n"
 
@@ -206,7 +205,7 @@ def test_hidden_files_visibility(tmp_path, macos_test_env):
     assert hidden_file.read_text() == "Hidden content\n"
 
     # List all files including hidden
-    all_files = list(tmp_path.glob("*"))
+    list(tmp_path.glob("*"))
     hidden_files = list(tmp_path.glob(".*"))
 
     # Hidden file appears in .* glob
@@ -220,8 +219,8 @@ def test_tmpdir_cleanup(macos_test_env):
     if not macos_test_env["is_macos"]:
         pytest.skip("Test requires macOS")
 
-    import tempfile
     import shutil
+    import tempfile
 
     # Create temp directory
     temp_dir = tempfile.mkdtemp(prefix="doit_test_")

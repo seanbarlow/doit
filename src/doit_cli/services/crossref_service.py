@@ -1,7 +1,8 @@
 """Cross-reference service for spec-task traceability."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 from ..models.crossref_models import (
     CoverageReport,
@@ -26,7 +27,7 @@ class CrossReferenceService:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
+        project_root: Path | None = None,
         specs_dir: str = "specs",
     ) -> None:
         """Initialize the service.
@@ -46,8 +47,8 @@ class CrossReferenceService:
 
     def get_coverage(
         self,
-        spec_name: Optional[str] = None,
-        spec_path: Optional[Path] = None,
+        spec_name: str | None = None,
+        spec_path: Path | None = None,
     ) -> CoverageReport:
         """Get coverage report for a specification.
 
@@ -74,8 +75,8 @@ class CrossReferenceService:
     def get_tasks_for_requirement(
         self,
         requirement_id: str,
-        spec_name: Optional[str] = None,
-        tasks_path: Optional[Path] = None,
+        spec_name: str | None = None,
+        tasks_path: Path | None = None,
     ) -> list[Task]:
         """Get all tasks that implement a specific requirement.
 
@@ -91,27 +92,23 @@ class CrossReferenceService:
             ValueError: If neither spec_name nor tasks_path provided.
         """
         if tasks_path:
-            return self.task_parser.get_tasks_for_requirement(
-                requirement_id, tasks_path
-            )
+            return self.task_parser.get_tasks_for_requirement(requirement_id, tasks_path)
 
         if spec_name:
             feature_dir = self.project_root / self.specs_dir / spec_name
             tasks_file = feature_dir / "tasks.md"
             if not tasks_file.exists():
                 return []
-            return self.task_parser.get_tasks_for_requirement(
-                requirement_id, tasks_file
-            )
+            return self.task_parser.get_tasks_for_requirement(requirement_id, tasks_file)
 
         raise ValueError("Either spec_name or tasks_path must be provided")
 
     def locate_requirement(
         self,
         requirement_id: str,
-        spec_name: Optional[str] = None,
-        spec_path: Optional[Path] = None,
-    ) -> Optional[Requirement]:
+        spec_name: str | None = None,
+        spec_path: Path | None = None,
+    ) -> Requirement | None:
         """Find a requirement definition in a spec.
 
         Args:
@@ -140,9 +137,9 @@ class CrossReferenceService:
     def get_requirement_coverage(
         self,
         requirement_id: str,
-        spec_name: Optional[str] = None,
-        spec_path: Optional[Path] = None,
-    ) -> Optional[RequirementCoverage]:
+        spec_name: str | None = None,
+        spec_path: Path | None = None,
+    ) -> RequirementCoverage | None:
         """Get coverage details for a specific requirement.
 
         Args:
@@ -158,8 +155,8 @@ class CrossReferenceService:
 
     def validate_references(
         self,
-        spec_name: Optional[str] = None,
-        spec_path: Optional[Path] = None,
+        spec_name: str | None = None,
+        spec_path: Path | None = None,
     ) -> tuple[list[str], list[tuple[Task, str]]]:
         """Validate cross-references and find issues.
 
@@ -180,8 +177,8 @@ class CrossReferenceService:
 
     def get_all_requirements(
         self,
-        spec_name: Optional[str] = None,
-        spec_path: Optional[Path] = None,
+        spec_name: str | None = None,
+        spec_path: Path | None = None,
     ) -> list[Requirement]:
         """Get all requirements from a spec.
 
@@ -207,8 +204,8 @@ class CrossReferenceService:
 
     def get_all_tasks(
         self,
-        spec_name: Optional[str] = None,
-        tasks_path: Optional[Path] = None,
+        spec_name: str | None = None,
+        tasks_path: Path | None = None,
     ) -> list[Task]:
         """Get all tasks from a tasks file.
 

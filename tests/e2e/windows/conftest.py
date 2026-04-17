@@ -1,16 +1,17 @@
 """Pytest configuration and fixtures for Windows E2E tests."""
+
 import os
-import sys
 import subprocess
+import sys
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
 
 # Import utility classes
 sys.path.insert(0, str(Path(__file__).parents[3]))
-from tests.utils.windows.data_structures import TestEnvironment, PowerShellScriptResult
 from tests.utils.windows.comparison_utils import ComparisonTools
+from tests.utils.windows.data_structures import PowerShellScriptResult, TestEnvironment
 from tests.utils.windows.path_utils import WindowsPathValidator
 
 
@@ -52,9 +53,7 @@ def windows_test_env(tmp_path_factory) -> TestEnvironment:
 
     # Get Git version
     try:
-        git_result = subprocess.run(
-            ["git", "--version"], capture_output=True, text=True, timeout=5
-        )
+        git_result = subprocess.run(["git", "--version"], capture_output=True, text=True, timeout=5)
         git_version = git_result.stdout.strip() if git_result.returncode == 0 else "unknown"
     except (FileNotFoundError, subprocess.TimeoutExpired):
         git_version = "not available"
@@ -126,13 +125,14 @@ def powershell_executor():
             if not script_path.exists():
                 raise FileNotFoundError(f"PowerShell script not found: {script_path}")
 
-            cmd = ["pwsh", "-File", str(script_path)] + list(args)
+            cmd = ["pwsh", "-File", str(script_path), *list(args)]
             start_time = time.time()
 
             # Merge custom env with system environment
-            env = kwargs.get("env", None)
+            env = kwargs.get("env")
             if env:
                 import os
+
                 merged_env = os.environ.copy()
                 merged_env.update(env)
             else:
@@ -143,7 +143,12 @@ def powershell_executor():
 
             try:
                 result = subprocess.run(
-                    cmd, capture_output=True, text=True, encoding="utf-8", timeout=exec_timeout, env=merged_env
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=exec_timeout,
+                    env=merged_env,
                 )
 
                 execution_time = time.time() - start_time
@@ -214,7 +219,7 @@ def powershell_executor():
             except subprocess.TimeoutExpired:
                 return False, "Syntax validation timed out"
             except Exception as e:
-                return False, f"Validation error: {str(e)}"
+                return False, f"Validation error: {e!s}"
 
     return SimplePowerShellExecutor()
 
@@ -244,6 +249,7 @@ def path_validator() -> WindowsPathValidator:
 # ============================================================================
 # Test Reporting Hooks for CI/CD Integration
 # ============================================================================
+
 
 def pytest_report_header(config):
     """
@@ -305,7 +311,6 @@ def pytest_runtest_makereport(item, call):
     This hook wraps around test execution and can add additional
     information to test reports, especially for failures.
     """
-    import time
     import platform
 
     # Get the standard test report
@@ -351,7 +356,7 @@ def pytest_runtest_makereport(item, call):
                 [
                     f"Path Separator: {os.sep}",
                     f"Alternate Separator: {os.altsep}",
-                    f"Line Separator: {repr(os.linesep)}",
+                    f"Line Separator: {os.linesep!r}",
                 ]
             )
 
@@ -392,9 +397,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     # Add recommendations for CI
     if is_ci and failed > 0:
         terminalreporter.write_sep("!", "CI Failure Recommendations", red=True)
-        terminalreporter.write_line(
-            "Some tests failed in CI. Check the following:"
-        )
+        terminalreporter.write_line("Some tests failed in CI. Check the following:")
         terminalreporter.write_line("- Review Windows Diagnostics sections above")
         terminalreporter.write_line("- Verify PowerShell 7.x is available")
         terminalreporter.write_line("- Check file permissions and paths")

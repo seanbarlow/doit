@@ -1,6 +1,6 @@
 """Tests comparing PowerShell and Bash script behavior on Windows."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -82,9 +82,7 @@ for ($i = 1; $i -le $Count; $i++) {
     )
 
     # Execute with parameters
-    ps_result = powershell_executor.run_script(
-        ps_script, "-Name", "Test", "-Count", "3"
-    )
+    ps_result = powershell_executor.run_script(ps_script, "-Name", "Test", "-Count", "3")
 
     assert ps_result.exit_code == 0, f"PowerShell script failed: {ps_result.stderr}"
     assert "Hello, Test - Iteration 1" in ps_result.stdout

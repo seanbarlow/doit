@@ -1,7 +1,6 @@
 """E2E tests for case-sensitivity on macOS filesystems."""
 
 import pytest
-from pathlib import Path
 
 
 @pytest.mark.macos

@@ -4,7 +4,7 @@ This module provides the fixit command and subcommands
 for the doit CLI tool.
 """
 
-from typing import Optional
+from __future__ import annotations
 
 import typer
 from rich.console import Console
@@ -41,19 +41,13 @@ def main() -> None:
 
 @app.command("start")
 def start(
-    issue_id: Optional[int] = typer.Argument(
+    issue_id: int | None = typer.Argument(
         None,
         help="GitHub issue number to fix",
     ),
-    resume: bool = typer.Option(
-        False, "--resume", "-r", help="Resume existing workflow"
-    ),
-    manual: bool = typer.Option(
-        False, "--manual", "-m", help="Skip automatic investigation"
-    ),
-    branch: Optional[str] = typer.Option(
-        None, "--branch", "-b", help="Custom branch name"
-    ),
+    resume: bool = typer.Option(False, "--resume", "-r", help="Resume existing workflow"),
+    manual: bool = typer.Option(False, "--manual", "-m", help="Skip automatic investigation"),
+    branch: str | None = typer.Option(None, "--branch", "-b", help="Custom branch name"),
 ) -> None:
     """Start or continue a bug-fix workflow.
 
@@ -74,8 +68,7 @@ def start(
     # Check GitHub availability
     if not service.is_github_available():
         console.print(
-            "[yellow]Warning:[/yellow] GitHub API is not available. "
-            "Some features may not work."
+            "[yellow]Warning:[/yellow] GitHub API is not available. Some features may not work."
         )
 
     # If no issue_id, prompt for selection
@@ -102,9 +95,7 @@ def start(
         )
 
         if resume:
-            console.print(
-                f"[green]Resumed[/green] workflow for issue [cyan]#{issue_id}[/cyan]"
-            )
+            console.print(f"[green]Resumed[/green] workflow for issue [cyan]#{issue_id}[/cyan]")
         else:
             display_workflow_started(workflow, issue_id)
 
@@ -118,15 +109,9 @@ def start(
 
 @app.command("list")
 def list_bugs(
-    label: str = typer.Option(
-        "bug", "--label", "-l", help="Label to filter by"
-    ),
-    limit: int = typer.Option(
-        20, "--limit", "-n", help="Maximum number of bugs to show"
-    ),
-    output_format: str = typer.Option(
-        "table", "--format", "-f", help="Output format: table, json"
-    ),
+    label: str = typer.Option("bug", "--label", "-l", help="Label to filter by"),
+    limit: int = typer.Option(20, "--limit", "-n", help="Maximum number of bugs to show"),
+    output_format: str = typer.Option("table", "--format", "-f", help="Output format: table, json"),
 ) -> None:
     """List open bugs from GitHub.
 
@@ -151,6 +136,7 @@ def list_bugs(
 
     if output_format == "json":
         import json
+
         data = [bug.to_dict() for bug in bugs]
         console.print(json.dumps(data, indent=2))
     else:
@@ -165,12 +151,12 @@ def list_bugs(
 
         console.print(table)
 
-    console.print(f"\nUse [cyan]doit fixit <issue_id>[/cyan] to start a workflow.")
+    console.print("\nUse [cyan]doit fixit <issue_id>[/cyan] to start a workflow.")
 
 
 @app.command("status")
 def status(
-    issue_id: Optional[int] = typer.Argument(
+    issue_id: int | None = typer.Argument(
         None,
         help="GitHub issue number (or shows active workflow)",
     ),
@@ -208,13 +194,11 @@ def status(
 
 @app.command("cancel")
 def cancel(
-    issue_id: Optional[int] = typer.Argument(
+    issue_id: int | None = typer.Argument(
         None,
         help="GitHub issue number to cancel",
     ),
-    force: bool = typer.Option(
-        False, "--force", "-f", help="Skip confirmation"
-    ),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation"),
 ) -> None:
     """Cancel an active fixit workflow.
 
@@ -249,9 +233,7 @@ def cancel(
 
     success = service.cancel_workflow(issue_id)
     if success:
-        console.print(
-            f"[green]Cancelled[/green] workflow for issue [cyan]#{issue_id}[/cyan]"
-        )
+        console.print(f"[green]Cancelled[/green] workflow for issue [cyan]#{issue_id}[/cyan]")
     else:
         console.print(f"[red]Failed to cancel workflow for issue #{issue_id}.[/red]")
         raise typer.Exit(code=1)
@@ -295,22 +277,23 @@ def list_workflows() -> None:
 
 @app.command("investigate")
 def investigate(
-    issue_id: Optional[int] = typer.Argument(
+    issue_id: int | None = typer.Argument(
         None,
         help="GitHub issue number (or uses active workflow)",
     ),
-    add_finding: Optional[str] = typer.Option(
+    add_finding: str | None = typer.Option(
         None, "--add-finding", "-a", help="Add a finding to the investigation"
     ),
     finding_type: str = typer.Option(
-        "hypothesis", "--type", "-t", help="Finding type: hypothesis, confirmed_cause, affected_file, reproduction_step"
+        "hypothesis",
+        "--type",
+        "-t",
+        help="Finding type: hypothesis, confirmed_cause, affected_file, reproduction_step",
     ),
-    checkpoint: Optional[str] = typer.Option(
+    checkpoint: str | None = typer.Option(
         None, "--checkpoint", "-c", help="Complete a checkpoint by ID"
     ),
-    done: bool = typer.Option(
-        False, "--done", "-d", help="Mark investigation complete"
-    ),
+    done: bool = typer.Option(False, "--done", "-d", help="Mark investigation complete"),
 ) -> None:
     """Manage investigation for a fixit workflow.
 
@@ -344,13 +327,12 @@ def investigate(
         success = service.complete_investigation(issue_id)
         if success:
             console.print(
-                f"[green]Investigation complete![/green] "
-                f"Run [cyan]doit fixit plan[/cyan] to create a fix plan."
+                "[green]Investigation complete![/green] "
+                "Run [cyan]doit fixit plan[/cyan] to create a fix plan."
             )
         else:
             console.print(
-                "[red]Cannot complete investigation.[/red] "
-                "Add a confirmed_cause finding first."
+                "[red]Cannot complete investigation.[/red] Add a confirmed_cause finding first."
             )
             raise typer.Exit(code=1)
         return
@@ -397,12 +379,14 @@ def investigate(
         console.print()
 
     # Display investigation status
-    console.print(Panel(
-        f"[dim]Keywords:[/dim] {', '.join(plan.keywords[:5]) if plan.keywords else 'none'}\n\n"
-        "[dim]Checkpoints:[/dim]",
-        title=f"Investigation Plan: {plan.id}",
-        border_style="yellow",
-    ))
+    console.print(
+        Panel(
+            f"[dim]Keywords:[/dim] {', '.join(plan.keywords[:5]) if plan.keywords else 'none'}\n\n"
+            "[dim]Checkpoints:[/dim]",
+            title=f"Investigation Plan: {plan.id}",
+            border_style="yellow",
+        )
+    )
 
     # Show checkpoints
     for cp in plan.checkpoints:
@@ -419,16 +403,14 @@ def investigate(
 
 @app.command("plan")
 def plan(
-    issue_id: Optional[int] = typer.Argument(
+    issue_id: int | None = typer.Argument(
         None,
         help="GitHub issue number (or uses active workflow)",
     ),
     generate: bool = typer.Option(
         False, "--generate", "-g", help="Generate fix plan from investigation"
     ),
-    submit: bool = typer.Option(
-        False, "--submit", "-s", help="Submit plan for review"
-    ),
+    submit: bool = typer.Option(False, "--submit", "-s", help="Submit plan for review"),
 ) -> None:
     """Create or view a fix plan for a workflow.
 
@@ -498,13 +480,11 @@ def plan(
 
 @app.command("review")
 def review(
-    issue_id: Optional[int] = typer.Argument(
+    issue_id: int | None = typer.Argument(
         None,
         help="GitHub issue number (or uses active workflow)",
     ),
-    approve: bool = typer.Option(
-        False, "--approve", "-a", help="Approve the fix plan"
-    ),
+    approve: bool = typer.Option(False, "--approve", "-a", help="Approve the fix plan"),
 ) -> None:
     """Review and approve a fix plan.
 
@@ -534,8 +514,7 @@ def review(
     plan_obj = service.get_fix_plan(issue_id)
     if plan_obj is None:
         console.print(
-            "[yellow]No fix plan found.[/yellow] "
-            "Run [cyan]doit fixit plan --generate[/cyan] first."
+            "[yellow]No fix plan found.[/yellow] Run [cyan]doit fixit plan --generate[/cyan] first."
         )
         raise typer.Exit(code=0)
 
@@ -562,9 +541,7 @@ def review(
         return
 
     # Prompt for action
-    console.print(
-        "\n[dim]Use --approve to approve this plan, or edit and resubmit.[/dim]"
-    )
+    console.print("\n[dim]Use --approve to approve this plan, or edit and resubmit.[/dim]")
 
 
 # =============================================================================

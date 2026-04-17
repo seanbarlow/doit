@@ -3,6 +3,8 @@
 This module provides validators for step inputs with real-time feedback.
 """
 
+from __future__ import annotations
+
 import os
 import re
 from abc import ABC, abstractmethod
@@ -10,11 +12,10 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..models.workflow_models import (
-    WorkflowStep,
     StepResponse,
     ValidationResult,
+    WorkflowStep,
 )
-
 
 # =============================================================================
 # Validator Protocol and Base Class

@@ -4,9 +4,10 @@ This module provides functions to detect GitHub repository configuration and
 verify that the GitHub CLI (gh) is available and authenticated.
 """
 
+from __future__ import annotations
+
 import shutil
 import subprocess
-from typing import Optional, Tuple
 
 
 def has_github_remote() -> bool:
@@ -74,7 +75,7 @@ def is_gh_authenticated() -> bool:
         return False
 
 
-def get_github_config_status() -> Tuple[bool, str]:
+def get_github_config_status() -> tuple[bool, str]:
     """Get comprehensive GitHub configuration status.
 
     Returns:
@@ -101,7 +102,7 @@ def get_github_config_status() -> Tuple[bool, str]:
     return True, "GitHub integration available"
 
 
-def get_repository_name() -> Optional[str]:
+def get_repository_name() -> str | None:
     """Get the repository name from the GitHub remote URL.
 
     Returns:

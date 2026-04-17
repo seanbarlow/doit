@@ -1,7 +1,9 @@
 """Validate command for spec file linting and quality checking."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -10,41 +12,24 @@ from ..models.validation_models import ValidationConfig
 from ..services.report_generator import ReportGenerator
 from ..services.validation_service import ValidationService
 
-
 console = Console()
 
 # Type aliases for CLI options
-JsonFlag = Annotated[
-    bool,
-    typer.Option(
-        "--json", "-j",
-        help="Output results as JSON"
-    )
-]
+JsonFlag = Annotated[bool, typer.Option("--json", "-j", help="Output results as JSON")]
 
 AllFlag = Annotated[
-    bool,
-    typer.Option(
-        "--all", "-a",
-        help="Validate all specs in specs/ directory"
-    )
+    bool, typer.Option("--all", "-a", help="Validate all specs in specs/ directory")
 ]
 
 VerboseFlag = Annotated[
-    bool,
-    typer.Option(
-        "--verbose", "-v",
-        help="Show detailed output including all issues"
-    )
+    bool, typer.Option("--verbose", "-v", help="Show detailed output including all issues")
 ]
 
 
 def validate_command(
     path: Annotated[
-        Optional[Path],
-        typer.Argument(
-            help="Spec file or directory to validate (defaults to current directory)"
-        )
+        Path | None,
+        typer.Argument(help="Spec file or directory to validate (defaults to current directory)"),
     ] = None,
     all_specs: AllFlag = False,
     json_output: JsonFlag = False,
@@ -115,7 +100,7 @@ def validate_command(
 
         elif target_path.is_file():
             # Validate single file
-            if not target_path.suffix.lower() == ".md":
+            if target_path.suffix.lower() != ".md":
                 if json_output:
                     print('{"error": "Not a markdown file"}')
                 else:

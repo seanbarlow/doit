@@ -1,7 +1,6 @@
 """Agent detector service for detecting existing AI agent configuration."""
 
-from pathlib import Path
-from typing import Optional
+from __future__ import annotations
 
 from ..models.agent import Agent
 from ..models.project import Project
@@ -77,7 +76,7 @@ class AgentDetector:
         """
         return self._has_copilot_setup()
 
-    def detect_primary_agent(self) -> Optional[Agent]:
+    def detect_primary_agent(self) -> Agent | None:
         """Detect the primary (most likely) agent for this project.
 
         Returns:

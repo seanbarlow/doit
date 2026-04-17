@@ -1,6 +1,5 @@
 """Unit tests for RuleEngine."""
 
-import pytest
 from pathlib import Path
 
 from doit_cli.models.validation_models import Severity, ValidationConfig

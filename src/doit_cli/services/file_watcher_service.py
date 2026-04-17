@@ -4,12 +4,13 @@ This module provides the FileWatcherService class for monitoring
 .doit/memory/ directory changes using the watchdog library.
 """
 
+from __future__ import annotations
+
 import threading
-import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Optional
 
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
@@ -43,7 +44,7 @@ class MemoryFileHandler(FileSystemEventHandler):
         self,
         memory_dir: Path,
         on_change: Callable[[FileChangeEvent], None],
-        ignored_patterns: list[str] = None,
+        ignored_patterns: list[str] | None = None,
     ):
         """Initialize handler.
 
@@ -68,10 +69,7 @@ class MemoryFileHandler(FileSystemEventHandler):
         from fnmatch import fnmatch
 
         name = Path(path).name
-        for pattern in self.ignored_patterns:
-            if fnmatch(name, pattern):
-                return True
-        return False
+        return any(fnmatch(name, pattern) for pattern in self.ignored_patterns)
 
     def _get_relative_path(self, src_path: str) -> str:
         """Get path relative to memory directory."""
@@ -124,9 +122,9 @@ class FileWatcherService:
 
     def __init__(
         self,
-        project_root: Path = None,
+        project_root: Path | None = None,
         notification_service: NotificationService = None,
-        current_user: str = None,
+        current_user: str | None = None,
     ):
         """Initialize FileWatcherService.
 
@@ -136,16 +134,14 @@ class FileWatcherService:
             current_user: Email of current user (to filter out self-changes)
         """
         self.project_root = project_root or Path.cwd()
-        self.notification_service = notification_service or NotificationService(
-            self.project_root
-        )
+        self.notification_service = notification_service or NotificationService(self.project_root)
         self.current_user = current_user or ""
 
-        self._observer: Optional[Observer] = None
+        self._observer: Observer | None = None
         self._is_running = False
         self._pending_changes: list[FileChangeEvent] = []
-        self._last_change_time: Optional[datetime] = None
-        self._debounce_timer: Optional[threading.Timer] = None
+        self._last_change_time: datetime | None = None
+        self._debounce_timer: threading.Timer | None = None
         self._lock = threading.Lock()
         self._on_change_callbacks: list[Callable[[list[FileChangeEvent]], None]] = []
 
@@ -159,9 +155,7 @@ class FileWatcherService:
         """Check if watcher is running."""
         return self._is_running
 
-    def add_change_callback(
-        self, callback: Callable[[list[FileChangeEvent]], None]
-    ) -> None:
+    def add_change_callback(self, callback: Callable[[list[FileChangeEvent]], None]) -> None:
         """Add a callback for batched change notifications.
 
         Args:
@@ -281,7 +275,7 @@ class FileWatcherService:
 
         self._is_running = False
 
-    def wait(self, timeout: float = None) -> None:
+    def wait(self, timeout: float | None = None) -> None:
         """Wait for watcher to stop.
 
         Args:
@@ -297,8 +291,8 @@ class FileWatcherManager:
     Use this to get a shared watcher instance across the application.
     """
 
-    _instance: Optional["FileWatcherManager"] = None
-    _watcher: Optional[FileWatcherService] = None
+    _instance: FileWatcherManager | None = None
+    _watcher: FileWatcherService | None = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -307,9 +301,9 @@ class FileWatcherManager:
 
     def get_watcher(
         self,
-        project_root: Path = None,
+        project_root: Path | None = None,
         notification_service: NotificationService = None,
-        current_user: str = None,
+        current_user: str | None = None,
     ) -> FileWatcherService:
         """Get or create the file watcher instance.
 

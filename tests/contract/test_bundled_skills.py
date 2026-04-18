@@ -85,17 +85,11 @@ def test_every_command_has_a_skill_counterpart() -> None:
     command_names = {p.stem for p in commands_dir.glob("doit.*.md")}
     skill_names = {s.name for s in SKILLS}
 
-    # Record the migration status so the test fails loud when someone
-    # adds a new command template without a skill counterpart.
+    # All command templates have a skill counterpart after Phase 5c. If
+    # someone adds a new command template, this test will fail loud.
     not_yet_migrated = command_names - skill_names
-    expected_not_yet = {
-        "doit.specit",
-        "doit.researchit",
-        "doit.documentit",
-        "doit.scaffoldit",
-    }
-    assert not_yet_migrated == expected_not_yet, (
-        f"Migration delta changed. Previously unmigrated: {expected_not_yet}. "
-        f"Now unmigrated: {not_yet_migrated}. "
-        f"Either finish the migration or update this test's expected set."
+    assert not_yet_migrated == set(), (
+        f"Command templates without a skills/ counterpart: "
+        f"{sorted(not_yet_migrated)}. Add a skill directory for each, or "
+        f"document why it intentionally has no skill form."
     )

@@ -65,8 +65,8 @@ def register_status_tool(mcp: FastMCP) -> None:
             blocking_only=blocking_only,
         )
 
-        specs_data = []
-        by_status = {}
+        specs_data: list[dict[str, object]] = []
+        by_status: dict[str, int] = {}
         for spec in report.specs:
             status_val = spec.status.value if hasattr(spec.status, "value") else str(spec.status)
             specs_data.append(

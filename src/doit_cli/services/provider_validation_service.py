@@ -57,7 +57,9 @@ class ProviderValidationService:
                 token=config_values.get("token", ""),
             )
         else:
-            return ValidationResult.failed(
+            # Catch-all for future ProviderType variants we haven't wired up
+            # yet; mypy marks the branch unreachable given the current enum.
+            return ValidationResult.failed(  # type: ignore[unreachable]
                 step=WizardStep.DETECT_PROVIDER,
                 error=f"Unknown provider: {provider}",
             )
@@ -279,7 +281,7 @@ class ProviderValidationService:
                 # Parse "Logged in to github.com as USERNAME" from stderr
                 for line in result.stderr.split("\n"):
                     if "Logged in" in line and " as " in line:
-                        username = line.split(" as ")[-1].strip()
+                        username: str | None = line.split(" as ")[-1].strip()
                         # Remove any trailing info like "(keyring)"
                         username = username.split()[0] if username else None
                         return True, username

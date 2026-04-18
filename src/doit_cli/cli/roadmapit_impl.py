@@ -262,7 +262,7 @@ def _display_roadmap(items: list[RoadmapItem], github_available: bool, cache_use
         return
 
     # Group by priority
-    by_priority = {}
+    by_priority: dict[str, list[RoadmapItem]] = {}
     for item in items:
         if item.priority not in by_priority:
             by_priority[item.priority] = []
@@ -318,7 +318,7 @@ def _display_summary(items: list[RoadmapItem], github_available: bool):
     console.print(f"  Total items: {len(items)}")
 
     # Count by source
-    sources = {}
+    sources: dict[str, int] = {}
     for item in items:
         sources[item.source] = sources.get(item.source, 0) + 1
 

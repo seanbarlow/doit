@@ -35,7 +35,7 @@ class GitHubEpic:
     url: str
     created_at: datetime | None = None
     updated_at: datetime | None = None
-    features: list[GitHubFeature] = field(default_factory=list)  # type: ignore
+    features: list[GitHubFeature] = field(default_factory=list)
 
     def __post_init__(self):
         """Validate epic data after initialization."""

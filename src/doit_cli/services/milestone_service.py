@@ -376,12 +376,13 @@ class MilestoneService:
         for level in PRIORITY_LEVELS:
             items = priority_sections.get(level, [])
 
-            # Count uncompleted items (checkbox not marked)
-            uncompleted = sum(
-                1
-                for item in items
-                if self.CHECKBOX_RE.match(item) and self.CHECKBOX_RE.match(item).group(1) == " "
-            )
+            # Count uncompleted items (checkbox not marked). We re-match to
+            # get the group; `m and m.group(...)` narrows Match|None for mypy.
+            def _uncompleted(item: str) -> bool:
+                m = self.CHECKBOX_RE.match(item)
+                return bool(m and m.group(1) == " ")
+
+            uncompleted = sum(1 for item in items if _uncompleted(item))
 
             # If no uncompleted items in active roadmap, check completed roadmap
             if uncompleted == 0 and len(items) > 0:

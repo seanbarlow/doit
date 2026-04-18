@@ -304,9 +304,11 @@ class AnalyticsReport:
         for spec in specs:
             by_status[spec.status] = by_status.get(spec.status, 0) + 1
 
-        # Calculate cycle times
-        records = [CycleTimeRecord.from_metadata(s) for s in specs]
-        records = [r for r in records if r is not None]
+        # Calculate cycle times — filter out specs without enough metadata
+        # to produce a cycle-time record.
+        records: list[CycleTimeRecord] = [
+            r for r in (CycleTimeRecord.from_metadata(s) for s in specs) if r is not None
+        ]
         cycle_stats = CycleTimeStats.calculate(records)
 
         # Calculate velocity

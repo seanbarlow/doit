@@ -218,7 +218,10 @@ class DiagramService:
             # For now, return None (to be implemented in Phase 8)
             return None
 
-        return None
+        # All DiagramType enum variants are handled above; the fallthrough is
+        # unreachable in practice but mypy needs a return path if the enum
+        # ever grows a variant we forget to handle.
+        return None  # type: ignore[unreachable]
 
     def _insert_diagrams(
         self, content: str, diagrams: list[GeneratedDiagram]

@@ -16,13 +16,13 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  # mypy runs on demand during the Phase 2/3 type-hardening work.
-  # Invoke manually with: pre-commit run mypy --hook-stage manual --all-files
+  # mypy is enforced as a blocking pre-commit hook as of the April 2026
+  # type-hardening pass. All src/doit_cli/ files type-check; see
+  # pyproject.toml for the (now empty) override list.
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
     hooks:
       - id: mypy
-        stages: [manual]
         additional_dependencies:
           - types-PyYAML
           - types-requests

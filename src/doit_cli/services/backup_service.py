@@ -78,7 +78,7 @@ class BackupService:
         Returns:
             Path to backup directory, or None if no files to backup
         """
-        files_to_backup = []
+        files_to_backup: list[Path] = []
 
         # Find all doit-prefixed files in command directories
         command_dirs = [
@@ -128,7 +128,7 @@ class BackupService:
         Returns:
             Dict with 'restored' list of paths and 'errors' list
         """
-        result = {
+        result: dict[str, list[Path | str]] = {
             "restored": [],
             "errors": [],
         }
@@ -168,7 +168,7 @@ class BackupService:
             List of removed backup paths
         """
         backups = self.list_backups()
-        removed = []
+        removed: list[Path] = []
 
         if len(backups) <= keep_count:
             return removed

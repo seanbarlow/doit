@@ -185,7 +185,7 @@ class TeamService:
             added_by=current_user or self.config.team.owner_id,
         )
 
-        self._config.members.append(member)
+        self.config.members.append(member)
         self._save_config()
 
         return member
@@ -212,14 +212,14 @@ class TeamService:
                     "Cannot remove the last owner. Transfer ownership first or delete the team."
                 )
 
-        self._config.members = [m for m in self._config.members if m.id != email]
+        self.config.members = [m for m in self.config.members if m.id != email]
         self._save_config()
 
     def update_member(
         self,
         email: str,
-        role: TeamRole = None,
-        permission: TeamPermission = None,
+        role: TeamRole | None = None,
+        permission: TeamPermission | None = None,
         notifications: bool | None = None,
         display_name: str | None = None,
     ) -> TeamMember:
@@ -355,14 +355,14 @@ class TeamService:
             modified_by=modified_by or self.get_current_user_email() or "",
         )
 
-        self._config.shared_files.append(shared)
+        self.config.shared_files.append(shared)
         self._save_config()
 
         return shared
 
     def remove_shared_file(self, path: str) -> None:
         """Remove a file from shared memory."""
-        self._config.shared_files = [sf for sf in self._config.shared_files if sf.path != path]
+        self.config.shared_files = [sf for sf in self.config.shared_files if sf.path != path]
         self._save_config()
 
     def get_large_file_warnings(self) -> list[str]:

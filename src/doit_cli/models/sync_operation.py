@@ -84,7 +84,7 @@ class SyncOperation:
         Returns:
             Duration in seconds if complete, None if still running
         """
-        if not self.is_complete:
+        if not self.is_complete or self.completed_at is None:
             return None
         return (self.completed_at - self.started_at).total_seconds()
 

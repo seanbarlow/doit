@@ -12,6 +12,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
@@ -83,11 +84,16 @@ class MemoryFileHandler(FileSystemEventHandler):
 
     def _handle_event(self, event: FileSystemEvent, event_type: str) -> None:
         """Handle a file system event."""
-        if self._should_ignore(event.src_path):
+        # watchdog's FileSystemEvent.src_path can be bytes|str depending on
+        # platform; coerce to str for the rest of the pipeline.
+        src_path = (
+            event.src_path.decode() if isinstance(event.src_path, bytes) else event.src_path
+        )
+        if self._should_ignore(src_path):
             return
 
         change_event = FileChangeEvent(
-            path=self._get_relative_path(event.src_path),
+            path=self._get_relative_path(src_path),
             event_type=event_type,
             timestamp=datetime.now(),
             is_directory=event.is_directory,
@@ -126,7 +132,7 @@ class FileWatcherService:
     def __init__(
         self,
         project_root: Path | None = None,
-        notification_service: NotificationService = None,
+        notification_service: NotificationService | None = None,
         current_user: str | None = None,
     ):
         """Initialize FileWatcherService.
@@ -140,7 +146,9 @@ class FileWatcherService:
         self.notification_service = notification_service or NotificationService(self.project_root)
         self.current_user = current_user or ""
 
-        self._observer: Observer | None = None
+        # watchdog's Observer is a factory function, not a class — mypy
+        # doesn't accept it as a type annotation, so we fall back to Any.
+        self._observer: Any = None
         self._is_running = False
         self._pending_changes: list[FileChangeEvent] = []
         self._last_change_time: datetime | None = None
@@ -307,7 +315,7 @@ class FileWatcherManager:
     def get_watcher(
         self,
         project_root: Path | None = None,
-        notification_service: NotificationService = None,
+        notification_service: NotificationService | None = None,
         current_user: str | None = None,
     ) -> FileWatcherService:
         """Get or create the file watcher instance.

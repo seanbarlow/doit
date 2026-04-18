@@ -6,6 +6,7 @@ import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from ..models.status_models import SpecState, SpecStatus, StatusReport
 
@@ -54,7 +55,9 @@ class SpecScanner:
         """
         self.project_root = project_root or Path.cwd()
         self.validate = validate
-        self._validator = None
+        # Lazy-loaded in the `validator` property below. Typed as Any to
+        # avoid a circular import on ValidationService at module scope.
+        self._validator: Any = None
 
         # Validate this is a doit project
         doit_dir = self.project_root / ".doit"

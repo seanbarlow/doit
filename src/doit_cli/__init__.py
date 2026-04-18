@@ -427,7 +427,7 @@ def select_with_arrows(
 
                 except KeyboardInterrupt:
                     console.print("\n[yellow]Selection cancelled[/yellow]")
-                    raise typer.Exit(1)
+                    raise typer.Exit(1) from None
 
     run_selection_loop()
 
@@ -703,11 +703,11 @@ def download_template_from_github(
         except ValueError as je:
             raise RuntimeError(
                 f"Failed to parse release JSON: {je}\nRaw (truncated 400): {response.text[:400]}"
-            )
+            ) from je
     except Exception as e:
         console.print("[red]Error fetching release information[/red]")
         console.print(Panel(str(e), title="Fetch Error", border_style="red"))
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     assets = release_data.get("assets", [])
     pattern = f"doit-template-{ai_assistant}-{script_type}"
@@ -790,7 +790,7 @@ def download_template_from_github(
         if zip_path.exists():
             zip_path.unlink()
         console.print(Panel(detail, title="Download Error", border_style="red"))
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
     if verbose:
         console.print(f"Downloaded: {filename}")
     metadata = {
@@ -956,7 +956,7 @@ def download_and_extract_template(
 
         if not is_current_dir and project_path.exists():
             shutil.rmtree(project_path)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
     else:
         if tracker:
             tracker.complete("extract")
@@ -991,7 +991,7 @@ def ensure_executable_scripts(project_path: Path, tracker: StepTracker | None = 
                 with script.open("rb") as f:
                     if f.read(2) != b"#!":
                         continue
-            except Exception:
+            except OSError:
                 continue
             st = script.stat()
             mode = st.st_mode
@@ -1290,7 +1290,7 @@ def init(
                 )
             if not here and project_path.exists():
                 shutil.rmtree(project_path)
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
         finally:
             pass
 
@@ -1423,7 +1423,7 @@ def version():
     cli_version = "unknown"
     try:
         cli_version = importlib.metadata.version("doit-cli")
-    except Exception:
+    except importlib.metadata.PackageNotFoundError:
         # Fallback: try reading from pyproject.toml if running from source
         try:
             import tomllib
@@ -1433,7 +1433,7 @@ def version():
                 with open(pyproject_path, "rb") as f:
                     data = tomllib.load(f)
                     cli_version = data.get("project", {}).get("version", "unknown")
-        except Exception:
+        except (OSError, tomllib.TOMLDecodeError):
             pass
 
     # Fetch latest template release version
@@ -1463,9 +1463,9 @@ def version():
                 try:
                     dt = datetime.fromisoformat(release_date.replace("Z", "+00:00"))
                     release_date = dt.strftime("%Y-%m-%d")
-                except Exception:
+                except ValueError:
                     pass
-    except Exception:
+    except httpx.HTTPError:
         pass
 
     info_table = Table(show_header=False, box=None, padding=(0, 2))

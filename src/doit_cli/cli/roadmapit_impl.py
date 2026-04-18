@@ -87,7 +87,7 @@ def show(
 
     except Exception as e:
         console.print(f"[red]✗ Error: {e}[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 def _fetch_github_epics(refresh: bool):
@@ -438,12 +438,12 @@ def add(
                     )
                     console.print(f"  Title: {item}")
                     console.print(f"  Labels: epic, priority:{priority}")
-                    raise typer.Exit(code=1)
+                    raise typer.Exit(code=1) from e
 
                 except GitHubAPIError as e:
                     console.print(f"\n[yellow]⚠ GitHub API error: {e}[/yellow]")
                     console.print("[yellow]  Item not created on GitHub[/yellow]")
-                    raise typer.Exit(code=1)
+                    raise typer.Exit(code=1) from e
 
             else:
                 console.print(
@@ -460,7 +460,7 @@ def add(
 
     except Exception as e:
         console.print(f"[red]✗ Error: {e}[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 @app.command(name="sync-milestones")
@@ -527,16 +527,16 @@ def sync_milestones(
     except GitHubAuthError as e:
         console.print(f"\n[red]✗ GitHub Authentication Error:[/red] {e}")
         console.print("\n[dim]Run: gh auth login[/dim]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
     except GitHubAPIError as e:
         console.print(f"\n[red]✗ GitHub API Error:[/red] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
     except FileNotFoundError as e:
         console.print(f"\n[red]✗ File Not Found:[/red] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
     except Exception as e:
         console.print(f"\n[red]✗ Error:[/red] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 if __name__ == "__main__":

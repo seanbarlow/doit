@@ -138,7 +138,7 @@ def init_team(
         if e.errors:
             for error in e.errors:
                 console.print(f"  • {error}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 # =============================================================================
@@ -215,13 +215,13 @@ def add_member(
 
     except MemberAlreadyExistsError:
         console.print(f"[red]Error:[/red] Member already exists: {email}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
     except TeamConfigValidationError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
     except PermissionDeniedError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from e
 
 
 @app.command("remove")
@@ -265,10 +265,10 @@ def remove_member(
 
     except TeamConfigValidationError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
     except PermissionDeniedError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=3) from e
 
 
 # =============================================================================
@@ -431,11 +431,11 @@ def sync_memory(
     except NoRemoteError as e:
         console.print(f"[red]Error:[/red] {e}")
         console.print("Push your repository to a remote first.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
     except NetworkError as e:
         console.print(f"[yellow]Warning:[/yellow] {e}")
         console.print("Changes saved locally. They will sync when connectivity returns.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 # =============================================================================
@@ -610,7 +610,7 @@ def list_notifications(
             console.print(
                 "Valid types: memory_changed, conflict_detected, member_joined, permission_changed"
             )
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=1) from None
 
     notifications = notif_service.get_notifications(
         unread_only=not all_notifications,
@@ -1108,7 +1108,7 @@ def resolve_conflict(
 
     except ConflictNotFoundError:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from None
 
 
 @conflict_app.command("clear")

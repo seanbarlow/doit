@@ -79,7 +79,7 @@ def configure_command(
         except ValueError:
             console.print(f"[red]Error: Unknown provider '{provider}'[/red]")
             console.print("Valid providers: github, azure_devops, gitlab")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=1) from None
 
     elif auto_detect or not provider:
         # Auto-detect from git remote
@@ -270,9 +270,9 @@ def wizard_command(
     except WizardCancelledError:
         wizard.handle_cancellation()
         console.print("\n[yellow]Wizard cancelled.[/yellow]")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=0) from None
 
     except KeyboardInterrupt:
         wizard.handle_cancellation()
         console.print("\n[yellow]Wizard interrupted.[/yellow]")
-        raise typer.Exit(code=130)
+        raise typer.Exit(code=130) from None

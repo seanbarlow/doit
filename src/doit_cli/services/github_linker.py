@@ -156,7 +156,7 @@ class GitHubLinkerService:
             self._update_epic_via_cli(epic_number, new_body)
 
         except subprocess.CalledProcessError as e:
-            raise GitHubServiceError(f"Failed to update epic #{epic_number}: {e}")
+            raise GitHubServiceError(f"Failed to update epic #{epic_number}: {e}") from e
 
     def get_epic_details(self, epic_number: int) -> dict:
         """Fetch epic details from GitHub API.
@@ -202,10 +202,10 @@ class GitHubLinkerService:
 
         except subprocess.CalledProcessError as e:
             if "404" in e.stderr:
-                raise GitHubServiceError(f"Epic #{epic_number} not found")
-            raise GitHubServiceError(f"Failed to fetch epic #{epic_number}: {e.stderr}")
+                raise GitHubServiceError(f"Epic #{epic_number} not found") from e
+            raise GitHubServiceError(f"Failed to fetch epic #{epic_number}: {e.stderr}") from e
         except subprocess.TimeoutExpired:
-            raise GitHubServiceError(f"Timeout fetching epic #{epic_number}")
+            raise GitHubServiceError(f"Timeout fetching epic #{epic_number}") from None
 
     def validate_epic_for_linking(self, epic_number: int) -> tuple[bool, str]:
         """Check if an epic can be linked to a spec.
@@ -377,7 +377,7 @@ class GitHubLinkerService:
             return slug
 
         except subprocess.CalledProcessError:
-            raise GitHubServiceError("Failed to get git remote URL")
+            raise GitHubServiceError("Failed to get git remote URL") from None
 
     def create_epic_for_roadmap_item(
         self, title: str, priority: str, feature_description: str | None = None
@@ -412,7 +412,7 @@ class GitHubLinkerService:
             return (epic.number, epic.url)
 
         except Exception as e:
-            raise GitHubServiceError(f"Failed to create epic: {e}")
+            raise GitHubServiceError(f"Failed to create epic: {e}") from e
 
     def update_roadmap_with_epic(
         self, roadmap_path: Path, roadmap_title: str, epic_number: int, epic_url: str

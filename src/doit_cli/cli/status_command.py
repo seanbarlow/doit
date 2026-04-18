@@ -109,4 +109,4 @@ def status_command(
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e

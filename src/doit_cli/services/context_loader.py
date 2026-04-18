@@ -79,8 +79,8 @@ def estimate_tokens(text: str) -> int:
             if _tiktoken_encoding is None:
                 _tiktoken_encoding = tiktoken.get_encoding("cl100k_base")
             return len(_tiktoken_encoding.encode(text))
-        except Exception:
-            pass
+        except (ImportError, ValueError, KeyError) as exc:
+            logger.debug("tiktoken estimate failed, falling back: %s", exc)
 
     # Fallback: approximately 4 characters per token
     return max(1, len(text) // 4)
@@ -342,8 +342,8 @@ def compute_similarity_scores(current_text: str, candidate_texts: list[str]) -> 
             # Compute cosine similarity between first text and all others
             similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])
             return similarities[0].tolist()
-        except Exception:
-            pass
+        except (ValueError, ImportError) as exc:
+            logger.debug("sklearn similarity failed, falling back: %s", exc)
 
     # Fallback: keyword overlap (Jaccard similarity)
     current_keywords = extract_keywords(current_text)
@@ -531,20 +531,17 @@ def parse_completed_roadmap(content: str) -> list[CompletedItem]:
                 # Parse date if provided
                 completion_date = None
                 if date_str:
-                    try:
-                        # Try common formats
-                        for _fmt in ["%Y-%m-%d", "%m/%d/%Y", "%d-%m-%Y"]:
-                            try:
-                                completion_date = (
-                                    date_type.fromisoformat(date_str)
-                                    if "-" in date_str and len(date_str) == 10
-                                    else None
-                                )
-                                break
-                            except ValueError:
-                                continue
-                    except Exception:
-                        pass
+                    # Try common formats
+                    for _fmt in ["%Y-%m-%d", "%m/%d/%Y", "%d-%m-%Y"]:
+                        try:
+                            completion_date = (
+                                date_type.fromisoformat(date_str)
+                                if "-" in date_str and len(date_str) == 10
+                                else None
+                            )
+                            break
+                        except ValueError:
+                            continue
 
                 items.append(
                     CompletedItem(

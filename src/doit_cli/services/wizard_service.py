@@ -423,8 +423,12 @@ class WizardService:
                     config = self.backup.restore_backup(latest.backup_id)
                     config.save()
                     self.console.print("[dim]Previous configuration restored from backup.[/dim]")
-                except Exception:
-                    pass
+                except (OSError, ValueError) as exc:
+                    # Restore is best-effort on cancel — surface a hint,
+                    # don't re-raise since the user already cancelled.
+                    self.console.print(
+                        f"[yellow]Could not restore backup automatically: {exc}[/yellow]"
+                    )
 
     def _display_header(self) -> None:
         """Display wizard header."""

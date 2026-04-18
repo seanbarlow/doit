@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -13,6 +14,8 @@ from ..models.validation_models import (
     ValidationRule,
 )
 from ..rules.builtin_rules import get_builtin_rules
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     pass
@@ -435,9 +438,9 @@ class RuleEngine:
                         )
                     )
 
-        except Exception:
-            # If cross-reference validation fails, skip silently
-            # (e.g., spec not found, parsing errors)
-            pass
+        except (OSError, ValueError, KeyError) as exc:
+            # Cross-reference validation is best-effort — missing specs or
+            # malformed requirement lists should not block the rule run.
+            logger.debug("cross-reference validation skipped: %s", exc)
 
         return issues

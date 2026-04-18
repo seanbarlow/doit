@@ -86,7 +86,7 @@ def show(
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 def _print_completion_summary(summary: dict) -> None:
@@ -163,7 +163,7 @@ def cycles(
                 filter_days = None  # since overrides days
             except ValueError:
                 console.print(f"[red]Error:[/red] Invalid date format '{since}'. Use YYYY-MM-DD.")
-                raise typer.Exit(code=2)
+                raise typer.Exit(code=2) from None
 
         stats, records = service.get_cycle_time_stats(days=filter_days, since=since_date)
 
@@ -186,7 +186,7 @@ def cycles(
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 def _print_cycles_json(stats, records) -> None:
@@ -306,7 +306,7 @@ def velocity(
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 def _print_velocity_json(velocity_data) -> None:
@@ -411,7 +411,7 @@ def spec(
                     console.print("\nAvailable specs:")
                     for a in available[:5]:
                         console.print(f"  - {a}")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=1) from None
 
         if json_output:
             _print_spec_json(metadata)
@@ -425,7 +425,7 @@ def spec(
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 def _print_spec_json(metadata) -> None:
@@ -548,10 +548,10 @@ def export(
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
     except OSError as e:
         console.print(f"[red]Error:[/red] Failed to export report: {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 def _generate_markdown_report(report) -> str:

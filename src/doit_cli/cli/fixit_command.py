@@ -63,7 +63,7 @@ def start(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     # Check GitHub availability
     if not service.is_github_available():
@@ -104,7 +104,7 @@ def start(
 
     except FixitServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 @app.command("list")
@@ -126,7 +126,7 @@ def list_bugs(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     bugs = service.list_bugs(label=label, limit=limit)
 
@@ -173,7 +173,7 @@ def status(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     if issue_id is None:
         # Show active workflow
@@ -212,7 +212,7 @@ def cancel(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     if issue_id is None:
         workflow = service.get_active_workflow()
@@ -249,7 +249,7 @@ def list_workflows() -> None:
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     workflows = service.list_workflows()
 
@@ -312,7 +312,7 @@ def investigate(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     # Get issue_id from active workflow if not provided
     if issue_id is None:
@@ -353,7 +353,7 @@ def investigate(
             ft = FindingType(finding_type)
         except ValueError:
             console.print(f"[red]Invalid finding type: {finding_type}[/red]")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=1) from None
 
         finding = service.add_finding(
             issue_id=issue_id,
@@ -427,7 +427,7 @@ def plan(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     # Get issue_id from active workflow if not provided
     if issue_id is None:
@@ -500,7 +500,7 @@ def review(
         service = FixitService()
     except GitHubServiceError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
     # Get issue_id from active workflow if not provided
     if issue_id is None:

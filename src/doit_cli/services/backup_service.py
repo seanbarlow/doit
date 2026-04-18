@@ -178,8 +178,8 @@ class BackupService:
             try:
                 shutil.rmtree(old_backup)
                 removed.append(old_backup)
-            except Exception:
-                # Silently skip backups that can't be removed
+            except OSError:
+                # Skip backups that can't be removed (permission/missing)
                 pass
 
         return removed

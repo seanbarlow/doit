@@ -357,9 +357,9 @@ class MilestoneService:
                 raise GitHubServiceError(f"Failed to assign epic: {result.stderr}")
 
         except subprocess.TimeoutExpired:
-            raise GitHubServiceError("GitHub CLI timeout")
+            raise GitHubServiceError("GitHub CLI timeout") from None
         except Exception as e:
-            raise GitHubServiceError(f"Failed to assign epic: {e}")
+            raise GitHubServiceError(f"Failed to assign epic: {e}") from e
 
     def detect_completed_priorities(self) -> list[str]:
         """Check roadmap.md and completed_roadmap.md for empty priority sections.

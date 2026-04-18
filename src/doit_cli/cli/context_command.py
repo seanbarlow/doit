@@ -73,7 +73,7 @@ def show_context(
         context = loader.load()
     except Exception as e:
         console.print(f"\n[red]Error loading context: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     # Show command-specific info
     if command:

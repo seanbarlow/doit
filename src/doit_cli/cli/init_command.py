@@ -548,7 +548,7 @@ def init_command(
             agents = parse_agent_string(agent)
         except typer.BadParameter as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
 
     # Non-interactive mode: bypass workflow entirely (FR-003, FR-008)
     if yes:
@@ -592,7 +592,7 @@ def init_command(
         responses = engine.run(workflow, initial_responses=initial_responses)
     except KeyboardInterrupt:
         # State is saved by workflow engine (FR-007)
-        raise typer.Exit(130)
+        raise typer.Exit(130) from None
 
     # Map workflow responses to init parameters (FR-006)
     workflow_agents, template_source = map_workflow_responses(responses)

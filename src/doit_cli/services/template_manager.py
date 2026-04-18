@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 from pathlib import Path
 
@@ -9,6 +10,8 @@ from ..models.agent import Agent
 from ..models.sync_models import CommandTemplate
 from ..models.template import DOIT_COMMANDS, Template
 from .prompt_transformer import PromptTransformer
+
+logger = logging.getLogger(__name__)
 
 # Workflow templates to copy to .doit/templates/
 WORKFLOW_TEMPLATES = [
@@ -143,8 +146,10 @@ class TemplateManager:
                 try:
                     template = Template.from_file(file_path, agent)
                     templates.append(template)
-                except Exception:
-                    # Skip files that can't be parsed
+                except (OSError, ValueError, UnicodeDecodeError) as exc:
+                    # Skip files that can't be parsed; log for debugging but
+                    # don't fail the whole scan for a single bad file.
+                    logger.debug("skipping unparseable template %s: %s", file_path, exc)
                     continue
 
         return templates
@@ -280,8 +285,8 @@ class TemplateManager:
                     # Always parse as Claude format since source is commands/
                     template = Template.from_file(file_path, Agent.CLAUDE)
                     templates.append(template)
-                except Exception:
-                    # Skip files that can't be parsed
+                except (OSError, ValueError, UnicodeDecodeError) as exc:
+                    logger.debug("skipping unparseable template %s: %s", file_path, exc)
                     continue
 
         return templates

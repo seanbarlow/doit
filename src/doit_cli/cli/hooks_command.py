@@ -57,7 +57,7 @@ def install_hooks(
 
     except RuntimeError as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 @hooks_app.command("uninstall")
@@ -149,7 +149,7 @@ def restore_hooks(
 
     except RuntimeError as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 @hooks_app.command("validate")

@@ -219,7 +219,7 @@ class MemorySearchService:
         try:
             regex = re.compile(pattern, flags)
         except re.error as e:
-            raise ValueError(f"Invalid regex pattern: {e}")
+            raise ValueError(f"Invalid regex pattern: {e}") from e
 
         # Search each file
         for file_path in files:

@@ -278,7 +278,7 @@ def sync_prompts_command(
         target_agents = parse_sync_agents(agent)
     except typer.BadParameter as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     # Initialize services
     reader = TemplateReader(project_root=project_root)

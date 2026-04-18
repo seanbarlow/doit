@@ -18,6 +18,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.status_models import SpecState
 from ..services.analytics_service import AnalyticsService
 from ..services.spec_scanner import NotADoitProjectError, SpecNotFoundError
@@ -71,7 +72,7 @@ def show(
                 print(json.dumps({"success": False, "error": "No specs found"}))
             else:
                 console.print("[yellow]No specifications found in specs/ directory.[/yellow]")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
         if json_output:
             report = service.generate_report()
@@ -79,14 +80,14 @@ def show(
         else:
             _print_completion_summary(summary)
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         if json_output:
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 def _print_completion_summary(summary: dict) -> None:
@@ -163,7 +164,7 @@ def cycles(
                 filter_days = None  # since overrides days
             except ValueError:
                 console.print(f"[red]Error:[/red] Invalid date format '{since}'. Use YYYY-MM-DD.")
-                raise typer.Exit(code=2) from None
+                raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from None
 
         stats, records = service.get_cycle_time_stats(days=filter_days, since=since_date)
 
@@ -172,21 +173,21 @@ def cycles(
                 print(json.dumps({"success": False, "error": "No completed specs in period"}))
             else:
                 console.print("[yellow]No completed specs found in the specified period.[/yellow]")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
         if json_output:
             _print_cycles_json(stats, records)
         else:
             _print_cycles_tables(stats, records, days if not since else None, since)
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         if json_output:
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 def _print_cycles_json(stats, records) -> None:
@@ -290,7 +291,7 @@ def velocity(
                 )
                 if velocity_data:
                     console.print(f"Available data points: {len(velocity_data)}")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
         if format_type == "json":
             _print_velocity_json(velocity_data)
@@ -299,14 +300,14 @@ def velocity(
         else:
             _print_velocity_table(velocity_data, weeks)
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         if format_type == "json":
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 def _print_velocity_json(velocity_data) -> None:
@@ -411,21 +412,21 @@ def spec(
                     console.print("\nAvailable specs:")
                     for a in available[:5]:
                         console.print(f"  - {a}")
-            raise typer.Exit(code=1) from None
+            raise typer.Exit(code=ExitCode.FAILURE) from None
 
         if json_output:
             _print_spec_json(metadata)
         else:
             _print_spec_details(metadata)
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         if json_output:
             print(json.dumps({"success": False, "error": str(e)}))
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 def _print_spec_json(metadata) -> None:
@@ -544,14 +545,14 @@ def export(
         output_path.write_text(content, encoding="utf-8")
 
         console.print(f"[green]✓[/green] Analytics report exported to {output_path}")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
     except OSError as e:
         console.print(f"[red]Error:[/red] Failed to export report: {e}")
-        raise typer.Exit(code=1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 def _generate_markdown_report(report) -> str:

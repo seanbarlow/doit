@@ -13,6 +13,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..services.cleanup_service import CleanupService
 
 app = typer.Typer(help="Constitution management commands")
@@ -78,14 +79,14 @@ def cleanup(
     if not memory_dir.exists():
         console.print(f"[red]Error:[/red] No .doit/memory directory found at {project_root}")
         console.print("Run [cyan]doit init[/cyan] to initialize the project first.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     service = CleanupService(project_root)
     constitution_path = service.constitution_path
 
     if not constitution_path.exists():
         console.print(f"[red]Error:[/red] Constitution not found at {constitution_path}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Analyze content first
     console.print(f"\n[bold]Analyzing[/bold] {constitution_path.relative_to(project_root)}...")
@@ -94,20 +95,20 @@ def cleanup(
     if not analysis.has_tech_content:
         console.print("\n[green]✓[/green] No tech-stack sections found in constitution.md")
         console.print("Constitution is already clean - no changes needed.")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     # Display what will be changed
     _display_analysis(analysis)
 
     if dry_run:
         console.print("\n[yellow]Dry run mode[/yellow] - no changes made.")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     # Check for existing tech-stack.md
     if service.tech_stack_path.exists() and not merge:
         console.print(f"\n[yellow]Warning:[/yellow] {service.tech_stack_path.name} already exists.")
         console.print("Use [cyan]--merge[/cyan] to combine content, or remove the existing file.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Confirm before proceeding
     if not yes:
@@ -115,7 +116,7 @@ def cleanup(
         confirmed = typer.confirm("Proceed with cleanup?", default=True)
         if not confirmed:
             console.print("[yellow]Cancelled.[/yellow]")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     # Perform cleanup
     console.print("\n[bold]Performing cleanup...[/bold]")
@@ -123,7 +124,7 @@ def cleanup(
 
     if result.error_message:
         console.print(f"\n[red]Error:[/red] {result.error_message}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Display results
     _display_result(result, project_root)

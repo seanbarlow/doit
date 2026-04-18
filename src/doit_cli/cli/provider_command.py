@@ -11,6 +11,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.wizard_models import WizardCancelledError
 from ..services.config_backup_service import ConfigBackupService
 from ..services.provider_config import ProviderConfig
@@ -79,7 +80,7 @@ def configure_command(
         except ValueError:
             console.print(f"[red]Error: Unknown provider '{provider}'[/red]")
             console.print("Valid providers: github, azure_devops, gitlab")
-            raise typer.Exit(code=1) from None
+            raise typer.Exit(code=ExitCode.FAILURE) from None
 
     elif auto_detect or not provider:
         # Auto-detect from git remote
@@ -118,7 +119,7 @@ def configure_command(
 
             if choice not in provider_map:
                 console.print("[red]Invalid choice[/red]")
-                raise typer.Exit(code=1)
+                raise typer.Exit(code=ExitCode.FAILURE)
 
             config.provider = provider_map[choice]
             config.auto_detected = False
@@ -261,18 +262,18 @@ def wizard_command(
 
         if result.cancelled:
             console.print("\n[yellow]Wizard cancelled.[/yellow]")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
         if not result.success:
             console.print(f"\n[red]Configuration failed: {result.error_message}[/red]")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
     except WizardCancelledError:
         wizard.handle_cancellation()
         console.print("\n[yellow]Wizard cancelled.[/yellow]")
-        raise typer.Exit(code=0) from None
+        raise typer.Exit(code=ExitCode.SUCCESS) from None
 
     except KeyboardInterrupt:
         wizard.handle_cancellation()
         console.print("\n[yellow]Wizard interrupted.[/yellow]")
-        raise typer.Exit(code=130) from None
+        raise typer.Exit(code=ExitCode.USER_CANCEL) from None

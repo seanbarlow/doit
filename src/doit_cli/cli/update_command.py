@@ -8,6 +8,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
+from ..exit_codes import ExitCode
 from ..models.agent import Agent
 from .init_command import display_init_result, parse_agent_string, run_init
 
@@ -47,7 +48,7 @@ def update_command(
             agents = parse_agent_string(agent)
         except typer.BadParameter as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1) from e
+            raise typer.Exit(code=ExitCode.FAILURE) from e
 
     result = run_init(
         path=path,
@@ -58,4 +59,4 @@ def update_command(
     )
     display_init_result(result, agents or result.project.agents or [Agent.CLAUDE])
     if not result.success:
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)

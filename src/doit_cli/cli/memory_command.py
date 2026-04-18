@@ -14,6 +14,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.search_models import QueryType, SourceFilter
 from ..services.memory_search import MemorySearchService
 
@@ -44,7 +45,7 @@ def get_project_root() -> Path:
             return parent
 
     console.print("[red]Error:[/red] Not in a doit project. Run 'doit init' to initialize.")
-    raise typer.Exit(1)
+    raise typer.Exit(code=ExitCode.FAILURE)
 
 
 @memory_app.command(name="search")
@@ -111,7 +112,7 @@ def search_command(
             f"[red]Error:[/red] Invalid query type '{query_type}'. "
             "Use: keyword, phrase, natural, regex"
         )
-        raise typer.Exit(1) from None
+        raise typer.Exit(code=ExitCode.FAILURE) from None
 
     # If regex flag is set, override query type
     if use_regex:
@@ -124,12 +125,12 @@ def search_command(
         console.print(
             f"[red]Error:[/red] Invalid source filter '{source}'. Use: all, governance, specs"
         )
-        raise typer.Exit(1) from None
+        raise typer.Exit(code=ExitCode.FAILURE) from None
 
     # Validate max results
     if not 1 <= max_results <= 100:
         console.print("[red]Error:[/red] Max results must be between 1 and 100")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Create service and search
     service = MemorySearchService(project_root, console)
@@ -146,7 +147,7 @@ def search_command(
         )
     except ValueError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(3) from e
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR) from e
 
     execution_time_ms = int((time.time() - start_time) * 1000)
 

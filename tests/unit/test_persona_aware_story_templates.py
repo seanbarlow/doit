@@ -287,9 +287,18 @@ class TestAgentSyncIntegrity:
         assert source == synced, "Claude commands specit differs from source template"
 
     def test_github_prompts_matches_source(self):
-        source = SPECIT_COMMAND.read_text()
+        """GitHub prompts are a Copilot-native rewrite of the source (see Phase 6).
+
+        Rather than a byte-for-byte equality check, assert the body instructions
+        made it through — frontmatter will differ by construction now.
+        """
         synced = GITHUB_SPECIT.read_text()
-        assert source == synced, "GitHub prompts specit differs from source template"
+        # Body content that exists in the source should exist in the rewrite
+        assert "## Persona Matching Rules (when personas loaded)" in synced
+        # Copilot-native frontmatter must be present
+        assert "agent: agent" in synced
+        # And Claude-specific leaks must not be
+        assert "allowed-tools" not in synced.split("---", 2)[1]
 
 
 class TestSpecitPersonaLoadingEnhanced:

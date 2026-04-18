@@ -1,21 +1,18 @@
 ---
-description: Create or update the project roadmap with prioritized requirements, deferred functionality, and AI-suggested enhancements.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Create Specification
-    agent: doit.specit
-    prompt: Create a feature specification for the top roadmap item...
-  - label: Update Constitution
-    agent: doit.constitution
-    prompt: Update the project constitution based on roadmap priorities...
+description: Create or update the project roadmap with prioritized requirements, deferred
+  functionality, and AI-suggested enhancements.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
+- githubRepo
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -70,7 +67,7 @@ This command creates or updates the project roadmap at `.doit/memory/roadmap.md`
 
 ### 1. Parse Command Arguments
 
-Extract the operation and details from `$ARGUMENTS`:
+Extract the operation and details from `${input:args}`:
 
 | Pattern | Operation | Example |
 |---------|-----------|---------|

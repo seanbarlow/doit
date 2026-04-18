@@ -1,24 +1,17 @@
 ---
-description: Generate project folder structure and starter files based on tech stack from constitution or user input.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Create Specification
-    agent: doit.specit
-    prompt: Create a feature specification for this scaffolded project. I want to build...
-  - label: Update Constitution
-    agent: doit.constitution
-    prompt: Update the project constitution with additional details...
-  - label: Organize Documentation
-    agent: doit.documentit
-    prompt: Organize and index the project documentation...
+description: Generate project folder structure and starter files based on tech stack
+  from constitution or user input.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 

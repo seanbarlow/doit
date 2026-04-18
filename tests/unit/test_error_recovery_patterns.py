@@ -286,11 +286,24 @@ class TestSyncIntegrity:
 
     @pytest.mark.parametrize("command", ALL_COMMANDS)
     def test_github_prompts_match_source(self, command):
-        """MT-012: .github/prompts/ matches source templates"""
-        source = (TEMPLATES_DIR / command).read_text()
+        """MT-012: .github/prompts/ matches the transformer's output from source.
+
+        As of Phase 6 (April 2026), the sync does a semantic rewrite to
+        Copilot-native frontmatter rather than a byte-for-byte copy, so
+        equality with the raw source no longer holds. The invariant worth
+        checking is that the shipped prompt equals what the transformer
+        emits right now.
+        """
+        from doit_cli.models.sync_models import CommandTemplate
+        from doit_cli.services.prompt_transformer import PromptTransformer
+
         prompt_name = command.replace(".md", ".prompt.md")
         github_path = GITHUB_PROMPTS_DIR / prompt_name
         assert github_path.exists(), f".github/prompts/{prompt_name} missing"
-        assert source == github_path.read_text(), (
-            f".github/prompts/{prompt_name} differs from source"
+
+        template = CommandTemplate.from_path(TEMPLATES_DIR / command)
+        expected = PromptTransformer().transform(template)
+        assert github_path.read_text() == expected, (
+            f".github/prompts/{prompt_name} is out of sync with the "
+            f"transformer. Re-run `doit sync-prompts --agent copilot`."
         )

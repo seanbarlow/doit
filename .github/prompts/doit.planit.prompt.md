@@ -1,22 +1,17 @@
 ---
-description: Execute the implementation planning workflow using the plan template to generate design artifacts.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs: 
-  - label: Create Tasks
-    agent: doit.tasks
-    prompt: Break the plan into tasks
-    send: true
-  - label: Create Checklist
-    agent: doit.checklist
-    prompt: Create a checklist for the following domain...
+description: Execute the implementation planning workflow using the plan template
+  to generate design artifacts.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 

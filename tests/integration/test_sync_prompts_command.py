@@ -129,13 +129,17 @@ class TestSyncPromptsCommand:
         assert output["total_commands"] == 1
 
     def test_sync_prompts_content_transformation(self, temp_dir):
-        """Test that content is properly transformed."""
-        # Setup with YAML frontmatter and $ARGUMENTS
+        """Verify the Copilot-native rewrite (Phase 6, April 2026)."""
         templates_dir = temp_dir / ".doit/templates/commands"
         templates_dir.mkdir(parents=True)
 
         template_content = """---
 description: Test description
+allowed-tools: Read, Write, Bash
+effort: high
+handoffs:
+  - label: Next
+    agent: doit.other
 ---
 
 ## User Input
@@ -154,14 +158,25 @@ $ARGUMENTS
         result = runner.invoke(app, ["sync-prompts", "--path", str(temp_dir)])
         assert result.exit_code == 0
 
-        # Verify transformation
         prompt_path = temp_dir / ".github/prompts/doit.test.prompt.md"
         prompt_content = prompt_path.read_text()
 
-        # YAML frontmatter should be stripped
-        assert "---\ndescription" not in prompt_content
-        # $ARGUMENTS should be replaced
+        # Copilot-native frontmatter present
+        assert prompt_content.startswith("---\n")
+        assert "description: Test description" in prompt_content
+        assert "agent: agent" in prompt_content
+        assert "editFiles" in prompt_content  # Read/Write -> editFiles
+        assert "runCommands" in prompt_content  # Bash -> runCommands
+
+        # Claude-specific fields scrubbed from frontmatter
+        frontmatter = prompt_content.split("---", 2)[1]
+        assert "allowed-tools" not in frontmatter
+        assert "handoffs" not in frontmatter
+        assert "effort" not in frontmatter
+
+        # Placeholder rewritten
         assert "$ARGUMENTS" not in prompt_content
+        assert "${input:args:" in prompt_content
         # Description should be preserved
         assert "Test description" in prompt_content
         # Outline should be preserved

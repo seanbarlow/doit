@@ -132,9 +132,10 @@ exclude = [
 
 # Modules slated for refactor in Phase 3 — type debt tracked separately.
 # Once those services are split and modernized, remove each entry to re-enable checking.
+# `doit_cli` (package __init__.py) was removed from this list once its
+# legacy Typer app was deleted.
 [[tool.mypy.overrides]]
 module = [
-    "doit_cli",
     "doit_cli.services.context_loader",
     "doit_cli.services.template_manager",
     "doit_cli.services.github_service",

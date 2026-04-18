@@ -71,18 +71,27 @@ doit sync-prompts              # Sync templates to AI agents
 - All `shutil.copy2` calls should use `TemplateManager._safe_copy()` to avoid SameFileError
 - Use `httpx` for API calls, never `requests`
 - Keep subprocess calls as list arguments (no `shell=True`)
+- **Error handling**: raise a subclass of `doit_cli.errors.DoitError` at boundaries; chain with `raise X(...) from e` inside `except` blocks (ruff B904 enforced)
+- **Exit codes**: every `typer.Exit(code=…)` call uses a `doit_cli.exit_codes.ExitCode` constant, never a numeric literal
+- **Output formats**: CLI commands that produce reports accept `--format/-f` declared via `doit_cli.cli.output.format_option()` with a per-command `allowed` subset
+- **Python modernity**: every `src/doit_cli/**/*.py` starts with `from __future__ import annotations`; type hints use `list[X] / X | None`, not `List/Optional`
 
 ## AI Integration
 
-- **Claude Code**: 12 slash commands in `.claude/commands/` (skills with frontmatter)
-- **GitHub Copilot**: 12 prompt files in `.github/prompts/`
-- **Workflow**: constitution -> roadmap -> spec -> plan -> tasks -> implement -> test -> review -> checkin
+Two template layouts ship side by side during the April 2026 Agent Skills transition:
+
+- **Claude Code (skills, current)**: 1 skill so far at `src/doit_cli/templates/skills/doit.constitution/SKILL.md`; the other 12 templates migrate in follow-ups (Phase 5b, 5c). Format documented in `docs/templates/agent-skills.md`.
+- **Claude Code (commands, legacy)**: 13 flat files in `src/doit_cli/templates/commands/doit.*.md`; still works per Anthropic's back-compat window. Synced to `.claude/commands/` by `doit sync-prompts`.
+- **GitHub Copilot**: 13 `.prompt.md` files in `.github/prompts/`, generated from the command sources by `PromptTransformer` (April 2026 Copilot schema: `agent: agent`, `tools: [...]`, `${input:args}` placeholders). Format documented in `docs/templates/copilot-prompts.md`.
+- **Workflow**: constitution → roadmap → researchit → specit → planit → taskit → implementit → testit → reviewit → fixit → documentit → scaffoldit → checkin
 
 ## Testing
 
-- 1749+ tests across unit, integration, contract, and E2E
+- 1,800+ tests across unit, integration, contract, and E2E
 - Platform-specific tests use markers: `@pytest.mark.windows`, `@pytest.mark.macos`
 - CI runs on push/PR to main and develop branches
+- Contract tests (`tests/contract/`) include a shipped-prompt validator that fails if `.github/prompts/` drifts from the transformer output — re-run `doit sync-prompts --agent copilot` if it fails
+- Run mypy manually (non-blocking during the type-hardening window): `pre-commit run mypy --hook-stage manual --all-files`
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
@@ -96,6 +105,7 @@ doit sync-prompts              # Sync templates to AI agents
 - File-based — Markdown files in `.doit/memory/` and `specs/{feature}/` (057-persona-aware-user-story-generation)
 - N/A — Markdown template authoring only + None — no code changes (058-error-recovery-patterns)
 - File-based — Markdown templates in `.doit/templates/commands/` (058-error-recovery-patterns)
+- April 2026 modernization sweep: ruff + mypy + DoitError hierarchy + context_loader package split + ExitCode / OutputFormat CLI conventions + Agent Skills layout for Claude + native Copilot `.prompt.md` frontmatter
 
 ## Recent Changes
 - 055-mcp-server: Added Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output)

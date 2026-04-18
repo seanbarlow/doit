@@ -228,11 +228,11 @@ class StateManager:
                 data = json.load(f)
             return WorkflowState.from_dict(data)
         except json.JSONDecodeError as e:
-            raise StateCorruptionError(filepath, f"Invalid JSON: {e}")
+            raise StateCorruptionError(filepath, f"Invalid JSON: {e}") from e
         except KeyError as e:
-            raise StateCorruptionError(filepath, f"Missing required field: {e}")
+            raise StateCorruptionError(filepath, f"Missing required field: {e}") from e
         except Exception as e:
-            raise StateCorruptionError(filepath, f"Failed to load: {e}")
+            raise StateCorruptionError(filepath, f"Failed to load: {e}") from e
 
     # =========================================================================
     # Fixit Workflow State Methods (T013)

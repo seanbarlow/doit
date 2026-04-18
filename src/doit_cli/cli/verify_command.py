@@ -172,7 +172,7 @@ def verify_command(
                 console.print(json.dumps({"error": str(e)}))
             else:
                 console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
 
     # Create project and validator
     project = Project(path=path.resolve())

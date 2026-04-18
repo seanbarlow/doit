@@ -38,10 +38,12 @@ class PowerShellExecutor:
             )
             if result.returncode != 0:
                 raise RuntimeError("PowerShell Core (pwsh) not available")
-        except FileNotFoundError:
-            raise RuntimeError("PowerShell Core (pwsh) not found. Please install PowerShell 7.x")
-        except subprocess.TimeoutExpired:
-            raise RuntimeError("PowerShell verification timed out")
+        except FileNotFoundError as e:
+            raise RuntimeError(
+                "PowerShell Core (pwsh) not found. Please install PowerShell 7.x"
+            ) from e
+        except subprocess.TimeoutExpired as e:
+            raise RuntimeError("PowerShell verification timed out") from e
 
     def run_script(
         self,

@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import fnmatch
+import logging
 import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
 
 from ..models.hook_config import HookConfig
+
+logger = logging.getLogger(__name__)
 
 
 class ValidationResult:
@@ -371,8 +374,9 @@ class HookValidator:
             # ValidationService not available - skip validation
             pass
         except Exception:
-            # Log error but don't block commit for validation failures
-            pass
+            # Any unexpected ValidationService failure is logged but must not
+            # block the commit — hook validation is advisory, not blocking.
+            logger.exception("spec validation failed unexpectedly; skipping gate")
 
         return ValidationResult(True, "Spec validation passed")
 

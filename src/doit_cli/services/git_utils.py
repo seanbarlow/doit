@@ -118,9 +118,9 @@ def run_git_command(
         return cmd_result
 
     except subprocess.TimeoutExpired:
-        raise GitError("Git command timed out after 60 seconds")
+        raise GitError("Git command timed out after 60 seconds") from None
     except FileNotFoundError:
-        raise GitNotAvailableError("Git is not installed or not available in PATH")
+        raise GitNotAvailableError("Git is not installed or not available in PATH") from None
 
 
 def is_git_available() -> bool:

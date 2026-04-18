@@ -137,7 +137,7 @@ def load_team_config(project_root: Path | None = None) -> TeamConfig:
         with open(config_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
     except yaml.YAMLError as e:
-        raise TeamConfigValidationError(f"Invalid YAML in team.yaml: {e}")
+        raise TeamConfigValidationError(f"Invalid YAML in team.yaml: {e}") from e
 
     if not data:
         raise TeamConfigValidationError("team.yaml is empty")
@@ -145,7 +145,7 @@ def load_team_config(project_root: Path | None = None) -> TeamConfig:
     try:
         config = TeamConfig.from_dict(data)
     except (KeyError, ValueError) as e:
-        raise TeamConfigValidationError(f"Invalid team configuration: {e}")
+        raise TeamConfigValidationError(f"Invalid team configuration: {e}") from e
 
     # Validate configuration
     errors = validate_team_config(config)

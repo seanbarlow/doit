@@ -139,7 +139,7 @@ def parse_spec_file(spec_path: Path) -> tuple[SpecFrontmatter, str]:
         return (frontmatter, body)
 
     except (ValueError, yaml.YAMLError) as e:
-        raise ValueError(f"Malformed frontmatter in {spec_path}: {e}")
+        raise ValueError(f"Malformed frontmatter in {spec_path}: {e}") from e
 
 
 def update_spec_frontmatter(spec_path: Path, updates: dict[str, Any]) -> None:

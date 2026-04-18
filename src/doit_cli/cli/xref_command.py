@@ -200,7 +200,7 @@ def coverage_command(
             report = service.get_coverage(spec_name=spec_name)
         except FileNotFoundError as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=2) from e
 
         # Format output
         if output_format == "json":
@@ -235,7 +235,7 @@ def coverage_command(
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 @xref_app.command(name="locate")
@@ -280,7 +280,7 @@ def locate_command(
             req = service.locate_requirement(requirement_id, spec_name=spec_name)
         except (FileNotFoundError, ValueError) as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=2) from e
 
         if req is None:
             console.print(f"[yellow]Requirement {requirement_id} not found in spec.[/yellow]")
@@ -307,7 +307,7 @@ def locate_command(
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 @xref_app.command(name="tasks")
@@ -350,7 +350,7 @@ def tasks_command(
             tasks = service.get_tasks_for_requirement(requirement_id, spec_name=spec_name)
         except (FileNotFoundError, ValueError) as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=2) from e
 
         if not tasks:
             console.print(f"[yellow]No tasks found implementing {requirement_id}[/yellow]")
@@ -415,7 +415,7 @@ def tasks_command(
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e
 
 
 @xref_app.command(name="validate")
@@ -464,7 +464,7 @@ def validate_command(
             report = service.get_coverage(spec_name=spec_name)
         except FileNotFoundError as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=2) from e
 
         # Count issues
         error_count = len(orphaned)  # Orphaned references are always errors
@@ -536,4 +536,4 @@ def validate_command(
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from e

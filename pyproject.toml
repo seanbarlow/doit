@@ -104,7 +104,6 @@ ignore = [
     "E402",    # module-import-not-at-top — Typer command modules use deferred imports
     "E741",    # ambiguous names (l, I, O) — small number of historical uses
     "B008",    # function call as default arg — Typer's Option/Argument use this pattern
-    "B904",    # raise-without-from — addressed in Phase 2 (error handling)
     "PTH",     # os.path → pathlib — addressed in Phase 3 (service refactor)
     "SIM102",  # collapsible-if — case-by-case readability call
     "SIM105",  # suppressible-exception — wholesale contextlib.suppress can hide intent

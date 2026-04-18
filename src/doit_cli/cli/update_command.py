@@ -47,7 +47,7 @@ def update_command(
             agents = parse_agent_string(agent)
         except typer.BadParameter as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
 
     result = run_init(
         path=path,

@@ -152,7 +152,7 @@ class GitHubProvider(GitProvider):
             return self.get_issue(issue_number)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
 
     def get_issue(self, issue_id: str) -> Issue:
         """Get a GitHub issue by number."""
@@ -183,9 +183,9 @@ class GitHubProvider(GitProvider):
             return self._parse_issue(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
         """List GitHub issues matching filters."""
@@ -229,9 +229,9 @@ class GitHubProvider(GitProvider):
             return [self._parse_issue(item) for item in data]
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def update_issue(self, issue_id: str, updates: IssueUpdateRequest) -> Issue:
         """Update a GitHub issue."""
@@ -279,7 +279,7 @@ class GitHubProvider(GitProvider):
             return self.get_issue(provider_id)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
 
     # -------------------------------------------------------------------------
     # Pull Request Operations
@@ -325,7 +325,7 @@ class GitHubProvider(GitProvider):
             return self.get_pull_request(pr_number)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
 
     def get_pull_request(self, pr_id: str) -> PullRequest:
         """Get a GitHub pull request by number."""
@@ -356,9 +356,9 @@ class GitHubProvider(GitProvider):
             return self._parse_pull_request(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
         """List GitHub pull requests matching filters."""
@@ -405,9 +405,9 @@ class GitHubProvider(GitProvider):
             return [self._parse_pull_request(item) for item in data]
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     # -------------------------------------------------------------------------
     # Milestone Operations
@@ -453,9 +453,9 @@ class GitHubProvider(GitProvider):
             return self._parse_milestone(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def get_milestone(self, milestone_id: str) -> Milestone:
         """Get a GitHub milestone by number."""
@@ -480,9 +480,9 @@ class GitHubProvider(GitProvider):
             return self._parse_milestone(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
         """List GitHub milestones."""
@@ -510,9 +510,9 @@ class GitHubProvider(GitProvider):
             return [self._parse_milestone(item) for item in data]
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     # -------------------------------------------------------------------------
     # Helper Methods
@@ -536,7 +536,7 @@ class GitHubProvider(GitProvider):
             raise AuthenticationError(
                 "GitHub CLI (gh) not installed. Install from: https://cli.github.com",
                 provider="GitHub",
-            )
+            ) from None
 
     def _handle_error(self, stderr: str) -> None:
         """Convert gh CLI error to appropriate exception."""
@@ -579,7 +579,7 @@ class GitHubProvider(GitProvider):
             return slug
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("Git command timeout", is_timeout=True)
+            raise NetworkError("Git command timeout", is_timeout=True) from None
 
     def _parse_issue(self, data: dict) -> Issue:
         """Parse gh CLI JSON output into Issue model."""

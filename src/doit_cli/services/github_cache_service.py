@@ -67,9 +67,9 @@ class GitHubCacheService:
             return cache_data
 
         except json.JSONDecodeError as e:
-            raise CacheError(f"Corrupted cache file: {e}")
+            raise CacheError(f"Corrupted cache file: {e}") from e
         except OSError as e:
-            raise CacheError(f"Failed to read cache file: {e}")
+            raise CacheError(f"Failed to read cache file: {e}") from e
 
     def save_cache(self, epics: list[GitHubEpic], metadata: SyncMetadata) -> None:
         """Save epics and metadata to cache file.
@@ -104,7 +104,7 @@ class GitHubCacheService:
             temp_path.replace(self.cache_path)
 
         except OSError as e:
-            raise CacheError(f"Failed to write cache file: {e}")
+            raise CacheError(f"Failed to write cache file: {e}") from e
 
     def is_valid(self) -> bool:
         """Check if cache exists and is still valid based on TTL.
@@ -195,7 +195,7 @@ class GitHubCacheService:
             try:
                 self.cache_path.unlink()
             except OSError as e:
-                raise CacheError(f"Failed to delete cache file: {e}")
+                raise CacheError(f"Failed to delete cache file: {e}") from e
 
     def get_cache_age_minutes(self) -> float | None:
         """Get cache age in minutes.

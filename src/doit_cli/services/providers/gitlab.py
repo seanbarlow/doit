@@ -293,18 +293,18 @@ class GitLabAPIClient:
                 f"SSL certificate error connecting to {self.host}. "
                 "For self-hosted GitLab, ensure your certificate is valid.",
                 cause=e,
-            )
+            ) from e
         except httpx.TimeoutException as e:
             raise NetworkError(
                 "Request timed out. Check your network connection.",
                 cause=e,
                 is_timeout=True,
-            )
+            ) from e
         except httpx.ConnectError as e:
             raise NetworkError(
                 f"Could not connect to {self.host}. Check your network connection.",
                 cause=e,
-            )
+            ) from e
 
     def get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """Make a GET request to the GitLab API.
@@ -723,7 +723,7 @@ class GitLabProvider(GitProvider):
             data = self._api.get(f"/projects/{self._encoded_path}/issues/{iid}")
             return self._parse_issue(data)
         except ResourceNotFoundError:
-            raise ResourceNotFoundError("Issue", issue_id)
+            raise ResourceNotFoundError("Issue", issue_id) from None
 
     @with_retry(max_retries=3)
     def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
@@ -793,7 +793,7 @@ class GitLabProvider(GitProvider):
             data = self._api.put(f"/projects/{self._encoded_path}/issues/{iid}", payload)
             return self._parse_issue(data)
         except ResourceNotFoundError:
-            raise ResourceNotFoundError("Issue", issue_id)
+            raise ResourceNotFoundError("Issue", issue_id) from None
 
     # -------------------------------------------------------------------------
     # Pull Request (Merge Request) Operations
@@ -847,7 +847,7 @@ class GitLabProvider(GitProvider):
             data = self._api.get(f"/projects/{self._encoded_path}/merge_requests/{iid}")
             return self._parse_pull_request(data)
         except ResourceNotFoundError:
-            raise ResourceNotFoundError("Merge Request", pr_id)
+            raise ResourceNotFoundError("Merge Request", pr_id) from None
 
     @with_retry(max_retries=3)
     def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
@@ -931,7 +931,7 @@ class GitLabProvider(GitProvider):
             data = self._api.get(f"/projects/{self._encoded_path}/milestones/{ms_id}")
             return self._parse_milestone(data)
         except ResourceNotFoundError:
-            raise ResourceNotFoundError("Milestone", milestone_id)
+            raise ResourceNotFoundError("Milestone", milestone_id) from None
 
     @with_retry(max_retries=3)
     def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
@@ -994,4 +994,4 @@ class GitLabProvider(GitProvider):
             data = self._api.put(f"/projects/{self._encoded_path}/milestones/{ms_id}", payload)
             return self._parse_milestone(data)
         except ResourceNotFoundError:
-            raise ResourceNotFoundError("Milestone", milestone_id)
+            raise ResourceNotFoundError("Milestone", milestone_id) from None

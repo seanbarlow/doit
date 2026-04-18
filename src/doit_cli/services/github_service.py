@@ -96,7 +96,7 @@ class GitHubService:
         except FileNotFoundError:
             raise GitHubServiceError(
                 "GitHub CLI (gh) not found. Install it from https://cli.github.com/"
-            )
+            ) from None
 
     def _ensure_authenticated(self) -> None:
         """Verify GitHub CLI is available and authenticated.
@@ -295,13 +295,13 @@ class GitHubService:
             raise GitHubAPIError(
                 f"GitHub CLI timeout after {self.timeout} seconds. "
                 "Try increasing timeout or use --skip-github flag."
-            )
+            ) from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
         except FileNotFoundError:
             raise GitHubAuthError(
                 "GitHub CLI (gh) not found in PATH. Install from: https://cli.github.com"
-            )
+            ) from None
 
     def fetch_features_for_epic(self, epic_number: int) -> list[GitHubFeature]:  # type: ignore
         """Fetch all feature issues linked to a specific epic.
@@ -369,9 +369,9 @@ class GitHubService:
             return features
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     def create_epic(
         self, title: str, body: str, priority: str = "P3", labels: list[str] | None = None
@@ -450,9 +450,9 @@ class GitHubService:
             )
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except (ValueError, IndexError) as e:
-            raise GitHubAPIError(f"Failed to parse created issue URL: {e}")
+            raise GitHubAPIError(f"Failed to parse created issue URL: {e}") from e
 
     # ==========================================================================
     # Milestone Operations
@@ -528,9 +528,9 @@ class GitHubService:
             return milestones
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds.")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds.") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     def create_milestone(self, title: str, description: str) -> Milestone:
         """Create a new GitHub milestone.
@@ -601,9 +601,9 @@ class GitHubService:
             )
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     def close_milestone(self, milestone_number: int) -> Milestone:
         """Close a GitHub milestone.
@@ -666,9 +666,9 @@ class GitHubService:
             )
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     # ==========================================================================
     # Branch Operations
@@ -767,6 +767,6 @@ class GitHubService:
             return slug
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError("Git command timeout")
+            raise GitHubAPIError("Git command timeout") from None
         except Exception as e:
-            raise GitHubAPIError(f"Failed to get repository slug: {e}")
+            raise GitHubAPIError(f"Failed to get repository slug: {e}") from e

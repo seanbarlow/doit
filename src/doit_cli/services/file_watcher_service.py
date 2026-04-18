@@ -6,6 +6,7 @@ This module provides the FileWatcherService class for monitoring
 
 from __future__ import annotations
 
+import logging
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -16,6 +17,8 @@ from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 from doit_cli.services.notification_service import NotificationService
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -197,12 +200,14 @@ class FileWatcherService:
 
         unique_changes = list(seen_paths.values())
 
-        # Call registered callbacks
+        # Call registered callbacks — user callbacks are untyped, so we
+        # must isolate any failure to avoid stalling the watcher. Exception
+        # is intentional here and the error is logged for debugging.
         for callback in self._on_change_callbacks:
             try:
                 callback(unique_changes)
             except Exception:
-                pass  # Don't let callback errors stop processing
+                logger.exception("file-change callback raised; continuing")
 
         # Create notification if there are file changes
         if unique_changes:

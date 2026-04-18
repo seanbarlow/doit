@@ -171,11 +171,11 @@ def validate_command(
             print(f'{{"error": "{e}"}}')
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     except ValueError as e:
         if json_output:
             print(f'{{"error": "{e}"}}')
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e

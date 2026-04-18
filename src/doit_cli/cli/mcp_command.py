@@ -44,7 +44,7 @@ def serve_command() -> None:
     except ImportError as e:
         console.print(f"[red]Failed to import MCP dependencies: {e}[/red]")
         console.print("Install with: pip install doit-toolkit-cli[mcp]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
     except Exception as e:
         console.print(f"[red]MCP server error: {e}[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e

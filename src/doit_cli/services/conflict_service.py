@@ -173,8 +173,8 @@ class ConflictService:
                 )
                 conflicts.append(conflict)
 
-            except Exception:
-                # If we can't read the conflict, skip it
+            except (OSError, UnicodeDecodeError):
+                # If we can't read the conflict file, skip it
                 continue
 
         # Store conflicts in state
@@ -306,7 +306,7 @@ class ConflictService:
             self._archive_conflict(conflict)
 
         except Exception as e:
-            raise ConflictError(f"Failed to resolve conflict: {e}")
+            raise ConflictError(f"Failed to resolve conflict: {e}") from e
 
         return conflict
 

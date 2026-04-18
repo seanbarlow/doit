@@ -1,21 +1,17 @@
 ---
-description: Organize, index, audit, and enhance project documentation aligned with scaffoldit conventions.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Run Scaffoldit
-    agent: doit.scaffoldit
-    prompt: Scaffold project structure and generate tech-stack.md...
-  - label: Create Specification
-    agent: doit.specit
-    prompt: Create a feature specification...
+description: Organize, index, audit, and enhance project documentation aligned with
+  scaffoldit conventions.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -72,7 +68,7 @@ If no subcommand is provided, show an interactive menu.
 
 ## Subcommand Detection
 
-Parse $ARGUMENTS to detect the operation:
+Parse ${input:args} to detect the operation:
 
 1. **If empty**: Show interactive menu (step 1)
 2. **If starts with "organize"**: Execute organize workflow (step 2)

@@ -1,18 +1,17 @@
 ---
-description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Build Specification
-    agent: doit.doit
-    prompt: Implement the feature specification based on the updated constitution. I want to build...
+description: Create or update the project constitution from interactive or provided
+  principle inputs, ensuring all dependent templates stay in sync.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 

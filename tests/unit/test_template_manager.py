@@ -396,21 +396,36 @@ class TestUnifiedTemplates:
             assert path.name.endswith(".prompt.md")
 
     def test_copilot_templates_are_transformed(self, temp_dir):
-        """Test Copilot templates have YAML frontmatter removed."""
+        """Test Copilot templates get Copilot-native frontmatter (April 2026).
+
+        Prior to Phase 6 the transformer stripped frontmatter entirely. The
+        current transformer rewrites it to Copilot's native schema
+        (agent: agent, tools: [...]) so `.prompt.md` files are still
+        wrapped in ---, just with different keys.
+        """
         manager = TemplateManager()
         target_dir = temp_dir / "copilot_output"
         target_dir.mkdir()
 
         manager.copy_templates_for_agent(Agent.COPILOT, target_dir)
 
-        # Check content of generated files
         for prompt_file in target_dir.iterdir():
-            if prompt_file.is_file():
-                content = prompt_file.read_text(encoding="utf-8")
-                # YAML frontmatter should be removed
-                assert not content.startswith("---")
-                # $ARGUMENTS should be replaced
-                assert "$ARGUMENTS" not in content
+            if not prompt_file.is_file():
+                continue
+            content = prompt_file.read_text(encoding="utf-8")
+
+            # Copilot-native frontmatter present
+            assert content.startswith("---")
+            assert "agent: agent" in content
+
+            # Claude-specific fields stripped
+            frontmatter = content.split("---", 2)[1]
+            assert "allowed-tools" not in frontmatter
+            assert "handoffs" not in frontmatter
+            assert "effort:" not in frontmatter
+
+            # Placeholder rewritten to Copilot input variable
+            assert "$ARGUMENTS" not in content
 
     def test_claude_templates_preserve_yaml(self, temp_dir):
         """Test Claude templates preserve YAML frontmatter."""

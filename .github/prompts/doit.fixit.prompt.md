@@ -1,27 +1,17 @@
 ---
 description: Start and manage bug-fix workflows for GitHub issues
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Create Plan
-    agent: doit.planit
-    prompt: Create fix plan from investigation findings
-    send: true
-  - label: Implement Fix
-    agent: doit.implementit
-    prompt: Execute the fix plan tasks
-    send: true
-  - label: Check In
-    agent: doit.checkin
-    prompt: Finalize fix and create pull request
-    send: true
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
+- githubRepo
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -70,7 +60,7 @@ This command manages the bug-fix workflow lifecycle for GitHub issues.
 
 ### 1. Parse Command Arguments
 
-Extract the operation from `$ARGUMENTS`:
+Extract the operation from `${input:args}`:
 
 | Pattern | Operation | Example |
 |---------|-----------|---------|

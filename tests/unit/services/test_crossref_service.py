@@ -1,7 +1,8 @@
 """Tests for CrossReferenceService."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from doit_cli.services.crossref_service import CrossReferenceService
 

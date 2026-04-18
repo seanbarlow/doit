@@ -1,18 +1,14 @@
 """Unit tests for sync services (TemplateReader, PromptTransformer, PromptWriter, DriftDetector)."""
 
-import pytest
-from datetime import datetime
-from pathlib import Path
-
 from doit_cli.models.sync_models import (
     CommandTemplate,
     OperationType,
     SyncStatusEnum,
 )
-from doit_cli.services.template_reader import TemplateReader
+from doit_cli.services.drift_detector import DriftDetector
 from doit_cli.services.prompt_transformer import PromptTransformer
 from doit_cli.services.prompt_writer import PromptWriter
-from doit_cli.services.drift_detector import DriftDetector
+from doit_cli.services.template_reader import TemplateReader
 
 
 class TestTemplateReader:
@@ -195,6 +191,7 @@ class TestPromptWriter:
 
         # Make prompt newer than template
         import time
+
         time.sleep(0.01)
         prompt_path.touch()
 
@@ -260,6 +257,7 @@ class TestDriftDetector:
         prompt_path = prompts_dir / "doit.test.prompt.md"
 
         import time
+
         time.sleep(0.01)
         prompt_path.write_text("# Generated")
 
@@ -279,6 +277,7 @@ class TestDriftDetector:
         prompt_path.write_text("# Old prompt")
 
         import time
+
         time.sleep(0.01)
 
         # Create template (newer than prompt)
@@ -304,6 +303,7 @@ class TestDriftDetector:
         prompts_dir.mkdir(parents=True)
 
         import time
+
         time.sleep(0.01)
         (prompts_dir / "doit.test.prompt.md").write_text("# Prompt")
 

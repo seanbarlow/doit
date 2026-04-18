@@ -4,9 +4,10 @@ This module defines dataclasses for tracking the results of milestone sync opera
 including counts of created/updated/skipped items and detailed result items.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List
 from enum import Enum
 
 
@@ -69,7 +70,7 @@ class SyncOperation:
     milestones_created: int = 0
     epics_assigned: int = 0
     errors: int = 0
-    results: List[SyncResultItem] = field(default_factory=list)
+    results: list[SyncResultItem] = field(default_factory=list)
 
     @property
     def is_complete(self) -> bool:
@@ -103,7 +104,7 @@ class SyncOperation:
             action=action,
             target=target,
             status=status,
-            message=message
+            message=message,
         )
         self.results.append(result)
 

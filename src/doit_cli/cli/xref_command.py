@@ -1,8 +1,9 @@
 """Cross-reference commands for spec-task traceability."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -22,7 +23,7 @@ xref_app = typer.Typer(
 )
 
 
-def _detect_spec_from_branch() -> Optional[str]:
+def _detect_spec_from_branch() -> str | None:
     """Try to detect spec name from current git branch.
 
     Returns:
@@ -49,9 +50,7 @@ def _detect_spec_from_branch() -> Optional[str]:
 def _format_coverage_rich(report: CoverageReport, console: Console) -> None:
     """Format coverage report as Rich table."""
     console.print()
-    console.print(
-        f"[bold]Requirement Coverage: {Path(report.spec_path).parent.name}[/bold]"
-    )
+    console.print(f"[bold]Requirement Coverage: {Path(report.spec_path).parent.name}[/bold]")
     console.print("=" * 50)
     console.print()
 
@@ -154,7 +153,7 @@ def _format_coverage_markdown(report: CoverageReport) -> str:
 
 @xref_app.command(name="coverage")
 def coverage_command(
-    spec_name: Optional[str] = typer.Argument(
+    spec_name: str | None = typer.Argument(
         None, help="Spec directory name (default: auto-detect from branch)"
     ),
     output_format: str = typer.Option(
@@ -163,9 +162,7 @@ def coverage_command(
     strict: bool = typer.Option(
         False, "--strict", "-s", help="Treat uncovered requirements as errors"
     ),
-    output_file: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Write output to file"
-    ),
+    output_file: Path | None = typer.Option(None, "--output", "-o", help="Write output to file"),
 ) -> None:
     """Generate a coverage report showing requirement-to-task mapping.
 
@@ -244,7 +241,7 @@ def coverage_command(
 @xref_app.command(name="locate")
 def locate_command(
     requirement_id: str = typer.Argument(..., help="Requirement ID (e.g., FR-001)"),
-    spec: Optional[str] = typer.Option(
+    spec: str | None = typer.Option(
         None, "--spec", "-s", help="Spec name or path (default: auto-detect)"
     ),
     output_format: str = typer.Option(
@@ -286,9 +283,7 @@ def locate_command(
             raise typer.Exit(code=2)
 
         if req is None:
-            console.print(
-                f"[yellow]Requirement {requirement_id} not found in spec.[/yellow]"
-            )
+            console.print(f"[yellow]Requirement {requirement_id} not found in spec.[/yellow]")
             raise typer.Exit(code=1)
 
         # Format output
@@ -318,9 +313,7 @@ def locate_command(
 @xref_app.command(name="tasks")
 def tasks_command(
     requirement_id: str = typer.Argument(..., help="Requirement ID (e.g., FR-001)"),
-    spec: Optional[str] = typer.Option(
-        None, "--spec", "-s", help="Spec name (default: auto-detect)"
-    ),
+    spec: str | None = typer.Option(None, "--spec", "-s", help="Spec name (default: auto-detect)"),
     output_format: str = typer.Option(
         "rich", "--format", "-f", help="Output format: rich, json, markdown"
     ),
@@ -360,9 +353,7 @@ def tasks_command(
             raise typer.Exit(code=2)
 
         if not tasks:
-            console.print(
-                f"[yellow]No tasks found implementing {requirement_id}[/yellow]"
-            )
+            console.print(f"[yellow]No tasks found implementing {requirement_id}[/yellow]")
             raise typer.Exit(code=1)
 
         # Format output
@@ -394,7 +385,10 @@ def tasks_command(
 
             completed = sum(1 for t in tasks if t.completed)
             lines.extend(
-                ["", f"Found {len(tasks)} tasks ({completed} complete, {len(tasks) - completed} pending)"]
+                [
+                    "",
+                    f"Found {len(tasks)} tasks ({completed} complete, {len(tasks) - completed} pending)",
+                ]
             )
             print("\n".join(lines))
         else:
@@ -426,15 +420,11 @@ def tasks_command(
 
 @xref_app.command(name="validate")
 def validate_command(
-    spec_name: Optional[str] = typer.Argument(
+    spec_name: str | None = typer.Argument(
         None, help="Spec directory name (default: auto-detect from branch)"
     ),
-    strict: bool = typer.Option(
-        False, "--strict", "-s", help="Treat warnings as errors"
-    ),
-    output_format: str = typer.Option(
-        "rich", "--format", "-f", help="Output format: rich, json"
-    ),
+    strict: bool = typer.Option(False, "--strict", "-s", help="Treat warnings as errors"),
+    output_format: str = typer.Option("rich", "--format", "-f", help="Output format: rich, json"),
 ) -> None:
     """Validate cross-reference integrity between spec and tasks.
 
@@ -492,8 +482,7 @@ def validate_command(
                 "errors": error_count,
                 "warnings": warning_count,
                 "orphaned_references": [
-                    {"task_line": t.line_number, "reference": ref}
-                    for t, ref in orphaned
+                    {"task_line": t.line_number, "reference": ref} for t, ref in orphaned
                 ],
                 "uncovered_requirements": uncovered,
             }
@@ -514,8 +503,7 @@ def validate_command(
                 console.print("[red]\u2717 Orphaned References:[/red]")
                 for task, ref_id in orphaned:
                     console.print(
-                        f"  - Task at line {task.line_number} references "
-                        f"non-existent {ref_id}"
+                        f"  - Task at line {task.line_number} references non-existent {ref_id}"
                     )
 
             if uncovered:
@@ -525,9 +513,7 @@ def validate_command(
                     f"{', '.join(uncovered)}[/]"
                 )
             elif report.total_count > 0:
-                console.print(
-                    f"[green]\u2713[/green] All requirements have linked tasks"
-                )
+                console.print("[green]\u2713[/green] All requirements have linked tasks")
 
             # Summary
             console.print()
@@ -535,13 +521,11 @@ def validate_command(
                 console.print("[green]Validation: PASS[/green]")
             elif error_count > 0:
                 console.print(
-                    f"[red]Validation: FAIL ({error_count} errors, "
-                    f"{warning_count} warnings)[/red]"
+                    f"[red]Validation: FAIL ({error_count} errors, {warning_count} warnings)[/red]"
                 )
             else:
                 console.print(
-                    f"[yellow]Validation: WARN (0 errors, "
-                    f"{warning_count} warnings)[/yellow]"
+                    f"[yellow]Validation: WARN (0 errors, {warning_count} warnings)[/yellow]"
                 )
 
         # Determine exit code

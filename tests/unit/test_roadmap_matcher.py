@@ -1,14 +1,12 @@
 """Unit tests for RoadmapMatcher service."""
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
-from doit_cli.services.roadmap_matcher import (
-    RoadmapMatcherService,
-    RoadmapItem,
-    MatchResult
-)
+
+import pytest
+
+from doit_cli.services.roadmap_matcher import MatchResult, RoadmapItem, RoadmapMatcherService
 
 
 @pytest.fixture
@@ -48,7 +46,7 @@ class TestRoadmapItem:
             github_number=123,
             github_url="https://github.com/owner/repo/issues/123",
             status="Planned",
-            category="Core"
+            category="Core",
         )
         assert item.title == "Test Feature"
         assert item.priority == "P1"
@@ -64,7 +62,7 @@ class TestRoadmapItem:
                 github_number=None,
                 github_url=None,
                 status="Planned",
-                category=None
+                category=None,
             )
 
     def test_invalid_github_number(self):
@@ -77,7 +75,7 @@ class TestRoadmapItem:
                 github_number=-1,  # Invalid
                 github_url="url",
                 status="Planned",
-                category=None
+                category=None,
             )
 
     def test_empty_title(self):
@@ -90,7 +88,7 @@ class TestRoadmapItem:
                 github_number=None,
                 github_url=None,
                 status="Planned",
-                category=None
+                category=None,
             )
 
 
@@ -297,14 +295,10 @@ class TestMatchResult:
             github_number=123,
             github_url="url",
             status="Planned",
-            category="Core"
+            category="Core",
         )
 
-        result = MatchResult(
-            item=item,
-            similarity_score=0.95,
-            is_exact_match=False
-        )
+        result = MatchResult(item=item, similarity_score=0.95, is_exact_match=False)
 
         assert result.item.title == "Test"
         assert result.similarity_score == 0.95

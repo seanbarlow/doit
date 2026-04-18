@@ -1,6 +1,5 @@
 """Unit tests for custom validation rules."""
 
-import pytest
 from pathlib import Path
 
 from doit_cli.models.validation_models import (

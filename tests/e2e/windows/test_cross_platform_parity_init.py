@@ -1,6 +1,6 @@
 """Cross-platform parity tests for 'doit init' command."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -33,8 +33,7 @@ def test_init_directory_structure_parity(temp_project_dir, comparison_tools):
     # Verify all directories created
     for dir_path in expected_dirs:
         normalized_path = comparison_tools.normalize_path(dir_path)
-        assert (temp_project_dir / dir_path).exists(), \
-            f"Directory missing: {normalized_path}"
+        assert (temp_project_dir / dir_path).exists(), f"Directory missing: {normalized_path}"
 
 
 @pytest.mark.windows
@@ -155,7 +154,7 @@ def test_init_template_file_parity(temp_project_dir, comparison_tools):
 
     # Read and verify structure
     read_content = spec_template.read_text(encoding="utf-8")
-    normalized = comparison_tools.normalize_output(read_content)
+    comparison_tools.normalize_output(read_content)
 
     # Verify template placeholders preserved
     assert "{{ feature_name }}" in read_content

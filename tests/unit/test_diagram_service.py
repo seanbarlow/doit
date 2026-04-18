@@ -1,10 +1,8 @@
 """Unit tests for DiagramService."""
 
 import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch
 
-from doit_cli.models.diagram_models import DiagramType, GeneratedDiagram, ValidationResult
+from doit_cli.models.diagram_models import DiagramType
 from doit_cli.services.diagram_service import DiagramService
 
 
@@ -91,8 +89,7 @@ class TestDiagramService:
         assert len(result.diagrams) >= 1
 
         user_journey = next(
-            (d for d in result.diagrams if d.diagram_type == DiagramType.USER_JOURNEY),
-            None
+            (d for d in result.diagrams if d.diagram_type == DiagramType.USER_JOURNEY), None
         )
         assert user_journey is not None
         assert "flowchart" in user_journey.mermaid_content
@@ -182,9 +179,7 @@ class TestDiagramService:
 flowchart LR
     A[Test] --> B[Node]
 ```"""
-        success = service.insert_diagram(
-            sample_spec_file, "user-journey", diagram_content
-        )
+        success = service.insert_diagram(sample_spec_file, "user-journey", diagram_content)
         assert success
 
         content = sample_spec_file.read_text(encoding="utf-8")
@@ -196,9 +191,7 @@ flowchart LR
         spec_file = tmp_path / "spec.md"
         spec_file.write_text("# No sections here", encoding="utf-8")
 
-        success = service.insert_diagram(
-            spec_file, "user-journey", "```mermaid\ntest\n```"
-        )
+        success = service.insert_diagram(spec_file, "user-journey", "```mermaid\ntest\n```")
         assert not success
 
     def test_get_diagram_content(self, service, tmp_path):
@@ -249,7 +242,7 @@ This should also be preserved.
         spec_file = tmp_path / "spec.md"
         spec_file.write_text(original_content, encoding="utf-8")
 
-        result = service.generate(spec_file, insert=True)
+        service.generate(spec_file, insert=True)
 
         updated_content = spec_file.read_text(encoding="utf-8")
 

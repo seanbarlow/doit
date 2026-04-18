@@ -1,12 +1,8 @@
 """Unit tests for ConfigBackupService - T017."""
 
-from datetime import datetime, UTC
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-
 import pytest
 
-from src.doit_cli.models.wizard_models import BackupNotFoundError, ConfigBackup
+from src.doit_cli.models.wizard_models import BackupNotFoundError
 from src.doit_cli.services.config_backup_service import ConfigBackupService
 from src.doit_cli.services.provider_config import ProviderConfig
 from src.doit_cli.services.providers.base import ProviderType
@@ -206,7 +202,7 @@ class TestDeleteBackup:
 
     def test_removes_specific_backup(self, backup_service, github_config):
         """Removes a specific backup by ID."""
-        backup1 = backup_service.create_backup(github_config, reason="keep")
+        backup_service.create_backup(github_config, reason="keep")
         backup2 = backup_service.create_backup(github_config, reason="delete")
 
         backup_service.delete_backup(backup2.backup_id)

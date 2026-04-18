@@ -1,6 +1,6 @@
 """Cross-platform parity tests for 'doit planit' command."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -279,7 +279,7 @@ def test_planit_dependency_list_parity(temp_project_dir, comparison_tools):
 
     # Read and normalize
     read_content = plan_file.read_text(encoding="utf-8")
-    normalized = comparison_tools.normalize_output(read_content)
+    comparison_tools.normalize_output(read_content)
 
     # Verify dependencies listed
     assert "pytest >= 7.0.0" in read_content

@@ -1,7 +1,9 @@
 """Update command for updating doit project templates and commands."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -9,39 +11,22 @@ from rich.console import Console
 from ..models.agent import Agent
 from .init_command import display_init_result, parse_agent_string, run_init
 
-
 console = Console()
 
 
 def update_command(
     path: Annotated[
         Path,
-        typer.Argument(
-            default=...,
-            help="Project directory path (use '.' for current directory)"
-        )
-    ] = Path("."),
+        typer.Argument(default=..., help="Project directory path (use '.' for current directory)"),
+    ] = Path(),
     agent: Annotated[
-        Optional[str],
-        typer.Option(
-            "--agent", "-a",
-            help="Target agent(s): claude, copilot, or claude,copilot"
-        )
+        str | None,
+        typer.Option("--agent", "-a", help="Target agent(s): claude, copilot, or claude,copilot"),
     ] = None,
     force: Annotated[
-        bool,
-        typer.Option(
-            "--force", "-f",
-            help="Overwrite all files including memory files"
-        )
+        bool, typer.Option("--force", "-f", help="Overwrite all files including memory files")
     ] = False,
-    yes: Annotated[
-        bool,
-        typer.Option(
-            "--yes", "-y",
-            help="Skip confirmation prompts"
-        )
-    ] = True,
+    yes: Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompts")] = True,
 ) -> None:
     """Update doit templates and commands to the latest version.
 

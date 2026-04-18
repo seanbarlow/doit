@@ -14,7 +14,7 @@ def parser():
 @pytest.fixture
 def valid_entity_content():
     """Sample content with Key Entities section."""
-    return '''# Feature Spec
+    return """# Feature Spec
 
 ## Key Entities
 
@@ -25,18 +25,18 @@ def valid_entity_content():
 ## Other Section
 
 Some other content.
-'''
+"""
 
 
 @pytest.fixture
 def empty_entity_content():
     """Content without Key Entities section."""
-    return '''# Feature Spec
+    return """# Feature Spec
 
 ## Overview
 
 No entities here.
-'''
+"""
 
 
 class TestEntityParser:
@@ -100,12 +100,12 @@ class TestEntityParser:
 
     def test_duplicate_entity_handling(self, parser):
         """Test that duplicate entity names are handled."""
-        content = '''
+        content = """
 ## Key Entities
 
 - **User**: First definition
 - **User**: Duplicate definition
-'''
+"""
         entities = parser.parse(content)
         # Should only have one User
         user_count = sum(1 for e in entities if e.name == "User")

@@ -9,16 +9,14 @@ Tests the full workflow:
 """
 
 import pytest
-from pathlib import Path
 
 from doit_cli.models.diagram_models import DiagramType
 from doit_cli.services.diagram_service import DiagramService
-from doit_cli.services.user_story_parser import UserStoryParser
 from doit_cli.services.entity_parser import EntityParser
-from doit_cli.services.user_journey_generator import UserJourneyGenerator
-from doit_cli.services.er_diagram_generator import ERDiagramGenerator
 from doit_cli.services.mermaid_validator import MermaidValidator
 from doit_cli.services.section_parser import SectionParser
+from doit_cli.services.user_journey_generator import UserJourneyGenerator
+from doit_cli.services.user_story_parser import UserStoryParser
 
 
 @pytest.fixture
@@ -253,9 +251,7 @@ class TestFullDiagramWorkflow:
 
         # Replace content
         new_content, success = section_parser.replace_section_content(
-            full_spec_content,
-            "user-journey",
-            "```mermaid\nflowchart LR\n    A[Test]\n```"
+            full_spec_content, "user-journey", "```mermaid\nflowchart LR\n    A[Test]\n```"
         )
 
         assert success
@@ -310,7 +306,7 @@ class TestEdgeCases:
 
     def test_special_characters_in_content(self, tmp_path):
         """Test handling of special characters."""
-        content = '''# Feature
+        content = """# Feature
 
 ## User Stories
 
@@ -327,7 +323,7 @@ class TestEdgeCases:
 
 <!-- BEGIN:AUTO-GENERATED section="user-journey" -->
 <!-- END:AUTO-GENERATED -->
-'''
+"""
         spec_file = tmp_path / "spec.md"
         spec_file.write_text(content, encoding="utf-8")
 
@@ -338,7 +334,7 @@ class TestEdgeCases:
 
     def test_unicode_content(self, tmp_path):
         """Test handling of Unicode characters."""
-        content = '''# Feature: Internationalisation
+        content = """# Feature: Internationalisation
 
 ## User Stories
 
@@ -355,7 +351,7 @@ class TestEdgeCases:
 
 <!-- BEGIN:AUTO-GENERATED section="user-journey" -->
 <!-- END:AUTO-GENERATED -->
-'''
+"""
         spec_file = tmp_path / "spec.md"
         spec_file.write_text(content, encoding="utf-8")
 
@@ -368,20 +364,20 @@ class TestEdgeCases:
         """Test handling of large spec with many stories."""
         stories = []
         for i in range(20):
-            stories.append(f'''
-### User Story {i+1} - Feature {i+1} (Priority: P{(i % 4) + 1})
+            stories.append(f"""
+### User Story {i + 1} - Feature {i + 1} (Priority: P{(i % 4) + 1})
 
-**Description**: Description for feature {i+1}
+**Description**: Description for feature {i + 1}
 
 **Acceptance Criteria**:
 
 #### Scenario 1
-- **Given**: precondition {i+1}
-- **When**: action {i+1}
-- **Then**: result {i+1}
-''')
+- **Given**: precondition {i + 1}
+- **When**: action {i + 1}
+- **Then**: result {i + 1}
+""")
 
-        content = f'''# Large Feature
+        content = f"""# Large Feature
 
 ## User Stories
 
@@ -389,7 +385,7 @@ class TestEdgeCases:
 
 <!-- BEGIN:AUTO-GENERATED section="user-journey" -->
 <!-- END:AUTO-GENERATED -->
-'''
+"""
         spec_file = tmp_path / "spec.md"
         spec_file.write_text(content, encoding="utf-8")
 
@@ -407,7 +403,7 @@ class TestEdgeCases:
 
     def test_minimal_spec(self, tmp_path):
         """Test with minimal valid spec."""
-        content = '''# Min
+        content = """# Min
 
 ## User Stories
 
@@ -422,7 +418,7 @@ class TestEdgeCases:
 
 <!-- BEGIN:AUTO-GENERATED section="user-journey" -->
 <!-- END:AUTO-GENERATED -->
-'''
+"""
         spec_file = tmp_path / "spec.md"
         spec_file.write_text(content, encoding="utf-8")
 

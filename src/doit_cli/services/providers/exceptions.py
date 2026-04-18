@@ -3,13 +3,13 @@
 This module defines all exceptions that can be raised by git provider operations.
 """
 
-from typing import Optional
+from __future__ import annotations
 
 
 class ProviderError(Exception):
     """Base exception for all provider errors."""
 
-    def __init__(self, message: str, cause: Optional[Exception] = None):
+    def __init__(self, message: str, cause: Exception | None = None):
         super().__init__(message)
         self.message = message
         self.cause = cause
@@ -30,8 +30,8 @@ class AuthenticationError(ProviderError):
     def __init__(
         self,
         message: str = "Authentication failed",
-        cause: Optional[Exception] = None,
-        provider: Optional[str] = None,
+        cause: Exception | None = None,
+        provider: str | None = None,
     ):
         super().__init__(message, cause)
         self.provider = provider
@@ -47,8 +47,8 @@ class RateLimitError(ProviderError):
     def __init__(
         self,
         message: str = "Rate limit exceeded",
-        retry_after: Optional[int] = None,
-        cause: Optional[Exception] = None,
+        retry_after: int | None = None,
+        cause: Exception | None = None,
     ):
         super().__init__(message, cause)
         self.retry_after = retry_after  # Seconds until rate limit resets
@@ -71,7 +71,7 @@ class ResourceNotFoundError(ProviderError):
         self,
         resource_type: str,
         resource_id: str,
-        cause: Optional[Exception] = None,
+        cause: Exception | None = None,
     ):
         message = f"{resource_type} not found: {resource_id}"
         super().__init__(message, cause)
@@ -89,8 +89,8 @@ class ValidationError(ProviderError):
     def __init__(
         self,
         message: str,
-        field: Optional[str] = None,
-        cause: Optional[Exception] = None,
+        field: str | None = None,
+        cause: Exception | None = None,
     ):
         super().__init__(message, cause)
         self.field = field
@@ -112,7 +112,7 @@ class NetworkError(ProviderError):
     def __init__(
         self,
         message: str = "Network error",
-        cause: Optional[Exception] = None,
+        cause: Exception | None = None,
         is_timeout: bool = False,
     ):
         super().__init__(message, cause)
@@ -129,7 +129,7 @@ class ProviderNotConfiguredError(ProviderError):
     def __init__(
         self,
         message: str = "No git provider configured. Run 'doit provider configure' first.",
-        cause: Optional[Exception] = None,
+        cause: Exception | None = None,
     ):
         super().__init__(message, cause)
 
@@ -145,7 +145,7 @@ class ProviderNotImplementedError(ProviderError):
         self,
         provider: str,
         operation: str,
-        cause: Optional[Exception] = None,
+        cause: Exception | None = None,
     ):
         message = (
             f"{provider} provider does not support '{operation}' yet. "

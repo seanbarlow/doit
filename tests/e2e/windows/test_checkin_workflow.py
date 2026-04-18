@@ -1,7 +1,7 @@
 """End-to-end tests for 'doit checkin' and Git operations on Windows."""
-import sys
+
 import subprocess
-from pathlib import Path
+import sys
 
 import pytest
 
@@ -37,7 +37,9 @@ def test_checkin_creates_git_commit(temp_project_dir):
     test_file.write_text("test content", encoding="utf-8")
 
     # Stage and commit
-    subprocess.run(["git", "add", "test.txt"], cwd=temp_project_dir, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "add", "test.txt"], cwd=temp_project_dir, check=True, capture_output=True
+    )
     result = subprocess.run(
         ["git", "commit", "-m", "Test commit"],
         cwd=temp_project_dir,
@@ -230,7 +232,9 @@ def test_git_line_ending_handling(temp_project_dir):
     test_file.write_bytes(b"line1\r\nline2\r\nline3\r\n")
 
     # Stage and commit
-    subprocess.run(["git", "add", "crlf.txt"], cwd=temp_project_dir, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "add", "crlf.txt"], cwd=temp_project_dir, check=True, capture_output=True
+    )
     subprocess.run(
         ["git", "commit", "-m", "Add CRLF file"],
         cwd=temp_project_dir,

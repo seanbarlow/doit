@@ -1,6 +1,5 @@
 """Unit tests for HookConfig model."""
 
-import pytest
 from pathlib import Path
 
 from doit_cli.models.hook_config import HookConfig, HookRule, LoggingConfig

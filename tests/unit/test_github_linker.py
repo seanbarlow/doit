@@ -1,16 +1,14 @@
 """Unit tests for GitHubLinker service."""
 
-import pytest
-import tempfile
-import shutil
 import json
+import shutil
+import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from doit_cli.services.github_linker import (
-    GitHubLinkerService,
-    EpicReference,
-    SpecReference
-)
+from unittest.mock import Mock, patch
+
+import pytest
+
+from doit_cli.services.github_linker import EpicReference, GitHubLinkerService, SpecReference
 from doit_cli.services.github_service import GitHubServiceError
 
 
@@ -48,7 +46,7 @@ def sample_epic_data():
         "state": "open",
         "labels": ["epic", "priority:P1"],
         "url": "https://github.com/owner/repo/issues/123",
-        "priority": "P1"
+        "priority": "P1",
     }
 
 
@@ -65,9 +63,7 @@ class TestEpicReference:
     def test_create_epic_reference(self):
         """Test creating an epic reference."""
         ref = EpicReference(
-            number=123,
-            url="https://github.com/owner/repo/issues/123",
-            priority="P1"
+            number=123, url="https://github.com/owner/repo/issues/123", priority="P1"
         )
         assert ref.number == 123
         assert ref.url == "https://github.com/owner/repo/issues/123"
@@ -80,9 +76,7 @@ class TestSpecReference:
     def test_create_spec_reference(self):
         """Test creating a spec reference."""
         ref = SpecReference(
-            file_path="specs/001-test/spec.md",
-            feature_name="Test Feature",
-            branch_name="001-test"
+            file_path="specs/001-test/spec.md", feature_name="Test Feature", branch_name="001-test"
         )
         assert ref.file_path == "specs/001-test/spec.md"
         assert ref.feature_name == "Test Feature"
@@ -91,8 +85,8 @@ class TestSpecReference:
 class TestGetEpicDetails:
     """Tests for get_epic_details method."""
 
-    @patch('subprocess.run')
-    @patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo')
+    @patch("subprocess.run")
+    @patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo")
     def test_get_epic_details_success(self, mock_repo_slug, mock_run, sample_epic_data):
         """Test successfully fetching epic details."""
         # Mock subprocess response
@@ -108,22 +102,21 @@ class TestGetEpicDetails:
         assert epic["state"] == "open"
         assert epic["priority"] == "P1"
 
-    @patch('subprocess.run')
-    @patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo')
+    @patch("subprocess.run")
+    @patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo")
     def test_get_epic_details_not_found(self, mock_repo_slug, mock_run, mock_github_service):
         """Test fetching non-existent epic."""
         import subprocess
-        mock_run.side_effect = subprocess.CalledProcessError(
-            1, 'gh', stderr="404 Not Found"
-        )
+
+        mock_run.side_effect = subprocess.CalledProcessError(1, "gh", stderr="404 Not Found")
 
         linker = GitHubLinkerService(github_service=mock_github_service)
 
         with pytest.raises(GitHubServiceError, match="not found"):
             linker.get_epic_details(999)
 
-    @patch('subprocess.run')
-    @patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo')
+    @patch("subprocess.run")
+    @patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo")
     def test_get_epic_details_invalid_number(self, mock_repo_slug, mock_run):
         """Test fetching epic with invalid number."""
         linker = GitHubLinkerService()
@@ -138,13 +131,10 @@ class TestGetEpicDetails:
 class TestValidateEpicForLinking:
     """Tests for validate_epic_for_linking method."""
 
-    @patch.object(GitHubLinkerService, 'get_epic_details')
+    @patch.object(GitHubLinkerService, "get_epic_details")
     def test_validate_open_epic_with_label(self, mock_get_epic):
         """Test validating an open epic with epic label."""
-        mock_get_epic.return_value = {
-            "state": "open",
-            "labels": ["epic", "priority:P1"]
-        }
+        mock_get_epic.return_value = {"state": "open", "labels": ["epic", "priority:P1"]}
 
         linker = GitHubLinkerService()
         is_valid, error = linker.validate_epic_for_linking(123)
@@ -152,13 +142,10 @@ class TestValidateEpicForLinking:
         assert is_valid is True
         assert error == ""
 
-    @patch.object(GitHubLinkerService, 'get_epic_details')
+    @patch.object(GitHubLinkerService, "get_epic_details")
     def test_validate_closed_epic(self, mock_get_epic):
         """Test validating a closed epic."""
-        mock_get_epic.return_value = {
-            "state": "closed",
-            "labels": ["epic"]
-        }
+        mock_get_epic.return_value = {"state": "closed", "labels": ["epic"]}
 
         linker = GitHubLinkerService()
         is_valid, error = linker.validate_epic_for_linking(123)
@@ -166,13 +153,10 @@ class TestValidateEpicForLinking:
         assert is_valid is False
         assert "closed" in error
 
-    @patch.object(GitHubLinkerService, 'get_epic_details')
+    @patch.object(GitHubLinkerService, "get_epic_details")
     def test_validate_issue_without_epic_label(self, mock_get_epic):
         """Test validating an issue without epic label."""
-        mock_get_epic.return_value = {
-            "state": "open",
-            "labels": ["bug", "priority:P1"]
-        }
+        mock_get_epic.return_value = {"state": "open", "labels": ["bug", "priority:P1"]}
 
         linker = GitHubLinkerService()
         is_valid, error = linker.validate_epic_for_linking(123)
@@ -180,7 +164,7 @@ class TestValidateEpicForLinking:
         assert is_valid is False
         assert "not labeled as an epic" in error
 
-    @patch.object(GitHubLinkerService, 'get_epic_details')
+    @patch.object(GitHubLinkerService, "get_epic_details")
     def test_validate_epic_api_error(self, mock_get_epic):
         """Test validation when API returns error."""
         mock_get_epic.side_effect = GitHubServiceError("API Error")
@@ -284,7 +268,7 @@ Content here.
 class TestGetRepoSlug:
     """Tests for _get_repo_slug method."""
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_get_repo_slug_ssh(self, mock_run):
         """Test getting repo slug from SSH remote URL."""
         mock_result = Mock()
@@ -296,7 +280,7 @@ class TestGetRepoSlug:
 
         assert slug == "owner/repo"
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_get_repo_slug_https(self, mock_run):
         """Test getting repo slug from HTTPS remote URL."""
         mock_result = Mock()
@@ -308,7 +292,7 @@ class TestGetRepoSlug:
 
         assert slug == "owner/repo"
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_get_repo_slug_not_github(self, mock_run):
         """Test error when remote is not GitHub."""
         mock_result = Mock()
@@ -320,11 +304,12 @@ class TestGetRepoSlug:
         with pytest.raises(GitHubServiceError, match="Not a GitHub repository"):
             linker._get_repo_slug()
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_get_repo_slug_no_remote(self, mock_run, mock_github_service):
         """Test error when no git remote found."""
         import subprocess
-        mock_run.side_effect = subprocess.CalledProcessError(1, 'git')
+
+        mock_run.side_effect = subprocess.CalledProcessError(1, "git")
 
         linker = GitHubLinkerService(github_service=mock_github_service)
 
@@ -335,7 +320,7 @@ class TestGetRepoSlug:
 class TestGetRelativePath:
     """Tests for _get_relative_path method."""
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_get_relative_path_success(self, mock_run):
         """Test getting relative path from repo root."""
         mock_result = Mock()
@@ -349,11 +334,12 @@ class TestGetRelativePath:
 
         assert relative_path == "specs/001-test/spec.md"
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_get_relative_path_fallback(self, mock_run, mock_github_service):
         """Test fallback when git command fails."""
         import subprocess
-        mock_run.side_effect = subprocess.CalledProcessError(1, 'git')
+
+        mock_run.side_effect = subprocess.CalledProcessError(1, "git")
 
         linker = GitHubLinkerService(github_service=mock_github_service)
         spec_path = Path("/home/user/repo/specs/001-test/spec.md")
@@ -366,12 +352,12 @@ class TestGetRelativePath:
 class TestLinkSpecToEpic:
     """Tests for link_spec_to_epic method."""
 
-    @patch.object(GitHubLinkerService, 'validate_epic_for_linking', return_value=(True, ""))
-    @patch.object(GitHubLinkerService, 'get_epic_details')
-    @patch.object(GitHubLinkerService, 'update_epic_body')
-    @patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo')
-    @patch('doit_cli.services.github_linker.add_epic_to_spec')
-    @patch('doit_cli.services.github_linker.get_epic_reference', return_value=None)
+    @patch.object(GitHubLinkerService, "validate_epic_for_linking", return_value=(True, ""))
+    @patch.object(GitHubLinkerService, "get_epic_details")
+    @patch.object(GitHubLinkerService, "update_epic_body")
+    @patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo")
+    @patch("doit_cli.services.github_linker.add_epic_to_spec")
+    @patch("doit_cli.services.github_linker.get_epic_reference", return_value=None)
     def test_link_spec_to_epic_success(
         self,
         mock_get_epic_ref,
@@ -381,7 +367,7 @@ class TestLinkSpecToEpic:
         mock_get_epic,
         mock_validate,
         temp_spec_dir,
-        sample_spec_content
+        sample_spec_content,
     ):
         """Test successfully linking spec to epic."""
         # Create spec file
@@ -397,7 +383,9 @@ class TestLinkSpecToEpic:
         mock_add_epic.assert_called_once()
         mock_update_body.assert_called_once()
 
-    @patch.object(GitHubLinkerService, 'validate_epic_for_linking', return_value=(False, "Epic is closed"))
+    @patch.object(
+        GitHubLinkerService, "validate_epic_for_linking", return_value=(False, "Epic is closed")
+    )
     def test_link_spec_to_closed_epic(self, mock_validate, temp_spec_dir, sample_spec_content):
         """Test linking to closed epic fails validation."""
         spec_path = temp_spec_dir / "spec.md"
@@ -427,7 +415,7 @@ class TestLinkSpecToEpic:
         with pytest.raises(ValueError, match="Invalid epic number"):
             linker.link_spec_to_epic(spec_path, epic_number=0)
 
-    @patch('doit_cli.services.github_linker.get_epic_reference', return_value=(456, "url"))
+    @patch("doit_cli.services.github_linker.get_epic_reference", return_value=(456, "url"))
     def test_link_spec_already_linked(self, mock_get_epic_ref, temp_spec_dir, sample_spec_content):
         """Test linking spec that's already linked to different epic."""
         spec_path = temp_spec_dir / "spec.md"
@@ -442,24 +430,17 @@ class TestLinkSpecToEpic:
 class TestUnlinkSpecFromEpic:
     """Tests for unlink_spec_from_epic method."""
 
-    @patch.object(GitHubLinkerService, 'get_epic_details')
-    @patch.object(GitHubLinkerService, '_update_epic_via_cli')
-    @patch('doit_cli.services.github_linker.remove_epic_reference')
+    @patch.object(GitHubLinkerService, "get_epic_details")
+    @patch.object(GitHubLinkerService, "_update_epic_via_cli")
+    @patch("doit_cli.services.github_linker.remove_epic_reference")
     def test_unlink_success(
-        self,
-        mock_remove_epic,
-        mock_update_cli,
-        mock_get_epic,
-        temp_spec_dir,
-        sample_spec_content
+        self, mock_remove_epic, mock_update_cli, mock_get_epic, temp_spec_dir, sample_spec_content
     ):
         """Test successfully unlinking spec from epic."""
         spec_path = temp_spec_dir / "spec.md"
         spec_path.write_text(sample_spec_content)
 
-        mock_get_epic.return_value = {
-            "body": "## Specification\n\n- `specs/001-test/spec.md`\n"
-        }
+        mock_get_epic.return_value = {"body": "## Specification\n\n- `specs/001-test/spec.md`\n"}
 
         linker = GitHubLinkerService()
         result = linker.unlink_spec_from_epic(spec_path, epic_number=123)

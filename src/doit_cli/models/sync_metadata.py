@@ -4,9 +4,10 @@ This module provides the SyncMetadata dataclass for managing cache validation
 and synchronization tracking between GitHub and local roadmap.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Optional
 
 
 @dataclass
@@ -91,7 +92,7 @@ class SyncMetadata:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SyncMetadata":
+    def from_dict(cls, data: dict) -> SyncMetadata:
         """Create SyncMetadata from dictionary.
 
         Args:
@@ -122,7 +123,7 @@ class SyncMetadata:
         )
 
     @classmethod
-    def create_new(cls, repo_url: str, ttl_minutes: int = 30) -> "SyncMetadata":
+    def create_new(cls, repo_url: str, ttl_minutes: int = 30) -> SyncMetadata:
         """Create new metadata with current timestamp.
 
         Args:

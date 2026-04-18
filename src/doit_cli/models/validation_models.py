@@ -1,9 +1,10 @@
 """Models for spec validation and linting."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 
 class Severity(str, Enum):
@@ -42,7 +43,7 @@ class ValidationRule:
     description: str
     severity: Severity
     category: str
-    pattern: Optional[str] = None
+    pattern: str | None = None
     enabled: bool = True
     builtin: bool = True
 
@@ -63,7 +64,7 @@ class ValidationIssue:
     severity: Severity
     line_number: int
     message: str
-    suggestion: Optional[str] = None
+    suggestion: str | None = None
 
 
 @dataclass
@@ -144,7 +145,7 @@ class CustomRule:
     severity: str
     category: str
     check: str = "present"
-    max: Optional[int] = None
+    max: int | None = None
 
 
 @dataclass
@@ -170,6 +171,6 @@ class ValidationConfig:
     custom_rules: list[CustomRule] = field(default_factory=list)
 
     @classmethod
-    def default(cls) -> "ValidationConfig":
+    def default(cls) -> ValidationConfig:
         """Return default configuration with no customizations."""
         return cls()

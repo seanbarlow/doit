@@ -1,9 +1,10 @@
 """MCP tool for project context loading."""
 
+from __future__ import annotations
+
 import json
 import logging
 from pathlib import Path
-from typing import List, Optional
 
 from mcp.server.fastmcp import FastMCP
 
@@ -14,7 +15,7 @@ def register_context_tool(mcp: FastMCP) -> None:
     """Register the doit_context tool with the MCP server."""
 
     @mcp.tool()
-    def doit_context(sources: Optional[List[str]] = None) -> str:
+    def doit_context(sources: list[str] | None = None) -> str:
         """Load project context (constitution, tech stack, roadmap).
 
         Args:
@@ -32,16 +33,22 @@ def register_context_tool(mcp: FastMCP) -> None:
         try:
             loader = ContextLoader(project_root=project_root)
         except FileNotFoundError as e:
-            return json.dumps({
-                "error": str(e),
-                "message": "Project memory files not found. Run `doit init` first.",
-            }, indent=2)
+            return json.dumps(
+                {
+                    "error": str(e),
+                    "message": "Project memory files not found. Run `doit init` first.",
+                },
+                indent=2,
+            )
         except Exception as e:
             logger.error("Unexpected error loading context: %s", e)
-            return json.dumps({
-                "error": str(e),
-                "message": "Failed to load context.",
-            }, indent=2)
+            return json.dumps(
+                {
+                    "error": str(e),
+                    "message": "Failed to load context.",
+                },
+                indent=2,
+            )
 
         loaded = loader.load()
         sources_data = []
@@ -51,18 +58,23 @@ def register_context_tool(mcp: FastMCP) -> None:
             if sources and source.source_type not in sources:
                 continue
             status = "truncated" if source.truncated else "complete"
-            sources_data.append({
-                "name": source.source_type,
-                "path": str(source.path),
-                "content": source.content,
-                "tokens": source.token_count,
-                "status": status,
-            })
+            sources_data.append(
+                {
+                    "name": source.source_type,
+                    "path": str(source.path),
+                    "content": source.content,
+                    "tokens": source.token_count,
+                    "status": status,
+                }
+            )
 
-        return json.dumps({
-            "sources": sources_data,
-            "summary": {
-                "total_sources": len(sources_data),
-                "total_tokens": sum(s["tokens"] for s in sources_data),
+        return json.dumps(
+            {
+                "sources": sources_data,
+                "summary": {
+                    "total_sources": len(sources_data),
+                    "total_tokens": sum(s["tokens"] for s in sources_data),
+                },
             },
-        }, indent=2)
+            indent=2,
+        )

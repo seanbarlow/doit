@@ -1,5 +1,7 @@
 """Agent enum and configuration for supported AI coding assistants."""
 
+from __future__ import annotations
+
 from enum import Enum
 
 

@@ -2,6 +2,7 @@
 
 import subprocess
 from pathlib import Path
+
 import pytest
 
 
@@ -27,7 +28,7 @@ def test_setup_plan_script_on_macos(git_repo, macos_test_env):
         cwd=git_repo,
         capture_output=True,
         text=True,
-        timeout=10
+        timeout=10,
     )
 
     # Script should at least respond to --help
@@ -51,14 +52,10 @@ def test_bash_scripts_execute_without_errors(git_repo, macos_test_env):
     # Test each .sh file with bash -n (syntax check)
     for script in scripts_dir.glob("*.sh"):
         result = subprocess.run(
-            ["bash", "-n", str(script)],
-            capture_output=True,
-            text=True,
-            timeout=5
+            ["bash", "-n", str(script)], capture_output=True, text=True, timeout=5
         )
 
-        assert result.returncode == 0, \
-            f"Syntax error in {script.name}: {result.stderr}"
+        assert result.returncode == 0, f"Syntax error in {script.name}: {result.stderr}"
 
 
 @pytest.mark.macos
@@ -139,6 +136,7 @@ exit 0
     test_script.chmod(0o755)
 
     from tests.utils.macos.bsd_utils import run_bash_script
+
     success, stdout, stderr = run_bash_script(str(test_script))
 
     assert success, f"BSD script failed: {stderr}"

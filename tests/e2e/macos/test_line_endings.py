@@ -1,6 +1,7 @@
 """E2E tests for line ending handling on macOS."""
 
 import subprocess
+
 import pytest
 
 
@@ -32,7 +33,7 @@ def test_handling_crlf_from_windows_files(tmp_path, comparison_tools):
     assert line_ending in ["CRLF", "MIXED"], f"Expected CRLF or MIXED, got {line_ending}"
 
     # Read in binary mode to preserve exact line endings
-    content = crlf_file.read_bytes().decode('utf-8')
+    content = crlf_file.read_bytes().decode("utf-8")
     normalized = content.replace("\r\n", "\n")
 
     lf_file = tmp_path / "normalized_file.txt"
@@ -52,16 +53,12 @@ def test_git_core_autocrlf_behavior(git_repo, macos_test_env):
 
     # Check Git's autocrlf setting (should be false or input on macOS)
     result = subprocess.run(
-        ["git", "config", "core.autocrlf"],
-        cwd=git_repo,
-        capture_output=True,
-        text=True
+        ["git", "config", "core.autocrlf"], cwd=git_repo, capture_output=True, text=True
     )
 
     # On macOS, autocrlf should be false or input (not true)
     autocrlf_value = result.stdout.strip() if result.returncode == 0 else "false"
-    assert autocrlf_value in ("false", "input", ""), \
-        f"Unexpected autocrlf value: {autocrlf_value}"
+    assert autocrlf_value in ("false", "input", ""), f"Unexpected autocrlf value: {autocrlf_value}"
 
 
 @pytest.mark.macos

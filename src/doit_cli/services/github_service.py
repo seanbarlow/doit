@@ -11,9 +11,11 @@ Note:
     provider = ProviderFactory.create()
 """
 
+from __future__ import annotations
+
 import json
 import subprocess
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 from ..models.fixit_models import GitHubIssue
 from ..models.github_epic import GitHubEpic
@@ -21,6 +23,7 @@ from ..models.milestone import Milestone
 from ..utils.github_auth import has_gh_cli, is_gh_authenticated
 
 if TYPE_CHECKING:
+    from ..models.github_feature import GitHubFeature
     from .providers.github import GitHubProvider
 
 
@@ -56,10 +59,10 @@ class GitHubService:
             timeout: Timeout in seconds for gh CLI commands (default: 30)
         """
         self.timeout = timeout
-        self._provider: Optional["GitHubProvider"] = None
+        self._provider: GitHubProvider | None = None
         self._verify_gh_cli()
 
-    def get_provider(self) -> "GitHubProvider":
+    def get_provider(self) -> GitHubProvider:
         """Get the GitHubProvider instance for provider abstraction operations.
 
         This method provides access to the new provider abstraction layer
@@ -75,6 +78,7 @@ class GitHubService:
         """
         if self._provider is None:
             from .providers.github import GitHubProvider
+
             self._provider = GitHubProvider(timeout=self.timeout)
         return self._provider
 
@@ -106,9 +110,7 @@ class GitHubService:
             )
 
         if not is_gh_authenticated():
-            raise GitHubAuthError(
-                "GitHub CLI not authenticated. Run: gh auth login"
-            )
+            raise GitHubAuthError("GitHub CLI not authenticated. Run: gh auth login")
 
     def is_available(self) -> bool:
         """Check if GitHub API is available."""
@@ -127,7 +129,7 @@ class GitHubService:
     # Issue Operations
     # ==========================================================================
 
-    def get_issue(self, issue_id: int) -> Optional[GitHubIssue]:
+    def get_issue(self, issue_id: int) -> GitHubIssue | None:
         """Fetch a GitHub issue by ID.
 
         Args:
@@ -137,10 +139,7 @@ class GitHubService:
             GitHubIssue if found, None otherwise.
         """
         result = subprocess.run(
-            [
-                "gh", "issue", "view", str(issue_id),
-                "--json", "number,title,body,state,labels"
-            ],
+            ["gh", "issue", "view", str(issue_id), "--json", "number,title,body,state,labels"],
             capture_output=True,
             text=True,
         )
@@ -165,11 +164,17 @@ class GitHubService:
         """
         result = subprocess.run(
             [
-                "gh", "issue", "list",
-                "--label", label,
-                "--state", "open",
-                "--limit", str(limit),
-                "--json", "number,title,body,state,labels"
+                "gh",
+                "issue",
+                "list",
+                "--label",
+                label,
+                "--state",
+                "open",
+                "--limit",
+                str(limit),
+                "--json",
+                "number,title,body,state,labels",
             ],
             capture_output=True,
             text=True,
@@ -220,7 +225,7 @@ class GitHubService:
     # Epic Operations
     # ==========================================================================
 
-    def fetch_epics(self, state: str = "open") -> List[GitHubEpic]:
+    def fetch_epics(self, state: str = "open") -> list[GitHubEpic]:
         """Fetch all GitHub issues labeled as 'epic'.
 
         Args:
@@ -298,7 +303,7 @@ class GitHubService:
                 "GitHub CLI (gh) not found in PATH. Install from: https://cli.github.com"
             )
 
-    def fetch_features_for_epic(self, epic_number: int) -> List["GitHubFeature"]:  # type: ignore
+    def fetch_features_for_epic(self, epic_number: int) -> list[GitHubFeature]:  # type: ignore
         """Fetch all feature issues linked to a specific epic.
 
         Searches for issues that reference the epic using "Part of Epic #XXX" pattern.
@@ -344,9 +349,7 @@ class GitHubService:
 
             if result.returncode != 0:
                 if "rate limit" in result.stderr.lower():
-                    raise GitHubAPIError(
-                        "GitHub API rate limit exceeded. Try again later."
-                    )
+                    raise GitHubAPIError("GitHub API rate limit exceeded. Try again later.")
                 raise GitHubAPIError(f"GitHub CLI error: {result.stderr}")
 
             issues_data = json.loads(result.stdout)
@@ -371,7 +374,7 @@ class GitHubService:
             raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
 
     def create_epic(
-        self, title: str, body: str, priority: str = "P3", labels: Optional[List[str]] = None
+        self, title: str, body: str, priority: str = "P3", labels: list[str] | None = None
     ) -> GitHubEpic:
         """Create a new GitHub epic issue.
 
@@ -455,7 +458,7 @@ class GitHubService:
     # Milestone Operations
     # ==========================================================================
 
-    def get_all_milestones(self, state: str = "open") -> List[Milestone]:
+    def get_all_milestones(self, state: str = "open") -> list[Milestone]:
         """Fetch all GitHub milestones for the repository.
 
         Args:
@@ -496,9 +499,7 @@ class GitHubService:
 
             if result.returncode != 0:
                 if "rate limit" in result.stderr.lower():
-                    raise GitHubAPIError(
-                        "GitHub API rate limit exceeded. Try again later."
-                    )
+                    raise GitHubAPIError("GitHub API rate limit exceeded. Try again later.")
                 raise GitHubAPIError(f"GitHub CLI error: {result.stderr}")
 
             # Parse JSON response
@@ -527,9 +528,7 @@ class GitHubService:
             return milestones
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(
-                f"GitHub CLI timeout after {self.timeout} seconds."
-            )
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds.")
         except json.JSONDecodeError as e:
             raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
 
@@ -586,9 +585,7 @@ class GitHubService:
                 if "rate limit" in result.stderr.lower():
                     raise GitHubAPIError("GitHub API rate limit exceeded")
                 if "422" in result.stderr:
-                    raise GitHubAPIError(
-                        f"Milestone with title '{title}' already exists"
-                    )
+                    raise GitHubAPIError(f"Milestone with title '{title}' already exists")
                 raise GitHubAPIError(f"Failed to create milestone: {result.stderr}")
 
             # Parse JSON response
@@ -653,9 +650,7 @@ class GitHubService:
                 if "rate limit" in result.stderr.lower():
                     raise GitHubAPIError("GitHub API rate limit exceeded")
                 if "404" in result.stderr:
-                    raise GitHubAPIError(
-                        f"Milestone #{milestone_number} not found"
-                    )
+                    raise GitHubAPIError(f"Milestone #{milestone_number} not found")
                 raise GitHubAPIError(f"Failed to close milestone: {result.stderr}")
 
             # Parse JSON response

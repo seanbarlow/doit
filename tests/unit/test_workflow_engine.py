@@ -3,17 +3,17 @@
 Tests the workflow orchestration functionality for guided workflows.
 """
 
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime
 
 from doit_cli.models.workflow_models import (
+    NavigationCommand,
+    StepResponse,
     Workflow,
-    WorkflowStep,
     WorkflowState,
     WorkflowStatus,
-    StepResponse,
-    NavigationCommand,
+    WorkflowStep,
 )
 
 
@@ -153,7 +153,7 @@ class TestWorkflowEngineExecuteStep:
         """Test that first step changes status from pending to running."""
         engine.prompt.prompt.return_value = "test-value"
 
-        updated_state, response = engine.execute_step(state, text_step)
+        updated_state, _response = engine.execute_step(state, text_step)
 
         assert updated_state.status == WorkflowStatus.RUNNING
 
@@ -161,7 +161,7 @@ class TestWorkflowEngineExecuteStep:
         """Test that execute_step returns the user's response."""
         engine.prompt.prompt.return_value = "my-project"
 
-        updated_state, response = engine.execute_step(state, text_step)
+        _updated_state, response = engine.execute_step(state, text_step)
 
         assert response.step_id == text_step.id
         assert response.value == "my-project"
@@ -172,7 +172,7 @@ class TestWorkflowEngineExecuteStep:
         engine.prompt.prompt.return_value = "value"
         initial_step = state.current_step
 
-        updated_state, response = engine.execute_step(state, text_step)
+        updated_state, _response = engine.execute_step(state, text_step)
 
         assert updated_state.current_step == initial_step + 1
 
@@ -180,7 +180,7 @@ class TestWorkflowEngineExecuteStep:
         """Test that response is stored in state."""
         engine.prompt.prompt.return_value = "stored-value"
 
-        updated_state, response = engine.execute_step(state, text_step)
+        updated_state, _response = engine.execute_step(state, text_step)
 
         assert text_step.id in updated_state.responses
         assert updated_state.responses[text_step.id].value == "stored-value"
@@ -189,7 +189,7 @@ class TestWorkflowEngineExecuteStep:
         """Test that choice steps use prompt_choice."""
         engine.prompt.prompt_choice.return_value = "react"
 
-        updated_state, response = engine.execute_step(state, choice_step)
+        _updated_state, response = engine.execute_step(state, choice_step)
 
         engine.prompt.prompt_choice.assert_called_once()
         assert response.value == "react"

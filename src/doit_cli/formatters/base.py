@@ -1,5 +1,7 @@
 """Base formatter for status output."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from ..models.status_models import StatusReport

@@ -5,18 +5,21 @@ This service creates and manages links between spec files and GitHub epics by:
 2. Updating GitHub epic descriptions with spec file paths
 """
 
+from __future__ import annotations
+
 import re
 import subprocess
-from pathlib import Path
-from typing import Optional, Tuple
 from dataclasses import dataclass
+from pathlib import Path
 
-from .github_service import GitHubService, GitHubServiceError
 from ..utils.spec_parser import (
     add_epic_reference as add_epic_to_spec,
-    remove_epic_reference,
-    get_epic_reference,
 )
+from ..utils.spec_parser import (
+    get_epic_reference,
+    remove_epic_reference,
+)
+from .github_service import GitHubService, GitHubServiceError
 
 
 @dataclass
@@ -25,7 +28,7 @@ class EpicReference:
 
     number: int
     url: str
-    priority: Optional[str]  # P1, P2, P3, P4
+    priority: str | None  # P1, P2, P3, P4
 
 
 @dataclass
@@ -44,7 +47,7 @@ class GitHubLinkerService:
     epic references and updating GitHub epic descriptions with spec file paths.
     """
 
-    def __init__(self, github_service: Optional[GitHubService] = None):
+    def __init__(self, github_service: GitHubService | None = None):
         """Initialize the linker service.
 
         Args:
@@ -52,12 +55,7 @@ class GitHubLinkerService:
         """
         self.github_service = github_service or GitHubService()
 
-    def link_spec_to_epic(
-        self,
-        spec_path: Path,
-        epic_number: int,
-        overwrite: bool = False
-    ) -> bool:
+    def link_spec_to_epic(self, spec_path: Path, epic_number: int, overwrite: bool = False) -> bool:
         """Create bidirectional link between spec file and GitHub epic.
 
         This method:
@@ -107,14 +105,14 @@ class GitHubLinkerService:
                 spec_path,
                 epic_number=epic_number,
                 epic_url=f"https://github.com/{self._get_repo_slug()}/issues/{epic_number}",
-                priority=epic.get("priority")
+                priority=epic.get("priority"),
             )
 
             # Update epic body with spec reference
             spec_ref = SpecReference(
                 file_path=self._get_relative_path(spec_path),
                 feature_name=spec_path.parent.name,
-                branch_name=spec_path.parent.name
+                branch_name=spec_path.parent.name,
             )
             self.update_epic_body(epic_number, spec_ref)
 
@@ -126,11 +124,7 @@ class GitHubLinkerService:
             print(f"Retry later with: doit spec link {spec_path.parent}")
             return False
 
-    def update_epic_body(
-        self,
-        epic_number: int,
-        spec_ref: SpecReference
-    ) -> None:
+    def update_epic_body(self, epic_number: int, spec_ref: SpecReference) -> None:
         """Update GitHub epic body with spec file reference.
 
         This method:
@@ -183,20 +177,17 @@ class GitHubLinkerService:
         try:
             repo_slug = self._get_repo_slug()
             cmd = [
-                "gh", "api",
+                "gh",
+                "api",
                 f"repos/{repo_slug}/issues/{epic_number}",
-                "--jq", "{number:.number, title:.title, body:.body, state:.state, labels:[.labels[].name], url:.html_url}"
+                "--jq",
+                "{number:.number, title:.title, body:.body, state:.state, labels:[.labels[].name], url:.html_url}",
             ]
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=True,
-                timeout=30
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
 
             import json
+
             epic_data = json.loads(result.stdout)
 
             # Extract priority from labels
@@ -216,7 +207,7 @@ class GitHubLinkerService:
         except subprocess.TimeoutExpired:
             raise GitHubServiceError(f"Timeout fetching epic #{epic_number}")
 
-    def validate_epic_for_linking(self, epic_number: int) -> Tuple[bool, str]:
+    def validate_epic_for_linking(self, epic_number: int) -> tuple[bool, str]:
         """Check if an epic can be linked to a spec.
 
         Validation checks:
@@ -296,14 +287,14 @@ class GitHubLinkerService:
             Updated body with spec path added
         """
         # Check if "## Specification" section exists
-        spec_section_pattern = r'## Specification\s*\n'
+        spec_section_pattern = r"## Specification\s*\n"
         spec_match = re.search(spec_section_pattern, body, re.MULTILINE)
 
         if spec_match:
             # Section exists, check if spec path is already listed
             # Find the end of the section (next ## or end of body)
             section_start = spec_match.end()
-            next_section = re.search(r'\n##\s', body[section_start:])
+            next_section = re.search(r"\n##\s", body[section_start:])
             section_end = section_start + next_section.start() if next_section else len(body)
 
             section_content = body[section_start:section_end]
@@ -339,7 +330,7 @@ class GitHubLinkerService:
         new_body = re.sub(line_pattern, "", body)
 
         # If Specification section is now empty, remove it
-        empty_section_pattern = r'## Specification\s*\n\s*(?=\n##|\Z)'
+        empty_section_pattern = r"## Specification\s*\n\s*(?=\n##|\Z)"
         new_body = re.sub(empty_section_pattern, "", new_body, flags=re.MULTILINE)
 
         return new_body
@@ -368,10 +359,7 @@ class GitHubLinkerService:
         """
         try:
             result = subprocess.run(
-                ["git", "remote", "get-url", "origin"],
-                capture_output=True,
-                text=True,
-                check=True
+                ["git", "remote", "get-url", "origin"], capture_output=True, text=True, check=True
             )
             remote_url = result.stdout.strip()
 
@@ -392,11 +380,8 @@ class GitHubLinkerService:
             raise GitHubServiceError("Failed to get git remote URL")
 
     def create_epic_for_roadmap_item(
-        self,
-        title: str,
-        priority: str,
-        feature_description: Optional[str] = None
-    ) -> Tuple[int, str]:
+        self, title: str, priority: str, feature_description: str | None = None
+    ) -> tuple[int, str]:
         """Create a new GitHub epic for a roadmap item.
 
         Args:
@@ -421,10 +406,7 @@ class GitHubLinkerService:
 
             # Create epic via GitHub service
             epic = self.github_service.create_epic(
-                title=title,
-                body=body,
-                priority=priority,
-                labels=[]
+                title=title, body=body, priority=priority, labels=[]
             )
 
             return (epic.number, epic.url)
@@ -433,11 +415,7 @@ class GitHubLinkerService:
             raise GitHubServiceError(f"Failed to create epic: {e}")
 
     def update_roadmap_with_epic(
-        self,
-        roadmap_path: Path,
-        roadmap_title: str,
-        epic_number: int,
-        epic_url: str
+        self, roadmap_path: Path, roadmap_title: str, epic_number: int, epic_url: str
     ) -> None:
         """Update roadmap.md file with newly created epic reference.
 
@@ -455,7 +433,7 @@ class GitHubLinkerService:
             raise FileNotFoundError(f"Roadmap file not found: {roadmap_path}")
 
         # Read current roadmap content
-        with open(roadmap_path, "r", encoding="utf-8") as f:
+        with open(roadmap_path, encoding="utf-8") as f:
             content = f.read()
 
         # Find the row with matching title
@@ -499,10 +477,7 @@ class GitHubLinkerService:
         try:
             # Get repo root
             result = subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"],
-                capture_output=True,
-                text=True,
-                check=True
+                ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True
             )
             repo_root = Path(result.stdout.strip())
 

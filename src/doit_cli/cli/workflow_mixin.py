@@ -5,17 +5,19 @@ to Typer CLI commands, including --non-interactive flag support and
 default value handling.
 """
 
+from __future__ import annotations
+
 import os
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 import typer
 from rich.console import Console
 
 from ..models.workflow_models import Workflow, WorkflowStep
 from ..prompts.interactive import InteractivePrompt
-from ..services.workflow_engine import WorkflowEngine
 from ..services.state_manager import StateManager
-
+from ..services.workflow_engine import WorkflowEngine
 
 # Type variable for decorator
 F = TypeVar("F", bound=Callable[..., Any])
@@ -124,6 +126,7 @@ def non_interactive_option() -> Callable[[F], F]:
         def my_command(non_interactive: bool = False):
             ...
     """
+
     def decorator(func: F) -> F:
         return typer.Option(
             False,
@@ -132,6 +135,7 @@ def non_interactive_option() -> Callable[[F], F]:
             help="Run without interactive prompts, using default values.",
             envvar="DOIT_NON_INTERACTIVE",
         )(func)
+
     return decorator
 
 
@@ -153,6 +157,7 @@ def workflow_command_options(
         ):
             ...
     """
+
     def decorator(f: F) -> F:
         # This would add the options via typer decorators
         # Implementation depends on how typer handles stacked decorators

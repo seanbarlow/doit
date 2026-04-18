@@ -17,10 +17,10 @@ class TestMermaidValidator:
 
     def test_validate_valid_flowchart(self, validator):
         """Test validation of valid flowchart."""
-        content = '''flowchart LR
+        content = """flowchart LR
     A[Start] --> B{Decision}
     B --> C[End]
-'''
+"""
         result = validator.validate(content, DiagramType.USER_JOURNEY)
 
         assert result.passed
@@ -28,7 +28,7 @@ class TestMermaidValidator:
 
     def test_validate_valid_er_diagram(self, validator):
         """Test validation of valid ER diagram."""
-        content = '''erDiagram
+        content = """erDiagram
     User ||--o{ Task : "owns"
     User {
         uuid id PK
@@ -37,7 +37,7 @@ class TestMermaidValidator:
     Task {
         uuid id PK
     }
-'''
+"""
         result = validator.validate(content, DiagramType.ER_DIAGRAM)
 
         # Note: The cardinality ||--o{ includes a { which affects bracket counting
@@ -53,10 +53,10 @@ class TestMermaidValidator:
 
     def test_validate_missing_type_declaration(self, validator):
         """Test validation catches missing type declaration."""
-        content = '''
+        content = """
     A --> B
     B --> C
-'''
+"""
         result = validator.validate(content)
 
         assert not result.passed
@@ -64,9 +64,9 @@ class TestMermaidValidator:
 
     def test_validate_unbalanced_brackets(self, validator):
         """Test validation catches unbalanced brackets."""
-        content = '''flowchart LR
+        content = """flowchart LR
     A[Start --> B{Decision}
-'''
+"""
         result = validator.validate(content)
 
         assert not result.passed
@@ -74,10 +74,10 @@ class TestMermaidValidator:
 
     def test_validate_with_code_fences(self, validator):
         """Test validation handles code fences."""
-        content = '''```mermaid
+        content = """```mermaid
 flowchart LR
     A --> B
-```'''
+```"""
         result = validator.validate(content)
 
         # Should strip fences and validate
@@ -114,10 +114,10 @@ flowchart LR
 
     def test_validate_er_cardinality(self, validator):
         """Test ER diagram cardinality validation."""
-        content = '''erDiagram
+        content = """erDiagram
     User ||--o{ Task : "owns"
     Task }o--|| User : "belongs_to"
-'''
+"""
         result = validator.validate(content, DiagramType.ER_DIAGRAM)
 
         assert result.passed
@@ -140,14 +140,14 @@ flowchart LR
 
     def test_orphan_entity_warning(self, validator):
         """Test warning for orphan entities in ER diagram."""
-        content = '''erDiagram
+        content = """erDiagram
     User {
         uuid id PK
     }
     Task {
         uuid id PK
     }
-'''
+"""
         result = validator.validate(content, DiagramType.ER_DIAGRAM)
 
         # Should warn about orphan entities

@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+
 import pytest
 
 
@@ -37,11 +38,7 @@ exit 0
     script.chmod(0o755)
 
     # Execute with bash explicitly
-    result = subprocess.run(
-        ["bash", str(script)],
-        capture_output=True,
-        text=True
-    )
+    result = subprocess.run(["bash", str(script)], capture_output=True, text=True)
 
     assert result.returncode == 0
     assert "Hello from bash" in result.stdout
@@ -63,11 +60,7 @@ echo ${arr[1]}
 """)
     bash_script.chmod(0o755)
 
-    result = subprocess.run(
-        ["bash", str(bash_script)],
-        capture_output=True,
-        text=True
-    )
+    result = subprocess.run(["bash", str(bash_script)], capture_output=True, text=True)
 
     assert result.returncode == 0
     assert "two" in result.stdout

@@ -1,7 +1,6 @@
 """Integration tests for spec validation hook behavior."""
 
 import pytest
-from pathlib import Path
 
 from doit_cli.models.hook_config import HookConfig, HookRule
 from doit_cli.services.hook_validator import HookValidator
@@ -103,7 +102,9 @@ class TestSpecValidationHook:
         assert result.success
         assert "passed" in result.message.lower()
 
-    def test_validate_spec_quality_invalid_spec(self, spec_with_errors, hook_config_with_validation):
+    def test_validate_spec_quality_invalid_spec(
+        self, spec_with_errors, hook_config_with_validation
+    ):
         """Test that invalid spec fails quality validation."""
         validator = HookValidator(
             project_root=spec_with_errors,
@@ -124,7 +125,7 @@ class TestSpecValidationHook:
         )
 
         # When validation is disabled, _validate_spec_quality should pass
-        spec_path = spec_with_errors / "specs" / "001-test-feature" / "spec.md"
+        spec_with_errors / "specs" / "001-test-feature" / "spec.md"
 
         # The disabled check happens in validate_pre_commit, not _validate_spec_quality
         # So we need to check the config is respected
@@ -174,7 +175,7 @@ class TestHookConfigValidation:
                 "enabled": True,
                 "validate_spec": True,
                 "validate_spec_threshold": 80,
-            }
+            },
         }
 
         config = HookConfig._from_dict(data)
@@ -189,7 +190,7 @@ class TestHookConfigValidation:
             "pre_commit": {
                 "enabled": True,
                 "validate_spec": False,
-            }
+            },
         }
 
         config = HookConfig._from_dict(data)
@@ -200,8 +201,11 @@ class TestHookConfigValidation:
 class TestPreCommitWithValidation:
     """Integration tests for pre-commit with spec validation."""
 
-    def test_pre_commit_blocks_invalid_spec(self, spec_with_errors, hook_config_with_validation, monkeypatch):
+    def test_pre_commit_blocks_invalid_spec(
+        self, spec_with_errors, hook_config_with_validation, monkeypatch
+    ):
         """Test that pre-commit blocks commit when spec has errors."""
+
         # Mock git commands to simulate being on feature branch
         def mock_run(*args, **kwargs):
             class MockResult:
@@ -232,8 +236,11 @@ class TestPreCommitWithValidation:
         # Message should indicate validation failure
         assert "validation" in result.message.lower() or "error" in result.message.lower()
 
-    def test_pre_commit_passes_valid_spec(self, valid_spec, hook_config_with_validation, monkeypatch):
+    def test_pre_commit_passes_valid_spec(
+        self, valid_spec, hook_config_with_validation, monkeypatch
+    ):
         """Test that pre-commit passes when spec is valid."""
+
         # Mock git commands to simulate being on feature branch
         def mock_run(*args, **kwargs):
             class MockResult:

@@ -1,7 +1,8 @@
 """Status command for displaying spec status dashboard."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -20,27 +21,21 @@ VALID_STATUSES = ["draft", "in-progress", "complete", "approved"]
 
 
 def status_command(
-    status_filter: Optional[str] = typer.Option(
+    status_filter: str | None = typer.Option(
         None,
         "--status",
         "-s",
         help="Filter by status (draft, in-progress, complete, approved)",
     ),
-    blocking: bool = typer.Option(
-        False, "--blocking", "-b", help="Show only blocking specs"
-    ),
-    verbose: bool = typer.Option(
-        False, "--verbose", "-v", help="Show detailed validation errors"
-    ),
-    recent: Optional[int] = typer.Option(
+    blocking: bool = typer.Option(False, "--blocking", "-b", help="Show only blocking specs"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed validation errors"),
+    recent: int | None = typer.Option(
         None, "--recent", "-r", help="Show specs modified in last N days"
     ),
     output_format: str = typer.Option(
         "rich", "--format", "-f", help="Output format: rich, json, markdown"
     ),
-    output_file: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Write report to file"
-    ),
+    output_file: Path | None = typer.Option(None, "--output", "-o", help="Write report to file"),
 ) -> None:
     """Display status of all specifications in the project.
 

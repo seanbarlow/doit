@@ -1,8 +1,5 @@
 """Unit tests for Validator service."""
 
-import pytest
-from pathlib import Path
-
 from doit_cli.models.agent import Agent
 from doit_cli.models.project import Project
 from doit_cli.models.results import VerifyStatus

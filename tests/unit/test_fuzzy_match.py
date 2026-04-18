@@ -1,11 +1,10 @@
 """Unit tests for fuzzy string matching algorithm."""
 
-import pytest
 from doit_cli.utils.fuzzy_match import (
     calculate_similarity,
-    find_best_match,
     find_all_matches,
-    is_exact_match
+    find_best_match,
+    is_exact_match,
 )
 
 
@@ -73,11 +72,7 @@ class TestFindBestMatch:
 
     def test_fuzzy_match_above_threshold(self):
         """Test finding fuzzy match above default 80% threshold."""
-        candidates = [
-            "User Authentication",
-            "GitHub Issue Auto-linking",
-            "Spec Validation"
-        ]
+        candidates = ["User Authentication", "GitHub Issue Auto-linking", "Spec Validation"]
         match = find_best_match("GitHub Issue Linking", candidates)
         assert match is not None
         assert match[0] == "GitHub Issue Auto-linking"
@@ -111,7 +106,7 @@ class TestFindBestMatch:
         candidates = [
             "GitHub Issue",
             "GitHub Issue Linking",
-            "GitHub Issue Auto-linking in Spec Creation"
+            "GitHub Issue Auto-linking in Spec Creation",
         ]
         match = find_best_match("GitHub Issue Auto-linking", candidates)
         assert match is not None
@@ -125,11 +120,7 @@ class TestFindAllMatches:
 
     def test_multiple_matches_above_threshold(self):
         """Test finding all matches above threshold."""
-        candidates = [
-            "User Auth",
-            "User Authentication",
-            "User Authentication System"
-        ]
+        candidates = ["User Auth", "User Authentication", "User Authentication System"]
         matches = find_all_matches("User Auth", candidates, threshold=0.7)
         # "User Auth" is exact match (1.0), others are below 0.7 threshold
         assert len(matches) >= 1
@@ -142,7 +133,7 @@ class TestFindAllMatches:
         candidates = [
             "GitHub Issue",
             "GitHub Issue Auto-linking",
-            "GitHub Issue Auto-linking in Spec Creation"
+            "GitHub Issue Auto-linking in Spec Creation",
         ]
         matches = find_all_matches("GitHub Issue Auto-linking", candidates, threshold=0.7)
         # Exact match + one above threshold = 2 matches

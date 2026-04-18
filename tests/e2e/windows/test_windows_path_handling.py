@@ -1,4 +1,5 @@
 """Tests for Windows-specific path handling edge cases."""
+
 import sys
 from pathlib import Path
 
@@ -91,12 +92,14 @@ def test_reserved_filename_detection(path_validator, reserved_name):
     Then: Reserved name is correctly detected
     """
     # Test with just the name
-    assert path_validator.is_reserved_name(reserved_name), f"{reserved_name} not detected as reserved"
+    assert path_validator.is_reserved_name(reserved_name), (
+        f"{reserved_name} not detected as reserved"
+    )
 
     # Test with extension
-    assert path_validator.is_reserved_name(
-        f"{reserved_name}.txt"
-    ), f"{reserved_name}.txt not detected as reserved"
+    assert path_validator.is_reserved_name(f"{reserved_name}.txt"), (
+        f"{reserved_name}.txt not detected as reserved"
+    )
 
     # Test in full path
     test_path = Path(f"C:/test/{reserved_name}/file.txt")
@@ -122,9 +125,9 @@ def test_path_length_limit_260_chars(path_validator):
     # Path near limit (252 chars - should pass)
     # "C:/" (3) + "a" * 240 (240) + "/file.txt" (9) = 252 chars
     near_limit_path = "C:/" + "a" * 240 + "/file.txt"
-    assert not path_validator.exceeds_max_path(
-        near_limit_path
-    ), f"Path near limit incorrectly flagged (length: {len(near_limit_path)})"
+    assert not path_validator.exceeds_max_path(near_limit_path), (
+        f"Path near limit incorrectly flagged (length: {len(near_limit_path)})"
+    )
 
     # Path exceeding limit (270 chars - should fail)
     long_path = "C:/" + "a" * 260 + "/file.txt"
@@ -212,7 +215,7 @@ def test_path_normalization_for_comparison(path_validator, comparison_tools):
     normalized_paths = [comparison_tools.normalize_path(p) for p in test_paths]
 
     # All should normalize to same format
-    first_normalized = normalized_paths[0]
+    normalized_paths[0]
     for normalized in normalized_paths[1:]:
         # Paths should be similar after normalization (drive letter handling may vary)
         assert "/" in normalized, f"Path not normalized: {normalized}"

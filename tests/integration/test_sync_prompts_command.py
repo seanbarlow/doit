@@ -1,11 +1,8 @@
 """Integration tests for sync-prompts command."""
 
-import pytest
-from pathlib import Path
 from typer.testing import CliRunner
 
 from doit_cli.main import app
-
 
 runner = CliRunner()
 
@@ -57,6 +54,7 @@ class TestSyncPromptsCommand:
         prompts_dir.mkdir(parents=True)
 
         import time
+
         time.sleep(0.01)
         (prompts_dir / "doit.test.prompt.md").write_text("# Prompt")
 
@@ -76,9 +74,7 @@ class TestSyncPromptsCommand:
         (templates_dir / "doit.cmd2.md").write_text("# Cmd 2")
 
         # Run for single command
-        result = runner.invoke(
-            app, ["sync-prompts", "doit.cmd1", "--path", str(temp_dir)]
-        )
+        result = runner.invoke(app, ["sync-prompts", "doit.cmd1", "--path", str(temp_dir)])
 
         # Verify only cmd1 was synced
         assert result.exit_code == 0
@@ -99,6 +95,7 @@ class TestSyncPromptsCommand:
         prompts_dir.mkdir(parents=True)
 
         import time
+
         time.sleep(0.01)
         (prompts_dir / "doit.test.prompt.md").write_text("# Old prompt")
 
@@ -125,6 +122,7 @@ class TestSyncPromptsCommand:
         # Verify JSON output
         assert result.exit_code == 0
         import json
+
         output = json.loads(result.stdout)
         assert "total_commands" in output
         assert "operations" in output
@@ -177,9 +175,7 @@ $ARGUMENTS
         (templates_dir / "doit.exists.md").write_text("# Exists")
 
         # Try to sync non-existent command
-        result = runner.invoke(
-            app, ["sync-prompts", "doit.nonexistent", "--path", str(temp_dir)]
-        )
+        result = runner.invoke(app, ["sync-prompts", "doit.nonexistent", "--path", str(temp_dir)])
 
         assert result.exit_code == 1
         assert "not found" in result.stdout.lower()

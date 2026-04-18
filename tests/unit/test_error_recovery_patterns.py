@@ -112,7 +112,9 @@ class TestOldOnErrorRemoved:
             if line.strip().startswith("```"):
                 in_code_block = not in_code_block
             if not in_code_block and re.match(r"^### On Error", line):
-                pytest.fail(f"{command} still has old '### On Error' outside Error Recovery: {line}")
+                pytest.fail(
+                    f"{command} still has old '### On Error' outside Error Recovery: {line}"
+                )
 
 
 class TestNoConflictingSections:
@@ -189,12 +191,9 @@ class TestSeverityIndicators:
         for scenario in scenarios:
             heading = scenario.split("\n")[0].strip()
             has_severity = any(
-                indicator in scenario
-                for indicator in ["**ERROR**", "**WARNING**", "**FATAL**"]
+                indicator in scenario for indicator in ["**ERROR**", "**WARNING**", "**FATAL**"]
             )
-            assert has_severity, (
-                f"{command}: scenario '{heading}' missing severity indicator"
-            )
+            assert has_severity, f"{command}: scenario '{heading}' missing severity indicator"
 
 
 class TestVerifySteps:
@@ -210,9 +209,7 @@ class TestVerifySteps:
         for scenario in scenarios:
             heading = scenario.split("\n")[0].strip()
             has_verify = "Verify:" in scenario or "verify:" in scenario.lower()
-            assert has_verify, (
-                f"{command}: scenario '{heading}' missing Verify step"
-            )
+            assert has_verify, f"{command}: scenario '{heading}' missing Verify step"
 
 
 class TestEscalationPaths:
@@ -252,9 +249,7 @@ class TestStatePreservationNotes:
             or "progress" in recovery.lower()
             or "state" in recovery.lower()
         )
-        assert has_preservation, (
-            f"{command}: stateful command missing state preservation guidance"
-        )
+        assert has_preservation, f"{command}: stateful command missing state preservation guidance"
 
 
 class TestScenarioCount:
@@ -266,9 +261,7 @@ class TestScenarioCount:
         recovery = _extract_error_recovery_section(content)
         assert recovery, f"{command} has no Error Recovery section"
         count = _count_scenarios(recovery)
-        assert 3 <= count <= 5, (
-            f"{command}: expected 3-5 scenarios, found {count}"
-        )
+        assert 3 <= count <= 5, f"{command}: expected 3-5 scenarios, found {count}"
 
 
 class TestSyncIntegrity:
@@ -289,9 +282,7 @@ class TestSyncIntegrity:
         source = (TEMPLATES_DIR / command).read_text()
         claude_path = CLAUDE_COMMANDS_DIR / command
         assert claude_path.exists(), f".claude/commands/{command} missing"
-        assert source == claude_path.read_text(), (
-            f".claude/commands/{command} differs from source"
-        )
+        assert source == claude_path.read_text(), f".claude/commands/{command} differs from source"
 
     @pytest.mark.parametrize("command", ALL_COMMANDS)
     def test_github_prompts_match_source(self, command):

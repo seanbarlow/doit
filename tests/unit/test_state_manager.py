@@ -4,15 +4,14 @@ Tests the state persistence functionality for workflow recovery.
 """
 
 import json
-import pytest
 from datetime import datetime, timedelta
-from pathlib import Path
+
+import pytest
 
 from doit_cli.models.workflow_models import (
+    StepResponse,
     WorkflowState,
     WorkflowStatus,
-    StepResponse,
-    StateCorruptionError,
 )
 
 

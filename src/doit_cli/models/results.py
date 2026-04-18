@@ -1,9 +1,10 @@
 """Result models for init and verify operations."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 from .project import Project
 
@@ -23,7 +24,7 @@ class VerifyCheck:
     name: str
     status: VerifyStatus
     message: str
-    suggestion: Optional[str] = None
+    suggestion: str | None = None
 
 
 @dataclass
@@ -36,8 +37,8 @@ class InitResult:
     created_files: list[Path] = field(default_factory=list)
     updated_files: list[Path] = field(default_factory=list)
     skipped_files: list[Path] = field(default_factory=list)
-    backup_path: Optional[Path] = None
-    error_message: Optional[str] = None
+    backup_path: Path | None = None
+    error_message: str | None = None
 
     @property
     def total_created(self) -> int:

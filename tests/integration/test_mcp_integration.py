@@ -1,6 +1,7 @@
 """Integration tests for the MCP server."""
 
 import json
+
 import pytest
 
 from doit_cli.mcp import MCP_AVAILABLE

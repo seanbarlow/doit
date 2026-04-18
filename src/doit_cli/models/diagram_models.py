@@ -1,9 +1,10 @@
 """Models for automatic Mermaid diagram generation."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 
 class DiagramType(str, Enum):
@@ -20,7 +21,7 @@ class DiagramType(str, Enum):
     ARCHITECTURE = "architecture"
 
     @classmethod
-    def from_string(cls, value: str) -> "DiagramType":
+    def from_string(cls, value: str) -> DiagramType:
         """Parse a diagram type string.
 
         Args:
@@ -64,7 +65,7 @@ class Cardinality(str, Enum):
     ZERO_OR_MANY_TO_ONE = "}o--o|"
 
     @classmethod
-    def from_keywords(cls, text: str) -> "Cardinality":
+    def from_keywords(cls, text: str) -> Cardinality:
         """Infer cardinality from natural language keywords.
 
         Args:
@@ -318,7 +319,7 @@ class GeneratedDiagram:
     diagram_type: DiagramType
     mermaid_content: str
     is_valid: bool = True
-    validation: Optional[ValidationResult] = None
+    validation: ValidationResult | None = None
     node_count: int = 0
 
     @property
@@ -345,7 +346,7 @@ class DiagramResult:
     sections_found: list[DiagramSection] = field(default_factory=list)
     sections_updated: list[str] = field(default_factory=list)
     success: bool = True
-    error: Optional[str] = None
+    error: str | None = None
 
     @property
     def total_diagrams(self) -> int:

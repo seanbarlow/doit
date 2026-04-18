@@ -1,11 +1,6 @@
 """Integration tests for init command CLI workflows."""
 
-import pytest
-from pathlib import Path
 from typer.testing import CliRunner
-
-from doit_cli.models.agent import Agent
-
 
 runner = CliRunner()
 
@@ -59,9 +54,7 @@ class TestInitCommand:
         """Test init with invalid agent name."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["init", str(project_dir), "--agent", "invalid", "--yes"]
-        )
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "invalid", "--yes"])
 
         assert result.exit_code == 1
         assert "unknown agent" in result.output.lower()
@@ -70,9 +63,7 @@ class TestInitCommand:
         """Test that init creates command templates."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         assert result.exit_code == 0
         command_dir = project_dir / ".claude" / "commands"
@@ -85,9 +76,7 @@ class TestInitCommand:
         """Test that init displays success message."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         assert result.exit_code == 0
         # Should show some form of success message
@@ -175,13 +164,10 @@ class TestInitScriptsCopy:
 
     def test_init_copies_scripts(self, project_dir):
         """Test doit init copies all 5 scripts."""
-        import os
         from doit_cli.main import app
         from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
 
-        result = runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         assert result.exit_code == 0
         scripts_dir = project_dir / ".doit" / "scripts" / "bash"
@@ -195,12 +181,11 @@ class TestInitScriptsCopy:
     def test_init_scripts_are_executable(self, project_dir):
         """Test initialized scripts have execute permission."""
         import os
+
         from doit_cli.main import app
         from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
 
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         scripts_dir = project_dir / ".doit" / "scripts" / "bash"
         for script_name in WORKFLOW_SCRIPTS:
@@ -213,9 +198,7 @@ class TestInitScriptsCopy:
         from doit_cli.main import app
 
         # First init
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Modify a script
         scripts_dir = project_dir / ".doit" / "scripts" / "bash"
@@ -224,9 +207,7 @@ class TestInitScriptsCopy:
         common_sh.write_text(custom_content)
 
         # Second init without force/update
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Script should be preserved
         assert common_sh.read_text() == custom_content
@@ -236,9 +217,7 @@ class TestInitScriptsCopy:
         from doit_cli.main import app
 
         # First init
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Modify a script
         scripts_dir = project_dir / ".doit" / "scripts" / "bash"
@@ -247,9 +226,7 @@ class TestInitScriptsCopy:
         common_sh.write_text(custom_content)
 
         # Init with force
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--force", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--force", "--yes"])
 
         # Script should be replaced (not equal to custom content)
         assert common_sh.read_text() != custom_content
@@ -267,9 +244,7 @@ class TestInitMemoryFilesPreservation:
         from doit_cli.main import app
 
         # First init
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Customize memory files
         memory_dir = project_dir / ".doit" / "memory"
@@ -290,19 +265,19 @@ class TestInitMemoryFilesPreservation:
         assert result.exit_code == 0
 
         # Memory files should be preserved (not overwritten)
-        assert constitution_file.read_text() == custom_constitution, \
+        assert constitution_file.read_text() == custom_constitution, (
             "constitution.md should NOT be overwritten by --update"
-        assert roadmap_file.read_text() == custom_roadmap, \
+        )
+        assert roadmap_file.read_text() == custom_roadmap, (
             "roadmap.md should NOT be overwritten by --update"
+        )
 
     def test_force_overwrites_memory_files(self, project_dir):
         """Test that --force DOES overwrite existing memory files."""
         from doit_cli.main import app
 
         # First init
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Customize memory files
         memory_dir = project_dir / ".doit" / "memory"
@@ -319,17 +294,16 @@ class TestInitMemoryFilesPreservation:
         assert result.exit_code == 0
 
         # Memory files SHOULD be overwritten with --force
-        assert constitution_file.read_text() != custom_constitution, \
+        assert constitution_file.read_text() != custom_constitution, (
             "constitution.md SHOULD be overwritten by --force"
+        )
 
     def test_update_still_updates_command_templates(self, project_dir):
         """Test that --update still updates command templates even while preserving memory."""
         from doit_cli.main import app
 
         # First init
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Modify a command template
         command_dir = project_dir / ".claude" / "commands"
@@ -353,12 +327,14 @@ class TestInitMemoryFilesPreservation:
             assert result.exit_code == 0
 
             # Command template SHOULD be updated
-            assert test_template.read_text(encoding="utf-8") != custom_content, \
+            assert test_template.read_text(encoding="utf-8") != custom_content, (
                 "Command templates should be updated with --update"
+            )
 
             # Memory file should be preserved
-            assert constitution_file.read_text(encoding="utf-8") == custom_constitution, \
+            assert constitution_file.read_text(encoding="utf-8") == custom_constitution, (
                 "Memory files should be preserved with --update"
+            )
 
 
 class TestInitTechStackCreation:
@@ -368,9 +344,7 @@ class TestInitTechStackCreation:
         """Test that init creates both constitution.md and tech-stack.md."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         assert result.exit_code == 0
 
@@ -385,45 +359,35 @@ class TestInitTechStackCreation:
         """Test that constitution.md contains cross-reference to tech-stack.md."""
         from doit_cli.main import app
 
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         memory_dir = project_dir / ".doit" / "memory"
         constitution_file = memory_dir / "constitution.md"
         content = constitution_file.read_text()
 
         # Check for cross-reference
-        assert "tech-stack.md" in content, \
-            "constitution.md should reference tech-stack.md"
-        assert "See also" in content, \
-            "constitution.md should have 'See also' cross-reference"
+        assert "tech-stack.md" in content, "constitution.md should reference tech-stack.md"
+        assert "See also" in content, "constitution.md should have 'See also' cross-reference"
 
     def test_tech_stack_has_cross_reference_to_constitution(self, project_dir):
         """Test that tech-stack.md contains cross-reference to constitution.md."""
         from doit_cli.main import app
 
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         memory_dir = project_dir / ".doit" / "memory"
         tech_stack_file = memory_dir / "tech-stack.md"
         content = tech_stack_file.read_text()
 
         # Check for cross-reference
-        assert "constitution.md" in content, \
-            "tech-stack.md should reference constitution.md"
-        assert "See also" in content, \
-            "tech-stack.md should have 'See also' cross-reference"
+        assert "constitution.md" in content, "tech-stack.md should reference constitution.md"
+        assert "See also" in content, "tech-stack.md should have 'See also' cross-reference"
 
     def test_tech_stack_has_required_sections(self, project_dir):
         """Test that tech-stack.md contains required sections."""
         from doit_cli.main import app
 
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         memory_dir = project_dir / ".doit" / "memory"
         tech_stack_file = memory_dir / "tech-stack.md"
@@ -440,30 +404,29 @@ class TestInitTechStackCreation:
         """Test that constitution.md does NOT contain tech stack sections."""
         from doit_cli.main import app
 
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         memory_dir = project_dir / ".doit" / "memory"
         constitution_file = memory_dir / "constitution.md"
         content = constitution_file.read_text()
 
         # Constitution should NOT have tech-related H2 sections
-        assert "## Tech Stack" not in content, \
+        assert "## Tech Stack" not in content, (
             "constitution.md should NOT have Tech Stack H2 section"
-        assert "## Infrastructure" not in content, \
+        )
+        assert "## Infrastructure" not in content, (
             "constitution.md should NOT have Infrastructure H2 section"
-        assert "## Deployment" not in content, \
+        )
+        assert "## Deployment" not in content, (
             "constitution.md should NOT have Deployment H2 section"
+        )
 
     def test_update_preserves_tech_stack(self, project_dir):
         """Test that --update preserves customized tech-stack.md."""
         from doit_cli.main import app
 
         # First init
-        runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
 
         # Customize tech-stack.md
         memory_dir = project_dir / ".doit" / "memory"
@@ -479,5 +442,6 @@ class TestInitTechStackCreation:
         assert result.exit_code == 0
 
         # tech-stack.md should be preserved
-        assert tech_stack_file.read_text() == custom_tech_stack, \
+        assert tech_stack_file.read_text() == custom_tech_stack, (
             "tech-stack.md should NOT be overwritten by --update"
+        )

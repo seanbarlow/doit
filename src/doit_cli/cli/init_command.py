@@ -1,7 +1,9 @@
 """Init command for initializing doit project structure."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -17,49 +19,29 @@ from ..services.scaffolder import Scaffolder
 from ..services.state_manager import StateManager
 from ..services.workflow_engine import WorkflowEngine
 
-
 console = Console()
 
 # Type aliases for CLI options
 AgentOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
-        "--agent", "-a",
-        help="Target agent(s): claude, copilot, or claude,copilot for both"
-    )
+        "--agent", "-a", help="Target agent(s): claude, copilot, or claude,copilot for both"
+    ),
 ]
 
 TemplatesOption = Annotated[
-    Optional[Path],
-    typer.Option(
-        "--templates", "-t",
-        help="Custom template directory path"
-    )
+    Path | None, typer.Option("--templates", "-t", help="Custom template directory path")
 ]
 
 UpdateFlag = Annotated[
-    bool,
-    typer.Option(
-        "--update", "-u",
-        help="Update existing project, preserving custom files"
-    )
+    bool, typer.Option("--update", "-u", help="Update existing project, preserving custom files")
 ]
 
 ForceFlag = Annotated[
-    bool,
-    typer.Option(
-        "--force", "-f",
-        help="Overwrite existing files without backup"
-    )
+    bool, typer.Option("--force", "-f", help="Overwrite existing files without backup")
 ]
 
-YesFlag = Annotated[
-    bool,
-    typer.Option(
-        "--yes", "-y",
-        help="Skip confirmation prompts"
-    )
-]
+YesFlag = Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompts")]
 
 
 # =============================================================================
@@ -123,7 +105,7 @@ def create_init_workflow(path: Path) -> Workflow:
     )
 
 
-def map_workflow_responses(responses: dict) -> tuple[list[Agent], Optional[Path]]:
+def map_workflow_responses(responses: dict) -> tuple[list[Agent], Path | None]:
     """Map workflow responses to init parameters.
 
     Args:
@@ -201,7 +183,9 @@ def display_init_result(result: InitResult, agents: list[Agent]) -> None:
             skipped_branch.add(f"[dim]{rel_path}[/dim]")
 
     console.print()
-    console.print(Panel(tree, title="[bold green]Initialization Complete[/bold green]", border_style="green"))
+    console.print(
+        Panel(tree, title="[bold green]Initialization Complete[/bold green]", border_style="green")
+    )
 
     # Display summary
     console.print()
@@ -335,20 +319,19 @@ def validate_custom_templates(template_source: Path, yes: bool = False) -> bool:
             )
         )
 
-        if not yes:
-            if not typer.confirm("Continue with missing templates?", default=True):
-                return False
+        if not yes and not typer.confirm("Continue with missing templates?", default=True):
+            return False
 
     return True
 
 
 def run_init(
     path: Path,
-    agents: Optional[list[Agent]] = None,
+    agents: list[Agent] | None = None,
     update: bool = False,
     force: bool = False,
     yes: bool = False,
-    template_source: Optional[Path] = None,
+    template_source: Path | None = None,
 ) -> InitResult:
     """Run the initialization process.
 
@@ -364,20 +347,19 @@ def run_init(
         InitResult with operation details
     """
     # Defer imports to avoid circular dependencies
-    from ..services.template_manager import TemplateManager
     from ..services.agent_detector import AgentDetector
+    from ..services.template_manager import TemplateManager
 
     # Create project model
     project = Project(path=path.resolve())
 
     # Validate custom template source if provided
-    if template_source:
-        if not validate_custom_templates(template_source, yes):
-            return InitResult(
-                success=False,
-                project=project,
-                error_message="Custom template validation failed",
-            )
+    if template_source and not validate_custom_templates(template_source, yes):
+        return InitResult(
+            success=False,
+            project=project,
+            error_message="Custom template validation failed",
+        )
 
     # Check if safe directory
     if not project.is_safe_directory() and not force:
@@ -538,11 +520,8 @@ def run_init(
 def init_command(
     path: Annotated[
         Path,
-        typer.Argument(
-            default=...,
-            help="Project directory path (use '.' for current directory)"
-        )
-    ] = Path("."),
+        typer.Argument(default=..., help="Project directory path (use '.' for current directory)"),
+    ] = Path(),
     agent: AgentOption = None,
     templates: TemplatesOption = None,
     update: UpdateFlag = False,

@@ -1,6 +1,6 @@
 """Line ending normalization utilities for cross-platform testing."""
-from typing import Literal
 
+from typing import Literal
 
 LineEnding = Literal["CRLF", "LF", "CR", "MIXED"]
 

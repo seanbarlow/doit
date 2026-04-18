@@ -1,7 +1,8 @@
 """Tests for TaskParser service."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from doit_cli.services.task_parser import TaskParser
 
@@ -124,9 +125,7 @@ class TestTaskParser:
         assert "[FR-001]" not in tasks[0].description
         assert "Implement the parser" in tasks[0].description
 
-    def test_clean_description_removes_multiple_references(
-        self, tmp_path: Path
-    ) -> None:
+    def test_clean_description_removes_multiple_references(self, tmp_path: Path) -> None:
         """Test that multiple FR references are cleaned."""
         tasks_content = """- [ ] Task [FR-001, FR-002] more text [FR-003]"""
         tasks_file = tmp_path / "tasks.md"
@@ -243,9 +242,7 @@ Regular paragraph text.
 
         assert ids == {"FR-001", "FR-002", "FR-003"}
 
-    def test_task_ids_are_unique_for_different_descriptions(
-        self, tmp_path: Path
-    ) -> None:
+    def test_task_ids_are_unique_for_different_descriptions(self, tmp_path: Path) -> None:
         """Test that different tasks get different IDs."""
         tasks_content = """- [ ] First task
 - [ ] Second task
@@ -258,9 +255,7 @@ Regular paragraph text.
 
         assert tasks[0].id != tasks[1].id
 
-    def test_task_ids_are_consistent_for_same_description(
-        self, tmp_path: Path
-    ) -> None:
+    def test_task_ids_are_consistent_for_same_description(self, tmp_path: Path) -> None:
         """Test that same description produces same ID."""
         parser = TaskParser()
 
@@ -360,9 +355,7 @@ class TestTaskParserReferencePreservation:
 - [ ] Create and configure validation checks"""
         new_tasks = parser.parse_content(new_content, "/new/tasks.md")
 
-        preserved = parser.preserve_references(
-            old_tasks, new_tasks, similarity_threshold=0.5
-        )
+        preserved = parser.preserve_references(old_tasks, new_tasks, similarity_threshold=0.5)
 
         assert len(preserved) == 3
         assert preserved[0].requirement_ids == ["FR-001"]
@@ -487,13 +480,9 @@ class TestTaskParserReferencePreservation:
         new_tasks = parser.parse_content(new_content, "/new/tasks.md")
 
         # With high threshold, should not match
-        preserved_high = parser.preserve_references(
-            old_tasks, new_tasks, similarity_threshold=0.9
-        )
+        preserved_high = parser.preserve_references(old_tasks, new_tasks, similarity_threshold=0.9)
         assert preserved_high[0].requirement_ids == []
 
         # With low threshold, should match
-        preserved_low = parser.preserve_references(
-            old_tasks, new_tasks, similarity_threshold=0.3
-        )
+        preserved_low = parser.preserve_references(old_tasks, new_tasks, similarity_threshold=0.3)
         assert preserved_low[0].requirement_ids == ["FR-001"]

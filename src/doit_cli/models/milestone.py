@@ -4,8 +4,9 @@ This module defines the Milestone dataclass used to represent GitHub milestones
 in the roadmap milestone generation feature.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass

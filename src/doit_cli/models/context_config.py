@@ -5,10 +5,11 @@ for doit commands. Context includes constitution, roadmap, current spec,
 and related specifications.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -30,7 +31,14 @@ class SummarizationConfig:
     enabled: bool = True
     threshold_percentage: float = 80.0
     source_priorities: list[str] = field(
-        default_factory=lambda: ["constitution", "tech_stack", "personas", "roadmap", "completed_roadmap", "current_spec"]
+        default_factory=lambda: [
+            "constitution",
+            "tech_stack",
+            "personas",
+            "roadmap",
+            "completed_roadmap",
+            "current_spec",
+        ]
     )
     timeout_seconds: float = 10.0
     fallback_to_truncation: bool = True
@@ -80,7 +88,7 @@ class CompletedItem:
 
     text: str
     priority: str = ""
-    completion_date: Optional[date] = None
+    completion_date: date | None = None
     feature_branch: str = ""
     relevance_score: float = 0.0
 
@@ -117,16 +125,20 @@ class SourceConfig:
     max_count: int = 1
 
     @classmethod
-    def default_sources(cls) -> dict[str, "SourceConfig"]:
+    def default_sources(cls) -> dict[str, SourceConfig]:
         """Get default source configurations."""
         return {
             "constitution": cls(source_type="constitution", enabled=True, priority=1),
             "tech_stack": cls(source_type="tech_stack", enabled=True, priority=2),
             "personas": cls(source_type="personas", enabled=True, priority=3),
             "roadmap": cls(source_type="roadmap", enabled=True, priority=4),
-            "completed_roadmap": cls(source_type="completed_roadmap", enabled=True, priority=5, max_count=5),
+            "completed_roadmap": cls(
+                source_type="completed_roadmap", enabled=True, priority=5, max_count=5
+            ),
             "current_spec": cls(source_type="current_spec", enabled=True, priority=6),
-            "related_specs": cls(source_type="related_specs", enabled=True, priority=7, max_count=3),
+            "related_specs": cls(
+                source_type="related_specs", enabled=True, priority=7, max_count=3
+            ),
         }
 
 
@@ -143,7 +155,7 @@ class CommandOverride:
     sources: dict[str, SourceConfig] = field(default_factory=dict)
 
     @classmethod
-    def default_commands(cls) -> dict[str, "CommandOverride"]:
+    def default_commands(cls) -> dict[str, CommandOverride]:
         """Get default command overrides.
 
         Returns default overrides for commands that should have
@@ -241,12 +253,12 @@ class ContextConfig:
             self.total_max_tokens = self.max_tokens_per_source
 
     @classmethod
-    def default(cls) -> "ContextConfig":
+    def default(cls) -> ContextConfig:
         """Create default configuration."""
         return cls()
 
     @classmethod
-    def from_yaml(cls, path: Path) -> "ContextConfig":
+    def from_yaml(cls, path: Path) -> ContextConfig:
         """Load configuration from YAML file.
 
         Args:
@@ -268,7 +280,7 @@ class ContextConfig:
         return cls._from_dict(data)
 
     @classmethod
-    def _from_dict(cls, data: dict) -> "ContextConfig":
+    def _from_dict(cls, data: dict) -> ContextConfig:
         """Create ContextConfig from dictionary."""
         # Parse sources
         sources_data = data.get("sources", {})
@@ -285,8 +297,11 @@ class ContextConfig:
                     # Create new custom source
                     sources[source_type] = SourceConfig(
                         source_type=source_type,
-                        **{k: v for k, v in source_config.items()
-                           if k in SourceConfig.__dataclass_fields__}
+                        **{
+                            k: v
+                            for k, v in source_config.items()
+                            if k in SourceConfig.__dataclass_fields__
+                        },
                     )
 
         # Parse command overrides (start with defaults, then overlay YAML)
@@ -306,14 +321,14 @@ class ContextConfig:
                     if isinstance(source_config, dict):
                         cmd_sources[source_type] = SourceConfig(
                             source_type=source_type,
-                            **{k: v for k, v in source_config.items()
-                               if k in SourceConfig.__dataclass_fields__}
+                            **{
+                                k: v
+                                for k, v in source_config.items()
+                                if k in SourceConfig.__dataclass_fields__
+                            },
                         )
 
-                commands[cmd_name] = CommandOverride(
-                    command_name=cmd_name,
-                    sources=cmd_sources
-                )
+                commands[cmd_name] = CommandOverride(command_name=cmd_name, sources=cmd_sources)
 
         # Parse summarization config
         summarization_data = data.get("summarization", {})
@@ -325,7 +340,9 @@ class ContextConfig:
                 if "max_count" in completed_items:
                     summarization_data["completed_items_max_count"] = completed_items["max_count"]
                 if "min_relevance" in completed_items:
-                    summarization_data["completed_items_min_relevance"] = completed_items["min_relevance"]
+                    summarization_data["completed_items_min_relevance"] = completed_items[
+                        "min_relevance"
+                    ]
 
             # Build SummarizationConfig from data
             summarization = SummarizationConfig(
@@ -333,12 +350,21 @@ class ContextConfig:
                 threshold_percentage=summarization_data.get("threshold_percentage", 80.0),
                 source_priorities=summarization_data.get(
                     "source_priorities",
-                    ["constitution", "tech_stack", "personas", "roadmap", "completed_roadmap", "current_spec"]
+                    [
+                        "constitution",
+                        "tech_stack",
+                        "personas",
+                        "roadmap",
+                        "completed_roadmap",
+                        "current_spec",
+                    ],
                 ),
                 timeout_seconds=summarization_data.get("timeout_seconds", 10.0),
                 fallback_to_truncation=summarization_data.get("fallback_to_truncation", True),
                 completed_items_max_count=summarization_data.get("completed_items_max_count", 5),
-                completed_items_min_relevance=summarization_data.get("completed_items_min_relevance", 0.3),
+                completed_items_min_relevance=summarization_data.get(
+                    "completed_items_min_relevance", 0.3
+                ),
             )
 
         return cls(
@@ -357,12 +383,12 @@ class ContextConfig:
         return Path(".doit/config/context.yaml")
 
     @classmethod
-    def load_default(cls) -> "ContextConfig":
+    def load_default(cls) -> ContextConfig:
         """Load configuration from default location."""
         return cls.from_yaml(cls.get_default_config_path())
 
     @classmethod
-    def load_from_project(cls, project_root: Path) -> "ContextConfig":
+    def load_from_project(cls, project_root: Path) -> ContextConfig:
         """Load configuration from a project directory.
 
         Args:
@@ -374,9 +400,7 @@ class ContextConfig:
         config_path = project_root / ".doit" / "config" / "context.yaml"
         return cls.from_yaml(config_path)
 
-    def get_source_config(
-        self, source_type: str, command: Optional[str] = None
-    ) -> SourceConfig:
+    def get_source_config(self, source_type: str, command: str | None = None) -> SourceConfig:
         """Get effective source configuration, considering command overrides.
 
         Args:
@@ -387,10 +411,7 @@ class ContextConfig:
             Effective SourceConfig for the given source and command.
         """
         # Start with base source config
-        base_config = self.sources.get(
-            source_type,
-            SourceConfig(source_type=source_type)
-        )
+        base_config = self.sources.get(source_type, SourceConfig(source_type=source_type))
 
         # Check for command-specific override
         if command and command in self.commands:
@@ -402,7 +423,9 @@ class ContextConfig:
                     source_type=source_type,
                     enabled=override.enabled,
                     priority=override.priority if override.priority != 99 else base_config.priority,
-                    max_count=override.max_count if override.max_count != 1 else base_config.max_count,
+                    max_count=override.max_count
+                    if override.max_count != 1
+                    else base_config.max_count,
                 )
 
         return base_config
@@ -426,9 +449,9 @@ class ContextSource:
     content: str
     token_count: int
     truncated: bool = False
-    original_tokens: Optional[int] = None
+    original_tokens: int | None = None
 
-    def __lt__(self, other: "ContextSource") -> bool:
+    def __lt__(self, other: ContextSource) -> bool:
         """Compare sources by their source type for sorting."""
         return self.source_type < other.source_type
 
@@ -449,7 +472,7 @@ class LoadedContext:
     total_tokens: int = 0
     any_truncated: bool = False
     loaded_at: datetime = field(default_factory=datetime.now)
-    _guidance_prompt: Optional[str] = None
+    _guidance_prompt: str | None = None
 
     def to_markdown(self) -> str:
         """Format all sources as markdown for injection.
@@ -504,7 +527,9 @@ class LoadedContext:
 
             if source.truncated and source.original_tokens:
                 sections.append("")
-                sections.append(f"<!-- Content truncated from {source.original_tokens} to {source.token_count} tokens. Full file at: {source.path} -->")
+                sections.append(
+                    f"<!-- Content truncated from {source.original_tokens} to {source.token_count} tokens. Full file at: {source.path} -->"
+                )
 
             sections.append("")
 
@@ -512,7 +537,7 @@ class LoadedContext:
 
         return "\n".join(sections)
 
-    def get_source(self, source_type: str) -> Optional[ContextSource]:
+    def get_source(self, source_type: str) -> ContextSource | None:
         """Get specific source by type.
 
         Args:

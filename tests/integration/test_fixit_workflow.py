@@ -5,10 +5,8 @@ Tests the complete lifecycle: start → investigate → plan → complete
 """
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
 from typer.testing import CliRunner
 
 from doit_cli.main import app
@@ -17,7 +15,6 @@ from doit_cli.models.fixit_models import (
     GitHubIssue,
     IssueState,
 )
-
 
 runner = CliRunner()
 
@@ -147,7 +144,11 @@ class TestFixitWorkflowInvestigateCommand:
     @patch("doit_cli.cli.fixit_command.FixitService")
     def test_investigate_starts_investigation(self, mock_service_class):
         """doit fixit investigate should start investigation."""
-        from doit_cli.models.fixit_models import InvestigationPlan, InvestigationCheckpoint, FixWorkflow
+        from doit_cli.models.fixit_models import (
+            FixWorkflow,
+            InvestigationCheckpoint,
+            InvestigationPlan,
+        )
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -175,9 +176,7 @@ class TestFixitWorkflowInvestigateCommand:
     @patch("doit_cli.cli.fixit_command.FixitService")
     def test_investigate_add_finding(self, mock_service_class):
         """doit fixit investigate -a should add finding."""
-        from doit_cli.models.fixit_models import (
-            InvestigationFinding, FindingType, FixWorkflow
-        )
+        from doit_cli.models.fixit_models import FindingType, FixWorkflow, InvestigationFinding
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -193,11 +192,9 @@ class TestFixitWorkflowInvestigateCommand:
         )
         mock_service_class.return_value = mock_service
 
-        result = runner.invoke(app, [
-            "fixit", "investigate",
-            "-a", "Null pointer in handler",
-            "-t", "hypothesis"
-        ])
+        result = runner.invoke(
+            app, ["fixit", "investigate", "-a", "Null pointer in handler", "-t", "hypothesis"]
+        )
 
         assert result.exit_code == 0
         assert "finding added" in result.output.lower()
@@ -249,9 +246,7 @@ class TestFixitWorkflowPlanCommand:
     @patch("doit_cli.cli.fixit_command.FixitService")
     def test_plan_generate_creates_plan(self, mock_service_class):
         """doit fixit plan --generate should create fix plan."""
-        from doit_cli.models.fixit_models import (
-            FixPlan, PlanStatus, RiskLevel, FixWorkflow
-        )
+        from doit_cli.models.fixit_models import FixPlan, FixWorkflow, PlanStatus, RiskLevel
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -303,9 +298,7 @@ class TestFixitWorkflowReviewCommand:
     @patch("doit_cli.cli.fixit_command.FixitService")
     def test_review_approve_advances_phase(self, mock_service_class):
         """doit fixit review --approve should approve plan."""
-        from doit_cli.models.fixit_models import (
-            FixPlan, PlanStatus, RiskLevel, FixWorkflow
-        )
+        from doit_cli.models.fixit_models import FixPlan, FixWorkflow, PlanStatus, RiskLevel
 
         mock_service = MagicMock()
         mock_service.get_active_workflow.return_value = FixWorkflow(
@@ -407,18 +400,24 @@ class TestFixitWorkflowWorkflowsCommand:
 
         mock_service = MagicMock()
         mock_service.list_workflows.return_value = [
-            (123, FixWorkflow(
-                id="fixit-123",
-                issue_id=123,
-                branch_name="fix/123-bug-a",
-                phase=FixPhase.INVESTIGATING,
-            )),
-            (456, FixWorkflow(
-                id="fixit-456",
-                issue_id=456,
-                branch_name="fix/456-bug-b",
-                phase=FixPhase.COMPLETED,
-            )),
+            (
+                123,
+                FixWorkflow(
+                    id="fixit-123",
+                    issue_id=123,
+                    branch_name="fix/123-bug-a",
+                    phase=FixPhase.INVESTIGATING,
+                ),
+            ),
+            (
+                456,
+                FixWorkflow(
+                    id="fixit-456",
+                    issue_id=456,
+                    branch_name="fix/456-bug-b",
+                    phase=FixPhase.COMPLETED,
+                ),
+            ),
         ]
         mock_service_class.return_value = mock_service
 
@@ -436,8 +435,8 @@ class TestFixitWorkflowEndToEnd:
     @patch("doit_cli.services.fixit_service.StateManager")
     def test_full_workflow_lifecycle(self, mock_state_class, mock_github_class, tmp_path):
         """Test complete workflow: start → investigate → plan → complete."""
-        from doit_cli.services.fixit_service import FixitService
         from doit_cli.models.fixit_models import FindingType
+        from doit_cli.services.fixit_service import FixitService
 
         # Setup mocks
         mock_github = MagicMock()
@@ -457,8 +456,12 @@ class TestFixitWorkflowEndToEnd:
         state_storage = {}
         mock_state = MagicMock()
         mock_state.load_fixit_state.side_effect = lambda issue_id: state_storage.get(issue_id)
-        mock_state.save_fixit_state.side_effect = lambda data, issue_id: state_storage.__setitem__(issue_id, data)
-        mock_state.get_active_fixit_workflow.side_effect = lambda: (123, state_storage[123]) if 123 in state_storage else None
+        mock_state.save_fixit_state.side_effect = lambda data, issue_id: state_storage.__setitem__(
+            issue_id, data
+        )
+        mock_state.get_active_fixit_workflow.side_effect = (
+            lambda: (123, state_storage[123]) if 123 in state_storage else None
+        )
         mock_state.list_fixit_states.side_effect = lambda: list(state_storage.items())
         mock_state_class.return_value = mock_state
 
@@ -551,7 +554,9 @@ class TestFixitWorkflowEndToEnd:
         state_storage = {}
         mock_state = MagicMock()
         mock_state.load_fixit_state.side_effect = lambda issue_id: state_storage.get(issue_id)
-        mock_state.save_fixit_state.side_effect = lambda data, issue_id: state_storage.__setitem__(issue_id, data)
+        mock_state.save_fixit_state.side_effect = lambda data, issue_id: state_storage.__setitem__(
+            issue_id, data
+        )
         mock_state_class.return_value = mock_state
 
         service = FixitService(
@@ -573,8 +578,8 @@ class TestFixitWorkflowEndToEnd:
     @patch("doit_cli.services.fixit_service.StateManager")
     def test_investigation_requires_confirmed_cause(self, mock_state_class, mock_github_class):
         """Test that investigation cannot complete without confirmed cause."""
-        from doit_cli.services.fixit_service import FixitService
         from doit_cli.models.fixit_models import FindingType
+        from doit_cli.services.fixit_service import FixitService
 
         # Setup mocks
         mock_github = MagicMock()
@@ -592,7 +597,9 @@ class TestFixitWorkflowEndToEnd:
         state_storage = {}
         mock_state = MagicMock()
         mock_state.load_fixit_state.side_effect = lambda issue_id: state_storage.get(issue_id)
-        mock_state.save_fixit_state.side_effect = lambda data, issue_id: state_storage.__setitem__(issue_id, data)
+        mock_state.save_fixit_state.side_effect = lambda data, issue_id: state_storage.__setitem__(
+            issue_id, data
+        )
         mock_state_class.return_value = mock_state
 
         service = FixitService(

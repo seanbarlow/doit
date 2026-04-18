@@ -1,8 +1,10 @@
 """Sync-prompts command for synchronizing agent commands with doit command templates."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -14,44 +16,26 @@ from ..services.command_writer import CommandWriter
 from ..services.prompt_writer import PromptWriter
 from ..services.template_reader import TemplateReader
 
-
 console = Console()
 
 # Type aliases for CLI options
-JsonFlag = Annotated[
-    bool,
-    typer.Option(
-        "--json", "-j",
-        help="Output results as JSON"
-    )
-]
+JsonFlag = Annotated[bool, typer.Option("--json", "-j", help="Output results as JSON")]
 
 CheckFlag = Annotated[
-    bool,
-    typer.Option(
-        "--check", "-c",
-        help="Check sync status without making changes"
-    )
+    bool, typer.Option("--check", "-c", help="Check sync status without making changes")
 ]
 
 ForceFlag = Annotated[
-    bool,
-    typer.Option(
-        "--force", "-f",
-        help="Force sync even if files are up-to-date"
-    )
+    bool, typer.Option("--force", "-f", help="Force sync even if files are up-to-date")
 ]
 
 AgentOption = Annotated[
-    Optional[str],
-    typer.Option(
-        "--agent", "-a",
-        help="Target agent(s): copilot (default), claude, or both"
-    )
+    str | None,
+    typer.Option("--agent", "-a", help="Target agent(s): copilot (default), claude, or both"),
 ]
 
 
-def parse_sync_agents(agent_str: Optional[str]) -> list[Agent]:
+def parse_sync_agents(agent_str: str | None) -> list[Agent]:
     """Parse agent string for sync command.
 
     Defaults to Copilot-only for backward compatibility.
@@ -78,9 +62,7 @@ def parse_sync_agents(agent_str: Optional[str]) -> list[Agent]:
         elif name == "both":
             return [Agent.CLAUDE, Agent.COPILOT]
         else:
-            raise typer.BadParameter(
-                f"Unknown agent: {name}. Use 'copilot', 'claude', or 'both'"
-            )
+            raise typer.BadParameter(f"Unknown agent: {name}. Use 'copilot', 'claude', or 'both'")
 
     return agents
 
@@ -229,51 +211,48 @@ def _check_agent_status(
         target_path = get_path_fn(template)
 
         if not target_path.exists():
-            result.add_operation(FileOperation(
-                file_path=str(target_path),
-                operation_type=OperationType.FAILED,
-                success=False,
-                message="Missing - needs sync",
-            ))
+            result.add_operation(
+                FileOperation(
+                    file_path=str(target_path),
+                    operation_type=OperationType.FAILED,
+                    success=False,
+                    message="Missing - needs sync",
+                )
+            )
         else:
             target_mtime = target_path.stat().st_mtime
             template_mtime = template.modified_at.timestamp()
 
             if target_mtime < template_mtime:
-                result.add_operation(FileOperation(
-                    file_path=str(target_path),
-                    operation_type=OperationType.UPDATED,
-                    success=True,
-                    message="Out-of-sync - needs update",
-                ))
+                result.add_operation(
+                    FileOperation(
+                        file_path=str(target_path),
+                        operation_type=OperationType.UPDATED,
+                        success=True,
+                        message="Out-of-sync - needs update",
+                    )
+                )
             else:
-                result.add_operation(FileOperation(
-                    file_path=str(target_path),
-                    operation_type=OperationType.SKIPPED,
-                    success=True,
-                    message="Up-to-date",
-                ))
+                result.add_operation(
+                    FileOperation(
+                        file_path=str(target_path),
+                        operation_type=OperationType.SKIPPED,
+                        success=True,
+                        message="Up-to-date",
+                    )
+                )
     return result
 
 
 def sync_prompts_command(
     command_name: Annotated[
-        Optional[str],
-        typer.Argument(
-            help="Specific command to sync (e.g., 'doit.checkin')"
-        )
+        str | None, typer.Argument(help="Specific command to sync (e.g., 'doit.checkin')")
     ] = None,
     agent: AgentOption = None,
     check: CheckFlag = False,
     force: ForceFlag = False,
     json_output: JsonFlag = False,
-    path: Annotated[
-        Path,
-        typer.Option(
-            "--path", "-p",
-            help="Project directory path"
-        )
-    ] = Path("."),
+    path: Annotated[Path, typer.Option("--path", "-p", help="Project directory path")] = Path(),
 ) -> None:
     """Synchronize agent commands with doit command templates.
 

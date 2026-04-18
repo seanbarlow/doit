@@ -6,7 +6,6 @@ including cache population, offline mode, and merge logic.
 
 import json
 from datetime import datetime, timedelta
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -16,9 +15,9 @@ from doit_cli.models.roadmap import RoadmapItem
 from doit_cli.models.sync_metadata import SyncMetadata
 from doit_cli.services.github_cache_service import GitHubCacheService
 from doit_cli.services.github_service import (
-    GitHubService,
-    GitHubAuthError,
     GitHubAPIError,
+    GitHubAuthError,
+    GitHubService,
 )
 from doit_cli.services.roadmap_merge_service import RoadmapMergeService
 
@@ -156,10 +155,7 @@ class TestRoadmapitGitHubIntegration:
         assert epics[1].number == 578
 
         # Step 2: Save to cache
-        metadata = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(epics, metadata)
 
         # Verify cache was created
@@ -201,7 +197,8 @@ class TestRoadmapitGitHubIntegration:
 
         # Find merged item (matched by branch)
         merged_item = next(
-            item for item in merged_items
+            item
+            for item in merged_items
             if item.source == "merged" and "[039-local-feature]" in (item.feature_branch or "")
         )
         assert merged_item.title == "Local Feature A"  # Preserves local title
@@ -218,15 +215,10 @@ class TestRoadmapitGitHubIntegration:
         assert github_only.source == "github"
         assert github_only.github_number == 578
 
-    def test_offline_mode_with_valid_cache(
-        self, cache_service, mock_github_epics
-    ):
+    def test_offline_mode_with_valid_cache(self, cache_service, mock_github_epics):
         """Test offline mode uses valid cache when GitHub is unavailable."""
         # Setup: Create valid cache
-        metadata = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(mock_github_epics, metadata)
 
         # Verify cache is valid
@@ -247,9 +239,7 @@ class TestRoadmapitGitHubIntegration:
         assert cached_metadata.repo_url == "https://github.com/owner/repo"
         assert cached_metadata.is_valid
 
-    def test_offline_mode_with_expired_cache(
-        self, cache_service, mock_github_epics
-    ):
+    def test_offline_mode_with_expired_cache(self, cache_service, mock_github_epics):
         """Test offline mode with expired cache returns None."""
         # Create expired cache (60 minutes old, TTL is 30)
         old_time = datetime.now() - timedelta(minutes=60)
@@ -269,15 +259,10 @@ class TestRoadmapitGitHubIntegration:
         # Should return None because cache is expired
         assert cached_epics is None
 
-    def test_cache_refresh_with_flag(
-        self, cache_service, mock_github_epics
-    ):
+    def test_cache_refresh_with_flag(self, cache_service, mock_github_epics):
         """Test --refresh flag invalidates cache and forces fresh fetch."""
         # Create valid cache
-        metadata = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(mock_github_epics, metadata)
 
         # Verify cache exists and is valid
@@ -310,10 +295,7 @@ class TestRoadmapitGitHubIntegration:
         mock_is_auth.return_value = True
 
         # Setup: Create valid cache
-        metadata = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(mock_github_epics, metadata)
 
         # Simulate rate limit error from GitHub
@@ -337,9 +319,7 @@ class TestRoadmapitGitHubIntegration:
         assert cached_epics is not None
         assert len(cached_epics) == 2
 
-    def test_merge_preserves_local_priorities(
-        self, mock_github_epics
-    ):
+    def test_merge_preserves_local_priorities(self, mock_github_epics):
         """Test that merge preserves local priority over GitHub priority."""
         # Local item with P1 priority
         local_items = [
@@ -410,10 +390,7 @@ class TestRoadmapitGitHubIntegration:
 
     def test_cache_age_tracking(self, cache_service, mock_github_epics):
         """Test that cache age is tracked correctly."""
-        metadata = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(mock_github_epics, metadata)
 
         # Get cache age
@@ -470,15 +447,10 @@ class TestRoadmapitGitHubIntegration:
         assert cache_service.get_epics() is None
         assert cache_service.get_metadata() is None
 
-    def test_multiple_sync_cycles(
-        self, cache_service, mock_github_epics
-    ):
+    def test_multiple_sync_cycles(self, cache_service, mock_github_epics):
         """Test multiple sync cycles maintain data consistency."""
         # First sync
-        metadata1 = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata1 = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(mock_github_epics, metadata1)
 
         cached1 = cache_service.get_epics()
@@ -504,10 +476,7 @@ class TestRoadmapitGitHubIntegration:
             ),
         ]
 
-        metadata2 = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata2 = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(updated_epics, metadata2)
 
         cached2 = cache_service.get_epics()
@@ -538,16 +507,18 @@ class TestRoadmapitPerformance:
         # Create 50 mock epics
         epics_data = []
         for i in range(50):
-            epics_data.append({
-                "number": i + 1,
-                "title": f"[Epic]: Feature {i + 1}",
-                "state": "open",
-                "labels": [{"name": "epic"}, {"name": "priority:P2"}],
-                "body": f"Description {i + 1}",
-                "url": f"https://github.com/owner/repo/issues/{i + 1}",
-                "createdAt": "2026-01-21T10:00:00Z",
-                "updatedAt": "2026-01-21T15:30:00Z",
-            })
+            epics_data.append(
+                {
+                    "number": i + 1,
+                    "title": f"[Epic]: Feature {i + 1}",
+                    "state": "open",
+                    "labels": [{"name": "epic"}, {"name": "priority:P2"}],
+                    "body": f"Description {i + 1}",
+                    "url": f"https://github.com/owner/repo/issues/{i + 1}",
+                    "createdAt": "2026-01-21T10:00:00Z",
+                    "updatedAt": "2026-01-21T15:30:00Z",
+                }
+            )
 
         mock_run.return_value = MagicMock(
             returncode=0,
@@ -567,10 +538,7 @@ class TestRoadmapitPerformance:
 
         # Measure cache save time
         start_time = time.time()
-        metadata = SyncMetadata.create_new(
-            "https://github.com/owner/repo",
-            ttl_minutes=30
-        )
+        metadata = SyncMetadata.create_new("https://github.com/owner/repo", ttl_minutes=30)
         cache_service.save_cache(epics, metadata)
         save_time = time.time() - start_time
 
@@ -589,11 +557,8 @@ class TestRoadmapitPerformance:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_epic_with_linked_features(
-        self, mock_run, mock_has_cli, mock_is_auth, cache_service
-    ):
+    def test_epic_with_linked_features(self, mock_run, mock_has_cli, mock_is_auth, cache_service):
         """Test that epic with linked features displays correctly (User Story 2)."""
-        from doit_cli.models.github_feature import GitHubFeature
 
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -723,9 +688,7 @@ class TestRoadmapitAddCommand:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_add_creates_github_epic(
-        self, mock_run, mock_has_cli, mock_is_auth
-    ):
+    def test_add_creates_github_epic(self, mock_run, mock_has_cli, mock_is_auth):
         """Test that roadmapit add creates a GitHub epic (User Story 3)."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -741,9 +704,7 @@ class TestRoadmapitAddCommand:
         # Create epic via service (this is what the add command calls)
         github_service = GitHubService()
         epic = github_service.create_epic(
-            title="[Epic]: New Feature X",
-            body="Test feature",
-            priority="P2"
+            title="[Epic]: New Feature X", body="Test feature", priority="P2"
         )
 
         # Verify epic was created correctly
@@ -774,9 +735,7 @@ class TestRoadmapitAddCommand:
 
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
-    def test_add_handles_github_not_configured(
-        self, mock_has_cli, mock_is_auth
-    ):
+    def test_add_handles_github_not_configured(self, mock_has_cli, mock_is_auth):
         """Test that add command handles GitHub not configured gracefully."""
         mock_has_cli.return_value = False
         mock_is_auth.return_value = False
@@ -785,20 +744,14 @@ class TestRoadmapitAddCommand:
 
         # Should raise GitHubAuthError
         with pytest.raises(GitHubAuthError) as exc_info:
-            github_service.create_epic(
-                title="[Epic]: Test",
-                body="Test",
-                priority="P2"
-            )
+            github_service.create_epic(title="[Epic]: Test", body="Test", priority="P2")
 
         assert "not installed" in str(exc_info.value).lower()
 
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_add_handles_api_error(
-        self, mock_run, mock_has_cli, mock_is_auth
-    ):
+    def test_add_handles_api_error(self, mock_run, mock_has_cli, mock_is_auth):
         """Test that add command handles GitHub API errors gracefully."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -814,20 +767,14 @@ class TestRoadmapitAddCommand:
 
         # Should raise GitHubAPIError
         with pytest.raises(GitHubAPIError) as exc_info:
-            github_service.create_epic(
-                title="[Epic]: Test",
-                body="Test",
-                priority="P2"
-            )
+            github_service.create_epic(title="[Epic]: Test", body="Test", priority="P2")
 
         assert "Failed to create epic" in str(exc_info.value)
 
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_add_with_custom_priority(
-        self, mock_run, mock_has_cli, mock_is_auth
-    ):
+    def test_add_with_custom_priority(self, mock_run, mock_has_cli, mock_is_auth):
         """Test that add command respects custom priority levels."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -845,10 +792,8 @@ class TestRoadmapitAddCommand:
         for priority in ["P1", "P2", "P3", "P4"]:
             mock_run.reset_mock()
 
-            epic = github_service.create_epic(
-                title=f"[Epic]: {priority} Feature",
-                body="Test",
-                priority=priority
+            github_service.create_epic(
+                title=f"[Epic]: {priority} Feature", body="Test", priority=priority
             )
 
             # Verify priority label was used
@@ -860,9 +805,7 @@ class TestRoadmapitAddCommand:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_add_with_additional_labels(
-        self, mock_run, mock_has_cli, mock_is_auth
-    ):
+    def test_add_with_additional_labels(self, mock_run, mock_has_cli, mock_is_auth):
         """Test that add command can include additional labels."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -875,11 +818,11 @@ class TestRoadmapitAddCommand:
         )
 
         github_service = GitHubService()
-        epic = github_service.create_epic(
+        github_service.create_epic(
             title="[Epic]: Feature with Labels",
             body="Test",
             priority="P2",
-            labels=["enhancement", "needs-review"]
+            labels=["enhancement", "needs-review"],
         )
 
         # Verify all labels were included

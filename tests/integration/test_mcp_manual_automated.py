@@ -6,6 +6,7 @@ converting manual testing checklists into automated assertions.
 
 import json
 import subprocess
+
 import pytest
 
 from doit_cli.mcp import MCP_AVAILABLE
@@ -50,7 +51,9 @@ class TestMCPConfiguration:
         """MT-003: 'doit mcp serve' CLI command is registered and accessible."""
         result = subprocess.run(
             ["doit", "mcp", "--help"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         assert result.returncode == 0
         assert "serve" in result.stdout.lower() or "serve" in result.stderr.lower()
@@ -63,6 +66,7 @@ class TestToolResponses:
     def _get_tool_fn(self, tool_name):
         """Helper to get a registered tool function."""
         from doit_cli.mcp.server import create_server
+
         server = create_server()
         return server._tool_manager._tools[tool_name].fn
 
@@ -80,9 +84,9 @@ class TestToolResponses:
             encoding="utf-8",
         )
 
-        result = json.loads(self._get_tool_fn("doit_validate")(
-            spec_path=str(specs_dir / "spec.md")
-        ))
+        result = json.loads(
+            self._get_tool_fn("doit_validate")(spec_path=str(specs_dir / "spec.md"))
+        )
         assert "specs" in result
         assert len(result["specs"]) == 1
         # A minimal spec should have some issues or a low score
@@ -133,9 +137,7 @@ class TestToolResponses:
             encoding="utf-8",
         )
 
-        result = json.loads(self._get_tool_fn("doit_tasks")(
-            feature_name="test-feature"
-        ))
+        result = json.loads(self._get_tool_fn("doit_tasks")(feature_name="test-feature"))
         assert result["summary"]["total"] >= 0
 
     def test_mt007_context_returns_all_sources(self, tmp_path, monkeypatch):
@@ -183,6 +185,7 @@ class TestErrorHandling:
 
     def _get_tool_fn(self, tool_name):
         from doit_cli.mcp.server import create_server
+
         server = create_server()
         return server._tool_manager._tools[tool_name].fn
 
@@ -204,11 +207,14 @@ class TestErrorHandling:
         """MT-011: Verify clear error message when mcp package not installed."""
         # We can't actually uninstall mcp, but we can verify the guard exists
         from doit_cli.mcp import MCP_AVAILABLE
+
         assert MCP_AVAILABLE is True  # Since we're running with mcp installed
 
         # Verify the CLI command checks for MCP_AVAILABLE
         import inspect
+
         from doit_cli.cli.mcp_command import serve_command
+
         source = inspect.getsource(serve_command)
         assert "MCP_AVAILABLE" in source
         assert "not installed" in source.lower() or "pip install" in source.lower()

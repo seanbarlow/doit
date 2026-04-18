@@ -1,7 +1,8 @@
 """Parser for AUTO-GENERATED sections in markdown files."""
 
+from __future__ import annotations
+
 import re
-from typing import Optional
 
 from ..models.diagram_models import DiagramSection
 
@@ -35,7 +36,7 @@ class SectionParser:
         sections = []
         lines = content.split("\n")
 
-        current_section: Optional[DiagramSection] = None
+        current_section: DiagramSection | None = None
         section_content_lines: list[str] = []
 
         for line_num, line in enumerate(lines, start=1):
@@ -69,7 +70,7 @@ class SectionParser:
 
         return sections
 
-    def find_section(self, content: str, section_name: str) -> Optional[DiagramSection]:
+    def find_section(self, content: str, section_name: str) -> DiagramSection | None:
         """Find a specific AUTO-GENERATED section by name.
 
         Args:
@@ -112,7 +113,7 @@ class SectionParser:
         new_content_clean = new_content.strip()
 
         # Reconstruct
-        result_lines = before_lines + [new_content_clean] + after_lines
+        result_lines = [*before_lines, new_content_clean, *after_lines]
 
         return "\n".join(result_lines), True
 
@@ -139,9 +140,7 @@ class SectionParser:
             return content, False  # Section already exists
 
         lines = content.split("\n")
-        heading_pattern = re.compile(
-            rf"^#+\s*{re.escape(after_heading)}\s*$", re.IGNORECASE
-        )
+        heading_pattern = re.compile(rf"^#+\s*{re.escape(after_heading)}\s*$", re.IGNORECASE)
 
         insert_index = -1
         for i, line in enumerate(lines):
@@ -169,7 +168,7 @@ class SectionParser:
 
         return "\n".join(result_lines), True
 
-    def extract_mermaid_from_section(self, section: DiagramSection) -> Optional[str]:
+    def extract_mermaid_from_section(self, section: DiagramSection) -> str | None:
         """Extract Mermaid diagram content from a section.
 
         Args:
@@ -181,9 +180,7 @@ class SectionParser:
         content = section.content
 
         # Look for ```mermaid ... ``` block
-        mermaid_pattern = re.compile(
-            r"```mermaid\s*\n(.*?)\n```", re.DOTALL | re.IGNORECASE
-        )
+        mermaid_pattern = re.compile(r"```mermaid\s*\n(.*?)\n```", re.DOTALL | re.IGNORECASE)
         match = mermaid_pattern.search(content)
 
         if match:

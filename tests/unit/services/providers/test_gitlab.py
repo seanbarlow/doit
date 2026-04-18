@@ -10,19 +10,16 @@ import httpx
 import pytest
 
 from doit_cli.models.provider_models import (
-    Issue,
     IssueCreateRequest,
     IssueFilters,
     IssueState,
     IssueType,
     IssueUpdateRequest,
-    Milestone,
     MilestoneCreateRequest,
     MilestoneState,
     PRCreateRequest,
     PRFilters,
     PRState,
-    PullRequest,
 )
 from doit_cli.services.providers.base import ProviderType
 from doit_cli.services.providers.exceptions import (
@@ -37,7 +34,6 @@ from doit_cli.services.providers.gitlab import (
     GitLabLabelMapper,
     GitLabProvider,
 )
-
 
 # =============================================================================
 # GitLabLabelMapper Tests
@@ -64,9 +60,7 @@ class TestGitLabLabelMapper:
 
     def test_to_gitlab_labels_with_extra_labels(self) -> None:
         """Test adding extra labels."""
-        labels = self.mapper.to_gitlab_labels(
-            IssueType.TASK, extra_labels=["backend", "urgent"]
-        )
+        labels = self.mapper.to_gitlab_labels(IssueType.TASK, extra_labels=["backend", "urgent"])
         assert "Task" in labels
         assert "backend" in labels
         assert "urgent" in labels
@@ -81,9 +75,7 @@ class TestGitLabLabelMapper:
 
     def test_from_gitlab_labels_extracts_type(self) -> None:
         """Test extracting issue type from labels."""
-        issue_type, priority, remaining = self.mapper.from_gitlab_labels(
-            ["Feature", "backend"]
-        )
+        issue_type, priority, remaining = self.mapper.from_gitlab_labels(["Feature", "backend"])
         assert issue_type == IssueType.FEATURE
         assert priority is None
         assert remaining == ["backend"]
@@ -99,9 +91,7 @@ class TestGitLabLabelMapper:
 
     def test_from_gitlab_labels_default_type(self) -> None:
         """Test default type when no type label present."""
-        issue_type, priority, remaining = self.mapper.from_gitlab_labels(
-            ["custom-label"]
-        )
+        issue_type, _priority, remaining = self.mapper.from_gitlab_labels(["custom-label"])
         assert issue_type == IssueType.TASK
         assert remaining == ["custom-label"]
 
@@ -338,9 +328,7 @@ class TestGitLabProvider:
 
     @patch.object(GitLabAPIClient, "post")
     @patch.object(GitLabAPIClient, "get_list")
-    def test_create_issue(
-        self, mock_get_list: MagicMock, mock_post: MagicMock
-    ) -> None:
+    def test_create_issue(self, mock_get_list: MagicMock, mock_post: MagicMock) -> None:
         """Test creating an issue."""
         mock_get_list.return_value = []  # No existing labels
         mock_post.side_effect = [
@@ -443,9 +431,7 @@ class TestGitLabProvider:
 
     @patch.object(GitLabAPIClient, "put")
     @patch.object(GitLabAPIClient, "get_list")
-    def test_update_issue(
-        self, mock_get_list: MagicMock, mock_put: MagicMock
-    ) -> None:
+    def test_update_issue(self, mock_get_list: MagicMock, mock_put: MagicMock) -> None:
         """Test updating an issue."""
         mock_get_list.return_value = []
         mock_put.return_value = {
@@ -475,9 +461,7 @@ class TestGitLabProvider:
 
     @patch.object(GitLabAPIClient, "post")
     @patch.object(GitLabAPIClient, "get_list")
-    def test_create_pull_request(
-        self, mock_get_list: MagicMock, mock_post: MagicMock
-    ) -> None:
+    def test_create_pull_request(self, mock_get_list: MagicMock, mock_post: MagicMock) -> None:
         """Test creating a merge request."""
         mock_get_list.return_value = []
         mock_post.return_value = {

@@ -1,11 +1,10 @@
 """Unit tests for HookValidator service."""
 
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from doit_cli.services.hook_validator import HookValidator, ValidationResult
 from doit_cli.models.hook_config import HookConfig, HookRule
+from doit_cli.services.hook_validator import HookValidator, ValidationResult
 
 
 class TestValidationResult:
@@ -125,9 +124,7 @@ class TestHookValidatorSpecChecks:
         """Test extracting status from spec file."""
         spec_dir = tmp_path / "specs" / "025-feature"
         spec_dir.mkdir(parents=True)
-        (spec_dir / "spec.md").write_text(
-            "# Feature Spec\n\n**Status**: In Progress\n\n## Summary"
-        )
+        (spec_dir / "spec.md").write_text("# Feature Spec\n\n**Status**: In Progress\n\n## Summary")
 
         validator = HookValidator(project_root=tmp_path)
         assert validator.get_spec_status("025-feature") == "In Progress"

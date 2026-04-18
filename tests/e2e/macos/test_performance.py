@@ -1,6 +1,7 @@
 """Performance validation tests for macOS E2E test suite."""
 
 import time
+
 import pytest
 
 
@@ -22,7 +23,8 @@ def test_full_test_execution_time(macos_test_env):
 
     # Simulate a test operation
     import tempfile
-    with tempfile.TemporaryDirectory() as tmpdir:
+
+    with tempfile.TemporaryDirectory():
         pass
 
     elapsed = time.time() - start_time
@@ -66,7 +68,9 @@ def test_resource_usage_within_limits(tmp_path, macos_test_env):
     try:
         import psutil
     except ImportError:
-        pytest.skip("psutil not installed - install with 'pip install psutil' for resource monitoring")
+        pytest.skip(
+            "psutil not installed - install with 'pip install psutil' for resource monitoring"
+        )
 
     import os
 

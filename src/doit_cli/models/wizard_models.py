@@ -5,10 +5,12 @@ wizard service to manage state, track validation results, and handle
 configuration flow.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from ..services.providers.base import ProviderType
 
@@ -48,16 +50,16 @@ class ValidationResult:
     step: WizardStep
     success: bool
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
-    error_message: Optional[str] = None
-    suggestion: Optional[str] = None
+    error_message: str | None = None
+    suggestion: str | None = None
     details: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def passed(
         cls,
         step: WizardStep,
-        details: Optional[dict[str, Any]] = None,
-    ) -> "ValidationResult":
+        details: dict[str, Any] | None = None,
+    ) -> ValidationResult:
         """Create a successful validation result."""
         return cls(
             step=step,
@@ -70,8 +72,8 @@ class ValidationResult:
         cls,
         step: WizardStep,
         error: str,
-        suggestion: Optional[str] = None,
-    ) -> "ValidationResult":
+        suggestion: str | None = None,
+    ) -> ValidationResult:
         """Create a failed validation result."""
         return cls(
             step=step,
@@ -86,9 +88,9 @@ class WizardState:
     """Tracks wizard progress, collected values, and validation results."""
 
     current_step: WizardStep
-    provider_type: Optional[ProviderType] = None
+    provider_type: ProviderType | None = None
     auto_detected: bool = False
-    detection_source: Optional[str] = None
+    detection_source: str | None = None
     collected_values: dict[str, Any] = field(default_factory=dict)
     validation_results: list[ValidationResult] = field(default_factory=list)
     started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
@@ -97,7 +99,7 @@ class WizardState:
         """Add a validation result to the state."""
         self.validation_results.append(result)
 
-    def get_last_validation(self) -> Optional[ValidationResult]:
+    def get_last_validation(self) -> ValidationResult | None:
         """Get the most recent validation result."""
         return self.validation_results[-1] if self.validation_results else None
 
@@ -111,22 +113,22 @@ class WizardResult:
     """Result of wizard execution."""
 
     success: bool
-    provider: Optional[ProviderType] = None
+    provider: ProviderType | None = None
     cancelled: bool = False
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     @classmethod
-    def completed(cls, provider: ProviderType) -> "WizardResult":
+    def completed(cls, provider: ProviderType) -> WizardResult:
         """Create a successful completion result."""
         return cls(success=True, provider=provider)
 
     @classmethod
-    def canceled(cls) -> "WizardResult":
+    def canceled(cls) -> WizardResult:
         """Create a cancellation result."""
         return cls(success=False, cancelled=True)
 
     @classmethod
-    def error(cls, message: str) -> "WizardResult":
+    def error(cls, message: str) -> WizardResult:
         """Create an error result."""
         return cls(success=False, error_message=message)
 
@@ -145,7 +147,7 @@ class ConfigBackup:
         cls,
         reason: str,
         config_data: dict[str, Any],
-    ) -> "ConfigBackup":
+    ) -> ConfigBackup:
         """Create a new backup with auto-generated ID."""
         now = datetime.now(UTC)
         # Include microseconds for uniqueness in rapid succession
@@ -171,7 +173,7 @@ class WizardStepError(Exception):
         self,
         step: WizardStep,
         message: str,
-        suggestion: Optional[str] = None,
+        suggestion: str | None = None,
     ):
         self.step = step
         self.message = message

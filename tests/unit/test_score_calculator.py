@@ -1,7 +1,5 @@
 """Unit tests for ScoreCalculator."""
 
-import pytest
-
 from doit_cli.models.validation_models import Severity, ValidationIssue
 from doit_cli.services.score_calculator import ScoreCalculator
 

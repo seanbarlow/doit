@@ -4,8 +4,10 @@ This module provides the ProviderFactory class for instantiating
 the appropriate git provider based on configuration.
 """
 
+from __future__ import annotations
+
 import subprocess
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .providers.base import GitProvider, ProviderType
 from .providers.exceptions import ProviderError, ProviderNotConfiguredError
@@ -30,7 +32,7 @@ class ProviderFactory:
     """
 
     @classmethod
-    def create(cls, config: Optional["ProviderConfig"] = None) -> GitProvider:
+    def create(cls, config: ProviderConfig | None = None) -> GitProvider:
         """Create a provider instance based on configuration.
 
         Args:
@@ -76,7 +78,7 @@ class ProviderFactory:
             raise ProviderError(f"Unknown provider type: {provider_type}")
 
     @classmethod
-    def detect_provider(cls) -> Optional[ProviderType]:
+    def detect_provider(cls) -> ProviderType | None:
         """Auto-detect provider from git remote URL.
 
         Examines the origin remote URL to determine which git hosting
@@ -148,17 +150,13 @@ class ProviderFactory:
             import socket
 
             socket.setdefaulttimeout(3)
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(
-                ("github.com", 443)
-            )
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("github.com", 443))
             return False
-        except (socket.error, socket.timeout, OSError):
+        except (TimeoutError, OSError):
             return True
 
     @classmethod
-    def create_safe(
-        cls, config: Optional["ProviderConfig"] = None
-    ) -> Optional[GitProvider]:
+    def create_safe(cls, config: ProviderConfig | None = None) -> GitProvider | None:
         """Create a provider instance, returning None if unavailable.
 
         This method is useful for offline-safe operations where

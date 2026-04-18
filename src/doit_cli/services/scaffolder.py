@@ -1,7 +1,8 @@
 """Scaffolder service for creating doit project structure."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 from ..models.agent import Agent
 from ..models.project import Project

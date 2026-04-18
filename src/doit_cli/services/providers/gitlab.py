@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 import ssl
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import quote
 
 import httpx
@@ -49,7 +49,6 @@ from .exceptions import (
     ResourceNotFoundError,
     ValidationError,
 )
-
 
 # =============================================================================
 # GitLabLabelMapper - Maps between unified types and GitLab labels
@@ -102,8 +101,8 @@ class GitLabLabelMapper:
     def to_gitlab_labels(
         self,
         issue_type: IssueType,
-        priority: Optional[str] = None,
-        extra_labels: Optional[list[str]] = None,
+        priority: str | None = None,
+        extra_labels: list[str] | None = None,
     ) -> list[str]:
         """Convert unified issue type and priority to GitLab labels.
 
@@ -131,9 +130,7 @@ class GitLabLabelMapper:
 
         return labels
 
-    def from_gitlab_labels(
-        self, labels: list[str]
-    ) -> tuple[IssueType, Optional[str], list[str]]:
+    def from_gitlab_labels(self, labels: list[str]) -> tuple[IssueType, str | None, list[str]]:
         """Extract unified issue type and priority from GitLab labels.
 
         Args:
@@ -143,7 +140,7 @@ class GitLabLabelMapper:
             Tuple of (issue_type, priority, remaining_labels).
         """
         issue_type = IssueType.TASK  # Default
-        priority: Optional[str] = None
+        priority: str | None = None
         remaining: list[str] = []
 
         for label in labels:
@@ -191,7 +188,7 @@ class GitLabAPIClient:
         self,
         project_path: str,
         host: str = "gitlab.com",
-        token: Optional[str] = None,
+        token: str | None = None,
         timeout: int = 30,
     ):
         self.project_path = project_path
@@ -199,7 +196,7 @@ class GitLabAPIClient:
         self.base_url = f"https://{host}/api/v4"
         self.token = token or os.environ.get("GITLAB_TOKEN", "")
         self.timeout = timeout
-        self._client: Optional[httpx.Client] = None
+        self._client: httpx.Client | None = None
 
     @property
     def client(self) -> httpx.Client:
@@ -309,9 +306,7 @@ class GitLabAPIClient:
                 cause=e,
             )
 
-    def get(
-        self, endpoint: str, params: Optional[dict[str, Any]] = None
-    ) -> dict[str, Any]:
+    def get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """Make a GET request to the GitLab API.
 
         Args:
@@ -324,9 +319,7 @@ class GitLabAPIClient:
         response = self.client.get(endpoint, params=params)
         return self._handle_response(response)
 
-    def get_list(
-        self, endpoint: str, params: Optional[dict[str, Any]] = None
-    ) -> list[dict[str, Any]]:
+    def get_list(self, endpoint: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Make a GET request expecting a list response.
 
         Args:
@@ -351,9 +344,7 @@ class GitLabAPIClient:
             self._handle_response(response)
         return response.json()
 
-    def post(
-        self, endpoint: str, data: Optional[dict[str, Any]] = None
-    ) -> dict[str, Any]:
+    def post(self, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any]:
         """Make a POST request to the GitLab API.
 
         Args:
@@ -366,9 +357,7 @@ class GitLabAPIClient:
         response = self.client.post(endpoint, json=data or {})
         return self._handle_response(response)
 
-    def put(
-        self, endpoint: str, data: Optional[dict[str, Any]] = None
-    ) -> dict[str, Any]:
+    def put(self, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any]:
         """Make a PUT request to the GitLab API.
 
         Args:
@@ -420,7 +409,7 @@ class GitLabProvider(GitProvider):
         self,
         project_path: str = "",
         host: str = "gitlab.com",
-        token: Optional[str] = None,
+        token: str | None = None,
         timeout: int = 30,
     ):
         # URL-encode the project path for API calls
@@ -429,7 +418,7 @@ class GitLabProvider(GitProvider):
         self._host = host
         self._token = token
         self._timeout = timeout
-        self._client: Optional[GitLabAPIClient] = None
+        self._client: GitLabAPIClient | None = None
         self._label_mapper = GitLabLabelMapper()
         self._validated = False
 
@@ -512,8 +501,7 @@ class GitLabProvider(GitProvider):
         """
         # Extract labels as strings
         label_names = [
-            lbl if isinstance(lbl, str) else lbl.get("name", "")
-            for lbl in data.get("labels", [])
+            lbl if isinstance(lbl, str) else lbl.get("name", "") for lbl in data.get("labels", [])
         ]
 
         # Parse issue type and priority from labels
@@ -556,8 +544,7 @@ class GitLabProvider(GitProvider):
         """
         # Extract labels
         label_names = [
-            lbl if isinstance(lbl, str) else lbl.get("name", "")
-            for lbl in data.get("labels", [])
+            lbl if isinstance(lbl, str) else lbl.get("name", "") for lbl in data.get("labels", [])
         ]
 
         # Map GitLab state to unified state
@@ -599,9 +586,7 @@ class GitLabProvider(GitProvider):
             Unified Milestone object.
         """
         # Map GitLab state to unified state
-        state = (
-            MilestoneState.CLOSED if data.get("state") == "closed" else MilestoneState.OPEN
-        )
+        state = MilestoneState.CLOSED if data.get("state") == "closed" else MilestoneState.OPEN
 
         # Parse due date if present
         due_date = None
@@ -714,9 +699,7 @@ class GitLabProvider(GitProvider):
             payload["labels"] = ",".join(labels)
 
         if request.milestone_id:
-            payload["milestone_id"] = int(
-                self._extract_provider_id(request.milestone_id)
-            )
+            payload["milestone_id"] = int(self._extract_provider_id(request.milestone_id))
 
         # Create issue
         data = self._api.post(f"/projects/{self._encoded_path}/issues", payload)
@@ -743,7 +726,7 @@ class GitLabProvider(GitProvider):
             raise ResourceNotFoundError("Issue", issue_id)
 
     @with_retry(max_retries=3)
-    def list_issues(self, filters: Optional[IssueFilters] = None) -> list[Issue]:
+    def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
         """List issues matching the given filters.
 
         Args:
@@ -797,23 +780,17 @@ class GitLabProvider(GitProvider):
 
         if updates.state is not None:
             # GitLab uses state_event to change state
-            payload["state_event"] = (
-                "close" if updates.state == IssueState.CLOSED else "reopen"
-            )
+            payload["state_event"] = "close" if updates.state == IssueState.CLOSED else "reopen"
 
         if updates.labels is not None:
             self._ensure_labels_exist(updates.labels)
             payload["labels"] = ",".join(updates.labels)
 
         if updates.milestone_id is not None:
-            payload["milestone_id"] = int(
-                self._extract_provider_id(updates.milestone_id)
-            )
+            payload["milestone_id"] = int(self._extract_provider_id(updates.milestone_id))
 
         try:
-            data = self._api.put(
-                f"/projects/{self._encoded_path}/issues/{iid}", payload
-            )
+            data = self._api.put(f"/projects/{self._encoded_path}/issues/{iid}", payload)
             return self._parse_issue(data)
         except ResourceNotFoundError:
             raise ResourceNotFoundError("Issue", issue_id)
@@ -849,9 +826,7 @@ class GitLabProvider(GitProvider):
             self._ensure_labels_exist(request.labels)
             payload["labels"] = ",".join(request.labels)
 
-        data = self._api.post(
-            f"/projects/{self._encoded_path}/merge_requests", payload
-        )
+        data = self._api.post(f"/projects/{self._encoded_path}/merge_requests", payload)
         return self._parse_pull_request(data)
 
     @with_retry(max_retries=3)
@@ -869,17 +844,13 @@ class GitLabProvider(GitProvider):
         """
         iid = self._extract_provider_id(pr_id)
         try:
-            data = self._api.get(
-                f"/projects/{self._encoded_path}/merge_requests/{iid}"
-            )
+            data = self._api.get(f"/projects/{self._encoded_path}/merge_requests/{iid}")
             return self._parse_pull_request(data)
         except ResourceNotFoundError:
             raise ResourceNotFoundError("Merge Request", pr_id)
 
     @with_retry(max_retries=3)
-    def list_pull_requests(
-        self, filters: Optional[PRFilters] = None
-    ) -> list[PullRequest]:
+    def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
         """List merge requests matching the given filters.
 
         Args:
@@ -908,9 +879,7 @@ class GitLabProvider(GitProvider):
             if filters.limit:
                 params["per_page"] = min(filters.limit, 100)
 
-        data = self._api.get_list(
-            f"/projects/{self._encoded_path}/merge_requests", params
-        )
+        data = self._api.get_list(f"/projects/{self._encoded_path}/merge_requests", params)
         return [self._parse_pull_request(item) for item in data]
 
     # -------------------------------------------------------------------------
@@ -965,9 +934,7 @@ class GitLabProvider(GitProvider):
             raise ResourceNotFoundError("Milestone", milestone_id)
 
     @with_retry(max_retries=3)
-    def list_milestones(
-        self, state: Optional[MilestoneState] = None
-    ) -> list[Milestone]:
+    def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
         """List milestones.
 
         Args:
@@ -987,10 +954,10 @@ class GitLabProvider(GitProvider):
     def update_milestone(
         self,
         milestone_id: str,
-        title: Optional[str] = None,
-        description: Optional[str] = None,
-        due_date: Optional[datetime] = None,
-        state: Optional[MilestoneState] = None,
+        title: str | None = None,
+        description: str | None = None,
+        due_date: datetime | None = None,
+        state: MilestoneState | None = None,
     ) -> Milestone:
         """Update an existing milestone.
 
@@ -1021,14 +988,10 @@ class GitLabProvider(GitProvider):
 
         if state is not None:
             # GitLab uses state_event to change state
-            payload["state_event"] = (
-                "close" if state == MilestoneState.CLOSED else "activate"
-            )
+            payload["state_event"] = "close" if state == MilestoneState.CLOSED else "activate"
 
         try:
-            data = self._api.put(
-                f"/projects/{self._encoded_path}/milestones/{ms_id}", payload
-            )
+            data = self._api.put(f"/projects/{self._encoded_path}/milestones/{ms_id}", payload)
             return self._parse_milestone(data)
         except ResourceNotFoundError:
             raise ResourceNotFoundError("Milestone", milestone_id)

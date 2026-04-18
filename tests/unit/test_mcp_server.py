@@ -3,7 +3,7 @@
 import pytest
 
 from doit_cli.mcp import MCP_AVAILABLE
-from doit_cli.mcp.server import create_server, _get_version
+from doit_cli.mcp.server import _get_version, create_server
 
 
 @pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp package not installed")

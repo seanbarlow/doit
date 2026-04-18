@@ -1,8 +1,9 @@
 """Integration tests for hooks CLI commands."""
 
 import subprocess
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 class TestHooksCommandIntegration:

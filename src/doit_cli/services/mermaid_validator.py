@@ -1,7 +1,8 @@
 """Validator for Mermaid diagram syntax."""
 
+from __future__ import annotations
+
 import re
-from typing import Optional
 
 from ..models.diagram_models import DiagramType, ValidationResult
 
@@ -25,23 +26,19 @@ class MermaidValidator:
 
     # Arrow patterns for flowchart
     FLOWCHART_ARROW_PATTERNS = [
-        re.compile(r"-->"),   # Standard arrow
+        re.compile(r"-->"),  # Standard arrow
         re.compile(r"-\.->"),  # Dotted arrow
-        re.compile(r"==>"),   # Thick arrow
+        re.compile(r"==>"),  # Thick arrow
         re.compile(r"--\s*\w+\s*-->"),  # Labeled arrow
     ]
 
     # ER diagram cardinality patterns
-    ER_CARDINALITY_PATTERN = re.compile(
-        r"(\|o|\|\||\}o|\}|)\s*--\s*(\|o|\|\||\}o|\}||\{o|\{)"
-    )
+    ER_CARDINALITY_PATTERN = re.compile(r"(\|o|\|\||\}o|\}|)\s*--\s*(\|o|\|\||\}o|\}||\{o|\{)")
 
     # Bracket pairs for balance checking
     BRACKET_PAIRS = [("{", "}"), ("[", "]"), ("(", ")")]
 
-    def validate(
-        self, content: str, diagram_type: Optional[DiagramType] = None
-    ) -> ValidationResult:
+    def validate(self, content: str, diagram_type: DiagramType | None = None) -> ValidationResult:
         """Validate Mermaid diagram syntax.
 
         Args:
@@ -117,7 +114,7 @@ class MermaidValidator:
 
         return "\n".join(lines)
 
-    def _detect_diagram_type(self, content: str) -> Optional[DiagramType]:
+    def _detect_diagram_type(self, content: str) -> DiagramType | None:
         """Auto-detect diagram type from content.
 
         Args:
@@ -135,9 +132,7 @@ class MermaidValidator:
 
         return None
 
-    def _validate_type_declaration(
-        self, content: str, diagram_type: DiagramType
-    ) -> list[str]:
+    def _validate_type_declaration(self, content: str, diagram_type: DiagramType) -> list[str]:
         """Validate diagram type declaration.
 
         Args:
@@ -262,9 +257,7 @@ class MermaidValidator:
 
                 # Validate cardinality notation
                 if not self._validate_cardinality_in_line(line):
-                    warnings.append(
-                        f"Line {line_num}: Potentially invalid cardinality notation"
-                    )
+                    warnings.append(f"Line {line_num}: Potentially invalid cardinality notation")
 
         # Check for orphan entities (defined but no relationships)
         orphans = entities_defined - entities_referenced

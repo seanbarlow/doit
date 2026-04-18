@@ -1,7 +1,8 @@
 """Config loader for validation rules configuration."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -18,7 +19,7 @@ class ConfigLoader:
     # Default configuration file path
     DEFAULT_CONFIG_PATH = ".doit/validation-rules.yaml"
 
-    def __init__(self, project_root: Optional[Path] = None) -> None:
+    def __init__(self, project_root: Path | None = None) -> None:
         """Initialize config loader.
 
         Args:
@@ -26,7 +27,7 @@ class ConfigLoader:
         """
         self.project_root = project_root or Path.cwd()
 
-    def load(self, config_path: Optional[Path] = None) -> ValidationConfig:
+    def load(self, config_path: Path | None = None) -> ValidationConfig:
         """Load validation configuration from YAML file.
 
         Args:
@@ -100,7 +101,7 @@ class ConfigLoader:
         )
 
 
-def load_validation_config(project_root: Optional[Path] = None) -> ValidationConfig:
+def load_validation_config(project_root: Path | None = None) -> ValidationConfig:
     """Convenience function to load validation config.
 
     Args:

@@ -1,11 +1,10 @@
 """Validator service for checking project setup."""
 
-from pathlib import Path
-from typing import Optional
+from __future__ import annotations
 
 from ..models.agent import Agent
 from ..models.project import Project
-from ..models.results import VerifyResult, VerifyCheck, VerifyStatus
+from ..models.results import VerifyCheck, VerifyResult, VerifyStatus
 from ..models.template import DOIT_COMMANDS
 
 
@@ -85,7 +84,7 @@ class Validator:
             return VerifyCheck(
                 name=f"{agent.value}_commands",
                 status=VerifyStatus.FAIL,
-                message=f"Cannot check commands - directory does not exist",
+                message="Cannot check commands - directory does not exist",
             )
 
         # Get expected file names
@@ -187,7 +186,7 @@ class Validator:
             message="copilot-instructions.md configured correctly",
         )
 
-    def run_all_checks(self, agents: Optional[list[Agent]] = None) -> VerifyResult:
+    def run_all_checks(self, agents: list[Agent] | None = None) -> VerifyResult:
         """Run all validation checks.
 
         Args:

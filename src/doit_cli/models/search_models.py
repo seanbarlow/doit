@@ -4,12 +4,13 @@ This module provides data models for the memory search feature, including
 query types, search results, and memory sources.
 """
 
+from __future__ import annotations
+
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional
-import uuid
 
 
 class QueryType(str, Enum):
@@ -121,7 +122,7 @@ class MemorySource:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     @classmethod
-    def from_path(cls, path: Path, source_type: SourceType) -> "MemorySource":
+    def from_path(cls, path: Path, source_type: SourceType) -> MemorySource:
         """Create a MemorySource from a file path.
 
         Args:

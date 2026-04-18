@@ -1,5 +1,7 @@
 """Quality score calculator for spec validation."""
 
+from __future__ import annotations
+
 from ..models.validation_models import Severity, ValidationIssue
 
 

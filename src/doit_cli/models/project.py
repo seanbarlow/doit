@@ -1,12 +1,12 @@
 """Project model representing a directory being initialized for doit workflow."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from .agent import Agent
-
 
 # Unsafe paths that require confirmation before initialization
 UNSAFE_PATHS = [
@@ -27,8 +27,8 @@ class Project:
 
     path: Path
     initialized: bool = False
-    doit_version: Optional[str] = None
-    created_at: Optional[datetime] = None
+    doit_version: str | None = None
+    created_at: datetime | None = None
     agents: list[Agent] = field(default_factory=list)
 
     @property

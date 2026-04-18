@@ -4,11 +4,12 @@ This module provides the ContextAuditor service that scans command templates
 for double-injection patterns and generates optimization recommendations.
 """
 
+from __future__ import annotations
+
 import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,9 @@ DOUBLE_INJECTION_PATTERNS = [
     r'Read\s+[`"]?\.doit/memory/roadmap\.md[`"]?',
     r'Read\s+[`"]?\.doit/memory/completed_roadmap\.md[`"]?',
     r'Check\s+if\s+[`"]?\.doit/memory/',
-    r'Load\s+context:.*\.doit/memory/',
-    r'Extract\s+.*from\s+constitution\.md',
-    r'Read\s+Tech\s+Stack\s+section\s+from\s+constitution',
+    r"Load\s+context:.*\.doit/memory/",
+    r"Extract\s+.*from\s+constitution\.md",
+    r"Read\s+Tech\s+Stack\s+section\s+from\s+constitution",
 ]
 
 
@@ -84,7 +85,7 @@ def estimate_tokens(text: str) -> int:
 class ContextAuditor:
     """Service for auditing templates for context injection patterns."""
 
-    def __init__(self, templates_dir: Optional[Path] = None):
+    def __init__(self, templates_dir: Path | None = None):
         """Initialize the context auditor.
 
         Args:
@@ -131,7 +132,7 @@ class ContextAuditor:
 
         # Check for `doit context show` instruction
         context_show_pattern = r"doit\s+context\s+show"
-        for i, line in enumerate(lines, 1):
+        for line in lines:
             if re.search(context_show_pattern, line, re.IGNORECASE):
                 result.has_context_show = True
                 break
@@ -152,7 +153,7 @@ class ContextAuditor:
                                 finding_type="double_injection",
                                 severity="critical",
                                 line_number=i,
-                                description=f"Double-injection: explicit read after doit context show",
+                                description="Double-injection: explicit read after doit context show",
                                 recommendation="Remove explicit file read - content already in context",
                                 pattern_matched=pattern,
                             )

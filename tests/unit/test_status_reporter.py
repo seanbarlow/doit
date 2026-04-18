@@ -1,8 +1,9 @@
 """Unit tests for StatusReporter service."""
 
-import pytest
 from datetime import datetime, timedelta
 from pathlib import Path
+
+import pytest
 
 from doit_cli.models.status_models import SpecState, SpecStatus, StatusReport
 from doit_cli.services.status_reporter import StatusReporter

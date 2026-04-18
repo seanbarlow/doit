@@ -1,8 +1,9 @@
 """Parser for extracting requirements from spec.md files."""
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
-from typing import Optional
 
 from ..models.crossref_models import Requirement
 
@@ -21,7 +22,7 @@ class RequirementParser:
         re.MULTILINE,
     )
 
-    def __init__(self, spec_path: Optional[Path] = None) -> None:
+    def __init__(self, spec_path: Path | None = None) -> None:
         """Initialize parser with optional spec file path.
 
         Args:
@@ -29,7 +30,7 @@ class RequirementParser:
         """
         self.spec_path = spec_path
 
-    def parse(self, spec_path: Optional[Path] = None) -> list[Requirement]:
+    def parse(self, spec_path: Path | None = None) -> list[Requirement]:
         """Parse spec.md and extract all functional requirements.
 
         Args:
@@ -82,8 +83,8 @@ class RequirementParser:
         return requirements
 
     def get_requirement(
-        self, requirement_id: str, spec_path: Optional[Path] = None
-    ) -> Optional[Requirement]:
+        self, requirement_id: str, spec_path: Path | None = None
+    ) -> Requirement | None:
         """Get a specific requirement by ID.
 
         Args:
@@ -99,7 +100,7 @@ class RequirementParser:
                 return req
         return None
 
-    def get_requirement_ids(self, spec_path: Optional[Path] = None) -> list[str]:
+    def get_requirement_ids(self, spec_path: Path | None = None) -> list[str]:
         """Get list of all requirement IDs in a spec.
 
         Args:

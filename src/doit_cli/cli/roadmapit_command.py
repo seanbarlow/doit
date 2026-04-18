@@ -3,6 +3,8 @@
 This module imports and exposes the roadmapit command from the CLI implementation.
 """
 
+from __future__ import annotations
+
 from .roadmapit_impl import app as roadmapit_app
 
 # Export the app for registration in main.py

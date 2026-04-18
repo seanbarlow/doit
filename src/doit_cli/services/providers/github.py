@@ -4,10 +4,11 @@ This module implements the GitProvider interface for GitHub
 using the gh CLI tool for API operations.
 """
 
+from __future__ import annotations
+
 import json
 import subprocess
 from datetime import datetime
-from typing import Optional
 
 from ...models.provider_models import (
     Issue,
@@ -20,10 +21,10 @@ from ...models.provider_models import (
     Milestone,
     MilestoneCreateRequest,
     MilestoneState,
-    PullRequest,
     PRCreateRequest,
     PRFilters,
     PRState,
+    PullRequest,
 )
 from .base import GitProvider, ProviderType
 from .exceptions import (
@@ -161,8 +162,12 @@ class GitHubProvider(GitProvider):
         try:
             result = subprocess.run(
                 [
-                    "gh", "issue", "view", provider_id,
-                    "--json", "number,title,body,state,url,createdAt,updatedAt,labels,milestone"
+                    "gh",
+                    "issue",
+                    "view",
+                    provider_id,
+                    "--json",
+                    "number,title,body,state,url,createdAt,updatedAt,labels,milestone",
                 ],
                 capture_output=True,
                 text=True,
@@ -182,13 +187,16 @@ class GitHubProvider(GitProvider):
         except json.JSONDecodeError as e:
             raise ProviderError(f"Failed to parse GitHub response: {e}")
 
-    def list_issues(self, filters: Optional[IssueFilters] = None) -> list[Issue]:
+    def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
         """List GitHub issues matching filters."""
         self._ensure_authenticated()
 
         cmd = [
-            "gh", "issue", "list",
-            "--json", "number,title,body,state,url,createdAt,updatedAt,labels,milestone"
+            "gh",
+            "issue",
+            "list",
+            "--json",
+            "number,title,body,state,url,createdAt,updatedAt,labels,milestone",
         ]
 
         if filters:
@@ -282,10 +290,15 @@ class GitHubProvider(GitProvider):
         self._ensure_authenticated()
 
         cmd = [
-            "gh", "pr", "create",
-            "--title", request.title,
-            "--head", request.source_branch,
-            "--base", request.target_branch,
+            "gh",
+            "pr",
+            "create",
+            "--title",
+            request.title,
+            "--head",
+            request.source_branch,
+            "--base",
+            request.target_branch,
         ]
 
         if request.body:
@@ -322,8 +335,12 @@ class GitHubProvider(GitProvider):
         try:
             result = subprocess.run(
                 [
-                    "gh", "pr", "view", provider_id,
-                    "--json", "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels"
+                    "gh",
+                    "pr",
+                    "view",
+                    provider_id,
+                    "--json",
+                    "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels",
                 ],
                 capture_output=True,
                 text=True,
@@ -343,15 +360,16 @@ class GitHubProvider(GitProvider):
         except json.JSONDecodeError as e:
             raise ProviderError(f"Failed to parse GitHub response: {e}")
 
-    def list_pull_requests(
-        self, filters: Optional[PRFilters] = None
-    ) -> list[PullRequest]:
+    def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
         """List GitHub pull requests matching filters."""
         self._ensure_authenticated()
 
         cmd = [
-            "gh", "pr", "list",
-            "--json", "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels"
+            "gh",
+            "pr",
+            "list",
+            "--json",
+            "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels",
         ]
 
         if filters:
@@ -401,11 +419,15 @@ class GitHubProvider(GitProvider):
         repo_slug = self._get_repo_slug()
 
         cmd = [
-            "gh", "api",
+            "gh",
+            "api",
             f"repos/{repo_slug}/milestones",
-            "--method", "POST",
-            "--field", f"title={request.title}",
-            "--field", "state=open",
+            "--method",
+            "POST",
+            "--field",
+            f"title={request.title}",
+            "--field",
+            "state=open",
         ]
 
         if request.description:
@@ -462,9 +484,7 @@ class GitHubProvider(GitProvider):
         except json.JSONDecodeError as e:
             raise ProviderError(f"Failed to parse GitHub response: {e}")
 
-    def list_milestones(
-        self, state: Optional[MilestoneState] = None
-    ) -> list[Milestone]:
+    def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
         """List GitHub milestones."""
         self._ensure_authenticated()
         repo_slug = self._get_repo_slug()

@@ -1,8 +1,9 @@
 """Validation service for spec file validation."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from ..models.validation_models import ValidationConfig, ValidationResult
 from .config_loader import load_validation_config
@@ -21,8 +22,8 @@ class ValidationService:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        config: Optional[ValidationConfig] = None,
+        project_root: Path | None = None,
+        config: ValidationConfig | None = None,
     ) -> None:
         """Initialize validation service.
 

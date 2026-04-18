@@ -4,19 +4,22 @@ This command provides roadmap management with bidirectional GitHub sync,
 allowing users to view GitHub epics alongside local roadmap items.
 """
 
-import typer
+from __future__ import annotations
+
 from pathlib import Path
+
+import typer
 from rich.console import Console
 from rich.table import Table
 
 from ..models.roadmap import RoadmapItem
 from ..models.sync_metadata import SyncMetadata
+from ..services.github_cache_service import CacheError, GitHubCacheService
 from ..services.github_service import (
-    GitHubService,
-    GitHubAuthError,
     GitHubAPIError,
+    GitHubAuthError,
+    GitHubService,
 )
-from ..services.github_cache_service import GitHubCacheService, CacheError
 from ..services.roadmap_merge_service import RoadmapMergeService
 from ..utils.github_auth import get_github_config_status, get_repository_name
 
@@ -27,14 +30,10 @@ console = Console()
 @app.command()
 def show(
     skip_github: bool = typer.Option(
-        False,
-        "--skip-github",
-        help="Skip GitHub synchronization and use only local roadmap data"
+        False, "--skip-github", help="Skip GitHub synchronization and use only local roadmap data"
     ),
     refresh: bool = typer.Option(
-        False,
-        "--refresh",
-        help="Force refresh from GitHub API, bypassing cache"
+        False, "--refresh", help="Force refresh from GitHub API, bypassing cache"
     ),
 ):
     """Display the project roadmap with GitHub epic integration.
@@ -108,9 +107,7 @@ def _fetch_github_epics(refresh: bool):
         epics = cache_service.get_epics()
         if epics is not None:
             cache_age = cache_service.get_cache_age_minutes()
-            console.print(
-                f"[dim]Using cached GitHub data ({cache_age:.1f} minutes old)[/dim]\n"
-            )
+            console.print(f"[dim]Using cached GitHub data ({cache_age:.1f} minutes old)[/dim]\n")
             return epics, True
 
     # Fetch from GitHub API
@@ -125,7 +122,9 @@ def _fetch_github_epics(refresh: bool):
                 epic.features = features
             except Exception as e:
                 # Log warning but continue with other epics
-                console.print(f"[dim yellow]Warning: Failed to fetch features for epic #{epic.number}: {e}[/dim yellow]")
+                console.print(
+                    f"[dim yellow]Warning: Failed to fetch features for epic #{epic.number}: {e}[/dim yellow]"
+                )
                 epic.features = []
 
         # Save to cache
@@ -134,7 +133,9 @@ def _fetch_github_epics(refresh: bool):
         cache_service.save_cache(epics, metadata)
 
         feature_count = sum(len(epic.features) for epic in epics)
-        console.print(f"[dim]Found {len(epics)} open epic(s) with {feature_count} linked feature(s) on GitHub[/dim]\n")
+        console.print(
+            f"[dim]Found {len(epics)} open epic(s) with {feature_count} linked feature(s) on GitHub[/dim]\n"
+        )
         return epics, False
 
     except GitHubAuthError as e:
@@ -218,9 +219,7 @@ def _load_local_roadmap() -> list[RoadmapItem]:
                 sub = lines[j].strip()
                 if sub.startswith("- **Rationale**:"):
                     rationale = sub.replace("- **Rationale**:", "").strip()
-                elif sub.startswith("- **Aligns with**:"):
-                    description_lines.append(sub)
-                elif sub:
+                elif sub.startswith("- **Aligns with**:") or sub:
                     description_lines.append(sub)
                 j += 1
 
@@ -249,11 +248,7 @@ def _load_local_roadmap() -> list[RoadmapItem]:
     return items
 
 
-def _display_roadmap(
-    items: list[RoadmapItem],
-    github_available: bool,
-    cache_used: bool
-):
+def _display_roadmap(items: list[RoadmapItem], github_available: bool, cache_used: bool):
     """Display merged roadmap items in a formatted table.
 
     Args:
@@ -283,7 +278,7 @@ def _display_roadmap(
         table = Table(
             title=f"\n{priority} - {_get_priority_name(priority)}",
             show_header=True,
-            header_style="bold cyan"
+            header_style="bold cyan",
         )
         table.add_column("Title", style="white", no_wrap=False)
         table.add_column("Source", style="dim", width=10)
@@ -378,22 +373,12 @@ def _get_source_icon(source: str) -> str:
 def add(
     item: str = typer.Argument(..., help="Roadmap item title to add"),
     priority: str = typer.Option(
-        "P3",
-        "--priority",
-        "-p",
-        help="Priority level (P1, P2, P3, or P4)"
+        "P3", "--priority", "-p", help="Priority level (P1, P2, P3, or P4)"
     ),
     description: str = typer.Option(
-        "",
-        "--description",
-        "-d",
-        help="Detailed description of the roadmap item"
+        "", "--description", "-d", help="Detailed description of the roadmap item"
     ),
-    skip_github: bool = typer.Option(
-        False,
-        "--skip-github",
-        help="Skip creating GitHub epic"
-    ),
+    skip_github: bool = typer.Option(False, "--skip-github", help="Skip creating GitHub epic"),
 ):
     """Add a new item to the roadmap.
 
@@ -411,7 +396,7 @@ def add(
             console.print(f"[red]✗ Invalid priority: {priority}. Must be P1, P2, P3, or P4[/red]")
             raise typer.Exit(code=1)
 
-        console.print(f"\n[bold]Adding roadmap item:[/bold]")
+        console.print("\n[bold]Adding roadmap item:[/bold]")
         console.print(f"  Title: {item}")
         console.print(f"  Priority: {priority}")
         if description:
@@ -422,52 +407,56 @@ def add(
             is_configured, status_message = get_github_config_status()
 
             if is_configured:
-                console.print(f"\n[dim]Creating GitHub epic...[/dim]")
+                console.print("\n[dim]Creating GitHub epic...[/dim]")
 
                 try:
                     github_service = GitHubService()
 
                     # Format title with Epic prefix if not already present
                     epic_title = item if item.startswith("[Epic]:") else f"[Epic]: {item}"
-                    epic_body = description or f"Roadmap item created via doit roadmapit add"
+                    epic_body = description or "Roadmap item created via doit roadmapit add"
 
                     # Create the epic
                     epic = github_service.create_epic(
-                        title=epic_title,
-                        body=epic_body,
-                        priority=priority
+                        title=epic_title, body=epic_body, priority=priority
                     )
 
                     console.print(f"\n[green]✓ Created GitHub epic #{epic.number}[/green]")
                     console.print(f"  URL: {epic.url}")
-                    console.print(f"\n[dim]Next steps:[/dim]")
-                    console.print(f"  1. The epic is now live on GitHub")
-                    console.print(f"  2. Run 'doit roadmapit' to see it in your roadmap")
-                    console.print(f"  3. Add feature issues and link them with 'Part of Epic #{epic.number}' in the description")
+                    console.print("\n[dim]Next steps:[/dim]")
+                    console.print("  1. The epic is now live on GitHub")
+                    console.print("  2. Run 'doit roadmapit' to see it in your roadmap")
+                    console.print(
+                        f"  3. Add feature issues and link them with 'Part of Epic #{epic.number}' in the description"
+                    )
 
                 except GitHubAuthError as e:
                     console.print(f"\n[yellow]⚠ GitHub authentication error: {e}[/yellow]")
-                    console.print(f"[yellow]  Item not created on GitHub[/yellow]")
-                    console.print(f"\n[dim]Note: You can manually create the epic on GitHub with:[/dim]")
+                    console.print("[yellow]  Item not created on GitHub[/yellow]")
+                    console.print(
+                        "\n[dim]Note: You can manually create the epic on GitHub with:[/dim]"
+                    )
                     console.print(f"  Title: {item}")
                     console.print(f"  Labels: epic, priority:{priority}")
                     raise typer.Exit(code=1)
 
                 except GitHubAPIError as e:
                     console.print(f"\n[yellow]⚠ GitHub API error: {e}[/yellow]")
-                    console.print(f"[yellow]  Item not created on GitHub[/yellow]")
+                    console.print("[yellow]  Item not created on GitHub[/yellow]")
                     raise typer.Exit(code=1)
 
             else:
-                console.print(f"\n[yellow]ℹ GitHub integration unavailable: {status_message}[/yellow]")
-                console.print(f"[yellow]  Epic not created on GitHub[/yellow]")
-                console.print(f"\n[dim]To create this epic on GitHub:[/dim]")
-                console.print(f"  1. Configure GitHub CLI authentication")
-                console.print(f"  2. Run this command again")
+                console.print(
+                    f"\n[yellow]ℹ GitHub integration unavailable: {status_message}[/yellow]"
+                )
+                console.print("[yellow]  Epic not created on GitHub[/yellow]")
+                console.print("\n[dim]To create this epic on GitHub:[/dim]")
+                console.print("  1. Configure GitHub CLI authentication")
+                console.print("  2. Run this command again")
         else:
-            console.print(f"\n[dim]Skipped GitHub epic creation (--skip-github flag)[/dim]")
-            console.print(f"\n[dim]To create this epic on GitHub later:[/dim]")
-            console.print(f"  Run: doit roadmapit add \"{item}\" --priority {priority}")
+            console.print("\n[dim]Skipped GitHub epic creation (--skip-github flag)[/dim]")
+            console.print("\n[dim]To create this epic on GitHub later:[/dim]")
+            console.print(f'  Run: doit roadmapit add "{item}" --priority {priority}')
 
     except Exception as e:
         console.print(f"[red]✗ Error: {e}[/red]")
@@ -476,11 +465,7 @@ def add(
 
 @app.command(name="sync-milestones")
 def sync_milestones(
-    dry_run: bool = typer.Option(
-        False,
-        "--dry-run",
-        help="Preview changes without executing them"
-    ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview changes without executing them"),
 ):
     """Sync roadmap priorities to GitHub milestones.
 
@@ -496,6 +481,7 @@ def sync_milestones(
     """
     try:
         from datetime import datetime
+
         from ..models.sync_operation import SyncOperation
         from ..services.milestone_service import MilestoneService
 
@@ -506,11 +492,7 @@ def sync_milestones(
 
         # Create sync operation
         sync_id = f"sync_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        sync_op = SyncOperation(
-            id=sync_id,
-            started_at=datetime.now(),
-            dry_run=dry_run
-        )
+        sync_op = SyncOperation(id=sync_id, started_at=datetime.now(), dry_run=dry_run)
 
         # Initialize services
         github_service = GitHubService()
@@ -534,13 +516,13 @@ def sync_milestones(
         console.print(f"\n{sync_op.get_summary()}")
 
         if sync_op.milestones_created > 0:
-            console.print(f"\n[green]✓ Sync complete![/green]")
+            console.print("\n[green]✓ Sync complete![/green]")
             # Get repo name for URL
             repo_name = get_repository_name()
             if repo_name:
                 console.print(f"\nView milestones: https://github.com/{repo_name}/milestones")
         else:
-            console.print(f"\n[dim]All priority milestones already exist.[/dim]")
+            console.print("\n[dim]All priority milestones already exist.[/dim]")
 
     except GitHubAuthError as e:
         console.print(f"\n[red]✗ GitHub Authentication Error:[/red] {e}")

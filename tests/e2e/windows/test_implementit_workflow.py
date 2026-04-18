@@ -1,6 +1,6 @@
 """End-to-end tests for 'doit implementit' command on Windows."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -59,7 +59,9 @@ def test_implementit_handles_windows_paths(temp_project_dir):
 
     # Create file in nested path
     test_file = nested_path / "helper.py"
-    test_file.write_text('"""Windows helper utilities."""\n\ndef test():\n    pass\n', encoding="utf-8")
+    test_file.write_text(
+        '"""Windows helper utilities."""\n\ndef test():\n    pass\n', encoding="utf-8"
+    )
 
     # Verify nested structure
     assert nested_path.exists(), "Nested path not created"
@@ -155,23 +157,14 @@ def test_implementit_creates_nested_directories(temp_project_dir):
     Then: Full path is created successfully on Windows
     """
     # Create deeply nested structure
-    nested_path = (
-        temp_project_dir
-        / "src"
-        / "components"
-        / "features"
-        / "authentication"
-        / "utils"
-    )
+    nested_path = temp_project_dir / "src" / "components" / "features" / "authentication" / "utils"
     nested_path.mkdir(parents=True, exist_ok=True)
 
     # Verify all levels created
     assert (temp_project_dir / "src").exists()
     assert (temp_project_dir / "src" / "components").exists()
     assert (temp_project_dir / "src" / "components" / "features").exists()
-    assert (
-        temp_project_dir / "src" / "components" / "features" / "authentication"
-    ).exists()
+    assert (temp_project_dir / "src" / "components" / "features" / "authentication").exists()
     assert nested_path.exists()
 
     # Create file in nested location

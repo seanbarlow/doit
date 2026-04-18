@@ -1,6 +1,6 @@
 """Tests for PowerShell script discovery and validation on Windows."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -80,7 +80,7 @@ Write-Host "Unclosed string
 
     # Note: Syntax validation might not catch all errors without execution
     # The PowerShell parser may be lenient, so we just verify the method works
-    is_valid2, message2 = powershell_executor.validate_script_syntax(invalid_script)
+    _is_valid2, _message2 = powershell_executor.validate_script_syntax(invalid_script)
     # Either way is acceptable - validation works
 
 

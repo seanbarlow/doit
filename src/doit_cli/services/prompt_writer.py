@@ -1,5 +1,7 @@
 """Service to write GitHub Copilot prompt files."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from ..models.sync_models import (

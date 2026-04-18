@@ -4,8 +4,9 @@ This module provides the RoadmapItem dataclass for managing roadmap entries
 from both local roadmap file and GitHub epics.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -29,11 +30,11 @@ class RoadmapItem:
     priority: str
     description: str
     rationale: str = ""
-    feature_branch: Optional[str] = None
+    feature_branch: str | None = None
     status: str = "pending"
     source: str = "local"
-    github_number: Optional[int] = None
-    github_url: Optional[str] = None
+    github_number: int | None = None
+    github_url: str | None = None
     features: list = None  # List of GitHubFeature objects
 
     def __post_init__(self):
@@ -45,7 +46,9 @@ class RoadmapItem:
             raise ValueError(f"Priority must be P1, P2, P3, or P4, got {self.priority}")
 
         if self.status not in ("pending", "in-progress", "completed"):
-            raise ValueError(f"Status must be pending, in-progress, or completed, got {self.status}")
+            raise ValueError(
+                f"Status must be pending, in-progress, or completed, got {self.status}"
+            )
 
         if self.source not in ("local", "github", "merged"):
             raise ValueError(f"Source must be local, github, or merged, got {self.source}")
@@ -87,7 +90,7 @@ class RoadmapItem:
         return self.title
 
     @classmethod
-    def from_github_epic(cls, epic: "GitHubEpic", priority: str) -> "RoadmapItem":  # type: ignore
+    def from_github_epic(cls, epic: GitHubEpic, priority: str) -> RoadmapItem:  # type: ignore
         """Create RoadmapItem from GitHub epic.
 
         Args:
@@ -132,7 +135,7 @@ class RoadmapItem:
             source="github",
             github_number=epic.number,
             github_url=epic.url,
-            features=epic.features if hasattr(epic, 'features') else [],
+            features=epic.features if hasattr(epic, "features") else [],
         )
 
     def to_dict(self) -> dict:
@@ -155,4 +158,4 @@ class RoadmapItem:
 
 
 # Import at end to avoid circular dependency
-from .github_epic import GitHubEpic  # noqa: E402
+from .github_epic import GitHubEpic

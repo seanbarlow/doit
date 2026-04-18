@@ -20,6 +20,9 @@ from ..prompts.fixit_prompts import (
 )
 from ..services.fixit_service import FixitService, FixitServiceError
 from ..services.github_service import GitHubServiceError
+from .output import OutputFormat, format_option, resolve_format
+
+_LIST_FORMATS = (OutputFormat.TABLE, OutputFormat.JSON)
 
 app = typer.Typer(help="Bug-fix workflow commands")
 console = Console()
@@ -112,7 +115,10 @@ def start(
 def list_bugs(
     label: str = typer.Option("bug", "--label", "-l", help="Label to filter by"),
     limit: int = typer.Option(20, "--limit", "-n", help="Maximum number of bugs to show"),
-    output_format: str = typer.Option("table", "--format", "-f", help="Output format: table, json"),
+    output_format: str = format_option(
+        default=OutputFormat.TABLE,
+        allowed=_LIST_FORMATS,
+    ),
 ) -> None:
     """List open bugs from GitHub.
 
@@ -123,6 +129,8 @@ def list_bugs(
         doit fixit list --label high # List high priority issues
         doit fixit list --limit 10   # Show only 10 bugs
     """
+    fmt = resolve_format(output_format, _LIST_FORMATS)
+
     try:
         service = FixitService()
     except GitHubServiceError as e:
@@ -135,7 +143,7 @@ def list_bugs(
         console.print(f"[yellow]No open issues with label '{label}' found.[/yellow]")
         raise typer.Exit(code=ExitCode.SUCCESS)
 
-    if output_format == "json":
+    if fmt is OutputFormat.JSON:
         import json
 
         data = [bug.to_dict() for bug in bugs]

@@ -13,6 +13,13 @@ from ..exit_codes import ExitCode
 from ..models.crossref_models import CoverageReport, CoverageStatus
 from ..services.crossref_service import CrossReferenceService
 from ..services.spec_scanner import NotADoitProjectError
+from .output import OutputFormat, format_option, resolve_format
+
+# Standard (rich, json, markdown) format set used by most xref reports.
+_REPORT_FORMATS = (OutputFormat.RICH, OutputFormat.JSON, OutputFormat.MARKDOWN)
+
+# Terse (rich, json) set for commands that don't carry a markdown variant.
+_TERSE_FORMATS = (OutputFormat.RICH, OutputFormat.JSON)
 
 console = Console()
 
@@ -157,8 +164,9 @@ def coverage_command(
     spec_name: str | None = typer.Argument(
         None, help="Spec directory name (default: auto-detect from branch)"
     ),
-    output_format: str = typer.Option(
-        "rich", "--format", "-f", help="Output format: rich, json, markdown"
+    output_format: str = format_option(
+        default=OutputFormat.RICH,
+        allowed=_REPORT_FORMATS,
     ),
     strict: bool = typer.Option(
         False, "--strict", "-s", help="Treat uncovered requirements as errors"
@@ -170,11 +178,13 @@ def coverage_command(
     Shows which requirements have implementing tasks and identifies
     any uncovered requirements or orphaned task references.
 
-    Exit codes:
-      0 - All requirements covered
-      1 - Uncovered requirements (with --strict) or errors
-      2 - Spec not found or invalid
+    Exit codes (see doit_cli.exit_codes.ExitCode):
+      0 (SUCCESS)          — all requirements covered
+      1 (FAILURE)          — uncovered requirements (with --strict) or orphans
+      2 (VALIDATION_ERROR) — spec not found or invalid
     """
+    fmt = resolve_format(output_format, _REPORT_FORMATS)
+
     try:
         # Auto-detect spec from branch if not provided
         if not spec_name:
@@ -186,15 +196,6 @@ def coverage_command(
                 )
                 raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
-        # Validate format
-        valid_formats = ["rich", "json", "markdown"]
-        if output_format not in valid_formats:
-            console.print(
-                f"[red]Error:[/red] Invalid format '{output_format}'. "
-                f"Valid: {', '.join(valid_formats)}"
-            )
-            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
-
         # Get coverage report
         service = CrossReferenceService()
         try:
@@ -204,21 +205,21 @@ def coverage_command(
             raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
         # Format output
-        if output_format == "json":
-            output_str = _format_coverage_json(report)
-        elif output_format == "markdown":
+        if fmt is OutputFormat.JSON:
+            output_str: str | None = _format_coverage_json(report)
+        elif fmt is OutputFormat.MARKDOWN:
             output_str = _format_coverage_markdown(report)
         else:
             output_str = None  # Rich output handled separately
 
         # Write to file or stdout
         if output_file:
-            if output_format == "rich":
+            if fmt is OutputFormat.RICH:
                 # For rich format to file, use markdown instead
                 output_str = _format_coverage_markdown(report)
-            output_file.write_text(output_str)
+            output_file.write_text(output_str or "")
             console.print(f"[green]Report written to {output_file}[/green]")
-        elif output_format == "rich":
+        elif fmt is OutputFormat.RICH:
             _format_coverage_rich(report, console)
         else:
             print(output_str)
@@ -315,17 +316,20 @@ def locate_command(
 def tasks_command(
     requirement_id: str = typer.Argument(..., help="Requirement ID (e.g., FR-001)"),
     spec: str | None = typer.Option(None, "--spec", "-s", help="Spec name (default: auto-detect)"),
-    output_format: str = typer.Option(
-        "rich", "--format", "-f", help="Output format: rich, json, markdown"
+    output_format: str = format_option(
+        default=OutputFormat.RICH,
+        allowed=_REPORT_FORMATS,
     ),
 ) -> None:
     """List all tasks that implement a specific requirement.
 
-    Exit codes:
-      0 - Tasks found
-      1 - No tasks found for requirement
-      2 - Requirement or spec not found
+    Exit codes (see doit_cli.exit_codes.ExitCode):
+      0 (SUCCESS)          — tasks found
+      1 (FAILURE)          — no tasks found for requirement
+      2 (VALIDATION_ERROR) — requirement or spec not found
     """
+    fmt = resolve_format(output_format, _REPORT_FORMATS)
+
     try:
         # Determine spec name
         spec_name = spec or _detect_spec_from_branch()
@@ -333,15 +337,6 @@ def tasks_command(
             console.print(
                 "[red]Error:[/red] Could not detect spec. "
                 "Please provide --spec or run from a feature branch."
-            )
-            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
-
-        # Validate format
-        valid_formats = ["rich", "json", "markdown"]
-        if output_format not in valid_formats:
-            console.print(
-                f"[red]Error:[/red] Invalid format '{output_format}'. "
-                f"Valid: {', '.join(valid_formats)}"
             )
             raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
@@ -358,7 +353,7 @@ def tasks_command(
             raise typer.Exit(code=ExitCode.FAILURE)
 
         # Format output
-        if output_format == "json":
+        if fmt is OutputFormat.JSON:
             data = {
                 "requirement_id": requirement_id,
                 "tasks": [
@@ -373,7 +368,7 @@ def tasks_command(
                 "completed_count": sum(1 for t in tasks if t.completed),
             }
             print(json.dumps(data, indent=2))
-        elif output_format == "markdown":
+        elif fmt is OutputFormat.MARKDOWN:
             lines = [
                 f"# Tasks implementing {requirement_id}",
                 "",
@@ -425,7 +420,10 @@ def validate_command(
         None, help="Spec directory name (default: auto-detect from branch)"
     ),
     strict: bool = typer.Option(False, "--strict", "-s", help="Treat warnings as errors"),
-    output_format: str = typer.Option("rich", "--format", "-f", help="Output format: rich, json"),
+    output_format: str = format_option(
+        default=OutputFormat.RICH,
+        allowed=_TERSE_FORMATS,
+    ),
 ) -> None:
     """Validate cross-reference integrity between spec and tasks.
 
@@ -433,11 +431,13 @@ def validate_command(
     - Orphaned task references (tasks referencing non-existent requirements)
     - Uncovered requirements (requirements with no linked tasks)
 
-    Exit codes:
-      0 - All cross-references valid
-      1 - Validation errors found
-      2 - Files not found
+    Exit codes (see doit_cli.exit_codes.ExitCode):
+      0 (SUCCESS)          — all cross-references valid
+      1 (FAILURE)          — validation errors found
+      2 (VALIDATION_ERROR) — files not found
     """
+    fmt = resolve_format(output_format, _TERSE_FORMATS)
+
     try:
         # Auto-detect spec from branch if not provided
         if not spec_name:
@@ -448,15 +448,6 @@ def validate_command(
                     "Please provide spec name or run from a feature branch."
                 )
                 raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
-
-        # Validate format
-        valid_formats = ["rich", "json"]
-        if output_format not in valid_formats:
-            console.print(
-                f"[red]Error:[/red] Invalid format '{output_format}'. "
-                f"Valid: {', '.join(valid_formats)}"
-            )
-            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Validate references
         service = CrossReferenceService()
@@ -476,7 +467,7 @@ def validate_command(
             warning_count = 0
 
         # Format output
-        if output_format == "json":
+        if fmt is OutputFormat.JSON:
             data = {
                 "spec": spec_name,
                 "valid": error_count == 0 and warning_count == 0,

@@ -1,7 +1,7 @@
 """Output comparison utilities for cross-platform testing."""
+
 import re
-from pathlib import Path, PurePosixPath
-from typing import List
+
 from .line_ending_utils import normalize_line_endings
 
 
@@ -27,8 +27,8 @@ class CrossPlatformComparisonResult:
         windows_output: str,
         linux_output: str,
         matches: bool,
-        discrepancies: List[Discrepancy],
-        normalization_applied: List[str],
+        discrepancies: list[Discrepancy],
+        normalization_applied: list[str],
     ):
         self.test_name = test_name
         self.windows_output = windows_output
@@ -134,7 +134,9 @@ class ComparisonTools:
             )
 
         # Compare common lines
-        for i, (win_line, linux_line) in enumerate(zip(windows_lines, linux_lines), 1):
+        for i, (win_line, linux_line) in enumerate(
+            zip(windows_lines, linux_lines, strict=False), 1
+        ):
             if win_line != linux_line:
                 # Check if it's a path difference we should tolerate
                 win_paths = self.extract_paths(win_line)
@@ -172,7 +174,7 @@ class ComparisonTools:
             normalization_applied=normalizations,
         )
 
-    def extract_paths(self, text: str) -> List[str]:
+    def extract_paths(self, text: str) -> list[str]:
         """
         Extract all path-like strings from text.
 

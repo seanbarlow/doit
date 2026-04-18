@@ -5,18 +5,18 @@ assigning epics to their corresponding priority milestones, and managing milesto
 lifecycle based on roadmap completion status.
 """
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
-from datetime import datetime
 
 from rich.console import Console
 
 from ..models.milestone import Milestone
-from ..models.priority import PRIORITIES, PRIORITY_LEVELS, get_priority
+from ..models.priority import PRIORITY_LEVELS, get_priority
 from ..models.sync_operation import (
-    SyncOperation,
     SyncAction,
+    SyncOperation,
     SyncStatus,
 )
 from .github_service import GitHubService, GitHubServiceError
@@ -49,7 +49,7 @@ class MilestoneService:
         self.roadmap_path = Path(".doit/memory/roadmap.md")
         self.completed_roadmap_path = Path(".doit/memory/completed_roadmap.md")
 
-    def detect_priority_sections(self) -> Dict[str, List[str]]:
+    def detect_priority_sections(self) -> dict[str, list[str]]:
         """Parse roadmap.md and identify P1-P4 priority sections.
 
         Returns:
@@ -61,10 +61,10 @@ class MilestoneService:
         if not self.roadmap_path.exists():
             raise FileNotFoundError(f"Roadmap not found at {self.roadmap_path}")
 
-        priority_sections: Dict[str, List[str]] = {level: [] for level in PRIORITY_LEVELS}
-        current_priority: Optional[str] = None
+        priority_sections: dict[str, list[str]] = {level: [] for level in PRIORITY_LEVELS}
+        current_priority: str | None = None
 
-        with open(self.roadmap_path, "r", encoding="utf-8") as f:
+        with open(self.roadmap_path, encoding="utf-8") as f:
             for line in f:
                 line = line.rstrip()
 
@@ -84,7 +84,7 @@ class MilestoneService:
 
         return priority_sections
 
-    def create_missing_milestones(self, sync_op: SyncOperation) -> List[Milestone]:
+    def create_missing_milestones(self, sync_op: SyncOperation) -> list[Milestone]:
         """Check existing milestones and create missing priority milestones.
 
         Args:
@@ -114,7 +114,7 @@ class MilestoneService:
                     action=SyncAction.CREATE_MILESTONE,
                     target=expected_title,
                     status=SyncStatus.SKIPPED,
-                    message=f"Milestone already exists"
+                    message="Milestone already exists",
                 )
                 self.console.print(f"  • [dim]{expected_title}[/dim] already exists")
             else:
@@ -124,14 +124,13 @@ class MilestoneService:
                         action=SyncAction.CREATE_MILESTONE,
                         target=expected_title,
                         status=SyncStatus.SKIPPED,
-                        message="Dry run - would create"
+                        message="Dry run - would create",
                     )
                     self.console.print(f"  ✓ [yellow]Would create:[/yellow] {expected_title}")
                 else:
                     try:
                         milestone = self.github_service.create_milestone(
-                            title=expected_title,
-                            description=priority.milestone_description
+                            title=expected_title, description=priority.milestone_description
                         )
                         created_milestones.append(milestone)
                         all_milestones.append(milestone)
@@ -140,21 +139,25 @@ class MilestoneService:
                             action=SyncAction.CREATE_MILESTONE,
                             target=expected_title,
                             status=SyncStatus.SUCCESS,
-                            message=f"Created milestone #{milestone.number}"
+                            message=f"Created milestone #{milestone.number}",
                         )
-                        self.console.print(f"  ✓ [green]Created:[/green] {expected_title} (#{milestone.number})")
+                        self.console.print(
+                            f"  ✓ [green]Created:[/green] {expected_title} (#{milestone.number})"
+                        )
                     except GitHubServiceError as e:
                         sync_op.add_result(
                             action=SyncAction.CREATE_MILESTONE,
                             target=expected_title,
                             status=SyncStatus.ERROR,
-                            message=str(e)
+                            message=str(e),
                         )
-                        self.console.print(f"  ✗ [red]Error:[/red] Failed to create {expected_title}: {e}")
+                        self.console.print(
+                            f"  ✗ [red]Error:[/red] Failed to create {expected_title}: {e}"
+                        )
 
         return all_milestones
 
-    def extract_epic_references(self) -> Dict[str, List[int]]:
+    def extract_epic_references(self) -> dict[str, list[int]]:
         """Parse roadmap items and extract GitHub epic numbers by priority.
 
         Returns:
@@ -166,10 +169,10 @@ class MilestoneService:
         if not self.roadmap_path.exists():
             raise FileNotFoundError(f"Roadmap not found at {self.roadmap_path}")
 
-        epic_by_priority: Dict[str, List[int]] = {level: [] for level in PRIORITY_LEVELS}
-        current_priority: Optional[str] = None
+        epic_by_priority: dict[str, list[int]] = {level: [] for level in PRIORITY_LEVELS}
+        current_priority: str | None = None
 
-        with open(self.roadmap_path, "r", encoding="utf-8") as f:
+        with open(self.roadmap_path, encoding="utf-8") as f:
             for line in f:
                 line = line.rstrip()
 
@@ -194,9 +197,9 @@ class MilestoneService:
 
     def assign_epics_to_milestones(
         self,
-        epic_by_priority: Dict[str, List[int]],
-        milestones: List[Milestone],
-        sync_op: SyncOperation
+        epic_by_priority: dict[str, list[int]],
+        milestones: list[Milestone],
+        sync_op: SyncOperation,
     ) -> None:
         """Assign each epic to its corresponding priority milestone.
 
@@ -238,9 +241,11 @@ class MilestoneService:
                             action=SyncAction.ASSIGN_EPIC,
                             target=f"#{epic_number}",
                             status=SyncStatus.SKIPPED,
-                            message=f"Already assigned to {milestone_title}"
+                            message=f"Already assigned to {milestone_title}",
                         )
-                        self.console.print(f"  • [dim]#{epic_number}[/dim] already in {milestone_title}")
+                        self.console.print(
+                            f"  • [dim]#{epic_number}[/dim] already in {milestone_title}"
+                        )
                     else:
                         # Assign or reassign
                         if self.dry_run:
@@ -248,7 +253,7 @@ class MilestoneService:
                                 action=SyncAction.ASSIGN_EPIC,
                                 target=f"#{epic_number}",
                                 status=SyncStatus.SKIPPED,
-                                message=f"Dry run - would assign to {milestone_title}"
+                                message=f"Dry run - would assign to {milestone_title}",
                             )
                             if previous_milestone:
                                 self.console.print(
@@ -256,7 +261,9 @@ class MilestoneService:
                                     f"from '{previous_milestone}' to '{milestone_title}'"
                                 )
                             else:
-                                self.console.print(f"  ✓ [yellow]Would assign:[/yellow] #{epic_number} to {milestone_title}")
+                                self.console.print(
+                                    f"  ✓ [yellow]Would assign:[/yellow] #{epic_number} to {milestone_title}"
+                                )
                         else:
                             self._assign_epic_to_milestone(epic_number, milestone_title)
 
@@ -264,7 +271,7 @@ class MilestoneService:
                                 action=SyncAction.ASSIGN_EPIC,
                                 target=f"#{epic_number}",
                                 status=SyncStatus.SUCCESS,
-                                message=f"Assigned to {milestone_title}"
+                                message=f"Assigned to {milestone_title}",
                             )
 
                             if previous_milestone:
@@ -273,18 +280,22 @@ class MilestoneService:
                                     f"from '{previous_milestone}' to '{milestone_title}'"
                                 )
                             else:
-                                self.console.print(f"  ✓ [green]Assigned:[/green] #{epic_number} to {milestone_title}")
+                                self.console.print(
+                                    f"  ✓ [green]Assigned:[/green] #{epic_number} to {milestone_title}"
+                                )
 
                 except GitHubServiceError as e:
                     sync_op.add_result(
                         action=SyncAction.ASSIGN_EPIC,
                         target=f"#{epic_number}",
                         status=SyncStatus.ERROR,
-                        message=str(e)
+                        message=str(e),
                     )
-                    self.console.print(f"  ✗ [red]Error:[/red] Failed to assign #{epic_number}: {e}")
+                    self.console.print(
+                        f"  ✗ [red]Error:[/red] Failed to assign #{epic_number}: {e}"
+                    )
 
-    def check_existing_assignment(self, epic_number: int) -> Optional[str]:
+    def check_existing_assignment(self, epic_number: int) -> str | None:
         """Check if epic is already assigned to a milestone.
 
         Args:
@@ -294,8 +305,8 @@ class MilestoneService:
             Milestone title if assigned, None otherwise
         """
         try:
-            import subprocess
             import json
+            import subprocess
 
             result = subprocess.run(
                 ["gh", "issue", "view", str(epic_number), "--json", "milestone"],
@@ -346,11 +357,11 @@ class MilestoneService:
                 raise GitHubServiceError(f"Failed to assign epic: {result.stderr}")
 
         except subprocess.TimeoutExpired:
-            raise GitHubServiceError("GitHub CLI timeout")
+            raise GitHubServiceError("GitHub CLI timeout") from None
         except Exception as e:
-            raise GitHubServiceError(f"Failed to assign epic: {e}")
+            raise GitHubServiceError(f"Failed to assign epic: {e}") from e
 
-    def detect_completed_priorities(self) -> List[str]:
+    def detect_completed_priorities(self) -> list[str]:
         """Check roadmap.md and completed_roadmap.md for empty priority sections.
 
         Returns:
@@ -365,11 +376,13 @@ class MilestoneService:
         for level in PRIORITY_LEVELS:
             items = priority_sections.get(level, [])
 
-            # Count uncompleted items (checkbox not marked)
-            uncompleted = sum(
-                1 for item in items
-                if self.CHECKBOX_RE.match(item) and self.CHECKBOX_RE.match(item).group(1) == " "
-            )
+            # Count uncompleted items (checkbox not marked). We re-match to
+            # get the group; `m and m.group(...)` narrows Match|None for mypy.
+            def _uncompleted(item: str) -> bool:
+                m = self.CHECKBOX_RE.match(item)
+                return bool(m and m.group(1) == " ")
+
+            uncompleted = sum(1 for item in items if _uncompleted(item))
 
             # If no uncompleted items in active roadmap, check completed roadmap
             if uncompleted == 0 and len(items) > 0:
@@ -393,7 +406,7 @@ class MilestoneService:
             return False
 
         try:
-            with open(self.completed_roadmap_path, "r", encoding="utf-8") as f:
+            with open(self.completed_roadmap_path, encoding="utf-8") as f:
                 content = f.read()
                 # Look for priority label in completed roadmap
                 # Format: "| Item | P2 | 2026-01-21 | ..."

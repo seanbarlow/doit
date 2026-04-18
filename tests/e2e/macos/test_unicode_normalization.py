@@ -1,7 +1,6 @@
 """E2E tests for Unicode normalization on macOS."""
 
 import pytest
-from pathlib import Path
 
 
 @pytest.mark.macos
@@ -44,9 +43,8 @@ def test_filename_comparison_across_normalizations(tmp_path, macos_test_env):
         pytest.skip("Test requires macOS")
 
     from tests.utils.macos.unicode_utils import (
-        create_nfd_filename,
         create_nfc_filename,
-        compare_normalized
+        create_nfd_filename,
     )
 
     # Create both NFD and NFC files
@@ -89,7 +87,7 @@ def test_unicode_normalization_detection(macos_test_env):
     if not macos_test_env["is_macos"]:
         pytest.skip("Test requires macOS")
 
-    from tests.utils.macos.unicode_utils import detect_normalization, normalize_nfd, normalize_nfc
+    from tests.utils.macos.unicode_utils import detect_normalization, normalize_nfc, normalize_nfd
 
     # Test NFD detection
     nfd_text = normalize_nfd("café")

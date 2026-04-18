@@ -4,8 +4,9 @@ This module defines the priority level mappings from P1-P4 to their display name
 and milestone titles used in the GitHub milestone generation feature.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Dict
 
 
 @dataclass
@@ -40,35 +41,28 @@ class Priority:
         Returns:
             Description text for milestone
         """
-        return f"Auto-managed by doit. Contains all {self.level} - {self.display_name} roadmap items."
+        return (
+            f"Auto-managed by doit. Contains all {self.level} - {self.display_name} roadmap items."
+        )
 
 
 # Priority level constants with mappings
-PRIORITIES: Dict[str, Priority] = {
+PRIORITIES: dict[str, Priority] = {
     "P1": Priority(
-        level="P1",
-        display_name="Critical",
-        description="Must Have for MVP",
-        sort_order=1
+        level="P1", display_name="Critical", description="Must Have for MVP", sort_order=1
     ),
     "P2": Priority(
         level="P2",
         display_name="High Priority",
         description="Significant Business Value",
-        sort_order=2
+        sort_order=2,
     ),
     "P3": Priority(
-        level="P3",
-        display_name="Medium Priority",
-        description="Valuable",
-        sort_order=3
+        level="P3", display_name="Medium Priority", description="Valuable", sort_order=3
     ),
     "P4": Priority(
-        level="P4",
-        display_name="Low Priority",
-        description="Nice to Have",
-        sort_order=4
-    )
+        level="P4", display_name="Low Priority", description="Nice to Have", sort_order=4
+    ),
 }
 
 # Ordered list of priority levels (P1 to P4)

@@ -4,34 +4,32 @@ This module provides the team command and subcommands
 for team memory sharing, synchronization, and management.
 """
 
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Optional
 
 import typer
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 
-from doit_cli.models.team_models import TeamPermission, TeamRole
-from doit_cli.services.team_config import (
-    TeamConfigError,
-    TeamConfigValidationError,
-    TeamNotInitializedError,
-)
-from doit_cli.services.team_service import (
-    MemberAlreadyExistsError,
-    MemberNotFoundError,
-    PermissionDeniedError,
-    TeamService,
-)
+from doit_cli.models.team_models import NotificationType, TeamPermission, TeamRole
+from doit_cli.services.access_service import AccessService
+from doit_cli.services.notification_service import NotificationService
 from doit_cli.services.sync_service import (
     NetworkError,
     NoRemoteError,
     SyncService,
 )
-from doit_cli.services.notification_service import NotificationService
-from doit_cli.services.access_service import AccessService
-from doit_cli.models.team_models import NotificationType
+from doit_cli.services.team_config import (
+    TeamConfigValidationError,
+)
+from doit_cli.services.team_service import (
+    MemberAlreadyExistsError,
+    PermissionDeniedError,
+    TeamService,
+)
+
+from ..exit_codes import ExitCode
 
 app = typer.Typer(help="Team collaboration commands")
 console = Console()
@@ -54,10 +52,10 @@ def _require_initialized(service: TeamService) -> None:
             "[red]Error:[/red] Team collaboration not initialized.\n"
             "Run [cyan]doit team init[/cyan] first."
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
 
-def _format_time_ago(dt: Optional[datetime]) -> str:
+def _format_time_ago(dt: datetime | None) -> str:
     """Format datetime as relative time."""
     if not dt:
         return "Never"
@@ -100,14 +98,16 @@ def main() -> None:
 
 @app.command("init")
 def init_team(
-    name: Optional[str] = typer.Option(
+    name: str | None = typer.Option(
         None,
-        "--name", "-n",
+        "--name",
+        "-n",
         help="Team name (defaults to project folder name)",
     ),
-    owner: Optional[str] = typer.Option(
+    owner: str | None = typer.Option(
         None,
-        "--owner", "-o",
+        "--owner",
+        "-o",
         help="Owner email (defaults to git user.email)",
     ),
 ) -> None:
@@ -140,7 +140,7 @@ def init_team(
         if e.errors:
             for error in e.errors:
                 console.print(f"  • {error}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 # =============================================================================
@@ -156,12 +156,14 @@ def add_member(
     ),
     role: str = typer.Option(
         "member",
-        "--role", "-r",
+        "--role",
+        "-r",
         help="Role: 'owner' or 'member'",
     ),
     permission: str = typer.Option(
         "read-write",
-        "--permission", "-p",
+        "--permission",
+        "-p",
         help="Permission: 'read-write' or 'read-only'",
     ),
     no_notify: bool = typer.Option(
@@ -169,7 +171,7 @@ def add_member(
         "--no-notify",
         help="Disable notifications for this member",
     ),
-    display_name: Optional[str] = typer.Option(
+    display_name: str | None = typer.Option(
         None,
         "--name",
         help="Display name for the member",
@@ -209,17 +211,19 @@ def add_member(
         console.print(f"[green]✓ Added {email} to team[/green]")
         console.print(f"  Role: [cyan]{member.role.value}[/cyan]")
         console.print(f"  Permission: [cyan]{member.permission.value}[/cyan]")
-        console.print(f"  Notifications: [cyan]{'enabled' if member.notifications else 'disabled'}[/cyan]")
+        console.print(
+            f"  Notifications: [cyan]{'enabled' if member.notifications else 'disabled'}[/cyan]"
+        )
 
     except MemberAlreadyExistsError:
         console.print(f"[red]Error:[/red] Member already exists: {email}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from None
     except TeamConfigValidationError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
     except PermissionDeniedError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR) from e
 
 
 @app.command("remove")
@@ -230,7 +234,8 @@ def remove_member(
     ),
     force: bool = typer.Option(
         False,
-        "--force", "-f",
+        "--force",
+        "-f",
         help="Skip confirmation prompt",
     ),
 ) -> None:
@@ -247,14 +252,14 @@ def remove_member(
     member = service.get_member(email)
     if not member:
         console.print(f"[red]Error:[/red] Member not found: {email}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Confirm unless forced
     if not force:
         confirm = typer.confirm(f"Remove {email} from team?")
         if not confirm:
             console.print("Cancelled.")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     try:
         service.remove_member(email)
@@ -262,10 +267,10 @@ def remove_member(
 
     except TeamConfigValidationError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
     except PermissionDeniedError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=3)
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR) from e
 
 
 # =============================================================================
@@ -277,7 +282,8 @@ def remove_member(
 def list_members(
     format: str = typer.Option(
         "table",
-        "--format", "-f",
+        "--format",
+        "-f",
         help="Output format: 'table', 'json', or 'yaml'",
     ),
 ) -> None:
@@ -295,6 +301,7 @@ def list_members(
 
     if format.lower() == "json":
         import json
+
         data = {
             "team": team.to_dict(),
             "members": [m.to_dict() for m in members],
@@ -304,6 +311,7 @@ def list_members(
 
     if format.lower() == "yaml":
         import yaml
+
         data = {
             "team": team.to_dict(),
             "members": [m.to_dict() for m in members],
@@ -357,7 +365,8 @@ def sync_memory(
     ),
     force: bool = typer.Option(
         False,
-        "--force", "-f",
+        "--force",
+        "-f",
         help="Overwrite conflicts without prompting",
     ),
 ) -> None:
@@ -393,7 +402,7 @@ def sync_memory(
             console.print()
             console.print("Run [cyan]doit team sync --force[/cyan] to keep local versions,")
             console.print("or resolve manually and run [cyan]doit team sync[/cyan] again.")
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         if result.success:
             console.print()
@@ -416,19 +425,19 @@ def sync_memory(
             if not result.pulled_files and not result.pushed_files:
                 console.print("  [dim]Already up to date[/dim]")
 
-            console.print(f"  Last sync: [cyan]just now[/cyan]")
+            console.print("  Last sync: [cyan]just now[/cyan]")
         else:
             console.print(f"[red]Error:[/red] {result.error_message}")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
     except NoRemoteError as e:
         console.print(f"[red]Error:[/red] {e}")
         console.print("Push your repository to a remote first.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
     except NetworkError as e:
         console.print(f"[yellow]Warning:[/yellow] {e}")
         console.print("Changes saved locally. They will sync when connectivity returns.")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 # =============================================================================
@@ -440,7 +449,8 @@ def sync_memory(
 def show_status(
     verbose: bool = typer.Option(
         False,
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         help="Show detailed sync history",
     ),
 ) -> None:
@@ -555,22 +565,26 @@ def _format_notification_type(ntype: NotificationType) -> str:
 def list_notifications(
     all_notifications: bool = typer.Option(
         False,
-        "--all", "-a",
+        "--all",
+        "-a",
         help="Show all notifications (including read)",
     ),
-    notification_type: Optional[str] = typer.Option(
+    notification_type: str | None = typer.Option(
         None,
-        "--type", "-t",
+        "--type",
+        "-t",
         help="Filter by type: memory_changed, conflict_detected, member_joined, permission_changed",
     ),
     limit: int = typer.Option(
         20,
-        "--limit", "-l",
+        "--limit",
+        "-l",
         help="Maximum number to show",
     ),
     format: str = typer.Option(
         "table",
-        "--format", "-f",
+        "--format",
+        "-f",
         help="Output format: 'table' or 'json'",
     ),
 ) -> None:
@@ -595,8 +609,10 @@ def list_notifications(
             type_filter = NotificationType(notification_type)
         except ValueError:
             console.print(f"[red]Error:[/red] Invalid notification type: {notification_type}")
-            console.print("Valid types: memory_changed, conflict_detected, member_joined, permission_changed")
-            raise typer.Exit(code=1)
+            console.print(
+                "Valid types: memory_changed, conflict_detected, member_joined, permission_changed"
+            )
+            raise typer.Exit(code=ExitCode.FAILURE) from None
 
     notifications = notif_service.get_notifications(
         unread_only=not all_notifications,
@@ -606,6 +622,7 @@ def list_notifications(
 
     if format.lower() == "json":
         import json
+
         data = [n.to_dict() for n in notifications]
         console.print(json.dumps(data, indent=2, default=str))
         return
@@ -651,12 +668,12 @@ def list_notifications(
     console.print()
 
     if unread_count > 0:
-        console.print(f"[dim]Run 'doit team notify read' to mark all as read.[/dim]")
+        console.print("[dim]Run 'doit team notify read' to mark all as read.[/dim]")
 
 
 @notify_app.command("read")
 def mark_read(
-    notification_id: Optional[str] = typer.Argument(
+    notification_id: str | None = typer.Argument(
         None,
         help="Notification ID to mark as read (marks all if not provided)",
     ),
@@ -678,9 +695,11 @@ def mark_read(
 
     if count > 0:
         if notification_id:
-            console.print(f"[green]✓ Marked notification as read[/green]")
+            console.print("[green]✓ Marked notification as read[/green]")
         else:
-            console.print(f"[green]✓ Marked {count} notification{'s' if count != 1 else ''} as read[/green]")
+            console.print(
+                f"[green]✓ Marked {count} notification{'s' if count != 1 else ''} as read[/green]"
+            )
     else:
         if notification_id:
             console.print("[dim]Notification not found or already read.[/dim]")
@@ -692,7 +711,8 @@ def mark_read(
 def clear_notifications(
     force: bool = typer.Option(
         False,
-        "--force", "-f",
+        "--force",
+        "-f",
         help="Skip confirmation prompt",
     ),
 ) -> None:
@@ -719,7 +739,7 @@ def clear_notifications(
         confirm = typer.confirm(f"Clear all {count} notifications?")
         if not confirm:
             console.print("Cancelled.")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     cleared = notif_service.clear_all()
     console.print(f"[green]✓ Cleared {cleared} notification{'s' if cleared != 1 else ''}[/green]")
@@ -727,27 +747,27 @@ def clear_notifications(
 
 @notify_app.command("config")
 def configure_notifications(
-    enabled: Optional[bool] = typer.Option(
+    enabled: bool | None = typer.Option(
         None,
         "--enabled/--disabled",
         help="Enable or disable notifications",
     ),
-    batch_interval: Optional[int] = typer.Option(
+    batch_interval: int | None = typer.Option(
         None,
         "--batch-interval",
         help="Batch interval in minutes (0 = immediate)",
     ),
-    on_sync: Optional[bool] = typer.Option(
+    on_sync: bool | None = typer.Option(
         None,
         "--on-sync/--no-on-sync",
         help="Notify on sync events",
     ),
-    on_conflict: Optional[bool] = typer.Option(
+    on_conflict: bool | None = typer.Option(
         None,
         "--on-conflict/--no-on-conflict",
         help="Notify on conflicts",
     ),
-    on_member_change: Optional[bool] = typer.Option(
+    on_member_change: bool | None = typer.Option(
         None,
         "--on-member-change/--no-on-member-change",
         help="Notify on member changes",
@@ -769,13 +789,15 @@ def configure_notifications(
     notif_service = _get_notification_service()
 
     # If any options provided, update settings
-    has_updates = any([
-        enabled is not None,
-        batch_interval is not None,
-        on_sync is not None,
-        on_conflict is not None,
-        on_member_change is not None,
-    ])
+    has_updates = any(
+        [
+            enabled is not None,
+            batch_interval is not None,
+            on_sync is not None,
+            on_conflict is not None,
+            on_member_change is not None,
+        ]
+    )
 
     if has_updates:
         settings = notif_service.update_settings(
@@ -802,7 +824,9 @@ def configure_notifications(
     console.print("[bold]Notify on:[/bold]")
     console.print(f"  Sync events: {'[green]✓[/green]' if settings.on_sync else '[dim]✗[/dim]'}")
     console.print(f"  Conflicts: {'[green]✓[/green]' if settings.on_conflict else '[dim]✗[/dim]'}")
-    console.print(f"  Member changes: {'[green]✓[/green]' if settings.on_member_change else '[dim]✗[/dim]'}")
+    console.print(
+        f"  Member changes: {'[green]✓[/green]' if settings.on_member_change else '[dim]✗[/dim]'}"
+    )
 
 
 # =============================================================================
@@ -816,6 +840,7 @@ app.add_typer(conflict_app, name="conflict")
 def _get_conflict_service():
     """Get ConflictService instance."""
     from doit_cli.services.conflict_service import ConflictService
+
     return ConflictService()
 
 
@@ -823,12 +848,14 @@ def _get_conflict_service():
 def list_conflicts(
     all_conflicts: bool = typer.Option(
         False,
-        "--all", "-a",
+        "--all",
+        "-a",
         help="Show resolved conflicts too",
     ),
     format: str = typer.Option(
         "table",
-        "--format", "-f",
+        "--format",
+        "-f",
         help="Output format: 'table' or 'json'",
     ),
 ) -> None:
@@ -849,6 +876,7 @@ def list_conflicts(
 
     if format.lower() == "json":
         import json
+
         data = {"active": [c.to_dict() for c in active]}
         if all_conflicts:
             archived = conflict_service.get_archived_conflicts()
@@ -907,7 +935,8 @@ def show_conflict(
     ),
     diff: bool = typer.Option(
         False,
-        "--diff", "-d",
+        "--diff",
+        "-d",
         help="Show unified diff",
     ),
 ) -> None:
@@ -932,7 +961,7 @@ def show_conflict(
 
     if not conflict:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     console.print()
     console.print(f"[bold]Conflict:[/bold] {conflict.file_path}")
@@ -982,7 +1011,9 @@ def show_conflict(
     console.print()
     console.print("[bold]Resolution options:[/bold]")
     console.print("  [cyan]doit team conflict resolve {id} --keep-local[/cyan]   Keep your version")
-    console.print("  [cyan]doit team conflict resolve {id} --keep-remote[/cyan]  Keep their version")
+    console.print(
+        "  [cyan]doit team conflict resolve {id} --keep-remote[/cyan]  Keep their version"
+    )
     console.print("  [cyan]doit team conflict resolve {id} --manual[/cyan]       Resolve manually")
 
 
@@ -994,17 +1025,20 @@ def resolve_conflict(
     ),
     keep_local: bool = typer.Option(
         False,
-        "--keep-local", "--ours",
+        "--keep-local",
+        "--ours",
         help="Keep local version",
     ),
     keep_remote: bool = typer.Option(
         False,
-        "--keep-remote", "--theirs",
+        "--keep-remote",
+        "--theirs",
         help="Keep remote version",
     ),
     manual: bool = typer.Option(
         False,
-        "--manual", "-m",
+        "--manual",
+        "-m",
         help="Mark as manually resolved",
     ),
 ) -> None:
@@ -1025,8 +1059,10 @@ def resolve_conflict(
 
     # Determine resolution strategy
     if sum([keep_local, keep_remote, manual]) != 1:
-        console.print("[red]Error:[/red] Specify exactly one resolution: --keep-local, --keep-remote, or --manual")
-        raise typer.Exit(code=1)
+        console.print(
+            "[red]Error:[/red] Specify exactly one resolution: --keep-local, --keep-remote, or --manual"
+        )
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     if keep_local:
         resolution = ConflictResolution.KEEP_LOCAL
@@ -1061,7 +1097,7 @@ def resolve_conflict(
 
     if not conflict:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     try:
         resolved = conflict_service.resolve_conflict(conflict.id, resolution)
@@ -1069,19 +1105,20 @@ def resolve_conflict(
 
         if resolution == ConflictResolution.MANUAL_MERGE:
             console.print()
-            console.print(f"[dim]Edit the file manually, then run:[/dim]")
+            console.print("[dim]Edit the file manually, then run:[/dim]")
             console.print(f"[cyan]  git add .doit/memory/{resolved.file_path}[/cyan]")
 
     except ConflictNotFoundError:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from None
 
 
 @conflict_app.command("clear")
 def clear_conflicts(
     force: bool = typer.Option(
         False,
-        "--force", "-f",
+        "--force",
+        "-f",
         help="Skip confirmation prompt",
     ),
 ) -> None:
@@ -1103,11 +1140,13 @@ def clear_conflicts(
         return
 
     if not force:
-        console.print(f"[yellow]Warning:[/yellow] This will clear {len(active)} conflict(s) without resolving them.")
+        console.print(
+            f"[yellow]Warning:[/yellow] This will clear {len(active)} conflict(s) without resolving them."
+        )
         confirm = typer.confirm("Continue?")
         if not confirm:
             console.print("Cancelled.")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     count = conflict_service.clear_active_conflicts()
     console.print(f"[green]✓ Cleared {count} conflict(s)[/green]")
@@ -1122,20 +1161,21 @@ def clear_conflicts(
 def team_config(
     format: str = typer.Option(
         "table",
-        "--format", "-f",
+        "--format",
+        "-f",
         help="Output format: 'table', 'json', or 'yaml'",
     ),
-    auto_sync: Optional[bool] = typer.Option(
+    auto_sync: bool | None = typer.Option(
         None,
         "--auto-sync/--no-auto-sync",
         help="Enable/disable automatic sync on file changes",
     ),
-    sync_on_command: Optional[bool] = typer.Option(
+    sync_on_command: bool | None = typer.Option(
         None,
         "--sync-on-command/--no-sync-on-command",
         help="Enable/disable sync before/after doit commands",
     ),
-    conflict_strategy: Optional[str] = typer.Option(
+    conflict_strategy: str | None = typer.Option(
         None,
         "--conflict-strategy",
         help="Conflict strategy: 'prompt', 'keep-local', or 'keep-remote'",
@@ -1151,24 +1191,25 @@ def team_config(
         doit team config --auto-sync
         doit team config --conflict-strategy keep-local
     """
-    from doit_cli.services.access_service import AccessService, AccessDeniedError
 
     service = _get_service()
     _require_initialized(service)
 
     # Check if updating settings
-    has_updates = any([
-        auto_sync is not None,
-        sync_on_command is not None,
-        conflict_strategy is not None,
-    ])
+    has_updates = any(
+        [
+            auto_sync is not None,
+            sync_on_command is not None,
+            conflict_strategy is not None,
+        ]
+    )
 
     if has_updates:
         # Require owner permission to change settings
         access_service = AccessService()
         if not access_service.check_manage_permission():
             console.print("[red]Error:[/red] Only team owners can modify settings.")
-            raise typer.Exit(code=3)
+            raise typer.Exit(code=ExitCode.PROVIDER_ERROR)
 
         config = service.config
 
@@ -1180,7 +1221,7 @@ def team_config(
             if conflict_strategy not in ["prompt", "keep-local", "keep-remote"]:
                 console.print(f"[red]Error:[/red] Invalid conflict strategy: {conflict_strategy}")
                 console.print("Valid options: prompt, keep-local, keep-remote")
-                raise typer.Exit(code=1)
+                raise typer.Exit(code=ExitCode.FAILURE)
             config.sync.conflict_strategy = conflict_strategy
 
         service._save_config()
@@ -1193,12 +1234,14 @@ def team_config(
 
     if format.lower() == "json":
         import json
+
         data = config.to_dict()
         console.print(json.dumps(data, indent=2, default=str))
         return
 
     if format.lower() == "yaml":
         import yaml
+
         data = config.to_dict()
         console.print(yaml.dump(data, default_flow_style=False))
         return
@@ -1232,8 +1275,12 @@ def team_config(
     # Sync settings
     sync = config.sync
     console.print("[bold]Sync Settings:[/bold]")
-    console.print(f"  Auto sync: {'[green]✓ Enabled[/green]' if sync.auto_sync else '[dim]✗ Disabled[/dim]'}")
-    console.print(f"  Sync on command: {'[green]✓ Enabled[/green]' if sync.sync_on_command else '[dim]✗ Disabled[/dim]'}")
+    console.print(
+        f"  Auto sync: {'[green]✓ Enabled[/green]' if sync.auto_sync else '[dim]✗ Disabled[/dim]'}"
+    )
+    console.print(
+        f"  Sync on command: {'[green]✓ Enabled[/green]' if sync.sync_on_command else '[dim]✗ Disabled[/dim]'}"
+    )
     console.print(f"  Conflict strategy: [cyan]{sync.conflict_strategy}[/cyan]")
     console.print()
 
@@ -1258,5 +1305,5 @@ def team_config(
         console.print(f"  Can push: {'[green]✓[/green]' if context.can_write else '[red]✗[/red]'}")
         console.print(f"  Can manage: {'[green]✓[/green]' if context.is_owner else '[red]✗[/red]'}")
     else:
-        console.print(f"  [yellow]Not a team member[/yellow]")
+        console.print("  [yellow]Not a team member[/yellow]")
         console.print(f"  [dim]Email: {context.user_email or 'unknown'}[/dim]")

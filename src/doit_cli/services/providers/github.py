@@ -4,10 +4,11 @@ This module implements the GitProvider interface for GitHub
 using the gh CLI tool for API operations.
 """
 
+from __future__ import annotations
+
 import json
 import subprocess
 from datetime import datetime
-from typing import Optional
 
 from ...models.provider_models import (
     Issue,
@@ -20,10 +21,10 @@ from ...models.provider_models import (
     Milestone,
     MilestoneCreateRequest,
     MilestoneState,
-    PullRequest,
     PRCreateRequest,
     PRFilters,
     PRState,
+    PullRequest,
 )
 from .base import GitProvider, ProviderType
 from .exceptions import (
@@ -151,7 +152,7 @@ class GitHubProvider(GitProvider):
             return self.get_issue(issue_number)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
 
     def get_issue(self, issue_id: str) -> Issue:
         """Get a GitHub issue by number."""
@@ -161,8 +162,12 @@ class GitHubProvider(GitProvider):
         try:
             result = subprocess.run(
                 [
-                    "gh", "issue", "view", provider_id,
-                    "--json", "number,title,body,state,url,createdAt,updatedAt,labels,milestone"
+                    "gh",
+                    "issue",
+                    "view",
+                    provider_id,
+                    "--json",
+                    "number,title,body,state,url,createdAt,updatedAt,labels,milestone",
                 ],
                 capture_output=True,
                 text=True,
@@ -178,17 +183,20 @@ class GitHubProvider(GitProvider):
             return self._parse_issue(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
-    def list_issues(self, filters: Optional[IssueFilters] = None) -> list[Issue]:
+    def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
         """List GitHub issues matching filters."""
         self._ensure_authenticated()
 
         cmd = [
-            "gh", "issue", "list",
-            "--json", "number,title,body,state,url,createdAt,updatedAt,labels,milestone"
+            "gh",
+            "issue",
+            "list",
+            "--json",
+            "number,title,body,state,url,createdAt,updatedAt,labels,milestone",
         ]
 
         if filters:
@@ -221,9 +229,9 @@ class GitHubProvider(GitProvider):
             return [self._parse_issue(item) for item in data]
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def update_issue(self, issue_id: str, updates: IssueUpdateRequest) -> Issue:
         """Update a GitHub issue."""
@@ -271,7 +279,7 @@ class GitHubProvider(GitProvider):
             return self.get_issue(provider_id)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
 
     # -------------------------------------------------------------------------
     # Pull Request Operations
@@ -282,10 +290,15 @@ class GitHubProvider(GitProvider):
         self._ensure_authenticated()
 
         cmd = [
-            "gh", "pr", "create",
-            "--title", request.title,
-            "--head", request.source_branch,
-            "--base", request.target_branch,
+            "gh",
+            "pr",
+            "create",
+            "--title",
+            request.title,
+            "--head",
+            request.source_branch,
+            "--base",
+            request.target_branch,
         ]
 
         if request.body:
@@ -312,7 +325,7 @@ class GitHubProvider(GitProvider):
             return self.get_pull_request(pr_number)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
 
     def get_pull_request(self, pr_id: str) -> PullRequest:
         """Get a GitHub pull request by number."""
@@ -322,8 +335,12 @@ class GitHubProvider(GitProvider):
         try:
             result = subprocess.run(
                 [
-                    "gh", "pr", "view", provider_id,
-                    "--json", "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels"
+                    "gh",
+                    "pr",
+                    "view",
+                    provider_id,
+                    "--json",
+                    "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels",
                 ],
                 capture_output=True,
                 text=True,
@@ -339,19 +356,20 @@ class GitHubProvider(GitProvider):
             return self._parse_pull_request(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
-    def list_pull_requests(
-        self, filters: Optional[PRFilters] = None
-    ) -> list[PullRequest]:
+    def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
         """List GitHub pull requests matching filters."""
         self._ensure_authenticated()
 
         cmd = [
-            "gh", "pr", "list",
-            "--json", "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels"
+            "gh",
+            "pr",
+            "list",
+            "--json",
+            "number,title,body,state,url,createdAt,mergedAt,headRefName,baseRefName,labels",
         ]
 
         if filters:
@@ -387,9 +405,9 @@ class GitHubProvider(GitProvider):
             return [self._parse_pull_request(item) for item in data]
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     # -------------------------------------------------------------------------
     # Milestone Operations
@@ -401,11 +419,15 @@ class GitHubProvider(GitProvider):
         repo_slug = self._get_repo_slug()
 
         cmd = [
-            "gh", "api",
+            "gh",
+            "api",
             f"repos/{repo_slug}/milestones",
-            "--method", "POST",
-            "--field", f"title={request.title}",
-            "--field", "state=open",
+            "--method",
+            "POST",
+            "--field",
+            f"title={request.title}",
+            "--field",
+            "state=open",
         ]
 
         if request.description:
@@ -431,9 +453,9 @@ class GitHubProvider(GitProvider):
             return self._parse_milestone(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     def get_milestone(self, milestone_id: str) -> Milestone:
         """Get a GitHub milestone by number."""
@@ -458,13 +480,11 @@ class GitHubProvider(GitProvider):
             return self._parse_milestone(data)
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
-    def list_milestones(
-        self, state: Optional[MilestoneState] = None
-    ) -> list[Milestone]:
+    def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
         """List GitHub milestones."""
         self._ensure_authenticated()
         repo_slug = self._get_repo_slug()
@@ -490,9 +510,129 @@ class GitHubProvider(GitProvider):
             return [self._parse_milestone(item) for item in data]
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("GitHub CLI timeout", is_timeout=True)
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
         except json.JSONDecodeError as e:
-            raise ProviderError(f"Failed to parse GitHub response: {e}")
+            raise ProviderError(f"Failed to parse GitHub response: {e}") from e
+
+    # -------------------------------------------------------------------------
+    # Issue Comments and Closing
+    # -------------------------------------------------------------------------
+
+    def add_issue_comment(self, issue_id: str, comment: str) -> bool:
+        """Post a comment on an issue.
+
+        Args:
+            issue_id: Issue number (provider ID or the full "GH-123" form).
+            comment: Comment body text.
+
+        Returns:
+            True if the comment posted, False if the CLI returned a non-zero
+            exit code. Raises on auth/network failure.
+        """
+        self._ensure_authenticated()
+        provider_id = self._extract_provider_id(issue_id)
+
+        try:
+            result = subprocess.run(
+                ["gh", "issue", "comment", provider_id, "--body", comment],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+            return result.returncode == 0
+        except subprocess.TimeoutExpired:
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
+
+    def close_issue(self, issue_id: str, comment: str | None = None) -> bool:
+        """Close an issue, optionally posting a closing comment first.
+
+        Args:
+            issue_id: Issue number (provider ID or the full "GH-123" form).
+            comment: Optional comment body to post before closing.
+
+        Returns:
+            True if the close succeeded. Raises on auth/network failure.
+        """
+        self._ensure_authenticated()
+        provider_id = self._extract_provider_id(issue_id)
+
+        cmd = ["gh", "issue", "close", provider_id]
+        if comment:
+            cmd.extend(["--comment", comment])
+
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+            return result.returncode == 0
+        except subprocess.TimeoutExpired:
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
+
+    # -------------------------------------------------------------------------
+    # Branch Operations
+    # -------------------------------------------------------------------------
+
+    def check_branch_exists(self, branch_name: str) -> tuple[bool, bool]:
+        """Check whether a branch exists locally and/or on the remote.
+
+        Runs `git branch --list` and `git ls-remote --heads origin <branch>`
+        to distinguish the two cases. Neither call requires network for the
+        local check; the remote check fails gracefully to `False` if the
+        remote is unreachable.
+
+        Returns:
+            Tuple of (local_exists, remote_exists).
+        """
+        local_exists = False
+        remote_exists = False
+
+        try:
+            local = subprocess.run(
+                ["git", "branch", "--list", branch_name],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            local_exists = bool(local.returncode == 0 and local.stdout.strip())
+        except (subprocess.SubprocessError, FileNotFoundError):
+            pass
+
+        try:
+            remote = subprocess.run(
+                ["git", "ls-remote", "--heads", "origin", branch_name],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+            remote_exists = bool(remote.returncode == 0 and remote.stdout.strip())
+        except (subprocess.SubprocessError, FileNotFoundError):
+            pass
+
+        return local_exists, remote_exists
+
+    def create_branch(self, branch_name: str, from_branch: str = "main") -> bool:
+        """Create a new local branch from `from_branch` and switch to it.
+
+        Does not push to the remote. Callers that need a remote branch
+        should follow up with `git push -u origin <branch>` or use the
+        provider's PR APIs once work is staged.
+
+        Returns:
+            True if the branch was created, False if git returned non-zero.
+        """
+        try:
+            result = subprocess.run(
+                ["git", "checkout", "-b", branch_name, from_branch],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            return result.returncode == 0
+        except (subprocess.SubprocessError, FileNotFoundError):
+            return False
 
     # -------------------------------------------------------------------------
     # Helper Methods
@@ -516,7 +656,7 @@ class GitHubProvider(GitProvider):
             raise AuthenticationError(
                 "GitHub CLI (gh) not installed. Install from: https://cli.github.com",
                 provider="GitHub",
-            )
+            ) from None
 
     def _handle_error(self, stderr: str) -> None:
         """Convert gh CLI error to appropriate exception."""
@@ -559,7 +699,7 @@ class GitHubProvider(GitProvider):
             return slug
 
         except subprocess.TimeoutExpired:
-            raise NetworkError("Git command timeout", is_timeout=True)
+            raise NetworkError("Git command timeout", is_timeout=True) from None
 
     def _parse_issue(self, data: dict) -> Issue:
         """Parse gh CLI JSON output into Issue model."""

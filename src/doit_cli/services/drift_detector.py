@@ -1,9 +1,11 @@
 """Service to detect synchronization drift between commands and prompts."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from pathlib import Path
 
-from ..models.sync_models import CommandTemplate, PromptFile, SyncStatus, SyncStatusEnum
+from ..models.sync_models import CommandTemplate, SyncStatus, SyncStatusEnum
 from .template_reader import TemplateReader
 
 

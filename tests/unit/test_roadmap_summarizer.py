@@ -1,7 +1,5 @@
 """Unit tests for RoadmapSummarizer service."""
 
-import pytest
-
 from doit_cli.models.context_config import (
     RoadmapItem,
     RoadmapSummary,

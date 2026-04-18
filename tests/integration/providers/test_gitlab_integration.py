@@ -35,7 +35,6 @@ from doit_cli.services.providers.exceptions import (
 )
 from doit_cli.services.providers.gitlab import GitLabProvider
 
-
 # Skip all tests if environment variables are not set
 pytestmark = pytest.mark.skipif(
     not os.environ.get("GITLAB_TOKEN") or not os.environ.get("GITLAB_TEST_PROJECT"),

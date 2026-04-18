@@ -1,11 +1,11 @@
 """Report generator for validation results."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 from rich.tree import Tree
 
@@ -15,7 +15,7 @@ from ..models.validation_models import Severity, ValidationResult, ValidationSta
 class ReportGenerator:
     """Generates validation reports in human-readable and JSON formats."""
 
-    def __init__(self, console: Optional[Console] = None) -> None:
+    def __init__(self, console: Console | None = None) -> None:
         """Initialize report generator.
 
         Args:
@@ -29,7 +29,6 @@ class ReportGenerator:
         Args:
             result: The validation result to display.
         """
-        spec_name = Path(result.spec_path).parent.name
         self.console.print()
         self.console.print(f"[bold]Validating:[/bold] {result.spec_path}")
         self.console.print()
@@ -74,10 +73,7 @@ class ReportGenerator:
         """
         tree = Tree(f"[{color}]{title} ({len(issues)})[/{color}]")
 
-        for i, issue in enumerate(issues):
-            is_last = i == len(issues) - 1
-            prefix = "└─" if is_last else "├─"
-
+        for issue in issues:
             line_info = f"Line {issue.line_number}: " if issue.line_number > 0 else ""
             tree.add(f"[{color}]{line_info}{issue.message}[/{color}]")
 
@@ -106,15 +102,15 @@ class ReportGenerator:
         if result.error_count > 0:
             parts.append(f"{result.error_count} error{'s' if result.error_count != 1 else ''}")
         if result.warning_count > 0:
-            parts.append(f"{result.warning_count} warning{'s' if result.warning_count != 1 else ''}")
+            parts.append(
+                f"{result.warning_count} warning{'s' if result.warning_count != 1 else ''}"
+            )
         if result.info_count > 0:
             parts.append(f"{result.info_count} info")
 
         status_detail = ", ".join(parts) if parts else "no issues"
 
-        self.console.print(
-            f"[bold]Quality Score:[/bold] {result.quality_score}/100"
-        )
+        self.console.print(f"[bold]Quality Score:[/bold] {result.quality_score}/100")
         self.console.print(
             f"[bold]Status:[/bold] [{color}]{result.status.value.upper()}[/{color}] ({status_detail})"
         )

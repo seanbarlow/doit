@@ -4,9 +4,10 @@ This module provides the TeamService class for managing team
 configuration, membership, and shared memory files.
 """
 
+from __future__ import annotations
+
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from doit_cli.models.team_models import (
     SharedMemory,
@@ -20,7 +21,6 @@ from doit_cli.services.git_utils import get_user_email
 from doit_cli.services.team_config import (
     TeamConfigError,
     TeamConfigValidationError,
-    TeamNotInitializedError,
     create_initial_config,
     ensure_state_directory,
     get_large_files_warning,
@@ -59,14 +59,14 @@ class TeamService:
     - Managing shared memory files
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path | None = None):
         """Initialize TeamService.
 
         Args:
             project_root: Project root directory. Defaults to cwd.
         """
         self.project_root = project_root or Path.cwd()
-        self._config: Optional[TeamConfig] = None
+        self._config: TeamConfig | None = None
 
     @property
     def config(self) -> TeamConfig:
@@ -87,8 +87,8 @@ class TeamService:
 
     def init_team(
         self,
-        name: str = None,
-        owner_email: str = None,
+        name: str | None = None,
+        owner_email: str | None = None,
     ) -> TeamConfig:
         """Initialize team collaboration for the project.
 
@@ -147,7 +147,7 @@ class TeamService:
         role: TeamRole = TeamRole.MEMBER,
         permission: TeamPermission = TeamPermission.READ_WRITE,
         notifications: bool = True,
-        display_name: str = None,
+        display_name: str | None = None,
     ) -> TeamMember:
         """Add a member to the team.
 
@@ -185,7 +185,7 @@ class TeamService:
             added_by=current_user or self.config.team.owner_id,
         )
 
-        self._config.members.append(member)
+        self.config.members.append(member)
         self._save_config()
 
         return member
@@ -209,20 +209,19 @@ class TeamService:
             owners = self.config.get_owners()
             if len(owners) <= 1:
                 raise TeamConfigValidationError(
-                    "Cannot remove the last owner. "
-                    "Transfer ownership first or delete the team."
+                    "Cannot remove the last owner. Transfer ownership first or delete the team."
                 )
 
-        self._config.members = [m for m in self._config.members if m.id != email]
+        self.config.members = [m for m in self.config.members if m.id != email]
         self._save_config()
 
     def update_member(
         self,
         email: str,
-        role: TeamRole = None,
-        permission: TeamPermission = None,
-        notifications: bool = None,
-        display_name: str = None,
+        role: TeamRole | None = None,
+        permission: TeamPermission | None = None,
+        notifications: bool | None = None,
+        display_name: str | None = None,
     ) -> TeamMember:
         """Update member settings.
 
@@ -247,9 +246,7 @@ class TeamService:
         if role and role != TeamRole.OWNER and member.is_owner:
             owners = self.config.get_owners()
             if len(owners) <= 1:
-                raise TeamConfigValidationError(
-                    "Cannot change role of last owner"
-                )
+                raise TeamConfigValidationError("Cannot change role of last owner")
 
         # Update fields
         if role is not None:
@@ -268,15 +265,15 @@ class TeamService:
         """List all team members."""
         return self.config.members.copy()
 
-    def get_member(self, email: str) -> Optional[TeamMember]:
+    def get_member(self, email: str) -> TeamMember | None:
         """Get a specific member by email."""
         return self.config.get_member(email)
 
-    def get_current_user_email(self) -> Optional[str]:
+    def get_current_user_email(self) -> str | None:
         """Get the current user's email from git config."""
         return get_user_email(self.project_root)
 
-    def get_current_user(self) -> Optional[TeamMember]:
+    def get_current_user(self) -> TeamMember | None:
         """Get the current user's team membership.
 
         Returns:
@@ -316,7 +313,7 @@ class TeamService:
 
         return False
 
-    def require_permission(self, action: str, error_message: str = None) -> None:
+    def require_permission(self, action: str, error_message: str | None = None) -> None:
         """Require a permission, raising if not met.
 
         Args:
@@ -337,7 +334,7 @@ class TeamService:
         """Get list of shared memory files."""
         return self.config.shared_files.copy()
 
-    def add_shared_file(self, path: str, modified_by: str = None) -> SharedMemory:
+    def add_shared_file(self, path: str, modified_by: str | None = None) -> SharedMemory:
         """Add a file to shared memory.
 
         Args:
@@ -358,16 +355,14 @@ class TeamService:
             modified_by=modified_by or self.get_current_user_email() or "",
         )
 
-        self._config.shared_files.append(shared)
+        self.config.shared_files.append(shared)
         self._save_config()
 
         return shared
 
     def remove_shared_file(self, path: str) -> None:
         """Remove a file from shared memory."""
-        self._config.shared_files = [
-            sf for sf in self._config.shared_files if sf.path != path
-        ]
+        self.config.shared_files = [sf for sf in self.config.shared_files if sf.path != path]
         self._save_config()
 
     def get_large_file_warnings(self) -> list[str]:

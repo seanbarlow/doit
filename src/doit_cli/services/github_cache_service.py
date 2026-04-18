@@ -4,9 +4,10 @@ This service handles reading, writing, and validating cached GitHub epic data
 to minimize API calls and support offline mode.
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import List, Optional
 
 from ..models.github_epic import GitHubEpic
 from ..models.sync_metadata import SyncMetadata
@@ -25,7 +26,7 @@ class GitHubCacheService:
     TTL-based validation and corruption handling.
     """
 
-    def __init__(self, cache_path: Optional[Path] = None):
+    def __init__(self, cache_path: Path | None = None):
         """Initialize cache service.
 
         Args:
@@ -37,7 +38,7 @@ class GitHubCacheService:
         self.cache_path = cache_path
         self.cache_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def load_cache(self) -> Optional[dict]:
+    def load_cache(self) -> dict | None:
         """Load cache data from file.
 
         Returns:
@@ -53,7 +54,7 @@ class GitHubCacheService:
             return None
 
         try:
-            with open(self.cache_path, "r") as f:
+            with open(self.cache_path) as f:
                 cache_data = json.load(f)
 
             # Validate cache structure
@@ -66,11 +67,11 @@ class GitHubCacheService:
             return cache_data
 
         except json.JSONDecodeError as e:
-            raise CacheError(f"Corrupted cache file: {e}")
-        except IOError as e:
-            raise CacheError(f"Failed to read cache file: {e}")
+            raise CacheError(f"Corrupted cache file: {e}") from e
+        except OSError as e:
+            raise CacheError(f"Failed to read cache file: {e}") from e
 
-    def save_cache(self, epics: List[GitHubEpic], metadata: SyncMetadata) -> None:
+    def save_cache(self, epics: list[GitHubEpic], metadata: SyncMetadata) -> None:
         """Save epics and metadata to cache file.
 
         Args:
@@ -102,8 +103,8 @@ class GitHubCacheService:
             # Atomic rename
             temp_path.replace(self.cache_path)
 
-        except IOError as e:
-            raise CacheError(f"Failed to write cache file: {e}")
+        except OSError as e:
+            raise CacheError(f"Failed to write cache file: {e}") from e
 
     def is_valid(self) -> bool:
         """Check if cache exists and is still valid based on TTL.
@@ -127,7 +128,7 @@ class GitHubCacheService:
         except (CacheError, KeyError, ValueError):
             return False
 
-    def get_epics(self) -> Optional[List[GitHubEpic]]:
+    def get_epics(self) -> list[GitHubEpic] | None:
         """Get epics from cache if valid.
 
         Returns:
@@ -161,7 +162,7 @@ class GitHubCacheService:
         except CacheError:
             return None
 
-    def get_metadata(self) -> Optional[SyncMetadata]:
+    def get_metadata(self) -> SyncMetadata | None:
         """Get sync metadata from cache.
 
         Returns:
@@ -193,10 +194,10 @@ class GitHubCacheService:
         if self.cache_path.exists():
             try:
                 self.cache_path.unlink()
-            except IOError as e:
-                raise CacheError(f"Failed to delete cache file: {e}")
+            except OSError as e:
+                raise CacheError(f"Failed to delete cache file: {e}") from e
 
-    def get_cache_age_minutes(self) -> Optional[float]:
+    def get_cache_age_minutes(self) -> float | None:
         """Get cache age in minutes.
 
         Returns:

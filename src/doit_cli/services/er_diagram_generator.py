@@ -1,5 +1,7 @@
 """Generator for ER diagrams from parsed entities."""
 
+from __future__ import annotations
+
 from ..models.diagram_models import (
     DiagramType,
     EntityRelationship,
@@ -66,9 +68,7 @@ class ERDiagramGenerator:
             node_count=len(entities),
         )
 
-    def _collect_relationships(
-        self, entities: list[ParsedEntity]
-    ) -> list[EntityRelationship]:
+    def _collect_relationships(self, entities: list[ParsedEntity]) -> list[EntityRelationship]:
         """Collect all unique relationships from entities.
 
         Args:
@@ -154,9 +154,7 @@ class ERDiagramGenerator:
 
         return "\n".join(lines)
 
-    def add_inferred_relationships(
-        self, entities: list[ParsedEntity]
-    ) -> list[ParsedEntity]:
+    def add_inferred_relationships(self, entities: list[ParsedEntity]) -> list[ParsedEntity]:
         """Add inferred relationships based on naming conventions.
 
         Looks for FK patterns like user_id that reference other entities.
@@ -181,9 +179,7 @@ class ERDiagramGenerator:
                         target = entity_names_lower[ref_name.lower()]
 
                         # Check if relationship already exists
-                        existing = any(
-                            r.target_entity == target for r in entity.relationships
-                        )
+                        existing = any(r.target_entity == target for r in entity.relationships)
 
                         if not existing and target != entity.name:
                             rel = EntityRelationship(

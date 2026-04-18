@@ -1,11 +1,8 @@
 """Integration tests for sync-prompts command."""
 
-import pytest
-from pathlib import Path
 from typer.testing import CliRunner
 
 from doit_cli.main import app
-
 
 runner = CliRunner()
 
@@ -57,6 +54,7 @@ class TestSyncPromptsCommand:
         prompts_dir.mkdir(parents=True)
 
         import time
+
         time.sleep(0.01)
         (prompts_dir / "doit.test.prompt.md").write_text("# Prompt")
 
@@ -76,9 +74,7 @@ class TestSyncPromptsCommand:
         (templates_dir / "doit.cmd2.md").write_text("# Cmd 2")
 
         # Run for single command
-        result = runner.invoke(
-            app, ["sync-prompts", "doit.cmd1", "--path", str(temp_dir)]
-        )
+        result = runner.invoke(app, ["sync-prompts", "doit.cmd1", "--path", str(temp_dir)])
 
         # Verify only cmd1 was synced
         assert result.exit_code == 0
@@ -99,6 +95,7 @@ class TestSyncPromptsCommand:
         prompts_dir.mkdir(parents=True)
 
         import time
+
         time.sleep(0.01)
         (prompts_dir / "doit.test.prompt.md").write_text("# Old prompt")
 
@@ -125,19 +122,24 @@ class TestSyncPromptsCommand:
         # Verify JSON output
         assert result.exit_code == 0
         import json
+
         output = json.loads(result.stdout)
         assert "total_commands" in output
         assert "operations" in output
         assert output["total_commands"] == 1
 
     def test_sync_prompts_content_transformation(self, temp_dir):
-        """Test that content is properly transformed."""
-        # Setup with YAML frontmatter and $ARGUMENTS
+        """Verify the Copilot-native rewrite (Phase 6, April 2026)."""
         templates_dir = temp_dir / ".doit/templates/commands"
         templates_dir.mkdir(parents=True)
 
         template_content = """---
 description: Test description
+allowed-tools: Read, Write, Bash
+effort: high
+handoffs:
+  - label: Next
+    agent: doit.other
 ---
 
 ## User Input
@@ -156,14 +158,25 @@ $ARGUMENTS
         result = runner.invoke(app, ["sync-prompts", "--path", str(temp_dir)])
         assert result.exit_code == 0
 
-        # Verify transformation
         prompt_path = temp_dir / ".github/prompts/doit.test.prompt.md"
         prompt_content = prompt_path.read_text()
 
-        # YAML frontmatter should be stripped
-        assert "---\ndescription" not in prompt_content
-        # $ARGUMENTS should be replaced
+        # Copilot-native frontmatter present
+        assert prompt_content.startswith("---\n")
+        assert "description: Test description" in prompt_content
+        assert "agent: agent" in prompt_content
+        assert "editFiles" in prompt_content  # Read/Write -> editFiles
+        assert "runCommands" in prompt_content  # Bash -> runCommands
+
+        # Claude-specific fields scrubbed from frontmatter
+        frontmatter = prompt_content.split("---", 2)[1]
+        assert "allowed-tools" not in frontmatter
+        assert "handoffs" not in frontmatter
+        assert "effort" not in frontmatter
+
+        # Placeholder rewritten
         assert "$ARGUMENTS" not in prompt_content
+        assert "${input:args:" in prompt_content
         # Description should be preserved
         assert "Test description" in prompt_content
         # Outline should be preserved
@@ -177,9 +190,65 @@ $ARGUMENTS
         (templates_dir / "doit.exists.md").write_text("# Exists")
 
         # Try to sync non-existent command
-        result = runner.invoke(
-            app, ["sync-prompts", "doit.nonexistent", "--path", str(temp_dir)]
-        )
+        result = runner.invoke(app, ["sync-prompts", "doit.nonexistent", "--path", str(temp_dir)])
 
         assert result.exit_code == 1
         assert "not found" in result.stdout.lower()
+
+
+class TestSyncPromptsSkillsTarget:
+    """Integration tests for the --skills / --no-skills flag (Phase 5d)."""
+
+    def test_claude_sync_writes_skills_by_default(self, temp_dir):
+        """--agent claude writes BOTH .claude/commands/ and .claude/skills/."""
+        result = runner.invoke(
+            app, ["sync-prompts", "--agent", "claude", "--path", str(temp_dir)]
+        )
+        assert result.exit_code == 0
+
+        commands_dir = temp_dir / ".claude" / "commands"
+        skills_dir = temp_dir / ".claude" / "skills"
+
+        assert commands_dir.is_dir(), "flat .claude/commands/ missing"
+        assert skills_dir.is_dir(), "new .claude/skills/ missing"
+
+        # At least the constitution skill should exist as a directory with SKILL.md
+        constitution_skill = skills_dir / "doit.constitution"
+        assert constitution_skill.is_dir()
+        assert (constitution_skill / "SKILL.md").is_file()
+
+    def test_no_skills_flag_skips_skills_sync(self, temp_dir):
+        """--no-skills suppresses the .claude/skills/ write."""
+        result = runner.invoke(
+            app,
+            ["sync-prompts", "--agent", "claude", "--no-skills", "--path", str(temp_dir)],
+        )
+        assert result.exit_code == 0
+
+        assert (temp_dir / ".claude" / "commands").is_dir()
+        assert not (temp_dir / ".claude" / "skills").exists()
+
+    def test_copilot_sync_does_not_touch_skills(self, temp_dir):
+        """--agent copilot (default) must not write to .claude/skills/."""
+        result = runner.invoke(app, ["sync-prompts", "--path", str(temp_dir)])
+        assert result.exit_code == 0
+
+        assert not (temp_dir / ".claude" / "skills").exists()
+        # Copilot prompts should still be produced
+        assert (temp_dir / ".github" / "prompts").is_dir()
+
+    def test_claude_force_rewrites_existing_skill(self, temp_dir):
+        """--force replaces an existing skill directory atomically."""
+        runner.invoke(app, ["sync-prompts", "--agent", "claude", "--path", str(temp_dir)])
+        stray = temp_dir / ".claude" / "skills" / "doit.constitution" / "stray.md"
+        stray.write_text("stray\n")
+
+        result = runner.invoke(
+            app,
+            ["sync-prompts", "--agent", "claude", "--force", "--path", str(temp_dir)],
+        )
+        assert result.exit_code == 0
+        assert not stray.exists()
+        assert (
+            temp_dir / ".claude" / "skills" / "doit.constitution" / "SKILL.md"
+        ).is_file()

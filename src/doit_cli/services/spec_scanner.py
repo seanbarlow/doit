@@ -1,13 +1,14 @@
 """Spec scanner service for discovering and parsing spec metadata."""
 
+from __future__ import annotations
+
 import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 from ..models.status_models import SpecState, SpecStatus, StatusReport
-from ..models.validation_models import ValidationResult
 
 
 class NotADoitProjectError(Exception):
@@ -32,16 +33,14 @@ class SpecScanner:
 
     # Regex pattern to extract status from spec.md
     # Matches: **Status**: Draft (or In Progress, Complete, Approved)
-    STATUS_PATTERN = re.compile(
-        r"\*\*Status\*\*:\s*([A-Za-z]+(?:\s+[A-Za-z]+)?)", re.IGNORECASE
-    )
+    STATUS_PATTERN = re.compile(r"\*\*Status\*\*:\s*([A-Za-z]+(?:\s+[A-Za-z]+)?)", re.IGNORECASE)
 
     # Default specs directory name
     SPECS_DIR = "specs"
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
+        project_root: Path | None = None,
         validate: bool = True,
     ) -> None:
         """Initialize scanner with project root directory.
@@ -56,7 +55,9 @@ class SpecScanner:
         """
         self.project_root = project_root or Path.cwd()
         self.validate = validate
-        self._validator = None
+        # Lazy-loaded in the `validator` property below. Typed as Any to
+        # avoid a circular import on ValidationService at module scope.
+        self._validator: Any = None
 
         # Validate this is a doit project
         doit_dir = self.project_root / ".doit"
@@ -136,10 +137,7 @@ class SpecScanner:
         spec_file = spec_dir / "spec.md"
 
         if not spec_dir.exists() or not spec_file.exists():
-            raise SpecNotFoundError(
-                f"Spec not found: {spec_name}. "
-                f"Expected spec.md at {spec_file}"
-            )
+            raise SpecNotFoundError(f"Spec not found: {spec_name}. Expected spec.md at {spec_file}")
 
         status = self._parse_spec(spec_name, spec_file)
 

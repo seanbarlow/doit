@@ -1,14 +1,17 @@
 """Hook validation service for workflow enforcement."""
 
+from __future__ import annotations
+
 import fnmatch
-import os
+import logging
 import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from ..models.hook_config import HookConfig
+
+logger = logging.getLogger(__name__)
 
 
 class ValidationResult:
@@ -42,8 +45,8 @@ class HookValidator:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        config: Optional[HookConfig] = None,
+        project_root: Path | None = None,
+        config: HookConfig | None = None,
     ):
         """Initialize the validator.
 
@@ -63,7 +66,7 @@ class HookValidator:
             return HookConfig.load_from_file(config_path)
         return HookConfig.load_default()
 
-    def get_current_branch(self) -> Optional[str]:
+    def get_current_branch(self) -> str | None:
         """Get the current Git branch name.
 
         Returns:
@@ -119,11 +122,7 @@ class HookValidator:
 
         # Check configured exempt branches
         exempt = self.config.pre_commit.exempt_branches
-        for pattern in exempt:
-            if fnmatch.fnmatch(branch, pattern):
-                return True
-
-        return False
+        return any(fnmatch.fnmatch(branch, pattern) for pattern in exempt)
 
     def is_exempt_path(self, file_path: str) -> bool:
         """Check if file path is exempt from validation.
@@ -135,10 +134,7 @@ class HookValidator:
             True if file should skip validation
         """
         exempt = self.config.pre_commit.exempt_paths
-        for pattern in exempt:
-            if fnmatch.fnmatch(file_path, pattern):
-                return True
-        return False
+        return any(fnmatch.fnmatch(file_path, pattern) for pattern in exempt)
 
     def all_files_exempt(self, files: list[str]) -> bool:
         """Check if all staged files are exempt from validation.
@@ -153,7 +149,7 @@ class HookValidator:
             return True
         return all(self.is_exempt_path(f) for f in files)
 
-    def extract_branch_spec_name(self, branch: str) -> Optional[str]:
+    def extract_branch_spec_name(self, branch: str) -> str | None:
         """Extract spec directory name from branch name.
 
         Args:
@@ -167,7 +163,7 @@ class HookValidator:
             return branch  # Full branch name is the spec directory
         return None
 
-    def get_spec_path(self, branch: str) -> Optional[Path]:
+    def get_spec_path(self, branch: str) -> Path | None:
         """Get the expected spec.md path for a branch.
 
         Args:
@@ -193,7 +189,7 @@ class HookValidator:
         spec_path = self.get_spec_path(branch)
         return spec_path is not None and spec_path.exists()
 
-    def get_spec_status(self, branch: str) -> Optional[str]:
+    def get_spec_status(self, branch: str) -> str | None:
         """Get the status field from spec.md.
 
         Args:
@@ -212,11 +208,11 @@ class HookValidator:
             match = re.search(r"\*\*Status\*\*:\s*(\w+(?:\s+\w+)*)", content)
             if match:
                 return match.group(1).strip()
-        except (OSError, IOError):
+        except OSError:
             pass
         return None
 
-    def is_spec_status_valid(self, status: Optional[str]) -> bool:
+    def is_spec_status_valid(self, status: str | None) -> bool:
         """Check if spec status allows code commits.
 
         Args:
@@ -305,7 +301,7 @@ class HookValidator:
             return ValidationResult(
                 False,
                 f"Missing specification for branch: {branch}",
-                f"Expected: {spec_path}\n\nTo fix: Run `doit specit \"Your feature description\"` first\n\nOr bypass with: git commit --no-verify (not recommended)",
+                f'Expected: {spec_path}\n\nTo fix: Run `doit specit "Your feature description"` first\n\nOr bypass with: git commit --no-verify (not recommended)',
             )
 
         # Check spec status for code changes
@@ -319,8 +315,10 @@ class HookValidator:
                     f"Allowed statuses: {', '.join(allowed)}\n\nTo fix: Update spec.md status to 'In Progress' before committing code",
                 )
 
-        # Run spec validation if enabled
-        if self.config.pre_commit.validate_spec:
+        # Run spec validation if enabled. spec_exists() above guarantees
+        # spec_path is not None when we reach here, but narrow explicitly
+        # to satisfy mypy.
+        if self.config.pre_commit.validate_spec and spec_path is not None:
             validation_result = self._validate_spec_quality(spec_path)
             if not validation_result.success:
                 return validation_result
@@ -355,7 +353,11 @@ class HookValidator:
                     False,
                     f"Specification validation failed with {result.error_count} error(s)\n\n"
                     + "\n".join(issues_summary[:5])  # Show first 5 errors
-                    + (f"\n  ... and {result.error_count - 5} more" if result.error_count > 5 else ""),
+                    + (
+                        f"\n  ... and {result.error_count - 5} more"
+                        if result.error_count > 5
+                        else ""
+                    ),
                     f"Quality score: {result.quality_score}/100 (threshold: {threshold})\n\n"
                     f"To fix: Run `doit validate {spec_path}` to see all issues\n\n"
                     "Or bypass with: git commit --no-verify (not recommended)",
@@ -373,9 +375,10 @@ class HookValidator:
         except ImportError:
             # ValidationService not available - skip validation
             pass
-        except Exception as e:
-            # Log error but don't block commit for validation failures
-            pass
+        except Exception:
+            # Any unexpected ValidationService failure is logged but must not
+            # block the commit — hook validation is advisory, not blocking.
+            logger.exception("spec validation failed unexpectedly; skipping gate")
 
         return ValidationResult(True, "Spec validation passed")
 
@@ -421,8 +424,8 @@ class HookValidator:
             if not spec_path.exists():
                 return ValidationResult(
                     False,
-                    f"Missing required artifact: spec.md",
-                    f"Expected: {spec_path}\n\nTo fix: Run `doit specit \"Your feature description\"` first",
+                    "Missing required artifact: spec.md",
+                    f'Expected: {spec_path}\n\nTo fix: Run `doit specit "Your feature description"` first',
                 )
 
         # Check plan.md
@@ -431,7 +434,7 @@ class HookValidator:
             if not plan_path.exists():
                 return ValidationResult(
                     False,
-                    f"Missing required artifact: plan.md",
+                    "Missing required artifact: plan.md",
                     f"Expected: {plan_path}\n\nTo fix: Run `/doit.planit` to create implementation plan",
                 )
 
@@ -441,13 +444,13 @@ class HookValidator:
             if not tasks_path.exists():
                 return ValidationResult(
                     False,
-                    f"Missing required artifact: tasks.md",
+                    "Missing required artifact: tasks.md",
                     f"Expected: {tasks_path}\n\nTo fix: Run `/doit.taskit` to generate task breakdown",
                 )
 
         return ValidationResult(True, "Pre-push validation passed")
 
-    def log_bypass(self, hook_type: str, commit_hash: Optional[str] = None) -> None:
+    def log_bypass(self, hook_type: str, commit_hash: str | None = None) -> None:
         """Log a hook bypass event.
 
         Args:
@@ -477,7 +480,7 @@ class HookValidator:
         with open(log_path, "a") as f:
             f.write(entry)
 
-    def _get_git_user(self) -> Optional[str]:
+    def _get_git_user(self) -> str | None:
         """Get the current Git user email."""
         try:
             result = subprocess.run(
@@ -522,7 +525,7 @@ class HookValidator:
                             event["timestamp"] = part
 
                     events.append(event)
-        except (OSError, IOError):
+        except OSError:
             pass
 
         return events

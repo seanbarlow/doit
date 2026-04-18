@@ -1,6 +1,8 @@
 """Generator for User Journey flowchart diagrams from user stories."""
 
-from ..models.diagram_models import GeneratedDiagram, DiagramType, ParsedUserStory
+from __future__ import annotations
+
+from ..models.diagram_models import DiagramType, GeneratedDiagram, ParsedUserStory
 
 
 class UserJourneyGenerator:
@@ -57,7 +59,8 @@ class UserJourneyGenerator:
 
         # Count nodes
         node_count = sum(
-            len(story.scenarios) + 1 for story in stories  # +1 for entry node
+            len(story.scenarios) + 1
+            for story in stories  # +1 for entry node
         )
 
         return GeneratedDiagram(

@@ -4,8 +4,9 @@ This module provides the GitHubFeature dataclass for storing GitHub feature
 issues that are part of an epic.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass
@@ -24,7 +25,7 @@ class GitHubFeature:
     number: int
     title: str
     state: str
-    labels: List[str]
+    labels: list[str]
     epic_number: int
     url: str
 
@@ -51,13 +52,23 @@ class GitHubFeature:
         """
         return self.state == "open"
 
-    def get_priority_labels(self) -> List[str]:
+    def get_priority_labels(self) -> list[str]:
         """Extract priority-related labels from the feature.
 
         Returns:
             List of labels that contain 'priority' or are priority keywords
         """
-        priority_keywords = {"priority", "p1", "p2", "p3", "p4", "critical", "high", "medium", "low"}
+        priority_keywords = {
+            "priority",
+            "p1",
+            "p2",
+            "p3",
+            "p4",
+            "critical",
+            "high",
+            "medium",
+            "low",
+        }
         return [
             label
             for label in self.labels
@@ -65,7 +76,7 @@ class GitHubFeature:
         ]
 
     @classmethod
-    def from_gh_json(cls, data: dict, epic_number: int) -> "GitHubFeature":
+    def from_gh_json(cls, data: dict, epic_number: int) -> GitHubFeature:
         """Create GitHubFeature from GitHub CLI JSON response.
 
         Args:

@@ -1,6 +1,7 @@
 """Tests for the doit_context MCP tool."""
 
 import json
+
 import pytest
 
 from doit_cli.mcp import MCP_AVAILABLE
@@ -13,8 +14,9 @@ class TestContextTool:
     def test_context_no_doit_project(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
 
-        from doit_cli.mcp.tools.context_tool import register_context_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.context_tool import register_context_tool
 
         mcp = FastMCP("test")
         register_context_tool(mcp)
@@ -33,8 +35,9 @@ class TestContextTool:
         (memory_dir / "tech-stack.md").write_text("# Tech Stack\nPython 3.11+")
         (tmp_path / ".doit" / "config").mkdir(parents=True)
 
-        from doit_cli.mcp.tools.context_tool import register_context_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.context_tool import register_context_tool
 
         mcp = FastMCP("test")
         register_context_tool(mcp)

@@ -4,9 +4,11 @@ This module implements the GitProvider interface for Azure DevOps
 using direct REST API calls via httpx.
 """
 
+from __future__ import annotations
+
 import os
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -21,10 +23,10 @@ from ...models.provider_models import (
     Milestone,
     MilestoneCreateRequest,
     MilestoneState,
-    PullRequest,
     PRCreateRequest,
     PRFilters,
     PRState,
+    PullRequest,
 )
 from ..provider_config import AzureDevOpsConfig
 from .base import GitProvider, ProviderType
@@ -32,7 +34,6 @@ from .exceptions import (
     AuthenticationError,
     NetworkError,
     ProviderError,
-    RateLimitError,
     ResourceNotFoundError,
     ValidationError,
 )
@@ -77,7 +78,7 @@ class AzureDevOpsProvider(GitProvider):
     authenticated via Personal Access Token (PAT).
     """
 
-    def __init__(self, config: Optional[AzureDevOpsConfig] = None, timeout: int = 30):
+    def __init__(self, config: AzureDevOpsConfig | None = None, timeout: int = 30):
         """Initialize the Azure DevOps provider.
 
         Args:
@@ -86,7 +87,7 @@ class AzureDevOpsProvider(GitProvider):
         """
         self.config = config or AzureDevOpsConfig()
         self.timeout = timeout
-        self._client: Optional[httpx.Client] = None
+        self._client: httpx.Client | None = None
 
     @property
     def provider_type(self) -> ProviderType:
@@ -137,9 +138,7 @@ class AzureDevOpsProvider(GitProvider):
         # Add tags from labels
         if request.labels:
             tags = "; ".join(request.labels)
-            operations.append(
-                {"op": "add", "path": "/fields/System.Tags", "value": tags}
-            )
+            operations.append({"op": "add", "path": "/fields/System.Tags", "value": tags})
 
         try:
             client = self._get_client()
@@ -169,9 +168,9 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_work_item(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     def get_issue(self, issue_id: str) -> Issue:
         """Get an Azure DevOps work item by ID."""
@@ -199,11 +198,11 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_work_item(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
-    def list_issues(self, filters: Optional[IssueFilters] = None) -> list[Issue]:
+    def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
         """List Azure DevOps work items matching filters."""
         self._ensure_authenticated()
 
@@ -227,7 +226,7 @@ class AzureDevOpsProvider(GitProvider):
         wiql = f"SELECT [System.Id] FROM WorkItems WHERE {where_clause}"
 
         if filters and filters.limit:
-            wiql += f" ORDER BY [System.Id] DESC"
+            wiql += " ORDER BY [System.Id] DESC"
 
         try:
             client = self._get_client()
@@ -250,7 +249,7 @@ class AzureDevOpsProvider(GitProvider):
 
             # Limit results
             if filters and filters.limit:
-                work_items = work_items[:filters.limit]
+                work_items = work_items[: filters.limit]
 
             # Fetch full details for each work item
             issues = []
@@ -264,9 +263,9 @@ class AzureDevOpsProvider(GitProvider):
             return issues
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     def update_issue(self, issue_id: str, updates: IssueUpdateRequest) -> Issue:
         """Update an Azure DevOps work item."""
@@ -287,15 +286,11 @@ class AzureDevOpsProvider(GitProvider):
 
         if updates.state:
             state_str = "Active" if updates.state == IssueState.OPEN else "Closed"
-            operations.append(
-                {"op": "replace", "path": "/fields/System.State", "value": state_str}
-            )
+            operations.append({"op": "replace", "path": "/fields/System.State", "value": state_str})
 
         if updates.labels is not None:
             tags = "; ".join(updates.labels)
-            operations.append(
-                {"op": "replace", "path": "/fields/System.Tags", "value": tags}
-            )
+            operations.append({"op": "replace", "path": "/fields/System.Tags", "value": tags})
 
         if not operations:
             return self.get_issue(provider_id)
@@ -323,9 +318,9 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_work_item(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     # -------------------------------------------------------------------------
     # Pull Request Operations
@@ -368,9 +363,9 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_pull_request(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     def get_pull_request(self, pr_id: str) -> PullRequest:
         """Get an Azure DevOps pull request by ID."""
@@ -399,13 +394,11 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_pull_request(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
-    def list_pull_requests(
-        self, filters: Optional[PRFilters] = None
-    ) -> list[PullRequest]:
+    def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
         """List Azure DevOps pull requests matching filters."""
         self._ensure_authenticated()
         repo_id = self._get_repository_id()
@@ -446,9 +439,9 @@ class AzureDevOpsProvider(GitProvider):
             return [self._parse_pull_request(pr) for pr in data.get("value", [])]
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     # -------------------------------------------------------------------------
     # Milestone Operations (Iterations)
@@ -489,9 +482,9 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_iteration(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     def get_milestone(self, milestone_id: str) -> Milestone:
         """Get an Azure DevOps iteration by ID."""
@@ -519,13 +512,11 @@ class AzureDevOpsProvider(GitProvider):
             return self._parse_iteration(data)
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
-    def list_milestones(
-        self, state: Optional[MilestoneState] = None
-    ) -> list[Milestone]:
+    def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
         """List Azure DevOps iterations."""
         self._ensure_authenticated()
 
@@ -556,15 +547,15 @@ class AzureDevOpsProvider(GitProvider):
             return milestones
 
         except httpx.TimeoutException:
-            raise NetworkError("Azure DevOps API timeout", is_timeout=True)
+            raise NetworkError("Azure DevOps API timeout", is_timeout=True) from None
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     # -------------------------------------------------------------------------
     # Helper Methods
     # -------------------------------------------------------------------------
 
-    def _get_pat(self) -> Optional[str]:
+    def _get_pat(self) -> str | None:
         """Get Personal Access Token from environment."""
         return os.environ.get("AZURE_DEVOPS_PAT")
 
@@ -623,7 +614,7 @@ class AzureDevOpsProvider(GitProvider):
             return repos[0]["id"]
 
         except httpx.RequestError as e:
-            raise NetworkError(f"Azure DevOps network error: {e}")
+            raise NetworkError(f"Azure DevOps network error: {e}") from e
 
     def _parse_work_item(self, data: dict) -> Issue:
         """Parse Azure DevOps work item into Issue model."""

@@ -1,6 +1,7 @@
 """E2E tests for doit implementit command on macOS."""
 
 import subprocess
+
 import pytest
 
 

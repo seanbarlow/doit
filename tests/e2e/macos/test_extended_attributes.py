@@ -17,11 +17,7 @@ def test_xattr_preservation(tmp_path, xattr_handler, macos_test_env):
     test_file.write_text("Content\n")
 
     # Set custom xattr
-    success = xattr_handler.set_xattr(
-        str(test_file),
-        "com.example.test",
-        "test_value"
-    )
+    success = xattr_handler.set_xattr(str(test_file), "com.example.test", "test_value")
 
     if success:
         # Read back xattr

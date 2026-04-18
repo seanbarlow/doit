@@ -4,13 +4,13 @@ This module contains all data models, enums, and dataclasses
 for the doit team collaboration workflow.
 """
 
+from __future__ import annotations
+
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Literal, Optional
-import uuid
-
 
 # =============================================================================
 # Enums
@@ -85,7 +85,7 @@ class Team:
     updated_at: datetime = field(default_factory=datetime.now)
 
     @classmethod
-    def create(cls, name: str, owner_email: str) -> "Team":
+    def create(cls, name: str, owner_email: str) -> Team:
         """Create a new team with a generated UUID."""
         return cls(
             id=str(uuid.uuid4()),
@@ -106,7 +106,7 @@ class Team:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Team":
+    def from_dict(cls, data: dict) -> Team:
         """Create Team from dictionary (YAML data)."""
         return cls(
             id=data["id"],
@@ -132,10 +132,10 @@ class TeamMember:
     role: TeamRole
     permission: TeamPermission
     notifications: bool = True
-    display_name: Optional[str] = None
+    display_name: str | None = None
     added_at: datetime = field(default_factory=datetime.now)
     added_by: str = ""
-    last_sync: Optional[datetime] = None  # Tracked locally in state
+    last_sync: datetime | None = None  # Tracked locally in state
 
     @classmethod
     def create(
@@ -144,9 +144,9 @@ class TeamMember:
         role: TeamRole = TeamRole.MEMBER,
         permission: TeamPermission = TeamPermission.READ_WRITE,
         added_by: str = "",
-        display_name: Optional[str] = None,
+        display_name: str | None = None,
         notifications: bool = True,
-    ) -> "TeamMember":
+    ) -> TeamMember:
         """Create a new team member."""
         return cls(
             id=email,
@@ -189,7 +189,7 @@ class TeamMember:
         return result
 
     @classmethod
-    def from_dict(cls, data: dict) -> "TeamMember":
+    def from_dict(cls, data: dict) -> TeamMember:
         """Create TeamMember from dictionary (YAML data)."""
         return cls(
             id=data["id"],
@@ -235,7 +235,7 @@ class SharedMemory:
         modified_by: str,
         version: str = "",
         size_bytes: int = 0,
-    ) -> "SharedMemory":
+    ) -> SharedMemory:
         """Create a new shared memory entry."""
         return cls(
             path=path,
@@ -256,7 +256,7 @@ class SharedMemory:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SharedMemory":
+    def from_dict(cls, data: dict) -> SharedMemory:
         """Create SharedMemory from dictionary (YAML data)."""
         return cls(
             path=data["path"],
@@ -291,7 +291,7 @@ class SyncSettings:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SyncSettings":
+    def from_dict(cls, data: dict) -> SyncSettings:
         """Create SyncSettings from dictionary."""
         return cls(
             auto_sync=data.get("auto_sync", False),
@@ -321,7 +321,7 @@ class NotificationSettings:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "NotificationSettings":
+    def from_dict(cls, data: dict) -> NotificationSettings:
         """Create NotificationSettings from dictionary."""
         return cls(
             enabled=data.get("enabled", True),
@@ -342,7 +342,7 @@ class TeamConfig:
     sync: SyncSettings = field(default_factory=SyncSettings)
     notifications: NotificationSettings = field(default_factory=NotificationSettings)
 
-    def get_member(self, email: str) -> Optional[TeamMember]:
+    def get_member(self, email: str) -> TeamMember | None:
         """Find a member by email."""
         for member in self.members:
             if member.id == email:
@@ -368,7 +368,7 @@ class TeamConfig:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "TeamConfig":
+    def from_dict(cls, data: dict) -> TeamConfig:
         """Create TeamConfig from dictionary (YAML data)."""
         return cls(
             team=Team.from_dict(data["team"]),
@@ -399,7 +399,7 @@ class Notification:
     affected_files: list[str] = field(default_factory=list)
     read: bool = False
     created_at: datetime = field(default_factory=datetime.now)
-    expires_at: Optional[datetime] = None
+    expires_at: datetime | None = None
 
     @classmethod
     def create(
@@ -408,9 +408,9 @@ class Notification:
         title: str,
         content: str,
         source_member: str,
-        affected_files: list[str] = None,
+        affected_files: list[str] | None = None,
         expires_days: int = 7,
-    ) -> "Notification":
+    ) -> Notification:
         """Create a new notification."""
         from datetime import timedelta
 
@@ -447,7 +447,7 @@ class Notification:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Notification":
+    def from_dict(cls, data: dict) -> Notification:
         """Create Notification from dictionary."""
         return cls(
             id=data["id"],
@@ -490,7 +490,7 @@ class ConflictVersion:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ConflictVersion":
+    def from_dict(cls, data: dict) -> ConflictVersion:
         """Create ConflictVersion from dictionary."""
         return cls(
             content=data["content"],
@@ -514,9 +514,9 @@ class ConflictRecord:
     file_path: str
     local_version: ConflictVersion
     remote_version: ConflictVersion
-    resolution: Optional[ConflictResolution] = None
-    resolved_by: Optional[str] = None
-    resolved_at: Optional[datetime] = None
+    resolution: ConflictResolution | None = None
+    resolved_by: str | None = None
+    resolved_at: datetime | None = None
     created_at: datetime = field(default_factory=datetime.now)
 
     @classmethod
@@ -526,7 +526,7 @@ class ConflictRecord:
         file_path: str,
         local_version: ConflictVersion,
         remote_version: ConflictVersion,
-    ) -> "ConflictRecord":
+    ) -> ConflictRecord:
         """Create a new conflict record."""
         return cls(
             id=str(uuid.uuid4()),
@@ -558,7 +558,7 @@ class ConflictRecord:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ConflictRecord":
+    def from_dict(cls, data: dict) -> ConflictRecord:
         """Create ConflictRecord from dictionary."""
         return cls(
             id=data["id"],
@@ -566,9 +566,7 @@ class ConflictRecord:
             file_path=data["file_path"],
             local_version=ConflictVersion.from_dict(data["local_version"]),
             remote_version=ConflictVersion.from_dict(data["remote_version"]),
-            resolution=ConflictResolution(data["resolution"])
-            if data.get("resolution")
-            else None,
+            resolution=ConflictResolution(data["resolution"]) if data.get("resolution") else None,
             resolved_by=data.get("resolved_by"),
             resolved_at=datetime.fromisoformat(data["resolved_at"])
             if data.get("resolved_at") and isinstance(data["resolved_at"], str)

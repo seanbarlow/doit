@@ -1,10 +1,11 @@
 """Models for spec status dashboard."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 from .validation_models import ValidationResult
 
@@ -27,7 +28,7 @@ class SpecState(str, Enum):
     ERROR = "error"
 
     @classmethod
-    def from_string(cls, value: str) -> "SpecState":
+    def from_string(cls, value: str) -> SpecState:
         """Parse a status string into a SpecState enum.
 
         Args:
@@ -96,9 +97,9 @@ class SpecStatus:
     path: Path
     status: SpecState
     last_modified: datetime
-    validation_result: Optional[ValidationResult] = None
+    validation_result: ValidationResult | None = None
     is_blocking: bool = False
-    error: Optional[str] = None
+    error: str | None = None
 
     @property
     def validation_passed(self) -> bool:
@@ -163,9 +164,7 @@ class StatusReport:
         if self.total_count == 0:
             return 0.0
         complete_count = sum(
-            1
-            for spec in self.specs
-            if spec.status in (SpecState.COMPLETE, SpecState.APPROVED)
+            1 for spec in self.specs if spec.status in (SpecState.COMPLETE, SpecState.APPROVED)
         )
         return (complete_count / self.total_count) * 100
 

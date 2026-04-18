@@ -4,40 +4,44 @@ This module provides the InteractivePrompt and ProgressDisplay classes
 for collecting user input and showing workflow progress.
 """
 
+from __future__ import annotations
+
 import os
 import sys
-from typing import Callable
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Prompt, Confirm
-from rich.text import Text
 from rich.theme import Theme
 
 from ..models.workflow_models import (
-    WorkflowStep,
-    ValidationResult,
     NavigationCommand,
+    ValidationResult,
+    WorkflowStep,
 )
 
+if TYPE_CHECKING:
+    from ..services.input_validator import InputValidator
 
 # =============================================================================
 # Theme Configuration
 # =============================================================================
 
 
-WORKFLOW_THEME = Theme({
-    "prompt": "bold cyan",
-    "prompt.default": "dim",
-    "error": "bold red",
-    "success": "bold green",
-    "warning": "bold yellow",
-    "info": "dim",
-    "step.current": "bold white",
-    "step.completed": "green",
-    "step.skipped": "dim",
-    "step.pending": "dim white",
-})
+WORKFLOW_THEME = Theme(
+    {
+        "prompt": "bold cyan",
+        "prompt.default": "dim",
+        "error": "bold red",
+        "success": "bold green",
+        "warning": "bold yellow",
+        "info": "dim",
+        "step.current": "bold white",
+        "step.completed": "green",
+        "step.skipped": "dim",
+        "step.pending": "dim white",
+    }
+)
 
 
 # =============================================================================
@@ -72,7 +76,7 @@ class InteractivePrompt:
     def prompt(
         self,
         step: WorkflowStep,
-        validator: "InputValidator | None" = None,
+        validator: InputValidator | None = None,
     ) -> str:
         """Prompt user for step input.
 
@@ -113,8 +117,6 @@ class InteractivePrompt:
 
             # Validate if validator provided
             if validator:
-                from ..services.input_validator import validate_step
-
                 result = validator.validate(value, step, {})
                 if not result.passed:
                     self._show_validation_error(result)
@@ -144,7 +146,7 @@ class InteractivePrompt:
         if not self._is_interactive():
             if step.default_value and step.default_value in options:
                 return step.default_value
-            return list(options.keys())[0]
+            return next(iter(options.keys()))
 
         while True:
             # Display prompt and options
@@ -269,9 +271,8 @@ class InteractivePrompt:
         if normalized == "back":
             return NavigationCommand("back")
 
-        if normalized == "skip":
-            if not step.required:
-                return NavigationCommand("skip")
+        if normalized == "skip" and not step.required:
+            return NavigationCommand("skip")
             # For required steps, 'skip' is treated as regular input
 
         return None
@@ -361,12 +362,14 @@ class ProgressDisplay:
     ) -> None:
         """Show validation error with suggestion."""
         self.console.print()
-        self.console.print(Panel(
-            f"[error]{error.error_message}[/error]\n\n"
-            f"[info]{error.suggestion or 'Please try again.'}[/info]",
-            title=f"Validation Error: {step.name}",
-            border_style="red",
-        ))
+        self.console.print(
+            Panel(
+                f"[error]{error.error_message}[/error]\n\n"
+                f"[info]{error.suggestion or 'Please try again.'}[/info]",
+                title=f"Validation Error: {step.name}",
+                border_style="red",
+            )
+        )
 
     def show_summary(self, total_steps: int) -> None:
         """Show final summary of workflow progress."""

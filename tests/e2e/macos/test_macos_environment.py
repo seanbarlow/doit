@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+
 import pytest
 
 
@@ -102,5 +103,4 @@ def test_lang_and_locale_settings(macos_test_env):
     lang = os.environ.get("LANG", "")
     # LANG may or may not be set, but if it is, should be valid
     if lang:
-        assert "UTF-8" in lang or "utf8" in lang.lower(), \
-            f"Unexpected LANG encoding: {lang}"
+        assert "UTF-8" in lang or "utf8" in lang.lower(), f"Unexpected LANG encoding: {lang}"

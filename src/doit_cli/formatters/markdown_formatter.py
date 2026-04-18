@@ -1,5 +1,7 @@
 """Markdown formatter for status output."""
 
+from __future__ import annotations
+
 from ..models.status_models import SpecState, StatusReport
 from .base import StatusFormatter
 
@@ -69,7 +71,9 @@ class MarkdownFormatter(StatusFormatter):
                         lines.append("")
                         for issue in spec.validation_result.issues:
                             severity = issue.severity.value.upper()
-                            lines.append(f"- **{severity}** (line {issue.line_number}): {issue.message}")
+                            lines.append(
+                                f"- **{severity}** (line {issue.line_number}): {issue.message}"
+                            )
                             if issue.suggestion:
                                 lines.append(f"  - Suggestion: {issue.suggestion}")
                         lines.append("")

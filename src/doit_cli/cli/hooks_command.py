@@ -1,10 +1,13 @@
 """CLI commands for Git hook management."""
 
+from __future__ import annotations
+
 import sys
 
 import typer
 from rich.console import Console
 
+from ..exit_codes import ExitCode
 from ..services.hook_manager import HookManager
 from ..services.hook_validator import HookValidator
 
@@ -34,7 +37,7 @@ def install_hooks(
     if not manager.is_git_repo():
         console.print("[red]Error: Not a Git repository.[/red]")
         console.print("Run 'git init' first to initialize a Git repository.")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     try:
         installed, skipped = manager.install_hooks(backup=backup, force=force)
@@ -55,7 +58,7 @@ def install_hooks(
 
     except RuntimeError as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 @hooks_app.command("uninstall")
@@ -86,7 +89,7 @@ def hooks_status() -> None:
 
     if not manager.is_git_repo():
         console.print("[red]Not a Git repository[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     installed = manager.get_installed_hooks()
 
@@ -101,9 +104,13 @@ def hooks_status() -> None:
     config_path = HookConfig.get_default_config_path()
     console.print(f"\n[bold]Configuration:[/bold] {config_path}")
 
-    pre_commit_status = "[green]enabled[/green]" if config.pre_commit.enabled else "[red]disabled[/red]"
+    pre_commit_status = (
+        "[green]enabled[/green]" if config.pre_commit.enabled else "[red]disabled[/red]"
+    )
     pre_push_status = "[green]enabled[/green]" if config.pre_push.enabled else "[red]disabled[/red]"
-    bypass_status = "[green]enabled[/green]" if config.logging.log_bypasses else "[red]disabled[/red]"
+    bypass_status = (
+        "[green]enabled[/green]" if config.logging.log_bypasses else "[red]disabled[/red]"
+    )
 
     console.print(f"  Pre-commit validation: {pre_commit_status}")
     console.print(f"  Pre-push validation:   {pre_push_status}")
@@ -111,7 +118,9 @@ def hooks_status() -> None:
 
     # Show exempt branches
     if config.pre_commit.exempt_branches:
-        console.print(f"\n[bold]Exempt Branches:[/bold] {', '.join(config.pre_commit.exempt_branches)}")
+        console.print(
+            f"\n[bold]Exempt Branches:[/bold] {', '.join(config.pre_commit.exempt_branches)}"
+        )
 
     # Show exempt paths
     if config.pre_commit.exempt_paths:
@@ -141,21 +150,19 @@ def restore_hooks(
 
     except RuntimeError as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 @hooks_app.command("validate")
 def validate_hook(
-    hook_type: str = typer.Argument(
-        ..., help="Type of hook to validate (pre-commit or pre-push)"
-    ),
+    hook_type: str = typer.Argument(..., help="Type of hook to validate (pre-commit or pre-push)"),
 ) -> None:
     """Validate workflow compliance for the specified hook type."""
     valid_types = ["pre-commit", "pre-push"]
     if hook_type not in valid_types:
         console.print(f"[red]Invalid hook type: {hook_type}[/red]")
         console.print(f"Valid types: {', '.join(valid_types)}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     validator = HookValidator()
 

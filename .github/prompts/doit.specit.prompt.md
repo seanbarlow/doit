@@ -1,21 +1,18 @@
 ---
-description: Create or update the feature specification from a natural language feature description, with integrated ambiguity resolution and GitHub issue creation.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Build Technical Plan
-    agent: doit.plan
-    prompt: Create a plan for the spec. I am building with...
-  - label: Scaffold Project Structure
-    agent: doit.scaffold
-    prompt: Generate project structure based on constitution tech stack
+description: Create or update the feature specification from a natural language feature
+  description, with integrated ambiguity resolution and GitHub issue creation.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
+- githubRepo
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -229,7 +226,7 @@ After story generation and traceability update, display a Persona Coverage summa
 
 ## Outline
 
-The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/doit.doit` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `${input:args}` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
@@ -263,10 +260,10 @@ Given that feature description, do this:
       - Find the highest number N
       - Use N+1 for the new branch number
 
-   d. Run the script `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS"` with the calculated number and short-name:
+   d. Run the script `.doit/scripts/bash/create-new-feature.sh --json "${input:args}"` with the calculated number and short-name:
       - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --json --number 5 --short-name "user-auth" "Add user authentication"`
-      - PowerShell example: `.doit/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
+      - Bash example: `.doit/scripts/bash/create-new-feature.sh --json "${input:args}" --json --number 5 --short-name "user-auth" "Add user authentication"`
+      - PowerShell example: `.doit/scripts/bash/create-new-feature.sh --json "${input:args}" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
 
    **IMPORTANT**:
    - Check all three sources (remote branches, local branches, specs directories) to find the highest number

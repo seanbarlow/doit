@@ -3,13 +3,11 @@
 Tests for Feature 031: Init Workflow Integration
 """
 
-import pytest
-from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 from typer.testing import CliRunner
-from unittest.mock import patch, MagicMock
 
 from doit_cli.main import app
-
 
 runner = CliRunner()
 
@@ -34,18 +32,14 @@ class TestInitWorkflowIntegration:
 
     def test_non_interactive_with_agent_flag(self, tmp_path):
         """doit init . --yes --agent copilot must use specified agent."""
-        result = runner.invoke(
-            app, ["init", str(tmp_path), "--yes", "--agent", "copilot"]
-        )
+        result = runner.invoke(app, ["init", str(tmp_path), "--yes", "--agent", "copilot"])
         assert result.exit_code == 0
         # Should create copilot directory
         assert (tmp_path / ".github" / "prompts").exists()
 
     def test_non_interactive_with_both_agents(self, tmp_path):
         """doit init . --yes -a claude,copilot must create both."""
-        result = runner.invoke(
-            app, ["init", str(tmp_path), "--yes", "--agent", "claude,copilot"]
-        )
+        result = runner.invoke(app, ["init", str(tmp_path), "--yes", "--agent", "claude,copilot"])
         assert result.exit_code == 0
         assert (tmp_path / ".claude" / "commands").exists()
         assert (tmp_path / ".github" / "prompts").exists()
@@ -63,7 +57,7 @@ class TestInitWorkflowIntegration:
         mock_engine_class.return_value = mock_engine
 
         # Run without --yes (interactive)
-        result = runner.invoke(app, ["init", str(tmp_path)])
+        runner.invoke(app, ["init", str(tmp_path)])
 
         # Verify WorkflowEngine was used
         mock_engine_class.assert_called_once()
@@ -117,9 +111,7 @@ class TestInitWorkflowIntegration:
         mock_engine_class.return_value = mock_engine
 
         # CLI specifies claude
-        result = runner.invoke(
-            app, ["init", str(tmp_path), "--agent", "claude"]
-        )
+        result = runner.invoke(app, ["init", str(tmp_path), "--agent", "claude"])
 
         assert result.exit_code == 0
         # CLI agent should win

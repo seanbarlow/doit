@@ -3,8 +3,9 @@
 Provides weekly velocity aggregation and trend analysis.
 """
 
+from __future__ import annotations
+
 from datetime import date, timedelta
-from typing import Optional
 
 from ..models.analytics_models import SpecMetadata, VelocityDataPoint
 
@@ -23,7 +24,7 @@ class VelocityTracker:
             specs: List of SpecMetadata objects to analyze
         """
         self.specs = specs
-        self._weekly_data: Optional[dict[str, VelocityDataPoint]] = None
+        self._weekly_data: dict[str, VelocityDataPoint] | None = None
 
     @property
     def weekly_data(self) -> dict[str, VelocityDataPoint]:
@@ -46,9 +47,7 @@ class VelocityTracker:
 
         for spec in self.specs:
             if spec.completed_at:
-                point = VelocityDataPoint.from_completion(
-                    spec.completed_at, spec.name
-                )
+                point = VelocityDataPoint.from_completion(spec.completed_at, spec.name)
                 if point.week_key in weekly:
                     weekly[point.week_key] = weekly[point.week_key].merge(point)
                 else:
@@ -133,7 +132,7 @@ class VelocityTracker:
         total = sum(v.specs_completed for v in data)
         return total / len(data)
 
-    def get_peak_week(self) -> Optional[VelocityDataPoint]:
+    def get_peak_week(self) -> VelocityDataPoint | None:
         """Get the week with most completions.
 
         Returns:

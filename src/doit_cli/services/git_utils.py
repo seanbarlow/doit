@@ -4,16 +4,17 @@ This module provides wrapper functions for Git subprocess operations
 used in team memory file synchronization.
 """
 
+from __future__ import annotations
+
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 
 class GitError(Exception):
     """Base exception for Git operations."""
 
-    def __init__(self, message: str, returncode: int = None, stderr: str = None):
+    def __init__(self, message: str, returncode: int | None = None, stderr: str | None = None):
         super().__init__(message)
         self.returncode = returncode
         self.stderr = stderr
@@ -40,7 +41,7 @@ class GitRemoteError(GitError):
 class GitConflictError(GitError):
     """Git merge conflict detected."""
 
-    def __init__(self, message: str, conflicting_files: list[str] = None):
+    def __init__(self, message: str, conflicting_files: list[str] | None = None):
         super().__init__(message)
         self.conflicting_files = conflicting_files or []
 
@@ -71,7 +72,7 @@ class GitCommandResult:
 
 def run_git_command(
     args: list[str],
-    cwd: Path = None,
+    cwd: Path | None = None,
     capture_output: bool = True,
     check: bool = False,
 ) -> GitCommandResult:
@@ -89,7 +90,7 @@ def run_git_command(
     Raises:
         GitError: If check=True and command fails
     """
-    cmd = ["git"] + args
+    cmd = ["git", *args]
 
     try:
         result = subprocess.run(
@@ -117,11 +118,9 @@ def run_git_command(
         return cmd_result
 
     except subprocess.TimeoutExpired:
-        raise GitError("Git command timed out after 60 seconds")
+        raise GitError("Git command timed out after 60 seconds") from None
     except FileNotFoundError:
-        raise GitNotAvailableError(
-            "Git is not installed or not available in PATH"
-        )
+        raise GitNotAvailableError("Git is not installed or not available in PATH") from None
 
 
 def is_git_available() -> bool:
@@ -133,7 +132,7 @@ def is_git_available() -> bool:
         return False
 
 
-def is_git_repo(path: Path = None) -> bool:
+def is_git_repo(path: Path | None = None) -> bool:
     """Check if the given path is a Git repository."""
     try:
         result = run_git_command(["rev-parse", "--git-dir"], cwd=path)
@@ -142,37 +141,37 @@ def is_git_repo(path: Path = None) -> bool:
         return False
 
 
-def get_current_branch(cwd: Path = None) -> str:
+def get_current_branch(cwd: Path | None = None) -> str:
     """Get the current Git branch name."""
     result = run_git_command(["branch", "--show-current"], cwd=cwd, check=True)
     return result.stdout
 
 
-def get_remote_url(remote: str = "origin", cwd: Path = None) -> Optional[str]:
+def get_remote_url(remote: str = "origin", cwd: Path | None = None) -> str | None:
     """Get the URL of a Git remote."""
     result = run_git_command(["remote", "get-url", remote], cwd=cwd)
     return result.stdout if result.success else None
 
 
-def has_remote(remote: str = "origin", cwd: Path = None) -> bool:
+def has_remote(remote: str = "origin", cwd: Path | None = None) -> bool:
     """Check if a remote exists."""
     result = run_git_command(["remote", "get-url", remote], cwd=cwd)
     return result.success
 
 
-def get_user_email(cwd: Path = None) -> Optional[str]:
+def get_user_email(cwd: Path | None = None) -> str | None:
     """Get the Git user email from configuration."""
     result = run_git_command(["config", "user.email"], cwd=cwd)
     return result.stdout if result.success else None
 
 
-def get_user_name(cwd: Path = None) -> Optional[str]:
+def get_user_name(cwd: Path | None = None) -> str | None:
     """Get the Git user name from configuration."""
     result = run_git_command(["config", "user.name"], cwd=cwd)
     return result.stdout if result.success else None
 
 
-def get_status(cwd: Path = None) -> GitStatus:
+def get_status(cwd: Path | None = None) -> GitStatus:
     """Get the current Git status.
 
     Returns:
@@ -230,15 +229,15 @@ def get_status(cwd: Path = None) -> GitStatus:
     )
 
 
-def fetch(remote: str = "origin", cwd: Path = None) -> GitCommandResult:
+def fetch(remote: str = "origin", cwd: Path | None = None) -> GitCommandResult:
     """Fetch from remote repository."""
     return run_git_command(["fetch", remote], cwd=cwd, check=True)
 
 
 def pull(
     remote: str = "origin",
-    branch: str = None,
-    cwd: Path = None,
+    branch: str | None = None,
+    cwd: Path | None = None,
     no_commit: bool = False,
 ) -> GitCommandResult:
     """Pull from remote repository.
@@ -281,8 +280,8 @@ def pull(
 
 def push(
     remote: str = "origin",
-    branch: str = None,
-    cwd: Path = None,
+    branch: str | None = None,
+    cwd: Path | None = None,
     set_upstream: bool = False,
 ) -> GitCommandResult:
     """Push to remote repository.
@@ -308,7 +307,7 @@ def push(
     return run_git_command(args, cwd=cwd, check=True)
 
 
-def add(files: list[str], cwd: Path = None) -> GitCommandResult:
+def add(files: list[str], cwd: Path | None = None) -> GitCommandResult:
     """Stage files for commit.
 
     Args:
@@ -318,10 +317,10 @@ def add(files: list[str], cwd: Path = None) -> GitCommandResult:
     Returns:
         GitCommandResult
     """
-    return run_git_command(["add"] + files, cwd=cwd, check=True)
+    return run_git_command(["add", *files], cwd=cwd, check=True)
 
 
-def commit(message: str, cwd: Path = None) -> GitCommandResult:
+def commit(message: str, cwd: Path | None = None) -> GitCommandResult:
     """Create a commit with the given message.
 
     Args:
@@ -334,7 +333,7 @@ def commit(message: str, cwd: Path = None) -> GitCommandResult:
     return run_git_command(["commit", "-m", message], cwd=cwd, check=True)
 
 
-def get_conflicting_files(cwd: Path = None) -> list[str]:
+def get_conflicting_files(cwd: Path | None = None) -> list[str]:
     """Get list of files with merge conflicts."""
     result = run_git_command(
         ["diff", "--name-only", "--diff-filter=U"],
@@ -345,21 +344,21 @@ def get_conflicting_files(cwd: Path = None) -> list[str]:
     return []
 
 
-def checkout_ours(files: list[str], cwd: Path = None) -> GitCommandResult:
+def checkout_ours(files: list[str], cwd: Path | None = None) -> GitCommandResult:
     """Resolve conflicts by keeping local version."""
-    return run_git_command(["checkout", "--ours"] + files, cwd=cwd, check=True)
+    return run_git_command(["checkout", "--ours", *files], cwd=cwd, check=True)
 
 
-def checkout_theirs(files: list[str], cwd: Path = None) -> GitCommandResult:
+def checkout_theirs(files: list[str], cwd: Path | None = None) -> GitCommandResult:
     """Resolve conflicts by keeping remote version."""
-    return run_git_command(["checkout", "--theirs"] + files, cwd=cwd, check=True)
+    return run_git_command(["checkout", "--theirs", *files], cwd=cwd, check=True)
 
 
 def get_file_at_ref(
     filepath: str,
     ref: str = "HEAD",
-    cwd: Path = None,
-) -> Optional[str]:
+    cwd: Path | None = None,
+) -> str | None:
     """Get file content at a specific Git ref.
 
     Args:
@@ -374,13 +373,13 @@ def get_file_at_ref(
     return result.stdout if result.success else None
 
 
-def get_latest_commit_hash(ref: str = "HEAD", cwd: Path = None) -> Optional[str]:
+def get_latest_commit_hash(ref: str = "HEAD", cwd: Path | None = None) -> str | None:
     """Get the commit hash for a ref."""
     result = run_git_command(["rev-parse", ref], cwd=cwd)
     return result.stdout if result.success else None
 
 
-def get_commit_message(commit_hash: str, cwd: Path = None) -> Optional[str]:
+def get_commit_message(commit_hash: str, cwd: Path | None = None) -> str | None:
     """Get the commit message for a commit."""
     result = run_git_command(
         ["log", "-1", "--pretty=%B", commit_hash],
@@ -389,7 +388,7 @@ def get_commit_message(commit_hash: str, cwd: Path = None) -> Optional[str]:
     return result.stdout if result.success else None
 
 
-def get_file_last_modified_by(filepath: str, cwd: Path = None) -> Optional[str]:
+def get_file_last_modified_by(filepath: str, cwd: Path | None = None) -> str | None:
     """Get email of last person who modified a file."""
     result = run_git_command(
         ["log", "-1", "--pretty=%ae", "--", filepath],
@@ -398,12 +397,12 @@ def get_file_last_modified_by(filepath: str, cwd: Path = None) -> Optional[str]:
     return result.stdout if result.success else None
 
 
-def abort_merge(cwd: Path = None) -> GitCommandResult:
+def abort_merge(cwd: Path | None = None) -> GitCommandResult:
     """Abort an in-progress merge."""
     return run_git_command(["merge", "--abort"], cwd=cwd)
 
 
-def is_online(remote: str = "origin", cwd: Path = None) -> bool:
+def is_online(remote: str = "origin", cwd: Path | None = None) -> bool:
     """Check if remote is reachable.
 
     Uses git ls-remote with a timeout to check connectivity.

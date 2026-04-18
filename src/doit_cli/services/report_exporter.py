@@ -4,10 +4,11 @@ Provides export functionality for analytics reports in
 Markdown and JSON formats.
 """
 
+from __future__ import annotations
+
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
-from typing import Optional
 
 from ..models.analytics_models import AnalyticsReport
 
@@ -48,18 +49,18 @@ class ReportExporter:
         ]
 
         if self.report.cycle_stats:
-            lines.append(
-                f"- **Average Cycle Time**: {self.report.cycle_stats.average_days} days"
-            )
+            lines.append(f"- **Average Cycle Time**: {self.report.cycle_stats.average_days} days")
 
         # Status breakdown
-        lines.extend([
-            "",
-            "## Status Breakdown",
-            "",
-            "| Status | Count | Percentage |",
-            "|--------|-------|------------|",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Status Breakdown",
+                "",
+                "| Status | Count | Percentage |",
+                "|--------|-------|------------|",
+            ]
+        )
 
         total = self.report.total_specs
         for status, count in sorted(
@@ -71,30 +72,34 @@ class ReportExporter:
         # Cycle time statistics
         if self.report.cycle_stats:
             stats = self.report.cycle_stats
-            lines.extend([
-                "",
-                "## Cycle Time Statistics",
-                "",
-                f"Based on {stats.sample_count} completed specifications.",
-                "",
-                "| Metric | Value |",
-                "|--------|-------|",
-                f"| Average | {stats.average_days} days |",
-                f"| Median | {stats.median_days} days |",
-                f"| Minimum | {stats.min_days} days |",
-                f"| Maximum | {stats.max_days} days |",
-                f"| Std Deviation | {stats.std_dev_days} days |",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "## Cycle Time Statistics",
+                    "",
+                    f"Based on {stats.sample_count} completed specifications.",
+                    "",
+                    "| Metric | Value |",
+                    "|--------|-------|",
+                    f"| Average | {stats.average_days} days |",
+                    f"| Median | {stats.median_days} days |",
+                    f"| Minimum | {stats.min_days} days |",
+                    f"| Maximum | {stats.max_days} days |",
+                    f"| Std Deviation | {stats.std_dev_days} days |",
+                ]
+            )
 
         # Velocity trends
         if self.report.velocity:
-            lines.extend([
-                "",
-                "## Velocity Trends",
-                "",
-                "| Week | Completed | Specs |",
-                "|------|-----------|-------|",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "## Velocity Trends",
+                    "",
+                    "| Week | Completed | Specs |",
+                    "|------|-----------|-------|",
+                ]
+            )
 
             for v in self.report.velocity[:12]:
                 specs_list = ", ".join(v.spec_names[:3])
@@ -105,44 +110,50 @@ class ReportExporter:
             # Calculate average
             total_completed = sum(v.specs_completed for v in self.report.velocity)
             avg = total_completed / len(self.report.velocity) if self.report.velocity else 0
-            lines.extend([
-                "",
-                f"**Average velocity**: {avg:.1f} specs/week",
-            ])
+            lines.extend(
+                [
+                    "",
+                    f"**Average velocity**: {avg:.1f} specs/week",
+                ]
+            )
 
-        # Individual specs (top 10 most recent)
+        # Individual specs (top 10 most recent). The filter above guarantees
+        # `completed_at` is not None on any remaining element, but mypy can't
+        # see through it. Use a sort key that substitutes a sentinel rather
+        # than deal with Optional in the comparison.
         if self.report.specs:
-            completed_specs = [
-                s for s in self.report.specs if s.completed_at
-            ]
-            completed_specs.sort(key=lambda s: s.completed_at, reverse=True)
+            completed_specs = [s for s in self.report.specs if s.completed_at]
+            completed_specs.sort(
+                key=lambda s: s.completed_at or date.min,  # pragma: no branch
+                reverse=True,
+            )
 
             if completed_specs:
-                lines.extend([
-                    "",
-                    "## Recent Completions",
-                    "",
-                    "| Spec | Completed | Cycle Time |",
-                    "|------|-----------|------------|",
-                ])
+                lines.extend(
+                    [
+                        "",
+                        "## Recent Completions",
+                        "",
+                        "| Spec | Completed | Cycle Time |",
+                        "|------|-----------|------------|",
+                    ]
+                )
 
                 for spec in completed_specs[:10]:
                     cycle = (
-                        f"{spec.cycle_time_days} days"
-                        if spec.cycle_time_days is not None
-                        else "-"
+                        f"{spec.cycle_time_days} days" if spec.cycle_time_days is not None else "-"
                     )
-                    lines.append(
-                        f"| {spec.name} | {spec.completed_at} | {cycle} |"
-                    )
+                    lines.append(f"| {spec.name} | {spec.completed_at} | {cycle} |")
 
         # Footer
-        lines.extend([
-            "",
-            "---",
-            "",
-            f"*Report generated by doit analytics on {self.report.generated_at.strftime('%Y-%m-%d')}*",
-        ])
+        lines.extend(
+            [
+                "",
+                "---",
+                "",
+                f"*Report generated by doit analytics on {self.report.generated_at.strftime('%Y-%m-%d')}*",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -156,7 +167,7 @@ class ReportExporter:
 
     def save(
         self,
-        output_path: Optional[Path] = None,
+        output_path: Path | None = None,
         format_type: str = "markdown",
     ) -> Path:
         """Save report to file.
@@ -202,7 +213,7 @@ class ReportExporter:
     def export_to_file(
         cls,
         report: AnalyticsReport,
-        output_path: Optional[Path] = None,
+        output_path: Path | None = None,
         format_type: str = "markdown",
     ) -> Path:
         """Convenience method to export report directly.

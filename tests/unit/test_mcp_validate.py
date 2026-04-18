@@ -1,9 +1,8 @@
 """Tests for the doit_validate MCP tool."""
 
 import json
+
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 from doit_cli.mcp import MCP_AVAILABLE
 
@@ -17,8 +16,9 @@ class TestValidateTool:
         (tmp_path / ".doit" / "memory").mkdir(parents=True)
         (tmp_path / "specs").mkdir()
 
-        from doit_cli.mcp.tools.validate_tool import register_validate_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.validate_tool import register_validate_tool
 
         mcp = FastMCP("test")
         register_validate_tool(mcp)
@@ -36,8 +36,9 @@ class TestValidateTool:
         (tmp_path / ".doit" / "memory").mkdir(parents=True)
         (tmp_path / "specs").mkdir()
 
-        from doit_cli.mcp.tools.validate_tool import register_validate_tool
         from mcp.server.fastmcp import FastMCP
+
+        from doit_cli.mcp.tools.validate_tool import register_validate_tool
 
         mcp = FastMCP("test")
         register_validate_tool(mcp)

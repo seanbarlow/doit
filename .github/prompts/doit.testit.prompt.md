@@ -1,23 +1,16 @@
 ---
 description: Execute automated tests and generate test reports with requirement mapping
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Check In
-    agent: doit.checkin
-    prompt: Finalize feature and create pull request
-    send: true
-  - label: Review Again
-    agent: doit.review
-    prompt: Re-review code after test fixes
-    send: true
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -166,7 +159,7 @@ Before generating or modifying code:
      ```
 
 8. **Record manual test results**:
-   - If $ARGUMENTS contains `--manual`:
+   - If ${input:args} contains `--manual`:
      - Present each manual test item
      - Ask for PASS/FAIL/SKIP result
      - Record notes for failed tests

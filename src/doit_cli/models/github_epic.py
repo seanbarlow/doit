@@ -4,9 +4,11 @@ This module provides the GitHubEpic dataclass for storing and managing
 GitHub epic issue data fetched from the GitHub API.
 """
 
+from __future__ import annotations
+
+import contextlib
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
 
 
 @dataclass
@@ -28,12 +30,12 @@ class GitHubEpic:
     number: int
     title: str
     state: str
-    labels: List[str]
+    labels: list[str]
     body: str
     url: str
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    features: List["GitHubFeature"] = field(default_factory=list)  # type: ignore
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    features: list[GitHubFeature] = field(default_factory=list)
 
     def __post_init__(self):
         """Validate epic data after initialization."""
@@ -64,13 +66,23 @@ class GitHubEpic:
         """
         return "epic" in (label.lower() for label in self.labels)
 
-    def get_priority_labels(self) -> List[str]:
+    def get_priority_labels(self) -> list[str]:
         """Extract priority-related labels from the epic.
 
         Returns:
             List of labels that contain 'priority' or are priority keywords
         """
-        priority_keywords = {"priority", "p1", "p2", "p3", "p4", "critical", "high", "medium", "low"}
+        priority_keywords = {
+            "priority",
+            "p1",
+            "p2",
+            "p3",
+            "p4",
+            "critical",
+            "high",
+            "medium",
+            "low",
+        }
         return [
             label
             for label in self.labels
@@ -78,7 +90,7 @@ class GitHubEpic:
         ]
 
     @classmethod
-    def from_gh_json(cls, data: dict) -> "GitHubEpic":
+    def from_gh_json(cls, data: dict) -> GitHubEpic:
         """Create GitHubEpic from GitHub CLI JSON response.
 
         Args:
@@ -108,17 +120,13 @@ class GitHubEpic:
         # Parse timestamps
         created_at = None
         if data.get("createdAt"):
-            try:
+            with contextlib.suppress(ValueError):
                 created_at = datetime.fromisoformat(data["createdAt"].replace("Z", "+00:00"))
-            except ValueError:
-                pass
 
         updated_at = None
         if data.get("updatedAt"):
-            try:
+            with contextlib.suppress(ValueError):
                 updated_at = datetime.fromisoformat(data["updatedAt"].replace("Z", "+00:00"))
-            except ValueError:
-                pass
 
         return cls(
             number=data["number"],
@@ -146,9 +154,11 @@ class GitHubEpic:
             "url": self.url,
             "createdAt": self.created_at.isoformat() if self.created_at else None,
             "updatedAt": self.updated_at.isoformat() if self.updated_at else None,
-            "features": [f.to_dict() for f in self.features] if hasattr(self.features[0] if self.features else None, "to_dict") else [],
+            "features": [f.to_dict() for f in self.features]
+            if hasattr(self.features[0] if self.features else None, "to_dict")
+            else [],
         }
 
 
 # Import here to avoid circular dependency
-from .github_feature import GitHubFeature  # noqa: E402
+from .github_feature import GitHubFeature

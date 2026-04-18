@@ -1,7 +1,11 @@
 """MCP server command for exposing doit operations to AI assistants."""
 
+from __future__ import annotations
+
 import typer
 from rich.console import Console
+
+from ..exit_codes import ExitCode
 
 app = typer.Typer(help="MCP server for AI assistant integration")
 console = Console()
@@ -32,7 +36,7 @@ def serve_command() -> None:
             "[red]Error: MCP dependencies not installed.[/red]\n"
             "Install with: pip install doit-toolkit-cli[mcp]"
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     try:
         from ..mcp.server import create_server
@@ -42,7 +46,7 @@ def serve_command() -> None:
     except ImportError as e:
         console.print(f"[red]Failed to import MCP dependencies: {e}[/red]")
         console.print("Install with: pip install doit-toolkit-cli[mcp]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
     except Exception as e:
         console.print(f"[red]MCP server error: {e}[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e

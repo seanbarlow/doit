@@ -4,12 +4,10 @@ Tests the priority mapper that maps GitHub labels to roadmap priorities (P1-P4),
 testing all label formats (priority:P1, P1, critical, etc) and default behavior.
 """
 
-import pytest
-
 from doit_cli.utils.priority_mapper import (
     DEFAULT_PRIORITY,
-    map_labels_to_priority,
     get_supported_label_formats,
+    map_labels_to_priority,
 )
 
 

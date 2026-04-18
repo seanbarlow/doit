@@ -3,8 +3,9 @@
 Tests for Feature 031: Init Workflow Integration
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from doit_cli.cli.init_command import (
     create_init_workflow,
@@ -18,34 +19,34 @@ class TestCreateInitWorkflow:
 
     def test_creates_workflow_with_three_steps(self):
         """InitWorkflow must have exactly 3 steps."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         assert len(workflow.steps) == 3
 
     def test_workflow_has_correct_id(self):
         """Workflow must have id 'init-workflow'."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         assert workflow.id == "init-workflow"
 
     def test_workflow_command_name_is_init(self):
         """Workflow command_name must be 'init'."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         assert workflow.command_name == "init"
 
     def test_step_ids_are_unique(self):
         """Step IDs must be unique within workflow."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         ids = [s.id for s in workflow.steps]
         assert len(ids) == len(set(ids))
 
     def test_step_order_is_sequential(self):
         """Steps must have order 0, 1, 2."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         orders = sorted([s.order for s in workflow.steps])
         assert orders == [0, 1, 2]
 
     def test_first_step_is_agent_selection(self):
         """First step (order=0) must be agent selection."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         step = workflow.get_step_by_order(0)
         assert step is not None
         assert step.id == "select-agent"
@@ -55,7 +56,7 @@ class TestCreateInitWorkflow:
 
     def test_second_step_is_path_confirmation(self):
         """Second step (order=1) must be path confirmation."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         step = workflow.get_step_by_order(1)
         assert step is not None
         assert step.id == "confirm-path"
@@ -64,7 +65,7 @@ class TestCreateInitWorkflow:
 
     def test_third_step_is_custom_templates(self):
         """Third step (order=2) must be custom templates."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         step = workflow.get_step_by_order(2)
         assert step is not None
         assert step.id == "custom-templates"
@@ -79,21 +80,21 @@ class TestCreateInitWorkflow:
 
     def test_agent_selection_has_valid_options(self):
         """Agent step must have claude, copilot, both options."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         step = workflow.get_step_by_id("select-agent")
         assert step is not None
         assert set(step.options.keys()) == {"claude", "copilot", "both"}
 
     def test_optional_step_has_default(self):
         """custom-templates step must have empty default."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         step = workflow.get_step_by_id("custom-templates")
         assert step is not None
         assert step.default_value == ""
 
     def test_required_steps_are_marked_required(self):
         """Agent selection and path confirmation must be required."""
-        workflow = create_init_workflow(Path("."))
+        workflow = create_init_workflow(Path())
         agent_step = workflow.get_step_by_id("select-agent")
         path_step = workflow.get_step_by_id("confirm-path")
         assert agent_step.required is True
@@ -110,7 +111,7 @@ class TestMapWorkflowResponses:
             "confirm-path": "yes",
             "custom-templates": "",
         }
-        agents, templates = map_workflow_responses(responses)
+        agents, _templates = map_workflow_responses(responses)
         assert agents == [Agent.CLAUDE]
 
     def test_maps_copilot_agent(self):
@@ -120,7 +121,7 @@ class TestMapWorkflowResponses:
             "confirm-path": "yes",
             "custom-templates": "",
         }
-        agents, templates = map_workflow_responses(responses)
+        agents, _templates = map_workflow_responses(responses)
         assert agents == [Agent.COPILOT]
 
     def test_maps_both_agents(self):
@@ -130,7 +131,7 @@ class TestMapWorkflowResponses:
             "confirm-path": "yes",
             "custom-templates": "",
         }
-        agents, templates = map_workflow_responses(responses)
+        agents, _templates = map_workflow_responses(responses)
         assert Agent.CLAUDE in agents
         assert Agent.COPILOT in agents
 
@@ -141,7 +142,7 @@ class TestMapWorkflowResponses:
             "confirm-path": "yes",
             "custom-templates": "",
         }
-        agents, templates = map_workflow_responses(responses)
+        _agents, templates = map_workflow_responses(responses)
         assert templates is None
 
     def test_template_path_is_converted(self):
@@ -151,7 +152,7 @@ class TestMapWorkflowResponses:
             "confirm-path": "yes",
             "custom-templates": "/custom/templates",
         }
-        agents, templates = map_workflow_responses(responses)
+        _agents, templates = map_workflow_responses(responses)
         assert templates == Path("/custom/templates")
 
     def test_confirm_no_raises_exit(self):

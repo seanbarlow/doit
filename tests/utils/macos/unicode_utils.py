@@ -8,7 +8,6 @@ This module provides utilities to handle these differences in testing.
 import os
 import unicodedata
 from pathlib import Path
-from typing import List, Tuple, Optional
 
 
 def normalize_nfd(text: str) -> str:
@@ -39,7 +38,7 @@ def normalize_nfc(text: str) -> str:
     return unicodedata.normalize("NFC", text)
 
 
-def detect_normalization(text: str) -> Optional[str]:
+def detect_normalization(text: str) -> str | None:
     """Detect the Unicode normalization form of the given text.
 
     Args:
@@ -85,7 +84,7 @@ def compare_normalized(text1: str, text2: str, normalization: str = "NFC") -> bo
         raise ValueError(f"Unsupported normalization form: {normalization}")
 
 
-def get_filename_normalization(filepath: str) -> Optional[str]:
+def get_filename_normalization(filepath: str) -> str | None:
     """Detect the normalization form of a filename as stored on disk.
 
     Args:
@@ -135,7 +134,7 @@ def create_nfc_filename(base_path: str, filename: str) -> Path:
     return filepath
 
 
-def find_unicode_differences(text1: str, text2: str) -> List[Tuple[int, str, str]]:
+def find_unicode_differences(text1: str, text2: str) -> list[tuple[int, str, str]]:
     """Find positions where two strings differ in Unicode normalization.
 
     Args:
@@ -160,7 +159,7 @@ def find_unicode_differences(text1: str, text2: str) -> List[Tuple[int, str, str
     return differences
 
 
-def list_unicode_files(directory: str) -> List[Tuple[str, str]]:
+def list_unicode_files(directory: str) -> list[tuple[str, str]]:
     """List all files in a directory that contain non-ASCII Unicode characters.
 
     Args:
@@ -172,7 +171,7 @@ def list_unicode_files(directory: str) -> List[Tuple[str, str]]:
     unicode_files = []
 
     try:
-        for root, dirs, files in os.walk(directory):
+        for root, _dirs, files in os.walk(directory):
             for filename in files:
                 if not filename.isascii():
                     filepath = os.path.join(root, filename)

@@ -15,3 +15,16 @@ repos:
       - id: ruff
         args: [--fix]
       - id: ruff-format
+
+  # mypy is enforced as a blocking pre-commit hook as of the April 2026
+  # type-hardening pass. All src/doit_cli/ files type-check; see
+  # pyproject.toml for the (now empty) override list.
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.1
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-PyYAML
+          - types-requests
+        args: [--config-file=pyproject.toml]
+        exclude: ^(tests/|src/doit_cli/templates/|\.doit/)

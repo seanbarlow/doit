@@ -1,7 +1,6 @@
 """E2E tests for symbolic links on macOS."""
 
 import pytest
-from pathlib import Path
 
 
 @pytest.mark.macos

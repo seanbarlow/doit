@@ -7,7 +7,6 @@ testing cache read/write, validation, TTL expiration, and corruption handling.
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
@@ -76,7 +75,7 @@ class TestGitHubCacheServiceInit:
     def test_init_creates_parent_directory(self, temp_cache_path):
         """Test initialization creates parent directory."""
         assert not temp_cache_path.parent.exists()
-        service = GitHubCacheService(cache_path=temp_cache_path)
+        GitHubCacheService(cache_path=temp_cache_path)
         assert temp_cache_path.parent.exists()
 
 
@@ -187,12 +186,20 @@ class TestSaveCache:
     def test_save_cache_multiple_epics(self, cache_service, mock_metadata):
         """Test save_cache with multiple epics."""
         epic1 = GitHubEpic(
-            number=1, title="Epic 1", state="open", labels=["epic"],
-            body="Desc 1", url="https://github.com/owner/repo/issues/1"
+            number=1,
+            title="Epic 1",
+            state="open",
+            labels=["epic"],
+            body="Desc 1",
+            url="https://github.com/owner/repo/issues/1",
         )
         epic2 = GitHubEpic(
-            number=2, title="Epic 2", state="open", labels=["epic"],
-            body="Desc 2", url="https://github.com/owner/repo/issues/2"
+            number=2,
+            title="Epic 2",
+            state="open",
+            labels=["epic"],
+            body="Desc 2",
+            url="https://github.com/owner/repo/issues/2",
         )
 
         cache_service.save_cache([epic1, epic2], mock_metadata)
@@ -202,9 +209,7 @@ class TestSaveCache:
 
         assert len(cache_data["epics"]) == 2
 
-    def test_save_cache_overwrites_existing(
-        self, cache_service, mock_epic, mock_metadata
-    ):
+    def test_save_cache_overwrites_existing(self, cache_service, mock_epic, mock_metadata):
         """Test save_cache overwrites existing cache."""
         # Write initial cache
         cache_service.save_cache([mock_epic], mock_metadata)
@@ -253,16 +258,12 @@ class TestIsValid:
         """Test is_valid returns False when cache doesn't exist."""
         assert cache_service.is_valid() is False
 
-    def test_is_valid_returns_true_for_fresh_cache(
-        self, cache_service, mock_epic, mock_metadata
-    ):
+    def test_is_valid_returns_true_for_fresh_cache(self, cache_service, mock_epic, mock_metadata):
         """Test is_valid returns True for fresh cache within TTL."""
         cache_service.save_cache([mock_epic], mock_metadata)
         assert cache_service.is_valid() is True
 
-    def test_is_valid_returns_false_for_expired_cache(
-        self, cache_service, mock_epic
-    ):
+    def test_is_valid_returns_false_for_expired_cache(self, cache_service, mock_epic):
         """Test is_valid returns False for expired cache."""
         # Create metadata with old timestamp
         old_time = datetime.now() - timedelta(minutes=60)
@@ -280,9 +281,7 @@ class TestIsValid:
         cache_service.cache_path.write_text("corrupted json")
         assert cache_service.is_valid() is False
 
-    def test_is_valid_returns_false_on_missing_metadata(
-        self, cache_service, mock_epic
-    ):
+    def test_is_valid_returns_false_on_missing_metadata(self, cache_service, mock_epic):
         """Test is_valid returns False when metadata is missing."""
         cache_data = {"version": "1.0.0", "epics": [mock_epic.to_dict()]}
         cache_service.cache_path.write_text(json.dumps(cache_data))
@@ -296,9 +295,7 @@ class TestGetEpics:
         """Test get_epics returns None when cache doesn't exist."""
         assert cache_service.get_epics() is None
 
-    def test_get_epics_returns_epics_for_valid_cache(
-        self, cache_service, mock_metadata
-    ):
+    def test_get_epics_returns_epics_for_valid_cache(self, cache_service, mock_metadata):
         """Test get_epics returns epics for valid cache."""
         # Create epic data in GitHub API format (with label objects)
         epic_data = {
@@ -338,9 +335,7 @@ class TestGetEpics:
 
         assert cache_service.get_epics() is None
 
-    def test_get_epics_returns_empty_list_when_no_epics(
-        self, cache_service, mock_metadata
-    ):
+    def test_get_epics_returns_empty_list_when_no_epics(self, cache_service, mock_metadata):
         """Test get_epics returns empty list when cache has no epics."""
         cache_service.save_cache([], mock_metadata)
 
@@ -349,9 +344,7 @@ class TestGetEpics:
         assert epics is not None
         assert len(epics) == 0
 
-    def test_get_epics_skips_corrupted_epics(
-        self, cache_service, mock_metadata, capsys
-    ):
+    def test_get_epics_skips_corrupted_epics(self, cache_service, mock_metadata, capsys):
         """Test get_epics skips corrupted epics and continues."""
         # Create valid epic
         valid_epic = {
@@ -419,9 +412,7 @@ class TestGetMetadata:
 
         assert cache_service.get_metadata() is None
 
-    def test_get_metadata_returns_none_on_missing_metadata_key(
-        self, cache_service, mock_epic
-    ):
+    def test_get_metadata_returns_none_on_missing_metadata_key(self, cache_service, mock_epic):
         """Test get_metadata returns None when metadata key is missing."""
         cache_data = {"version": "1.0.0", "epics": [mock_epic.to_dict()]}
         cache_service.cache_path.write_text(json.dumps(cache_data))
@@ -432,9 +423,7 @@ class TestGetMetadata:
 class TestInvalidate:
     """Tests for invalidate method."""
 
-    def test_invalidate_deletes_cache_file(
-        self, cache_service, mock_epic, mock_metadata
-    ):
+    def test_invalidate_deletes_cache_file(self, cache_service, mock_epic, mock_metadata):
         """Test invalidate deletes the cache file."""
         cache_service.save_cache([mock_epic], mock_metadata)
         assert cache_service.cache_path.exists()
@@ -490,9 +479,7 @@ class TestGetCacheAgeMinutes:
         assert age >= 0
         assert age < 1  # Should be very recent (less than 1 minute)
 
-    def test_get_cache_age_returns_correct_age_for_old_cache(
-        self, cache_service, mock_epic
-    ):
+    def test_get_cache_age_returns_correct_age_for_old_cache(self, cache_service, mock_epic):
         """Test get_cache_age_minutes returns correct age for old cache."""
         # Create metadata 45 minutes old
         old_time = datetime.now() - timedelta(minutes=45)

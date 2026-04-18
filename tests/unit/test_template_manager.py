@@ -1,8 +1,5 @@
 """Unit tests for TemplateManager service."""
 
-import pytest
-from pathlib import Path
-
 from doit_cli.models.agent import Agent
 from doit_cli.models.template import DOIT_COMMANDS
 from doit_cli.services.template_manager import TemplateManager
@@ -145,9 +142,7 @@ class TestTemplateManager:
         manager.copy_templates_for_agent(Agent.CLAUDE, target_dir)
 
         # Copy second time with overwrite
-        result = manager.copy_templates_for_agent(
-            Agent.CLAUDE, target_dir, overwrite=True
-        )
+        result = manager.copy_templates_for_agent(Agent.CLAUDE, target_dir, overwrite=True)
 
         assert len(result["updated"]) > 0
         assert len(result["skipped"]) == 0
@@ -224,7 +219,6 @@ class TestCopyScripts:
 
     def test_copy_scripts_creates_new_files(self, temp_dir):
         """Test scripts are created when target dir is empty."""
-        from doit_cli.services.template_manager import WORKFLOW_SCRIPTS
 
         manager = TemplateManager()
         target_dir = temp_dir / ".doit" / "scripts" / "bash"
@@ -402,21 +396,36 @@ class TestUnifiedTemplates:
             assert path.name.endswith(".prompt.md")
 
     def test_copilot_templates_are_transformed(self, temp_dir):
-        """Test Copilot templates have YAML frontmatter removed."""
+        """Test Copilot templates get Copilot-native frontmatter (April 2026).
+
+        Prior to Phase 6 the transformer stripped frontmatter entirely. The
+        current transformer rewrites it to Copilot's native schema
+        (agent: agent, tools: [...]) so `.prompt.md` files are still
+        wrapped in ---, just with different keys.
+        """
         manager = TemplateManager()
         target_dir = temp_dir / "copilot_output"
         target_dir.mkdir()
 
         manager.copy_templates_for_agent(Agent.COPILOT, target_dir)
 
-        # Check content of generated files
         for prompt_file in target_dir.iterdir():
-            if prompt_file.is_file():
-                content = prompt_file.read_text(encoding="utf-8")
-                # YAML frontmatter should be removed
-                assert not content.startswith("---")
-                # $ARGUMENTS should be replaced
-                assert "$ARGUMENTS" not in content
+            if not prompt_file.is_file():
+                continue
+            content = prompt_file.read_text(encoding="utf-8")
+
+            # Copilot-native frontmatter present
+            assert content.startswith("---")
+            assert "agent: agent" in content
+
+            # Claude-specific fields stripped
+            frontmatter = content.split("---", 2)[1]
+            assert "allowed-tools" not in frontmatter
+            assert "handoffs" not in frontmatter
+            assert "effort:" not in frontmatter
+
+            # Placeholder rewritten to Copilot input variable
+            assert "$ARGUMENTS" not in content
 
     def test_claude_templates_preserve_yaml(self, temp_dir):
         """Test Claude templates preserve YAML frontmatter."""
@@ -439,13 +448,19 @@ class TestUnifiedTemplates:
         assert yaml_found, "Expected at least one Claude template with YAML frontmatter"
 
     def test_transform_and_write_generates_correct_filenames(self, temp_dir):
-        """Test _transform_and_write_templates generates correct filenames."""
+        """Test command copier emits correct Copilot filenames for each template.
+
+        The underlying logic now lives in CommandCopier; this test drives
+        it through TemplateManager.copy_templates_for_agent to keep the
+        public contract tested via its canonical entry point.
+        """
+        from doit_cli.models.agent import Agent
+
         manager = TemplateManager()
         target_dir = temp_dir / "transform_test"
         target_dir.mkdir()
 
-        templates = manager._get_command_templates()
-        result = manager._transform_and_write_templates(templates, target_dir)
+        result = manager.copy_templates_for_agent(Agent.COPILOT, target_dir)
 
         # Each created file should match doit.{name}.prompt.md pattern
         for path in result["created"]:

@@ -1,37 +1,30 @@
 """Verify command for checking doit project setup."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.agent import Agent
 from ..models.project import Project
 from ..models.results import VerifyResult, VerifyStatus
 from ..services.validator import Validator
 
-
 console = Console()
 
 # Type aliases for CLI options
-JsonFlag = Annotated[
-    bool,
-    typer.Option(
-        "--json", "-j",
-        help="Output results as JSON"
-    )
-]
+JsonFlag = Annotated[bool, typer.Option("--json", "-j", help="Output results as JSON")]
 
 AgentOption = Annotated[
-    Optional[str],
-    typer.Option(
-        "--agent", "-a",
-        help="Specific agent to check: claude, copilot, or both"
-    )
+    str | None,
+    typer.Option("--agent", "-a", help="Specific agent to check: claude, copilot, or both"),
 ]
 
 
@@ -114,8 +107,7 @@ def display_verify_result(result: VerifyResult) -> None:
 
     # Show suggestions if there are warnings or failures
     suggestions = [
-        c.suggestion for c in result.checks
-        if c.suggestion and c.status != VerifyStatus.PASS
+        c.suggestion for c in result.checks if c.suggestion and c.status != VerifyStatus.PASS
     ]
 
     if suggestions:
@@ -152,11 +144,8 @@ def display_json_result(result: VerifyResult) -> None:
 def verify_command(
     path: Annotated[
         Path,
-        typer.Argument(
-            default=...,
-            help="Project directory path (use '.' for current directory)"
-        )
-    ] = Path("."),
+        typer.Argument(default=..., help="Project directory path (use '.' for current directory)"),
+    ] = Path(),
     agent: AgentOption = None,
     json_output: JsonFlag = False,
 ) -> None:
@@ -184,7 +173,7 @@ def verify_command(
                 console.print(json.dumps({"error": str(e)}))
             else:
                 console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(code=ExitCode.FAILURE) from e
 
     # Create project and validator
     project = Project(path=path.resolve())
@@ -201,4 +190,4 @@ def verify_command(
 
     # Exit with appropriate code
     if not result.passed:
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)

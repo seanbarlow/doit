@@ -8,11 +8,12 @@ This module provides dataclasses for analytics data:
 - AnalyticsReport: Complete analytics report
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from statistics import mean, median, stdev
-from typing import Optional
 
 from .status_models import SpecState, SpecStatus
 
@@ -33,19 +34,19 @@ class SpecMetadata:
 
     name: str
     status: SpecState
-    created_at: Optional[date]
-    completed_at: Optional[date]
+    created_at: date | None
+    completed_at: date | None
     current_phase: str = ""
     days_in_progress: int = 0
-    path: Optional[Path] = None
+    path: Path | None = None
 
     @classmethod
     def from_spec_status(
         cls,
         spec_status: SpecStatus,
-        created_at: Optional[date],
-        completed_at: Optional[date],
-    ) -> "SpecMetadata":
+        created_at: date | None,
+        completed_at: date | None,
+    ) -> SpecMetadata:
         """Create from existing SpecStatus with added dates.
 
         Args:
@@ -97,7 +98,7 @@ class SpecMetadata:
         return self.status in (SpecState.COMPLETE, SpecState.APPROVED)
 
     @property
-    def cycle_time_days(self) -> Optional[int]:
+    def cycle_time_days(self) -> int | None:
         """Calculate cycle time in days if completed."""
         if self.created_at and self.completed_at:
             return (self.completed_at - self.created_at).days
@@ -121,7 +122,7 @@ class CycleTimeRecord:
     end_date: date
 
     @classmethod
-    def from_metadata(cls, metadata: SpecMetadata) -> Optional["CycleTimeRecord"]:
+    def from_metadata(cls, metadata: SpecMetadata) -> CycleTimeRecord | None:
         """Create from SpecMetadata if spec is complete.
 
         Args:
@@ -163,7 +164,7 @@ class CycleTimeStats:
     sample_count: int
 
     @classmethod
-    def calculate(cls, records: list[CycleTimeRecord]) -> Optional["CycleTimeStats"]:
+    def calculate(cls, records: list[CycleTimeRecord]) -> CycleTimeStats | None:
         """Calculate statistics from cycle time records.
 
         Args:
@@ -204,7 +205,7 @@ class VelocityDataPoint:
     spec_names: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_completion(cls, completion_date: date, spec_name: str) -> "VelocityDataPoint":
+    def from_completion(cls, completion_date: date, spec_name: str) -> VelocityDataPoint:
         """Create a velocity point from a single completion.
 
         Args:
@@ -227,7 +228,7 @@ class VelocityDataPoint:
             spec_names=[spec_name],
         )
 
-    def merge(self, other: "VelocityDataPoint") -> "VelocityDataPoint":
+    def merge(self, other: VelocityDataPoint) -> VelocityDataPoint:
         """Merge another data point for the same week.
 
         Args:
@@ -273,7 +274,7 @@ class AnalyticsReport:
     total_specs: int
     completion_pct: float
     by_status: dict[SpecState, int]
-    cycle_stats: Optional[CycleTimeStats]
+    cycle_stats: CycleTimeStats | None
     velocity: list[VelocityDataPoint]
 
     @classmethod
@@ -281,7 +282,7 @@ class AnalyticsReport:
         cls,
         specs: list[SpecMetadata],
         project_root: Path,
-    ) -> "AnalyticsReport":
+    ) -> AnalyticsReport:
         """Generate a complete analytics report.
 
         Args:
@@ -295,9 +296,7 @@ class AnalyticsReport:
         report_id = now.strftime("%Y%m%d-%H%M%S")
 
         # Calculate completion percentage
-        completed = sum(
-            1 for s in specs if s.status in (SpecState.COMPLETE, SpecState.APPROVED)
-        )
+        completed = sum(1 for s in specs if s.status in (SpecState.COMPLETE, SpecState.APPROVED))
         pct = (completed / len(specs) * 100) if specs else 0.0
 
         # Group by status
@@ -305,9 +304,11 @@ class AnalyticsReport:
         for spec in specs:
             by_status[spec.status] = by_status.get(spec.status, 0) + 1
 
-        # Calculate cycle times
-        records = [CycleTimeRecord.from_metadata(s) for s in specs]
-        records = [r for r in records if r is not None]
+        # Calculate cycle times — filter out specs without enough metadata
+        # to produce a cycle-time record.
+        records: list[CycleTimeRecord] = [
+            r for r in (CycleTimeRecord.from_metadata(s) for s in specs) if r is not None
+        ]
         cycle_stats = CycleTimeStats.calculate(records)
 
         # Calculate velocity
@@ -361,9 +362,7 @@ class AnalyticsReport:
             "data": {
                 "total_specs": self.total_specs,
                 "completion_pct": self.completion_pct,
-                "by_status": {
-                    state.value: count for state, count in self.by_status.items()
-                },
+                "by_status": {state.value: count for state, count in self.by_status.items()},
                 "cycle_stats": (
                     {
                         "average_days": self.cycle_stats.average_days,
@@ -377,8 +376,7 @@ class AnalyticsReport:
                     else None
                 ),
                 "velocity": [
-                    {"week": v.week_key, "completed": v.specs_completed}
-                    for v in self.velocity
+                    {"week": v.week_key, "completed": v.specs_completed} for v in self.velocity
                 ],
             },
         }

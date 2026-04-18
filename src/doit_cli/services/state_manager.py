@@ -4,18 +4,18 @@ This module handles saving and loading workflow state for recovery
 after interruptions.
 """
 
+from __future__ import annotations
+
 import json
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..models.workflow_models import (
+    StateCorruptionError,
     WorkflowState,
     WorkflowStatus,
-    StateCorruptionError,
 )
-
 
 # =============================================================================
 # StateManager Protocol
@@ -224,21 +224,15 @@ class StateManager:
             StateCorruptionError: If file is corrupted
         """
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 data = json.load(f)
             return WorkflowState.from_dict(data)
         except json.JSONDecodeError as e:
-            raise StateCorruptionError(
-                filepath, f"Invalid JSON: {e}"
-            )
+            raise StateCorruptionError(filepath, f"Invalid JSON: {e}") from e
         except KeyError as e:
-            raise StateCorruptionError(
-                filepath, f"Missing required field: {e}"
-            )
+            raise StateCorruptionError(filepath, f"Missing required field: {e}") from e
         except Exception as e:
-            raise StateCorruptionError(
-                filepath, f"Failed to load: {e}"
-            )
+            raise StateCorruptionError(filepath, f"Failed to load: {e}") from e
 
     # =========================================================================
     # Fixit Workflow State Methods (T013)
@@ -283,7 +277,7 @@ class StateManager:
             return None
 
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 return json.load(f)
         except (json.JSONDecodeError, OSError):
             return None
@@ -322,7 +316,7 @@ class StateManager:
                 issue_id_str = filepath.stem.replace("fixit-", "")
                 issue_id = int(issue_id_str)
 
-                with open(filepath, "r", encoding="utf-8") as f:
+                with open(filepath, encoding="utf-8") as f:
                     data = json.load(f)
                 states.append((issue_id, data))
             except (ValueError, json.JSONDecodeError, OSError):
@@ -340,7 +334,8 @@ class StateManager:
 
         # Filter for non-completed/cancelled workflows
         active_states = [
-            (issue_id, data) for issue_id, data in states
+            (issue_id, data)
+            for issue_id, data in states
             if data.get("workflow", {}).get("phase") not in ["completed", "cancelled"]
         ]
 
@@ -349,7 +344,6 @@ class StateManager:
 
         # Return most recently updated
         active_states.sort(
-            key=lambda x: x[1].get("workflow", {}).get("updated_at", ""),
-            reverse=True
+            key=lambda x: x[1].get("workflow", {}).get("updated_at", ""), reverse=True
         )
         return active_states[0]

@@ -4,13 +4,16 @@ This module manages configuration backups when reconfiguring providers,
 ensuring no data loss during provider switching.
 """
 
-from datetime import datetime, UTC
+from __future__ import annotations
+
+import contextlib
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import yaml
 
-from ..models.wizard_models import ConfigBackup, BackupNotFoundError
+from ..models.wizard_models import BackupNotFoundError, ConfigBackup
 from .provider_config import ProviderConfig
 from .providers.base import ProviderType
 
@@ -21,7 +24,7 @@ class ConfigBackupService:
     BACKUP_PATH: Path = Path(".doit/config/provider_backup.yaml")
     MAX_BACKUPS: int = 5
 
-    def __init__(self, backup_path: Optional[Path] = None) -> None:
+    def __init__(self, backup_path: Path | None = None) -> None:
         """Initialize backup service.
 
         Args:
@@ -116,7 +119,7 @@ class ConfigBackupService:
 
         raise BackupNotFoundError(backup_id)
 
-    def get_latest_backup(self) -> Optional[ConfigBackup]:
+    def get_latest_backup(self) -> ConfigBackup | None:
         """Get the most recent backup.
 
         Returns:
@@ -224,10 +227,8 @@ class ConfigBackupService:
 
         # Parse provider type
         if "provider" in data:
-            try:
+            with contextlib.suppress(ValueError):
                 config.provider = ProviderType(data["provider"])
-            except ValueError:
-                pass
 
         config.auto_detected = data.get("auto_detected", False)
         config.detection_source = data.get("detection_source")

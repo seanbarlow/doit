@@ -4,9 +4,10 @@ This module defines the GitProvider interface that all provider
 implementations must follow.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional
 
 from ...models.provider_models import (
     Issue,
@@ -16,9 +17,9 @@ from ...models.provider_models import (
     Milestone,
     MilestoneCreateRequest,
     MilestoneState,
-    PullRequest,
     PRCreateRequest,
     PRFilters,
+    PullRequest,
 )
 
 
@@ -101,7 +102,7 @@ class GitProvider(ABC):
         pass
 
     @abstractmethod
-    def list_issues(self, filters: Optional[IssueFilters] = None) -> list[Issue]:
+    def list_issues(self, filters: IssueFilters | None = None) -> list[Issue]:
         """List issues matching the given filters.
 
         Args:
@@ -169,9 +170,7 @@ class GitProvider(ABC):
         pass
 
     @abstractmethod
-    def list_pull_requests(
-        self, filters: Optional[PRFilters] = None
-    ) -> list[PullRequest]:
+    def list_pull_requests(self, filters: PRFilters | None = None) -> list[PullRequest]:
         """List pull requests matching the given filters.
 
         Args:
@@ -218,9 +217,7 @@ class GitProvider(ABC):
         pass
 
     @abstractmethod
-    def list_milestones(
-        self, state: Optional[MilestoneState] = None
-    ) -> list[Milestone]:
+    def list_milestones(self, state: MilestoneState | None = None) -> list[Milestone]:
         """List milestones.
 
         Args:
@@ -267,8 +264,9 @@ class GitProvider(ABC):
 # =============================================================================
 
 import time
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 

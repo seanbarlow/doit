@@ -1,5 +1,7 @@
 """JSON formatter for status output."""
 
+from __future__ import annotations
+
 import json
 from datetime import datetime
 from typing import Any
@@ -48,21 +50,21 @@ class JsonFormatter(StatusFormatter):
                 "approved": report.by_status.get(SpecState.APPROVED, 0),
             },
             "blocking": report.blocking_count,
-            "validation_pass": sum(
-                1 for s in report.specs if s.validation_passed
-            ),
+            "validation_pass": sum(1 for s in report.specs if s.validation_passed),
             "validation_fail": sum(
-                1 for s in report.specs
+                1
+                for s in report.specs
                 if s.validation_result is not None and not s.validation_passed
             ),
             "completion_percentage": round(report.completion_percentage, 2),
             "ready_to_commit": report.is_ready_to_commit,
         }
 
-        # Build specs list
-        specs = []
+        # Build specs list. Each spec_data mixes scalars with a nested
+        # validation dict/None, so annotate as dict[str, Any].
+        specs: list[dict[str, Any]] = []
         for spec in report.specs:
-            spec_data = {
+            spec_data: dict[str, Any] = {
                 "name": spec.name,
                 "path": str(spec.path),
                 "status": spec.status.value,
@@ -71,9 +73,11 @@ class JsonFormatter(StatusFormatter):
                 "error": spec.error,
             }
 
-            # Add validation info
+            # Add validation info. `validation_data` mixes scalars, lists of
+            # dicts (for issues), and None — annotate as dict[str, Any] so
+            # mypy accepts later assignments.
             if spec.validation_result is not None:
-                validation_data = {
+                validation_data: dict[str, Any] = {
                     "passed": spec.validation_passed,
                     "score": spec.validation_score,
                     "error_count": spec.validation_result.error_count,

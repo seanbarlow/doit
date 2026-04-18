@@ -7,9 +7,7 @@ Tests the specification workflow including:
 - Unicode filename handling
 """
 
-import os
 import subprocess
-from pathlib import Path
 
 import pytest
 
@@ -23,11 +21,7 @@ def test_specit_creates_spec_file(temp_project_dir, git_repo, comparison_tools):
     subprocess.run(["doit", "init"], cwd=git_repo, capture_output=True)
 
     # Create feature branch
-    subprocess.run(
-        ["git", "checkout", "-b", "001-test-feature"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "001-test-feature"], cwd=git_repo, capture_output=True)
 
     # Create specs directory
     specs_dir = git_repo / "specs" / "001-test-feature"
@@ -57,11 +51,7 @@ def test_specit_handles_macos_absolute_paths(git_repo, macos_test_env):
     subprocess.run(["doit", "init"], cwd=git_repo, capture_output=True)
 
     # Create feature branch
-    subprocess.run(
-        ["git", "checkout", "-b", "002-path-test"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "002-path-test"], cwd=git_repo, capture_output=True)
 
     # Create spec with macOS-style absolute path references
     specs_dir = git_repo / "specs" / "002-path-test"
@@ -94,11 +84,7 @@ def test_specit_preserves_lf_in_generated_specs(git_repo, comparison_tools):
     subprocess.run(["doit", "init"], cwd=git_repo, capture_output=True)
 
     # Create feature branch
-    subprocess.run(
-        ["git", "checkout", "-b", "003-line-endings"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "003-line-endings"], cwd=git_repo, capture_output=True)
 
     # Create spec with multiple lines
     specs_dir = git_repo / "specs" / "003-line-endings"
@@ -136,11 +122,7 @@ def test_specit_handles_unicode_filenames(git_repo, macos_test_env):
     subprocess.run(["doit", "init"], cwd=git_repo, capture_output=True)
 
     # Create feature branch with Unicode
-    subprocess.run(
-        ["git", "checkout", "-b", "004-café-feature"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "004-café-feature"], cwd=git_repo, capture_output=True)
 
     # Create specs directory (macOS will normalize to NFD)
     specs_dir = git_repo / "specs" / "004-café-feature"
@@ -163,11 +145,7 @@ def test_specit_creates_proper_directory_structure(git_repo):
 
     # Create feature branch
     feature_name = "005-directory-structure"
-    subprocess.run(
-        ["git", "checkout", "-b", feature_name],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", feature_name], cwd=git_repo, capture_output=True)
 
     # Create proper directory structure
     specs_dir = git_repo / "specs" / feature_name
@@ -197,11 +175,7 @@ def test_specit_handles_symlinks_in_specs_dir(git_repo, macos_test_env):
     subprocess.run(["doit", "init"], cwd=git_repo, capture_output=True)
 
     # Create feature branch
-    subprocess.run(
-        ["git", "checkout", "-b", "006-symlink-test"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "006-symlink-test"], cwd=git_repo, capture_output=True)
 
     # Create specs directory
     specs_dir = git_repo / "specs" / "006-symlink-test"
@@ -228,11 +202,7 @@ def test_specit_handles_nested_specs_directories(git_repo):
     subprocess.run(["doit", "init"], cwd=git_repo, capture_output=True)
 
     # Create feature branch
-    subprocess.run(
-        ["git", "checkout", "-b", "007-nested-dirs"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "007-nested-dirs"], cwd=git_repo, capture_output=True)
 
     # Create nested directory structure
     nested_dir = git_repo / "specs" / "007-nested-dirs" / "subdirectory"
@@ -258,11 +228,7 @@ def test_specit_respects_gitignore(git_repo):
     gitignore.write_text("*.tmp\n")
 
     # Create feature branch
-    subprocess.run(
-        ["git", "checkout", "-b", "008-gitignore"],
-        cwd=git_repo,
-        capture_output=True
-    )
+    subprocess.run(["git", "checkout", "-b", "008-gitignore"], cwd=git_repo, capture_output=True)
 
     # Create specs directory
     specs_dir = git_repo / "specs" / "008-gitignore"
@@ -280,10 +246,7 @@ def test_specit_respects_gitignore(git_repo):
 
     # Check git status
     status_result = subprocess.run(
-        ["git", "status", "--short"],
-        cwd=git_repo,
-        capture_output=True,
-        text=True
+        ["git", "status", "--short"], cwd=git_repo, capture_output=True, text=True
     )
 
     # Verify .tmp file is ignored

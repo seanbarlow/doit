@@ -7,7 +7,6 @@ fallback behavior, and sync integrity.
 
 from pathlib import Path
 
-
 # Paths to source templates (single source of truth)
 TEMPLATES_DIR = Path(__file__).parent.parent.parent / "src" / "doit_cli" / "templates"
 SPEC_TEMPLATE = TEMPLATES_DIR / "spec-template.md"
@@ -15,13 +14,21 @@ USER_STORIES_TEMPLATE = TEMPLATES_DIR / "user-stories-template.md"
 SPECIT_COMMAND = TEMPLATES_DIR / "commands" / "doit.specit.md"
 
 # Local project templates (.doit/templates/)
-DOIT_SPEC_TEMPLATE = Path(__file__).parent.parent.parent / ".doit" / "templates" / "spec-template.md"
-DOIT_US_TEMPLATE = Path(__file__).parent.parent.parent / ".doit" / "templates" / "user-stories-template.md"
-DOIT_SPECIT_COMMAND = Path(__file__).parent.parent.parent / ".doit" / "templates" / "commands" / "doit.specit.md"
+DOIT_SPEC_TEMPLATE = (
+    Path(__file__).parent.parent.parent / ".doit" / "templates" / "spec-template.md"
+)
+DOIT_US_TEMPLATE = (
+    Path(__file__).parent.parent.parent / ".doit" / "templates" / "user-stories-template.md"
+)
+DOIT_SPECIT_COMMAND = (
+    Path(__file__).parent.parent.parent / ".doit" / "templates" / "commands" / "doit.specit.md"
+)
 
 # Sync targets (agent-specific copies)
 CLAUDE_SPECIT = Path(__file__).parent.parent.parent / ".claude" / "commands" / "doit.specit.md"
-GITHUB_SPECIT = Path(__file__).parent.parent.parent / ".github" / "prompts" / "doit.specit.prompt.md"
+GITHUB_SPECIT = (
+    Path(__file__).parent.parent.parent / ".github" / "prompts" / "doit.specit.prompt.md"
+)
 
 
 class TestSpecTemplatePersonaHeaders:
@@ -100,7 +107,7 @@ class TestSpecitMatchingRules:
         content = SPECIT_COMMAND.read_text()
         rules_section_start = content.find("## Persona Matching Rules")
         assert rules_section_start != -1
-        rules_section = content[rules_section_start:rules_section_start + 2000]
+        rules_section = content[rules_section_start : rules_section_start + 2000]
         assert "1." in rules_section
         assert "2." in rules_section
         assert "3." in rules_section
@@ -120,19 +127,19 @@ class TestSpecitTraceabilityUpdate:
         content = SPECIT_COMMAND.read_text()
         traceability_start = content.find("### Update Persona Traceability")
         assert traceability_start != -1
-        section = content[traceability_start:traceability_start + 1000]
+        section = content[traceability_start : traceability_start + 1000]
         assert "personas.md" in section
 
     def test_traceability_is_full_replacement(self):
         content = SPECIT_COMMAND.read_text()
         traceability_start = content.find("### Update Persona Traceability")
-        section = content[traceability_start:traceability_start + 1000]
+        section = content[traceability_start : traceability_start + 1000]
         assert "full replacement" in section.lower() or "Replace the table content" in section
 
     def test_traceability_includes_zero_coverage_personas(self):
         content = SPECIT_COMMAND.read_text()
         traceability_start = content.find("### Update Persona Traceability")
-        section = content[traceability_start:traceability_start + 1000]
+        section = content[traceability_start : traceability_start + 1000]
         assert "zero mapped stories" in section.lower() or "zero stories" in section.lower()
 
 
@@ -147,7 +154,7 @@ class TestSpecitCoverageReport:
         content = SPECIT_COMMAND.read_text()
         coverage_start = content.find("### Persona Coverage Report")
         assert coverage_start != -1
-        section = content[coverage_start:coverage_start + 1000]
+        section = content[coverage_start : coverage_start + 1000]
         assert "| Persona | Stories | Coverage |" in section
 
     def test_covered_indicator(self):
@@ -161,8 +168,11 @@ class TestSpecitCoverageReport:
     def test_coverage_only_when_personas_available(self):
         content = SPECIT_COMMAND.read_text()
         coverage_start = content.find("### Persona Coverage Report")
-        section = content[coverage_start:coverage_start + 1000]
-        assert "skip when no personas loaded" in section.lower() or "Only display this section when personas are available" in section
+        section = content[coverage_start : coverage_start + 1000]
+        assert (
+            "skip when no personas loaded" in section.lower()
+            or "Only display this section when personas are available" in section
+        )
 
 
 class TestSpecitFallbackBehavior:
@@ -180,25 +190,25 @@ class TestSpecitFallbackBehavior:
         content = SPECIT_COMMAND.read_text()
         fallback_start = content.find("**When No Personas Are Available**:")
         assert fallback_start != -1
-        section = content[fallback_start:fallback_start + 500]
+        section = content[fallback_start : fallback_start + 500]
         assert "Skip all persona matching rules" in section
 
     def test_fallback_skips_traceability(self):
         content = SPECIT_COMMAND.read_text()
         fallback_start = content.find("**When No Personas Are Available**:")
-        section = content[fallback_start:fallback_start + 500]
+        section = content[fallback_start : fallback_start + 500]
         assert "Skip the traceability table update" in section
 
     def test_fallback_skips_coverage_report(self):
         content = SPECIT_COMMAND.read_text()
         fallback_start = content.find("**When No Personas Are Available**:")
-        section = content[fallback_start:fallback_start + 500]
+        section = content[fallback_start : fallback_start + 500]
         assert "Skip the persona coverage report" in section
 
     def test_fallback_no_errors(self):
         content = SPECIT_COMMAND.read_text()
         fallback_start = content.find("**When No Personas Are Available**:")
-        section = content[fallback_start:fallback_start + 500]
+        section = content[fallback_start : fallback_start + 500]
         assert "Do NOT raise errors" in section
 
     def test_empty_personas_treated_as_no_personas(self):
@@ -209,7 +219,7 @@ class TestSpecitFallbackBehavior:
     def test_standard_format_without_persona_suffix(self):
         content = SPECIT_COMMAND.read_text()
         fallback_start = content.find("**When No Personas Are Available**:")
-        section = content[fallback_start:fallback_start + 500]
+        section = content[fallback_start : fallback_start + 500]
         assert "without" in section and "Persona" in section
 
 
@@ -228,8 +238,11 @@ class TestSpecitMultiPersona:
         """Multi-persona stories should register under each persona."""
         content = SPECIT_COMMAND.read_text()
         rules_start = content.find("## Persona Matching Rules")
-        section = content[rules_start:rules_start + 3000]
-        assert "genuinely serve multiple personas" in section.lower() or "genuinely serves multiple personas" in section.lower()
+        section = content[rules_start : rules_start + 3000]
+        assert (
+            "genuinely serve multiple personas" in section.lower()
+            or "genuinely serves multiple personas" in section.lower()
+        )
 
 
 class TestDotDoitTemplateSyncIntegrity:
@@ -274,9 +287,18 @@ class TestAgentSyncIntegrity:
         assert source == synced, "Claude commands specit differs from source template"
 
     def test_github_prompts_matches_source(self):
-        source = SPECIT_COMMAND.read_text()
+        """GitHub prompts are a Copilot-native rewrite of the source (see Phase 6).
+
+        Rather than a byte-for-byte equality check, assert the body instructions
+        made it through — frontmatter will differ by construction now.
+        """
         synced = GITHUB_SPECIT.read_text()
-        assert source == synced, "GitHub prompts specit differs from source template"
+        # Body content that exists in the source should exist in the rewrite
+        assert "## Persona Matching Rules (when personas loaded)" in synced
+        # Copilot-native frontmatter must be present
+        assert "agent: agent" in synced
+        # And Claude-specific leaks must not be
+        assert "allowed-tools" not in synced.split("---", 2)[1]
 
 
 class TestSpecitPersonaLoadingEnhanced:
@@ -286,25 +308,25 @@ class TestSpecitPersonaLoadingEnhanced:
         content = SPECIT_COMMAND.read_text()
         load_section_start = content.find("## Load Personas")
         assert load_section_start != -1
-        section = content[load_section_start:load_section_start + 1500]
+        section = content[load_section_start : load_section_start + 1500]
         assert "primary_goal" in section
 
     def test_extract_pain_points(self):
         content = SPECIT_COMMAND.read_text()
         load_section_start = content.find("## Load Personas")
-        section = content[load_section_start:load_section_start + 1500]
+        section = content[load_section_start : load_section_start + 1500]
         assert "pain_points" in section
 
     def test_extract_usage_context(self):
         content = SPECIT_COMMAND.read_text()
         load_section_start = content.find("## Load Personas")
-        section = content[load_section_start:load_section_start + 1500]
+        section = content[load_section_start : load_section_start + 1500]
         assert "usage_context" in section
 
     def test_extract_archetype(self):
         content = SPECIT_COMMAND.read_text()
         load_section_start = content.find("## Load Personas")
-        section = content[load_section_start:load_section_start + 1500]
+        section = content[load_section_start : load_section_start + 1500]
         assert "archetype" in section
 
 

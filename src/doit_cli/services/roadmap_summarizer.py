@@ -4,8 +4,9 @@ This module provides the RoadmapSummarizer service that parses roadmap.md
 and generates condensed summaries with P1/P2 items prioritized.
 """
 
+from __future__ import annotations
+
 import re
-from typing import Optional
 
 from ..models.context_config import (
     RoadmapItem,
@@ -22,7 +23,7 @@ class RoadmapSummarizer:
     P3/P4 to titles only.
     """
 
-    def __init__(self, config: Optional[SummarizationConfig] = None) -> None:
+    def __init__(self, config: SummarizationConfig | None = None) -> None:
         """Initialize with summarization configuration.
 
         Args:
@@ -84,22 +85,30 @@ class RoadmapSummarizer:
             while j < len(lines):
                 next_line = lines[j].strip()
                 # Check for rationale line
-                rationale_match = re.match(r"^-?\s*\*?\*?Rationale\*?\*?:\s*(.+)$", next_line, re.IGNORECASE)
+                rationale_match = re.match(
+                    r"^-?\s*\*?\*?Rationale\*?\*?:\s*(.+)$", next_line, re.IGNORECASE
+                )
                 if rationale_match:
                     rationale = rationale_match.group(1).strip()
                     break
                 # Stop if we hit another item or section
-                if next_line.startswith("- [") or next_line.startswith("-") or next_line.startswith("#"):
+                if (
+                    next_line.startswith("- [")
+                    or next_line.startswith("-")
+                    or next_line.startswith("#")
+                ):
                     break
                 j += 1
 
-            items.append(RoadmapItem(
-                text=text,
-                priority=current_priority,
-                rationale=rationale,
-                feature_ref=feature_ref,
-                completed=completed,
-            ))
+            items.append(
+                RoadmapItem(
+                    text=text,
+                    priority=current_priority,
+                    rationale=rationale,
+                    feature_ref=feature_ref,
+                    completed=completed,
+                )
+            )
 
             i += 1
 
@@ -109,7 +118,7 @@ class RoadmapSummarizer:
         self,
         items: list[RoadmapItem],
         max_tokens: int = 2000,
-        current_feature: Optional[str] = None,
+        current_feature: str | None = None,
     ) -> RoadmapSummary:
         """Generate condensed roadmap summary.
 

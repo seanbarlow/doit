@@ -1,11 +1,12 @@
 """Template model representing a bundled command template."""
 
+from __future__ import annotations
+
+import hashlib
 from dataclasses import dataclass, field
 from pathlib import Path
-import hashlib
 
 from .agent import Agent
-
 
 # List of all doit command names (without extension/prefix)
 DOIT_COMMANDS = [
@@ -48,7 +49,7 @@ class Template:
             return f"doit.{self.name}.prompt.md"
 
     @classmethod
-    def from_file(cls, path: Path, agent: Agent) -> "Template":
+    def from_file(cls, path: Path, agent: Agent) -> Template:
         """Create a Template from a file path."""
         content = path.read_text(encoding="utf-8")
 

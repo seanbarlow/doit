@@ -4,13 +4,13 @@ This module provides the ConflictService class for detecting,
 resolving, and archiving merge conflicts in shared memory files.
 """
 
+from __future__ import annotations
+
 import json
-import shutil
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
-import uuid
 
 from doit_cli.models.team_models import (
     ConflictRecord,
@@ -53,7 +53,7 @@ class ConflictState:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ConflictState":
+    def from_dict(cls, data: dict) -> ConflictState:
         """Create from dictionary."""
         return cls(
             active_conflicts=[
@@ -73,14 +73,14 @@ class ConflictService:
     - Managing conflict state
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path | None = None):
         """Initialize ConflictService.
 
         Args:
             project_root: Project root directory. Defaults to cwd.
         """
         self.project_root = project_root or Path.cwd()
-        self._state: Optional[ConflictState] = None
+        self._state: ConflictState | None = None
 
     @property
     def state_path(self) -> Path:
@@ -101,7 +101,7 @@ class ConflictService:
         """Load conflict state from file."""
         if self.state_path.exists():
             try:
-                with open(self.state_path, "r", encoding="utf-8") as f:
+                with open(self.state_path, encoding="utf-8") as f:
                     data = json.load(f)
                 return ConflictState.from_dict(data)
             except (json.JSONDecodeError, KeyError):
@@ -120,7 +120,7 @@ class ConflictService:
             self._state = self._load_state()
         return self._state
 
-    def detect_conflicts(self, sync_operation_id: str = None) -> list[ConflictRecord]:
+    def detect_conflicts(self, sync_operation_id: str | None = None) -> list[ConflictRecord]:
         """Detect conflicts in working directory.
 
         Args:
@@ -173,8 +173,8 @@ class ConflictService:
                 )
                 conflicts.append(conflict)
 
-            except Exception:
-                # If we can't read the conflict, skip it
+            except (OSError, UnicodeDecodeError):
+                # If we can't read the conflict file, skip it
                 continue
 
         # Store conflicts in state
@@ -235,7 +235,7 @@ class ConflictService:
         state = self.get_state()
         return [c for c in state.active_conflicts if c.resolution is None]
 
-    def get_conflict(self, conflict_id: str) -> Optional[ConflictRecord]:
+    def get_conflict(self, conflict_id: str) -> ConflictRecord | None:
         """Get a specific conflict by ID.
 
         Args:
@@ -254,7 +254,7 @@ class ConflictService:
         self,
         conflict_id: str,
         resolution: ConflictResolution,
-        resolved_by: str = None,
+        resolved_by: str | None = None,
     ) -> ConflictRecord:
         """Resolve a conflict.
 
@@ -281,16 +281,12 @@ class ConflictService:
             if resolution == ConflictResolution.KEEP_LOCAL:
                 # Keep local version
                 checkout_ours([git_path], self.project_root)
-                full_path.write_text(
-                    conflict.local_version.content, encoding="utf-8"
-                )
+                full_path.write_text(conflict.local_version.content, encoding="utf-8")
 
             elif resolution == ConflictResolution.KEEP_REMOTE:
                 # Keep remote version
                 checkout_theirs([git_path], self.project_root)
-                full_path.write_text(
-                    conflict.remote_version.content, encoding="utf-8"
-                )
+                full_path.write_text(conflict.remote_version.content, encoding="utf-8")
 
             elif resolution == ConflictResolution.MANUAL_MERGE:
                 # User will manually edit the file
@@ -310,14 +306,14 @@ class ConflictService:
             self._archive_conflict(conflict)
 
         except Exception as e:
-            raise ConflictError(f"Failed to resolve conflict: {e}")
+            raise ConflictError(f"Failed to resolve conflict: {e}") from e
 
         return conflict
 
     def resolve_all(
         self,
         resolution: ConflictResolution,
-        resolved_by: str = None,
+        resolved_by: str | None = None,
     ) -> list[ConflictRecord]:
         """Resolve all active conflicts with the same strategy.
 
@@ -331,9 +327,7 @@ class ConflictService:
         resolved = []
         for conflict in self.get_active_conflicts():
             try:
-                resolved_conflict = self.resolve_conflict(
-                    conflict.id, resolution, resolved_by
-                )
+                resolved_conflict = self.resolve_conflict(conflict.id, resolution, resolved_by)
                 resolved.append(resolved_conflict)
             except ConflictError:
                 continue
@@ -358,9 +352,7 @@ class ConflictService:
 
         # Remove from active conflicts
         state = self.get_state()
-        state.active_conflicts = [
-            c for c in state.active_conflicts if c.id != conflict.id
-        ]
+        state.active_conflicts = [c for c in state.active_conflicts if c.id != conflict.id]
         self._save_state(state)
         self._state = state
 
@@ -387,7 +379,7 @@ class ConflictService:
 
         for archive_file in archive_files[:limit]:
             try:
-                with open(archive_file, "r", encoding="utf-8") as f:
+                with open(archive_file, encoding="utf-8") as f:
                     data = json.load(f)
                 conflict = ConflictRecord.from_dict(data)
                 conflicts.append(conflict)
@@ -423,12 +415,14 @@ class ConflictService:
         local_lines = conflict.local_version.content.splitlines(keepends=True)
         remote_lines = conflict.remote_version.content.splitlines(keepends=True)
 
-        diff = list(difflib.unified_diff(
-            remote_lines,
-            local_lines,
-            fromfile=f"{conflict.file_path} (remote)",
-            tofile=f"{conflict.file_path} (local)",
-        ))
+        diff = list(
+            difflib.unified_diff(
+                remote_lines,
+                local_lines,
+                fromfile=f"{conflict.file_path} (remote)",
+                tofile=f"{conflict.file_path} (local)",
+            )
+        )
 
         return diff
 

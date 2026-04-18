@@ -1,12 +1,14 @@
 """CLI commands for diagram generation."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.diagram_models import DiagramType
 from ..services.diagram_service import DiagramService
 
@@ -20,7 +22,7 @@ app = typer.Typer(
 console = Console()
 
 
-def _resolve_file_path(file: Optional[Path]) -> Optional[Path]:
+def _resolve_file_path(file: Path | None) -> Path | None:
     """Resolve file path, auto-detecting if not provided.
 
     Args:
@@ -70,7 +72,7 @@ def _parse_diagram_types(type_str: str) -> list[DiagramType]:
 
 @app.command(name="generate")
 def generate_command(
-    file: Optional[Path] = typer.Argument(
+    file: Path | None = typer.Argument(
         None,
         help="Path to spec.md or plan.md file",
         exists=False,
@@ -92,7 +94,7 @@ def generate_command(
         "-t",
         help="Diagram type: user-journey, er-diagram, architecture, all",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -113,19 +115,21 @@ def generate_command(
     # Resolve file path
     resolved_path = _resolve_file_path(file)
     if not resolved_path:
-        console.print("[red]Error:[/red] No spec file found. Provide a path or run from a spec directory.")
-        raise typer.Exit(code=1)
+        console.print(
+            "[red]Error:[/red] No spec file found. Provide a path or run from a spec directory."
+        )
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     if not resolved_path.exists():
         console.print(f"[red]Error:[/red] File not found: {resolved_path}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Parse diagram types
     types = _parse_diagram_types(diagram_type)
     if not types and diagram_type != "all":
         console.print(f"[red]Error:[/red] Unknown diagram type: {diagram_type}")
         console.print("Valid types: user-journey, er-diagram, architecture, all")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     console.print(f"Generating diagrams for: [cyan]{resolved_path}[/cyan]")
     console.print()
@@ -141,7 +145,7 @@ def generate_command(
     # Handle errors
     if not result.success:
         console.print(f"[red]Error:[/red] {result.error}")
-        raise typer.Exit(code=2 if strict else 1)
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR if strict else ExitCode.FAILURE)
 
     # Display results table
     if result.diagrams:
@@ -151,7 +155,11 @@ def generate_command(
         table.add_column("Nodes")
 
         for diagram in result.diagrams:
-            status = "[green]✅ Generated[/green]" if diagram.is_valid else "[yellow]⚠️ Generated (warnings)[/yellow]"
+            status = (
+                "[green]✅ Generated[/green]"
+                if diagram.is_valid
+                else "[yellow]⚠️ Generated (warnings)[/yellow]"
+            )
             table.add_row(
                 diagram.diagram_type.value,
                 status,
@@ -188,13 +196,15 @@ def generate_command(
                 console.print(f"\n[bold]## {diagram.diagram_type.value}[/bold]\n")
                 console.print(diagram.wrapped_content)
     else:
-        console.print("[yellow]No diagrams generated.[/yellow] Check that the spec has User Stories or Key Entities.")
-        raise typer.Exit(code=3)
+        console.print(
+            "[yellow]No diagrams generated.[/yellow] Check that the spec has User Stories or Key Entities."
+        )
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR)
 
 
 @app.command(name="validate")
 def validate_command(
-    file: Optional[Path] = typer.Argument(
+    file: Path | None = typer.Argument(
         None,
         help="Path to file containing Mermaid diagrams",
         exists=False,
@@ -220,11 +230,11 @@ def validate_command(
     resolved_path = _resolve_file_path(file)
     if not resolved_path:
         console.print("[red]Error:[/red] No file found to validate.")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
     if not resolved_path.exists():
         console.print(f"[red]Error:[/red] File not found: {resolved_path}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
     console.print(f"Validating diagrams in: [cyan]{resolved_path}[/cyan]")
     console.print()
@@ -237,7 +247,7 @@ def validate_command(
 
     if not matches:
         console.print("[yellow]No Mermaid diagrams found in file.[/yellow]")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     from ..services.mermaid_validator import MermaidValidator
 
@@ -294,10 +304,10 @@ def validate_command(
 
     if has_errors:
         console.print("\n[red]Validation failed.[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
     else:
         console.print("\n[green]All diagrams valid.[/green]")
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
 
 # Export the app for registration

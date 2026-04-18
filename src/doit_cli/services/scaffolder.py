@@ -1,7 +1,8 @@
 """Scaffolder service for creating doit project structure."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 from ..models.agent import Agent
 from ..models.project import Project
@@ -159,7 +160,7 @@ class Scaffolder:
         Returns:
             List of paths to preserve
         """
-        preserved = []
+        preserved: list[Path] = []
 
         # Always preserve memory folder contents
         memory_dir = self.project.memory_folder

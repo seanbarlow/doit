@@ -1,9 +1,10 @@
 """Unit tests for HookManager service."""
 
 import json
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
+import pytest
 
 from doit_cli.services.hook_manager import HookManager
 
@@ -57,13 +58,15 @@ class TestHookManager:
         manager = HookManager(project_root=tmp_path)
 
         with patch.object(manager, "get_template_path") as mock_template:
+
             def get_template(hook_name):
                 if hook_name == "pre-commit":
                     return template_file
                 return None
+
             mock_template.side_effect = get_template
 
-            installed, skipped = manager.install_hooks()
+            installed, _skipped = manager.install_hooks()
 
         assert "pre-commit" in installed
         assert (tmp_path / ".git" / "hooks" / "pre-commit").exists()
@@ -212,7 +215,7 @@ class TestHookManagerBackup:
 
         manifest = {
             "latest_backup": timestamp,
-            "backups": [{"timestamp": timestamp, "hooks": ["pre-commit"]}]
+            "backups": [{"timestamp": timestamp, "hooks": ["pre-commit"]}],
         }
         (backup_dir / "manifest.json").write_text(json.dumps(manifest))
 

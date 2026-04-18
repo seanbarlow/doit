@@ -1,23 +1,17 @@
 ---
-description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Review Implementation
-    agent: doit.review
-    prompt: Review the implemented code for quality and completeness
-    send: true
-  - label: Run Tests
-    agent: doit.test
-    prompt: Execute automated tests and generate test report
-    send: true
+description: Execute the implementation plan by processing and executing all tasks
+  defined in tasks.md
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -65,7 +59,7 @@ Before generating or modifying code:
 1. Run `.doit/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
-   - Check for `--skip-checklist` in $ARGUMENTS - if present, skip checklist verification
+   - Check for `--skip-checklist` in ${input:args} - if present, skip checklist verification
    - If not skipped, scan all checklist files in the checklists/ directory
    - For each checklist, count:
      - Total items: All lines matching `- [ ]` or `- [X]` or `- [x]`

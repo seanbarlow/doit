@@ -1,6 +1,6 @@
 """Tests for Windows line ending handling (CRLF vs LF)."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -179,7 +179,9 @@ def test_git_autocrlf_behavior(temp_project_dir):
     test_file.write_text("Line 1\nLine 2\n", encoding="utf-8")
 
     # Stage and commit
-    subprocess.run(["git", "add", "test.txt"], cwd=temp_project_dir, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "add", "test.txt"], cwd=temp_project_dir, check=True, capture_output=True
+    )
     subprocess.run(
         ["git", "commit", "-m", "Test commit"],
         cwd=temp_project_dir,

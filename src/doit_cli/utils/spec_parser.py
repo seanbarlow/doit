@@ -4,17 +4,20 @@ This module provides utilities for parsing spec files, extracting frontmatter me
 and atomically updating frontmatter fields while preserving file content.
 """
 
+from __future__ import annotations
+
 import re
 import tempfile
-import yaml
 from pathlib import Path
-from typing import Dict, Any, Tuple
+from typing import Any
+
+import yaml
 
 
 class SpecFrontmatter:
     """Represents parsed YAML frontmatter from a spec file."""
 
-    def __init__(self, data: Dict[str, Any]):
+    def __init__(self, data: dict[str, Any]):
         """Initialize frontmatter from parsed YAML data.
 
         Args:
@@ -63,7 +66,7 @@ class SpecFrontmatter:
         except ValueError:
             return None
 
-    def to_yaml_dict(self) -> Dict[str, Any]:
+    def to_yaml_dict(self) -> dict[str, Any]:
         """Convert frontmatter to YAML-compatible dictionary.
 
         Returns:
@@ -100,7 +103,7 @@ class SpecFrontmatter:
         return result
 
 
-def parse_spec_file(spec_path: Path) -> Tuple[SpecFrontmatter, str]:
+def parse_spec_file(spec_path: Path) -> tuple[SpecFrontmatter, str]:
     """Parse spec file into frontmatter and content.
 
     Args:
@@ -116,7 +119,7 @@ def parse_spec_file(spec_path: Path) -> Tuple[SpecFrontmatter, str]:
     if not spec_path.exists():
         raise FileNotFoundError(f"Spec file not found: {spec_path}")
 
-    with open(spec_path, "r", encoding="utf-8") as f:
+    with open(spec_path, encoding="utf-8") as f:
         content = f.read()
 
     # Extract frontmatter (between --- markers)
@@ -127,7 +130,7 @@ def parse_spec_file(spec_path: Path) -> Tuple[SpecFrontmatter, str]:
         # Find end of frontmatter
         end_marker = content.index("---", 3)
         frontmatter_text = content[3:end_marker].strip()
-        body = content[end_marker + 3:].lstrip("\n")
+        body = content[end_marker + 3 :].lstrip("\n")
 
         # Parse YAML
         frontmatter_data = yaml.safe_load(frontmatter_text) or {}
@@ -136,13 +139,10 @@ def parse_spec_file(spec_path: Path) -> Tuple[SpecFrontmatter, str]:
         return (frontmatter, body)
 
     except (ValueError, yaml.YAMLError) as e:
-        raise ValueError(f"Malformed frontmatter in {spec_path}: {e}")
+        raise ValueError(f"Malformed frontmatter in {spec_path}: {e}") from e
 
 
-def update_spec_frontmatter(
-    spec_path: Path,
-    updates: Dict[str, Any]
-) -> None:
+def update_spec_frontmatter(spec_path: Path, updates: dict[str, Any]) -> None:
     """Update specific fields in spec frontmatter.
 
     This method atomically updates the spec file by:
@@ -185,10 +185,7 @@ def update_spec_frontmatter(
 
 
 def add_epic_reference(
-    spec_path: Path,
-    epic_number: int,
-    epic_url: str,
-    priority: str | None = None
+    spec_path: Path, epic_number: int, epic_url: str, priority: str | None = None
 ) -> None:
     """Add or update epic reference in spec frontmatter.
 
@@ -207,10 +204,7 @@ def add_epic_reference(
     if not epic_url or not epic_url.startswith("http"):
         raise ValueError(f"Invalid epic URL: {epic_url}")
 
-    updates = {
-        "Epic": f"[#{epic_number}]({epic_url})",
-        "Epic URL": epic_url
-    }
+    updates = {"Epic": f"[#{epic_number}]({epic_url})", "Epic URL": epic_url}
 
     if priority:
         if priority not in ["P1", "P2", "P3", "P4"]:
@@ -240,7 +234,7 @@ def remove_epic_reference(spec_path: Path) -> None:
     write_spec_file(spec_path, frontmatter, body)
 
 
-def get_epic_reference(spec_path: Path) -> Tuple[int, str] | None:
+def get_epic_reference(spec_path: Path) -> tuple[int, str] | None:
     """Extract epic reference from spec frontmatter.
 
     Args:
@@ -259,11 +253,7 @@ def get_epic_reference(spec_path: Path) -> Tuple[int, str] | None:
     return None
 
 
-def write_spec_file(
-    spec_path: Path,
-    frontmatter: SpecFrontmatter,
-    content: str
-) -> None:
+def write_spec_file(spec_path: Path, frontmatter: SpecFrontmatter, content: str) -> None:
     """Write spec file with frontmatter and content atomically.
 
     Uses atomic file operations (write to temp + rename) to prevent
@@ -280,10 +270,7 @@ def write_spec_file(
     # Serialize frontmatter to YAML
     frontmatter_dict = frontmatter.to_yaml_dict()
     frontmatter_yaml = yaml.dump(
-        frontmatter_dict,
-        default_flow_style=False,
-        allow_unicode=True,
-        sort_keys=False
+        frontmatter_dict, default_flow_style=False, allow_unicode=True, sort_keys=False
     )
 
     # Construct full file content
@@ -292,11 +279,7 @@ def write_spec_file(
     # Write atomically using temp file + rename
     spec_dir = spec_path.parent
     with tempfile.NamedTemporaryFile(
-        mode="w",
-        encoding="utf-8",
-        dir=spec_dir,
-        delete=False,
-        suffix=".tmp"
+        mode="w", encoding="utf-8", dir=spec_dir, delete=False, suffix=".tmp"
     ) as tmp:
         tmp.write(full_content)
         tmp_path = Path(tmp.name)

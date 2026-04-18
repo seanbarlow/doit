@@ -6,9 +6,10 @@ This service orchestrates the generation of analytics reports by:
 3. Building AnalyticsReport with aggregated metrics
 """
 
+from __future__ import annotations
+
 from datetime import date
 from pathlib import Path
-from typing import Optional
 
 from ..models.analytics_models import (
     AnalyticsReport,
@@ -19,7 +20,7 @@ from ..models.analytics_models import (
 )
 from ..models.status_models import SpecState
 from .date_inferrer import DateInferrer
-from .spec_scanner import NotADoitProjectError, SpecNotFoundError, SpecScanner
+from .spec_scanner import SpecScanner
 
 
 class AnalyticsService:
@@ -29,7 +30,7 @@ class AnalyticsService:
     SpecMetadata and aggregated analytics reports.
     """
 
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Path | None = None):
         """Initialize the analytics service.
 
         Args:
@@ -82,9 +83,7 @@ class AnalyticsService:
             status_name = spec.status.display_name
             by_status[status_name] = by_status.get(status_name, 0) + 1
 
-        completed = sum(
-            1 for s in specs if s.status in (SpecState.COMPLETE, SpecState.APPROVED)
-        )
+        completed = sum(1 for s in specs if s.status in (SpecState.COMPLETE, SpecState.APPROVED))
         completion_pct = (completed / total * 100) if total > 0 else 0.0
 
         return {
@@ -99,9 +98,9 @@ class AnalyticsService:
 
     def get_cycle_time_stats(
         self,
-        days: Optional[int] = None,
-        since: Optional[date] = None,
-    ) -> tuple[Optional[CycleTimeStats], list[CycleTimeRecord]]:
+        days: int | None = None,
+        since: date | None = None,
+    ) -> tuple[CycleTimeStats | None, list[CycleTimeRecord]]:
         """Get cycle time statistics for completed specs.
 
         Args:
@@ -201,11 +200,7 @@ class AnalyticsService:
             List of matching spec names
         """
         specs = self.scanner.scan(include_validation=False)
-        matches = [
-            s.name
-            for s in specs
-            if partial_name.lower() in s.name.lower()
-        ]
+        matches = [s.name for s in specs if partial_name.lower() in s.name.lower()]
         return matches
 
     def list_all_spec_names(self) -> list[str]:

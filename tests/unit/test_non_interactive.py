@@ -3,9 +3,9 @@
 Tests the non-interactive mode functionality for CI/CD automation.
 """
 
-import os
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch
 
 from doit_cli.models.workflow_models import (
     Workflow,

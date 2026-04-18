@@ -3,17 +3,12 @@
 Tests for FixitService class which orchestrates the bug-fix workflow lifecycle.
 """
 
-import json
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
 from doit_cli.models.fixit_models import (
     FixPhase,
-    FixWorkflow,
-    FixitWorkflowState,
     GitHubIssue,
     IssueState,
 )
@@ -439,10 +434,10 @@ class TestFixitServiceAddFinding:
 
     def test_add_finding_creates_finding(self):
         """Should add finding to investigation plan."""
+        from doit_cli.models.fixit_models import FindingType
         from doit_cli.services.fixit_service import FixitService
         from doit_cli.services.github_service import GitHubService
         from doit_cli.services.state_manager import StateManager
-        from doit_cli.models.fixit_models import FindingType
 
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
@@ -485,10 +480,10 @@ class TestFixitServiceAddFinding:
 
     def test_add_finding_returns_none_when_no_plan(self):
         """Should return None when no investigation plan exists."""
+        from doit_cli.models.fixit_models import FindingType
         from doit_cli.services.fixit_service import FixitService
         from doit_cli.services.github_service import GitHubService
         from doit_cli.services.state_manager import StateManager
-        from doit_cli.models.fixit_models import FindingType
 
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
@@ -613,7 +608,6 @@ class TestFixitServiceCompleteInvestigation:
         from doit_cli.services.fixit_service import FixitService
         from doit_cli.services.github_service import GitHubService
         from doit_cli.services.state_manager import StateManager
-        from doit_cli.models.fixit_models import FixPhase
 
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
@@ -668,10 +662,10 @@ class TestFixitServiceGenerateFixPlan:
 
     def test_generate_fix_plan_creates_plan_from_findings(self):
         """Should create fix plan from investigation findings."""
+        from doit_cli.models.fixit_models import PlanStatus
         from doit_cli.services.fixit_service import FixitService
         from doit_cli.services.github_service import GitHubService
         from doit_cli.services.state_manager import StateManager
-        from doit_cli.models.fixit_models import PlanStatus
 
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
@@ -800,10 +794,10 @@ class TestFixitServiceGetFixPlan:
 
     def test_get_fix_plan_returns_existing_plan(self):
         """Should return existing fix plan."""
+        from doit_cli.models.fixit_models import PlanStatus
         from doit_cli.services.fixit_service import FixitService
         from doit_cli.services.github_service import GitHubService
         from doit_cli.services.state_manager import StateManager
-        from doit_cli.models.fixit_models import PlanStatus
 
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
@@ -829,7 +823,7 @@ class TestFixitServiceGetFixPlan:
                     }
                 ],
                 "risk_level": "low",
-                                "status": "draft",
+                "status": "draft",
                 "created_at": "2026-01-16T11:00:00",
             },
         }
@@ -902,7 +896,7 @@ class TestFixitServiceApprovePlan:
                 "proposed_solution": "Add null check",
                 "affected_files": [],
                 "risk_level": "low",
-                                "status": "pending_review",
+                "status": "pending_review",
                 "created_at": "2026-01-16T11:00:00",
             },
         }
@@ -976,7 +970,7 @@ class TestFixitServiceSubmitForReview:
                 "proposed_solution": "Add null check",
                 "affected_files": [],
                 "risk_level": "low",
-                                "status": "draft",
+                "status": "draft",
                 "created_at": "2026-01-16T11:00:00",
             },
         }
@@ -1004,10 +998,10 @@ class TestFixitServiceGetWorkflowState:
 
     def test_get_workflow_state_returns_complete_state(self):
         """Should return complete workflow state including issue and plans."""
+        from doit_cli.models.fixit_models import FixPhase
         from doit_cli.services.fixit_service import FixitService
         from doit_cli.services.github_service import GitHubService
         from doit_cli.services.state_manager import StateManager
-        from doit_cli.models.fixit_models import FixPhase
 
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
@@ -1159,26 +1153,32 @@ class TestFixitServiceListWorkflows:
         mock_github = MagicMock(spec=GitHubService)
         mock_state = MagicMock(spec=StateManager)
         mock_state.list_fixit_states.return_value = [
-            (123, {
-                "workflow": {
-                    "id": "fixit-123",
-                    "issue_id": 123,
-                    "branch_name": "fix/123-bug",
-                    "phase": "investigating",
-                    "started_at": "2026-01-16T10:00:00",
-                    "updated_at": "2026-01-16T10:30:00",
-                }
-            }),
-            (456, {
-                "workflow": {
-                    "id": "fixit-456",
-                    "issue_id": 456,
-                    "branch_name": "fix/456-feature",
-                    "phase": "completed",
-                    "started_at": "2026-01-15T10:00:00",
-                    "updated_at": "2026-01-15T12:00:00",
-                }
-            }),
+            (
+                123,
+                {
+                    "workflow": {
+                        "id": "fixit-123",
+                        "issue_id": 123,
+                        "branch_name": "fix/123-bug",
+                        "phase": "investigating",
+                        "started_at": "2026-01-16T10:00:00",
+                        "updated_at": "2026-01-16T10:30:00",
+                    }
+                },
+            ),
+            (
+                456,
+                {
+                    "workflow": {
+                        "id": "fixit-456",
+                        "issue_id": 456,
+                        "branch_name": "fix/456-feature",
+                        "phase": "completed",
+                        "started_at": "2026-01-15T10:00:00",
+                        "updated_at": "2026-01-15T12:00:00",
+                    }
+                },
+            ),
         ]
 
         service = FixitService(

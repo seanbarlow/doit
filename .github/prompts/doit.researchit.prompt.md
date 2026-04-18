@@ -1,24 +1,24 @@
 ---
-description: Pre-specification research workflow for Product Owners to capture business requirements through interactive Q&A, generating research artifacts for handoff to technical specification.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
-handoffs:
-  - label: Create Technical Specification
-    agent: doit.specit
-    prompt: Create a specification using the research artifacts from this session.
+description: Pre-specification research workflow for Product Owners to capture business
+  requirements through interactive Q&A, generating research artifacts for handoff
+  to technical specification.
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty). The user input is the feature name or description they want to research.
 
 ### Flag Detection
 
-Check for the following flags in `$ARGUMENTS`:
+Check for the following flags in `${input:args}`:
 
 - `--auto-continue`: Skip handoff prompt and automatically invoke `/doit.specit` after research completes
 - `--skip-issues`: Skip GitHub issue creation (existing behavior)
@@ -74,7 +74,7 @@ ls specs/*/research.md 2>/dev/null | grep -i "$FEATURE_NAME" || echo "No existin
 
 ### Step 2: Establish Feature Context
 
-If `$ARGUMENTS` is empty, ask:
+If `${input:args}` is empty, ask:
 > "What feature or capability would you like to research? Please describe it in a sentence or two."
 
 Once you have the feature description:
@@ -278,7 +278,7 @@ If not already established, determine the feature number by finding the **highes
 ```bash
 # Find the highest feature number across all existing directories
 # This handles gaps (e.g., if 001, 002, 005 exist, next is 006)
-ls -d specs/[0-9][0-9][0-9]-* 2>/dev/null | sed 's/.*specs\/\([0-9]*\)-.*/\1/' | sort -n | tail -1 | awk '{printf "%03d", $1+1}'
+ls -d specs/[0-9][0-9][0-9]-* 2>/dev/null | sed 's/.*specs\/\([0-9]*\)-.*/\1/' | sort -n | tail -1 | awk '{printf "%03d", ${input:arg1}+1}'
 ```
 
 If no existing directories found, start with `001`.

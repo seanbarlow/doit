@@ -1,16 +1,17 @@
 """Unit tests for ContextLoader service."""
 
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
+import pytest
+
+from doit_cli.models.context_config import ContextConfig
 from doit_cli.services.context_loader import (
     ContextLoader,
     estimate_tokens,
-    truncate_content,
     extract_keywords,
+    truncate_content,
 )
-from doit_cli.models.context_config import ContextConfig, SourceConfig
 
 
 class TestEstimateTokens:
@@ -38,16 +39,15 @@ class TestEstimateTokens:
 
     def test_with_tiktoken(self):
         """Test token estimation with tiktoken if available."""
-        try:
-            import tiktoken
-            # tiktoken is available, test actual encoding
-            text = "Hello world, this is a test."
-            tokens = estimate_tokens(text)
-            # Should be closer to actual OpenAI tokens
-            assert 5 <= tokens <= 15
-        except ImportError:
-            # tiktoken not available, skip test
+        from importlib.util import find_spec
+
+        if find_spec("tiktoken") is None:
             pytest.skip("tiktoken not installed")
+
+        text = "Hello world, this is a test."
+        tokens = estimate_tokens(text)
+        # Should be closer to actual OpenAI tokens
+        assert 5 <= tokens <= 15
 
 
 class TestTruncateContent:
@@ -57,7 +57,7 @@ class TestTruncateContent:
         """Test truncation when content is under limit."""
         content = "# Header\n\nShort content."
         path = tmp_path / "test.md"
-        result, truncated, original = truncate_content(content, max_tokens=1000, path=path)
+        result, truncated, _original = truncate_content(content, max_tokens=1000, path=path)
         assert result == content
         assert truncated is False
 
@@ -76,7 +76,7 @@ This is another paragraph with more content.
 Even more content here.
 """
         path = tmp_path / "test.md"
-        result, truncated, original = truncate_content(content, max_tokens=20, path=path)
+        result, truncated, _original = truncate_content(content, max_tokens=20, path=path)
 
         # Should preserve main header
         assert "# Main Header" in result
@@ -100,7 +100,7 @@ This is less important detail content that can be truncated.
 Even more details here.
 """
         path = tmp_path / "test.md"
-        result, truncated, original = truncate_content(content, max_tokens=30, path=path)
+        result, _truncated, _original = truncate_content(content, max_tokens=30, path=path)
 
         # Should preserve summary
         assert "## Summary" in result
@@ -110,7 +110,7 @@ Even more details here.
         """Test truncation adds truncation notice."""
         content = "Long content. " * 1000
         path = tmp_path / "test.md"
-        result, truncated, original = truncate_content(content, max_tokens=50, path=path)
+        result, truncated, _original = truncate_content(content, max_tokens=50, path=path)
 
         # Notice is added as HTML comment
         assert "truncated" in result.lower()
@@ -120,7 +120,7 @@ Even more details here.
     def test_empty_content(self, tmp_path: Path):
         """Test truncation with empty content."""
         path = tmp_path / "test.md"
-        result, truncated, original = truncate_content("", max_tokens=1000, path=path)
+        result, truncated, _original = truncate_content("", max_tokens=1000, path=path)
         assert result == ""
         assert truncated is False
 
@@ -159,8 +159,7 @@ The implementation uses token estimation and smart truncation.
         assert len(keywords) > 0
         # Common meaningful words should appear
         meaningful_found = any(
-            kw in ["context", "feature", "loading", "implementation", "token"]
-            for kw in keywords
+            kw in ["context", "feature", "loading", "implementation", "token"] for kw in keywords
         )
         assert meaningful_found
 
@@ -691,16 +690,12 @@ class TestContextLoaderPersonas:
         # Create project-level personas
         memory_dir = tmp_path / ".doit" / "memory"
         memory_dir.mkdir(parents=True)
-        (memory_dir / "personas.md").write_text(
-            "# Project Personas\n\nP-001 Project-Level Dana"
-        )
+        (memory_dir / "personas.md").write_text("# Project Personas\n\nP-001 Project-Level Dana")
 
         # Create feature-level personas
         spec_dir = tmp_path / "specs" / "056-test-feature"
         spec_dir.mkdir(parents=True)
-        (spec_dir / "personas.md").write_text(
-            "# Feature Personas\n\nP-001 Feature-Level Dana"
-        )
+        (spec_dir / "personas.md").write_text("# Feature Personas\n\nP-001 Feature-Level Dana")
 
         loader = ContextLoader(project_root=tmp_path)
 
@@ -715,9 +710,7 @@ class TestContextLoaderPersonas:
         """Test project-level personas used when no feature-level exists."""
         memory_dir = tmp_path / ".doit" / "memory"
         memory_dir.mkdir(parents=True)
-        (memory_dir / "personas.md").write_text(
-            "# Personas\n\nP-001 Project-Level Dana"
-        )
+        (memory_dir / "personas.md").write_text("# Personas\n\nP-001 Project-Level Dana")
 
         # Feature spec dir exists but no personas.md in it
         spec_dir = tmp_path / "specs" / "056-test-feature"

@@ -1,6 +1,6 @@
 """Tests for output normalization utilities for cross-platform comparison."""
+
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -118,9 +118,7 @@ def test_whitespace_normalization(comparison_tools):
     ]
 
     # Normalize all variations
-    normalized_results = [
-        comparison_tools.normalize_output(text) for text in text_variations
-    ]
+    normalized_results = [comparison_tools.normalize_output(text) for text in text_variations]
 
     # After normalization, line structure should be comparable
     for result in normalized_results:
@@ -246,8 +244,9 @@ Total: 2 passed, 0 failed
 
     # Verify all normalization applied
     assert "\x1b[" not in normalized, "ANSI codes should be removed"
-    assert "tests/e2e/windows" in normalized or "test_init.py" in normalized, \
+    assert "tests/e2e/windows" in normalized or "test_init.py" in normalized, (
         "Test paths should be present"
+    )
 
 
 @pytest.mark.windows

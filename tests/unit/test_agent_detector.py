@@ -1,8 +1,5 @@
 """Unit tests for AgentDetector service."""
 
-import pytest
-from pathlib import Path
-
 from doit_cli.models.agent import Agent
 from doit_cli.models.project import Project
 from doit_cli.services.agent_detector import AgentDetector

@@ -4,15 +4,14 @@ These tests verify that implementations conform to the defined protocols.
 """
 
 import pytest
-from typing import Protocol
 
 from doit_cli.models.workflow_models import (
-    Workflow,
-    WorkflowStep,
-    WorkflowState,
-    WorkflowStatus,
     StepResponse,
     ValidationResult,
+    Workflow,
+    WorkflowState,
+    WorkflowStatus,
+    WorkflowStep,
 )
 
 
@@ -368,12 +367,18 @@ class TestDataModelContracts:
                 interactive=True,
                 steps=[
                     WorkflowStep(
-                        id="step1", name="Step 1", prompt_text="1:",
-                        required=True, order=0,
+                        id="step1",
+                        name="Step 1",
+                        prompt_text="1:",
+                        required=True,
+                        order=0,
                     ),
                     WorkflowStep(
-                        id="step2", name="Step 2", prompt_text="2:",
-                        required=True, order=0,  # Same order!
+                        id="step2",
+                        name="Step 2",
+                        prompt_text="2:",
+                        required=True,
+                        order=0,  # Same order!
                     ),
                 ],
             )
@@ -388,12 +393,18 @@ class TestDataModelContracts:
                 interactive=True,
                 steps=[
                     WorkflowStep(
-                        id="same-id", name="Step 1", prompt_text="1:",
-                        required=True, order=0,
+                        id="same-id",
+                        name="Step 1",
+                        prompt_text="1:",
+                        required=True,
+                        order=0,
                     ),
                     WorkflowStep(
-                        id="same-id", name="Step 2", prompt_text="2:",
-                        required=True, order=1,
+                        id="same-id",
+                        name="Step 2",
+                        prompt_text="2:",
+                        required=True,
+                        order=1,
                     ),
                 ],
             )

@@ -1,7 +1,8 @@
 """Tests for RequirementParser service."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from doit_cli.services.requirement_parser import RequirementParser
 

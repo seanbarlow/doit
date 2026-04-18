@@ -1,10 +1,11 @@
 """MCP tool for task listing and querying."""
 
+from __future__ import annotations
+
 import json
 import logging
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
@@ -16,7 +17,7 @@ def register_tasks_tool(mcp: FastMCP) -> None:
 
     @mcp.tool()
     def doit_tasks(
-        feature_name: Optional[str] = None,
+        feature_name: str | None = None,
         include_dependencies: bool = False,
     ) -> str:
         """List tasks from a feature's tasks.md with completion status.
@@ -39,7 +40,9 @@ def register_tasks_tool(mcp: FastMCP) -> None:
             try:
                 result = subprocess.run(
                     ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-                    capture_output=True, text=True, timeout=5,
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
                     cwd=str(project_root),
                 )
                 if result.returncode == 0:
@@ -52,18 +55,29 @@ def register_tasks_tool(mcp: FastMCP) -> None:
                 logger.debug("Git branch detection failed: %s", e)
 
         if not feature_name:
-            return json.dumps({
-                "error": "Could not determine feature name",
-                "message": "Provide feature_name parameter or run from a feature branch.",
-            }, indent=2)
+            return json.dumps(
+                {
+                    "error": "Could not determine feature name",
+                    "message": "Provide feature_name parameter or run from a feature branch.",
+                },
+                indent=2,
+            )
 
         tasks_path = project_root / "specs" / feature_name / "tasks.md"
         if not tasks_path.exists():
-            return json.dumps({
-                "tasks": [],
-                "summary": {"total": 0, "completed": 0, "pending": 0, "completion_percentage": 0.0},
-                "message": f"No tasks.md found at {tasks_path}. Run `/doit.taskit` to generate tasks.",
-            }, indent=2)
+            return json.dumps(
+                {
+                    "tasks": [],
+                    "summary": {
+                        "total": 0,
+                        "completed": 0,
+                        "pending": 0,
+                        "completion_percentage": 0.0,
+                    },
+                    "message": f"No tasks.md found at {tasks_path}. Run `/doit.taskit` to generate tasks.",
+                },
+                indent=2,
+            )
 
         parser = TaskParser(tasks_path=tasks_path)
         tasks = parser.parse()
@@ -91,12 +105,15 @@ def register_tasks_tool(mcp: FastMCP) -> None:
         total = len(tasks_data)
         completion_pct = round(completed / total * 100, 1) if total > 0 else 0.0
 
-        return json.dumps({
-            "tasks": tasks_data,
-            "summary": {
-                "total": total,
-                "completed": completed,
-                "pending": total - completed,
-                "completion_percentage": completion_pct,
+        return json.dumps(
+            {
+                "tasks": tasks_data,
+                "summary": {
+                    "total": total,
+                    "completed": completed,
+                    "pending": total - completed,
+                    "completion_percentage": completion_pct,
+                },
             },
-        }, indent=2)
+            indent=2,
+        )

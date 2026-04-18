@@ -1,10 +1,8 @@
 """Unit tests for CleanupService."""
 
 import pytest
-from pathlib import Path
 
-from doit_cli.models.cleanup_models import AnalysisResult, CleanupResult
-from doit_cli.services.cleanup_service import CleanupService, TECH_SECTIONS
+from doit_cli.services.cleanup_service import TECH_SECTIONS, CleanupService
 
 
 @pytest.fixture
@@ -147,7 +145,9 @@ class TestCleanupServiceAnalyze:
         assert "Infrastructure" in result.tech_sections
         assert "Deployment" in result.tech_sections
 
-    def test_analyze_identifies_preserved_sections(self, service, project_dir, combined_constitution):
+    def test_analyze_identifies_preserved_sections(
+        self, service, project_dir, combined_constitution
+    ):
         """Test that analyze correctly identifies non-tech sections."""
         constitution_path = project_dir / ".doit" / "memory" / "constitution.md"
         constitution_path.write_text(combined_constitution)
@@ -215,12 +215,14 @@ class TestCleanupServiceCleanup:
         tech_stack_path = project_dir / ".doit" / "memory" / "tech-stack.md"
         assert tech_stack_path.exists()
 
-    def test_cleanup_removes_tech_from_constitution(self, service, project_dir, combined_constitution):
+    def test_cleanup_removes_tech_from_constitution(
+        self, service, project_dir, combined_constitution
+    ):
         """Test that cleanup removes tech sections from constitution."""
         constitution_path = project_dir / ".doit" / "memory" / "constitution.md"
         constitution_path.write_text(combined_constitution)
 
-        result = service.cleanup()
+        service.cleanup()
 
         updated_constitution = constitution_path.read_text()
         assert "## Tech Stack" not in updated_constitution
@@ -281,7 +283,9 @@ class TestCleanupServiceCleanup:
         assert not result.tech_stack_created
         assert len(result.extracted_sections) == 0
 
-    def test_cleanup_existing_tech_stack_without_merge(self, service, project_dir, combined_constitution):
+    def test_cleanup_existing_tech_stack_without_merge(
+        self, service, project_dir, combined_constitution
+    ):
         """Test cleanup fails when tech-stack.md exists and merge=False."""
         constitution_path = project_dir / ".doit" / "memory" / "constitution.md"
         constitution_path.write_text(combined_constitution)
@@ -293,7 +297,9 @@ class TestCleanupServiceCleanup:
         assert not result.success
         assert "already exists" in result.error_message
 
-    def test_cleanup_existing_tech_stack_with_merge(self, service, project_dir, combined_constitution):
+    def test_cleanup_existing_tech_stack_with_merge(
+        self, service, project_dir, combined_constitution
+    ):
         """Test cleanup succeeds when tech-stack.md exists and merge=True."""
         constitution_path = project_dir / ".doit" / "memory" / "constitution.md"
         constitution_path.write_text(combined_constitution)
@@ -335,7 +341,9 @@ class TestCleanupServiceHelpers:
         assert service._is_tech_section("Infrastructure Setup", "") is True
         assert service._is_tech_section("Deployment Guide", "") is True
         # Headers that don't contain tech section names should not match
-        assert service._is_tech_section("Technology Stack", "") is False  # "Tech Stack" not in "Technology Stack"
+        assert (
+            service._is_tech_section("Technology Stack", "") is False
+        )  # "Tech Stack" not in "Technology Stack"
         assert service._is_tech_section("Infra", "") is False
 
     def test_is_tech_section_keyword_fallback(self, service, project_dir):

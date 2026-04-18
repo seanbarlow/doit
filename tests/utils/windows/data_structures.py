@@ -1,7 +1,7 @@
 """Data structures for Windows E2E testing."""
+
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 
 class TestEnvironment:
@@ -38,8 +38,8 @@ class PowerShellScriptResult:
         stdout: str,
         stderr: str,
         execution_time: float,
-        args: List[str],
-        environment_vars: Optional[Dict[str, str]] = None,
+        args: list[str],
+        environment_vars: dict[str, str] | None = None,
     ):
         self.script_path = script_path
         self.exit_code = exit_code
@@ -76,10 +76,10 @@ class E2EWorkflowResult:
     def __init__(
         self,
         workflow_name: str,
-        commands_executed: List[str],
+        commands_executed: list[str],
         success: bool,
-        failure_point: Optional[str],
-        generated_files: List[Path],
+        failure_point: str | None,
+        generated_files: list[Path],
         execution_time: float,
         environment: TestEnvironment,
     ):

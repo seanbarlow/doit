@@ -4,7 +4,7 @@ This module provides a comprehensive set of exception classes
 for handling errors in team collaboration operations.
 """
 
-from typing import Optional
+from __future__ import annotations
 
 
 class TeamError(Exception):
@@ -14,7 +14,7 @@ class TeamError(Exception):
     catching any team error with a single except clause.
     """
 
-    def __init__(self, message: str, details: dict = None):
+    def __init__(self, message: str, details: dict | None = None):
         """Initialize TeamError.
 
         Args:
@@ -46,7 +46,7 @@ class ConfigurationError(TeamError):
 class TeamNotInitializedError(ConfigurationError):
     """Team collaboration not initialized for this project."""
 
-    def __init__(self, message: str = None):
+    def __init__(self, message: str | None = None):
         super().__init__(
             message or "Team collaboration not initialized. Run 'doit team init' first."
         )
@@ -55,16 +55,17 @@ class TeamNotInitializedError(ConfigurationError):
 class TeamAlreadyInitializedError(ConfigurationError):
     """Team collaboration already initialized."""
 
-    def __init__(self, message: str = None):
+    def __init__(self, message: str | None = None):
         super().__init__(
-            message or "Team collaboration already initialized. Delete .doit/config/team.yaml to reinitialize."
+            message
+            or "Team collaboration already initialized. Delete .doit/config/team.yaml to reinitialize."
         )
 
 
 class InvalidConfigurationError(ConfigurationError):
     """Configuration file is invalid or corrupted."""
 
-    def __init__(self, message: str, validation_errors: list[str] = None):
+    def __init__(self, message: str, validation_errors: list[str] | None = None):
         super().__init__(message, {"validation_errors": validation_errors or []})
         self.validation_errors = validation_errors or []
 
@@ -77,7 +78,7 @@ class InvalidConfigurationError(ConfigurationError):
 class MemberError(TeamError):
     """Base class for member-related errors."""
 
-    def __init__(self, message: str, email: str = None):
+    def __init__(self, message: str, email: str | None = None):
         super().__init__(message, {"email": email} if email else {})
         self.email = email
 
@@ -130,8 +131,8 @@ class PermissionDeniedError(AccessError):
     def __init__(
         self,
         action: str,
-        required_permission: str = None,
-        message: str = None,
+        required_permission: str | None = None,
+        message: str | None = None,
     ):
         msg = message or f"Permission denied for '{action}'"
         if required_permission:
@@ -178,15 +179,13 @@ class NoRemoteConfiguredError(SyncError):
     """No Git remote is configured for sync."""
 
     def __init__(self):
-        super().__init__(
-            "No Git remote configured. Push your repository to a remote first."
-        )
+        super().__init__("No Git remote configured. Push your repository to a remote first.")
 
 
 class NetworkError(SyncError):
     """Network operation failed."""
 
-    def __init__(self, message: str = None):
+    def __init__(self, message: str | None = None):
         super().__init__(
             message or "Cannot reach remote repository. Check your network connection."
         )
@@ -252,15 +251,13 @@ class GitNotAvailableError(GitError):
     """Git is not installed or not available."""
 
     def __init__(self):
-        super().__init__(
-            "Git is not available. Please install Git and try again."
-        )
+        super().__init__("Git is not available. Please install Git and try again.")
 
 
 class GitOperationError(GitError):
     """A Git operation failed."""
 
-    def __init__(self, operation: str, stderr: str = None):
+    def __init__(self, operation: str, stderr: str | None = None):
         msg = f"Git {operation} failed"
         if stderr:
             msg += f": {stderr}"

@@ -1,8 +1,9 @@
 """Models for cross-reference support between specs and tasks."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 
 class CoverageStatus(str, Enum):
@@ -172,9 +173,7 @@ class CoverageReport:
         """Get list of requirements with no linked tasks."""
         return [rc.requirement for rc in self.requirements if not rc.is_covered]
 
-    def get_requirement_coverage(
-        self, requirement_id: str
-    ) -> Optional[RequirementCoverage]:
+    def get_requirement_coverage(self, requirement_id: str) -> RequirementCoverage | None:
         """Get coverage info for a specific requirement."""
         for rc in self.requirements:
             if rc.requirement.id == requirement_id:

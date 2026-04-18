@@ -1,13 +1,13 @@
 """Hook manager service for installing and managing Git hooks."""
 
+from __future__ import annotations
+
 import json
 import shutil
 import stat
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
-
 from importlib import resources
+from pathlib import Path
 
 
 class HookManager:
@@ -17,7 +17,7 @@ class HookManager:
     BACKUP_DIR = ".doit/backups/hooks"
     MANIFEST_FILE = "manifest.json"
 
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Path | None = None):
         """Initialize the hook manager.
 
         Args:
@@ -31,7 +31,7 @@ class HookManager:
         """Check if the project is a Git repository."""
         return (self.project_root / ".git").is_dir()
 
-    def get_template_path(self, hook_name: str) -> Optional[Path]:
+    def get_template_path(self, hook_name: str) -> Path | None:
         """Get the path to a hook template.
 
         Args:
@@ -40,9 +40,11 @@ class HookManager:
         Returns:
             Path to the template file, or None if not found.
         """
-        # Try to get from package resources
+        # Try to get from package resources. importlib.resources.files returns
+        # a Traversable that doesn't type-check as a context manager (stdlib
+        # stub limitation); at runtime it acts like one via a wrapper.
         try:
-            with resources.files("doit_cli.templates.hooks") as templates_dir:
+            with resources.files("doit_cli.templates.hooks") as templates_dir:  # type: ignore[attr-defined]
                 template_path = Path(templates_dir) / f"{hook_name}.sh"
                 if template_path.exists():
                     return template_path
@@ -50,9 +52,7 @@ class HookManager:
             pass
 
         # Fallback: try relative path from this file
-        fallback_path = (
-            Path(__file__).parent.parent / "templates" / "hooks" / f"{hook_name}.sh"
-        )
+        fallback_path = Path(__file__).parent.parent / "templates" / "hooks" / f"{hook_name}.sh"
         if fallback_path.exists():
             return fallback_path
 
@@ -126,7 +126,7 @@ class HookManager:
 
         return removed
 
-    def _backup_hook(self, hook_name: str) -> Optional[Path]:
+    def _backup_hook(self, hook_name: str) -> Path | None:
         """Backup an existing hook.
 
         Args:
@@ -174,23 +174,17 @@ class HookManager:
         manifest["latest_backup"] = timestamp
 
         # Find or create entry for this timestamp
-        existing_entry = next(
-            (b for b in manifest["backups"] if b["timestamp"] == timestamp),
-            None
-        )
+        existing_entry = next((b for b in manifest["backups"] if b["timestamp"] == timestamp), None)
         if existing_entry:
             if hook_name not in existing_entry["hooks"]:
                 existing_entry["hooks"].append(hook_name)
         else:
-            manifest["backups"].append({
-                "timestamp": timestamp,
-                "hooks": [hook_name]
-            })
+            manifest["backups"].append({"timestamp": timestamp, "hooks": [hook_name]})
 
         with open(manifest_path, "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
 
-    def restore_hooks(self, timestamp: Optional[str] = None) -> list[str]:
+    def restore_hooks(self, timestamp: str | None = None) -> list[str]:
         """Restore hooks from backup.
 
         Args:
@@ -220,8 +214,7 @@ class HookManager:
 
         # Find the backup entry
         backup_entry = next(
-            (b for b in manifest["backups"] if b["timestamp"] == target_timestamp),
-            None
+            (b for b in manifest["backups"] if b["timestamp"] == target_timestamp), None
         )
         if not backup_entry:
             raise RuntimeError(f"No backup found for timestamp: {target_timestamp}")

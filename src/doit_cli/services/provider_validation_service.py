@@ -4,9 +4,11 @@ This module provides validation methods for GitHub, Azure DevOps, and GitLab
 authentication and connectivity testing during the wizard flow.
 """
 
+from __future__ import annotations
+
 import shutil
 import subprocess
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -55,14 +57,16 @@ class ProviderValidationService:
                 token=config_values.get("token", ""),
             )
         else:
-            return ValidationResult.failed(
+            # Catch-all for future ProviderType variants we haven't wired up
+            # yet; mypy marks the branch unreachable given the current enum.
+            return ValidationResult.failed(  # type: ignore[unreachable]
                 step=WizardStep.DETECT_PROVIDER,
                 error=f"Unknown provider: {provider}",
             )
 
     def validate_github(
         self,
-        enterprise_host: Optional[str] = None,
+        enterprise_host: str | None = None,
     ) -> ValidationResult:
         """Validate GitHub authentication via gh CLI.
 
@@ -145,9 +149,7 @@ class ProviderValidationService:
                     )
 
                 # Test project access
-                project_response = client.get(
-                    f"{base_url}/{project}/_apis/project?api-version=7.0"
-                )
+                project_response = client.get(f"{base_url}/{project}/_apis/project?api-version=7.0")
 
                 if project_response.status_code == 404:
                     return ValidationResult.failed(
@@ -256,8 +258,8 @@ class ProviderValidationService:
 
     def check_gh_cli_authenticated(
         self,
-        enterprise_host: Optional[str] = None,
-    ) -> tuple[bool, Optional[str]]:
+        enterprise_host: str | None = None,
+    ) -> tuple[bool, str | None]:
         """Check if gh CLI is authenticated.
 
         Returns:
@@ -279,7 +281,7 @@ class ProviderValidationService:
                 # Parse "Logged in to github.com as USERNAME" from stderr
                 for line in result.stderr.split("\n"):
                     if "Logged in" in line and " as " in line:
-                        username = line.split(" as ")[-1].strip()
+                        username: str | None = line.split(" as ")[-1].strip()
                         # Remove any trailing info like "(keyring)"
                         username = username.split()[0] if username else None
                         return True, username
@@ -296,7 +298,7 @@ class ProviderValidationService:
 
     def test_github_repo_access(
         self,
-        enterprise_host: Optional[str] = None,
+        enterprise_host: str | None = None,
     ) -> bool:
         """Test if authenticated user has access to current repository."""
         cmd = ["gh", "api", "user"]
@@ -318,7 +320,7 @@ class ProviderValidationService:
         self,
         organization: str,
         pat: str,
-    ) -> Optional[list[str]]:
+    ) -> list[str] | None:
         """Determine PAT scopes by testing specific endpoints.
 
         Returns:
@@ -331,16 +333,12 @@ class ProviderValidationService:
         try:
             with httpx.Client(timeout=self.timeout, auth=auth) as client:
                 # Test Work Items read
-                wit_response = client.get(
-                    f"{base_url}/_apis/wit/workitemtypes?api-version=7.0"
-                )
+                wit_response = client.get(f"{base_url}/_apis/wit/workitemtypes?api-version=7.0")
                 if wit_response.status_code == 200:
                     scopes.append("Work Items (Read)")
 
                 # Test Git/Code read
-                git_response = client.get(
-                    f"{base_url}/_apis/git/repositories?api-version=7.0"
-                )
+                git_response = client.get(f"{base_url}/_apis/git/repositories?api-version=7.0")
                 if git_response.status_code == 200:
                     scopes.append("Code (Read)")
 

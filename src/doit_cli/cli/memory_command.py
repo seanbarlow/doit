@@ -4,15 +4,17 @@ This module provides the `doit memory` subcommand group for searching
 across project context files.
 """
 
+from __future__ import annotations
+
 import json
 import time
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.search_models import QueryType, SourceFilter
 from ..services.memory_search import MemorySearchService
 
@@ -38,15 +40,12 @@ def get_project_root() -> Path:
         typer.Exit: If no .doit directory found.
     """
     current = Path.cwd()
-    for parent in [current] + list(current.parents):
+    for parent in [current, *list(current.parents)]:
         if (parent / ".doit").is_dir():
             return parent
 
-    console.print(
-        "[red]Error:[/red] Not in a doit project. "
-        "Run 'doit init' to initialize."
-    )
-    raise typer.Exit(1)
+    console.print("[red]Error:[/red] Not in a doit project. Run 'doit init' to initialize.")
+    raise typer.Exit(code=ExitCode.FAILURE)
 
 
 @memory_app.command(name="search")
@@ -113,7 +112,7 @@ def search_command(
             f"[red]Error:[/red] Invalid query type '{query_type}'. "
             "Use: keyword, phrase, natural, regex"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from None
 
     # If regex flag is set, override query type
     if use_regex:
@@ -124,17 +123,14 @@ def search_command(
         sf = SourceFilter(source.lower())
     except ValueError:
         console.print(
-            f"[red]Error:[/red] Invalid source filter '{source}'. "
-            "Use: all, governance, specs"
+            f"[red]Error:[/red] Invalid source filter '{source}'. Use: all, governance, specs"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from None
 
     # Validate max results
     if not 1 <= max_results <= 100:
-        console.print(
-            "[red]Error:[/red] Max results must be between 1 and 100"
-        )
-        raise typer.Exit(1)
+        console.print("[red]Error:[/red] Max results must be between 1 and 100")
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Create service and search
     service = MemorySearchService(project_root, console)
@@ -151,24 +147,20 @@ def search_command(
         )
     except ValueError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(3)
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR) from e
 
     execution_time_ms = int((time.time() - start_time) * 1000)
 
     # Output results
     if json_output:
-        output = service.format_results_json(
-            results, sources, search_query, execution_time_ms
-        )
+        output = service.format_results_json(results, sources, search_query, execution_time_ms)
         console.print_json(json.dumps(output, indent=2))
         return
 
     # Rich output
     if not results:
         console.print("\n[yellow]No results found.[/yellow]")
-        console.print(
-            f"\nSearched {len(sources)} files in {execution_time_ms}ms"
-        )
+        console.print(f"\nSearched {len(sources)} files in {execution_time_ms}ms")
         return
 
     # Header
@@ -188,9 +180,7 @@ def search_command(
     else:
         console.print(f'Query: "{query}" ({qt.value})')
 
-    console.print(
-        f"Sources: {sf.value} | Found: {len(results)} results"
-    )
+    console.print(f"Sources: {sf.value} | Found: {len(results)} results")
     console.print()
 
     # Display results
@@ -201,9 +191,7 @@ def search_command(
         console.print()
 
     # Footer
-    console.print(
-        f"Searched {len(sources)} files in {execution_time_ms}ms"
-    )
+    console.print(f"Searched {len(sources)} files in {execution_time_ms}ms")
 
 
 @memory_app.command(name="history")
@@ -260,9 +248,7 @@ def history_command(
 
     if not entries:
         console.print("\n[yellow]No search history.[/yellow]")
-        console.print(
-            "\nRun 'doit memory search <query>' to start searching."
-        )
+        console.print("\nRun 'doit memory search <query>' to start searching.")
         return
 
     console.print()
@@ -280,7 +266,9 @@ def history_command(
 
     for i, entry in enumerate(entries, 1):
         time_str = entry.timestamp.strftime("%H:%M:%S")
-        query_display = entry.query_text[:27] + "..." if len(entry.query_text) > 30 else entry.query_text
+        query_display = (
+            entry.query_text[:27] + "..." if len(entry.query_text) > 30 else entry.query_text
+        )
         table.add_row(
             str(i),
             time_str,

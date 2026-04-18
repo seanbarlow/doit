@@ -1,8 +1,9 @@
 """Unit tests for SpecScanner service."""
 
-import pytest
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from doit_cli.models.status_models import SpecState, SpecStatus, StatusReport
 from doit_cli.services.spec_scanner import (
@@ -324,9 +325,9 @@ class TestBlockingLogic:
     def test_in_progress_with_validation_errors_is_blocking(self, tmp_path):
         """Test that IN_PROGRESS specs block when validation fails."""
         from doit_cli.models.validation_models import (
-            ValidationResult,
-            ValidationIssue,
             Severity,
+            ValidationIssue,
+            ValidationResult,
         )
 
         spec_status = SpecStatus(
@@ -379,10 +380,11 @@ class TestBlockingLogic:
     def test_draft_with_errors_not_staged_not_blocking(self, tmp_path, monkeypatch):
         """Test that DRAFT specs don't block when not staged, even with errors."""
         from unittest.mock import Mock
+
         from doit_cli.models.validation_models import (
-            ValidationResult,
-            ValidationIssue,
             Severity,
+            ValidationIssue,
+            ValidationResult,
         )
 
         spec_status = SpecStatus(
@@ -418,10 +420,11 @@ class TestBlockingLogic:
     def test_draft_with_errors_and_staged_is_blocking(self, tmp_path, monkeypatch):
         """Test that DRAFT specs block when staged with errors."""
         from unittest.mock import Mock
+
         from doit_cli.models.validation_models import (
-            ValidationResult,
-            ValidationIssue,
             Severity,
+            ValidationIssue,
+            ValidationResult,
         )
 
         spec_path = tmp_path / "specs" / "test-spec" / "spec.md"
@@ -458,9 +461,9 @@ class TestBlockingLogic:
     def test_complete_spec_never_blocking(self, tmp_path):
         """Test that COMPLETE specs never block regardless of validation."""
         from doit_cli.models.validation_models import (
-            ValidationResult,
-            ValidationIssue,
             Severity,
+            ValidationIssue,
+            ValidationResult,
         )
 
         spec_status = SpecStatus(
@@ -491,9 +494,9 @@ class TestBlockingLogic:
     def test_approved_spec_never_blocking(self, tmp_path):
         """Test that APPROVED specs never block regardless of validation."""
         from doit_cli.models.validation_models import (
-            ValidationResult,
-            ValidationIssue,
             Severity,
+            ValidationIssue,
+            ValidationResult,
         )
 
         spec_status = SpecStatus(

@@ -4,10 +4,11 @@ This module contains all data models and dataclasses
 for the constitution/tech-stack separation feature.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 
 class CleanupState(Enum):
@@ -31,7 +32,7 @@ class CleanupResult:
     from constitution.md into tech-stack.md.
     """
 
-    backup_path: Optional[Path] = None
+    backup_path: Path | None = None
     extracted_sections: list[str] = field(default_factory=list)
     preserved_sections: list[str] = field(default_factory=list)
     unclear_sections: list[str] = field(default_factory=list)
@@ -39,7 +40,7 @@ class CleanupResult:
     constitution_size_after: int = 0
     tech_stack_created: bool = False
     tech_stack_merged: bool = False
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     @property
     def success(self) -> bool:
@@ -68,7 +69,7 @@ class CleanupResult:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "CleanupResult":
+    def from_dict(cls, data: dict) -> CleanupResult:
         """Create CleanupResult from dictionary."""
         return cls(
             backup_path=Path(data["backup_path"]) if data.get("backup_path") else None,

@@ -1,50 +1,36 @@
 """Validate command for spec file linting and quality checking."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
 
+from ..exit_codes import ExitCode
 from ..models.validation_models import ValidationConfig
 from ..services.report_generator import ReportGenerator
 from ..services.validation_service import ValidationService
 
-
 console = Console()
 
 # Type aliases for CLI options
-JsonFlag = Annotated[
-    bool,
-    typer.Option(
-        "--json", "-j",
-        help="Output results as JSON"
-    )
-]
+JsonFlag = Annotated[bool, typer.Option("--json", "-j", help="Output results as JSON")]
 
 AllFlag = Annotated[
-    bool,
-    typer.Option(
-        "--all", "-a",
-        help="Validate all specs in specs/ directory"
-    )
+    bool, typer.Option("--all", "-a", help="Validate all specs in specs/ directory")
 ]
 
 VerboseFlag = Annotated[
-    bool,
-    typer.Option(
-        "--verbose", "-v",
-        help="Show detailed output including all issues"
-    )
+    bool, typer.Option("--verbose", "-v", help="Show detailed output including all issues")
 ]
 
 
 def validate_command(
     path: Annotated[
-        Optional[Path],
-        typer.Argument(
-            help="Spec file or directory to validate (defaults to current directory)"
-        )
+        Path | None,
+        typer.Argument(help="Spec file or directory to validate (defaults to current directory)"),
     ] = None,
     all_specs: AllFlag = False,
     json_output: JsonFlag = False,
@@ -93,7 +79,7 @@ def validate_command(
                     print('{"error": "No spec files found in specs/ directory"}')
                 else:
                     console.print("[yellow]No spec files found in specs/ directory[/yellow]")
-                raise typer.Exit(1)
+                raise typer.Exit(code=ExitCode.FAILURE)
 
             summary = service.get_summary(results)
 
@@ -111,16 +97,16 @@ def validate_command(
 
             # Exit with error if any specs failed
             if summary["failed"] > 0:
-                raise typer.Exit(1)
+                raise typer.Exit(code=ExitCode.FAILURE)
 
         elif target_path.is_file():
             # Validate single file
-            if not target_path.suffix.lower() == ".md":
+            if target_path.suffix.lower() != ".md":
                 if json_output:
                     print('{"error": "Not a markdown file"}')
                 else:
                     console.print(f"[red]Error:[/red] Not a markdown file: {target_path}")
-                raise typer.Exit(1)
+                raise typer.Exit(code=ExitCode.FAILURE)
 
             result = service.validate_file(target_path)
 
@@ -131,7 +117,7 @@ def validate_command(
 
             # Exit with error if validation failed
             if result.error_count > 0:
-                raise typer.Exit(1)
+                raise typer.Exit(code=ExitCode.FAILURE)
 
         elif target_path.is_dir():
             # Check if this is a spec directory (contains spec.md)
@@ -147,7 +133,7 @@ def validate_command(
                     reporter.display_result(result)
 
                 if result.error_count > 0:
-                    raise typer.Exit(1)
+                    raise typer.Exit(code=ExitCode.FAILURE)
             else:
                 # Validate all specs in the directory
                 results = service.validate_directory(target_path)
@@ -157,7 +143,7 @@ def validate_command(
                         print('{"error": "No spec files found in directory"}')
                     else:
                         console.print(f"[yellow]No spec files found in {target_path}[/yellow]")
-                    raise typer.Exit(1)
+                    raise typer.Exit(code=ExitCode.FAILURE)
 
                 summary = service.get_summary(results)
 
@@ -172,25 +158,25 @@ def validate_command(
                     reporter.display_summary(results, summary)
 
                 if summary["failed"] > 0:
-                    raise typer.Exit(1)
+                    raise typer.Exit(code=ExitCode.FAILURE)
 
         else:
             if json_output:
                 print(f'{{"error": "Path not found: {target_path}"}}')
             else:
                 console.print(f"[red]Error:[/red] Path not found: {target_path}")
-            raise typer.Exit(1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
     except FileNotFoundError as e:
         if json_output:
             print(f'{{"error": "{e}"}}')
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
     except ValueError as e:
         if json_output:
             print(f'{{"error": "{e}"}}')
         else:
             console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e

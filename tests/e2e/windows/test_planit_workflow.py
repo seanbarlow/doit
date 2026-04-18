@@ -1,6 +1,6 @@
 """End-to-end tests for 'doit planit' command on Windows."""
+
 import sys
-from pathlib import Path
 
 import pytest
 

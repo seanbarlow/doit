@@ -1,5 +1,7 @@
 """Main CLI application for doit-cli new commands (init, verify)."""
 
+from __future__ import annotations
+
 import typer
 
 from .cli.analytics_command import app as analytics_app
@@ -19,7 +21,6 @@ from .cli.update_command import update_command
 from .cli.validate_command import validate_command
 from .cli.verify_command import verify_command
 from .cli.xref_command import xref_app
-
 
 # Create a new typer app for the refactored commands
 app = typer.Typer(
@@ -50,7 +51,7 @@ app.add_typer(team_app, name="team")
 app.add_typer(xref_app, name="xref")
 
 # MCP subcommand - availability checked at runtime in serve_command()
-from .cli.mcp_command import app as mcp_app  # noqa: E402
+from .cli.mcp_command import app as mcp_app
 
 app.add_typer(mcp_app, name="mcp")
 

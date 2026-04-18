@@ -1,18 +1,19 @@
 """Unit tests for status formatters."""
 
 import json
-import pytest
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from doit_cli.formatters.json_formatter import JsonFormatter
 from doit_cli.formatters.markdown_formatter import MarkdownFormatter
 from doit_cli.formatters.rich_formatter import RichFormatter
 from doit_cli.models.status_models import SpecState, SpecStatus, StatusReport
 from doit_cli.models.validation_models import (
-    ValidationResult,
-    ValidationIssue,
     Severity,
+    ValidationIssue,
+    ValidationResult,
 )
 
 

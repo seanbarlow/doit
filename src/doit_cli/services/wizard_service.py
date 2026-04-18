@@ -4,10 +4,11 @@ This module provides a step-by-step wizard for configuring git provider
 authentication and settings.
 """
 
+from __future__ import annotations
+
 import os
-import subprocess
-from datetime import datetime, UTC
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from rich.console import Console
 from rich.panel import Panel
@@ -38,9 +39,9 @@ class WizardService:
     def __init__(
         self,
         console: Console,
-        validation_service: Optional[ProviderValidationService] = None,
-        backup_service: Optional[ConfigBackupService] = None,
-        existing_config: Optional[ProviderConfig] = None,
+        validation_service: ProviderValidationService | None = None,
+        backup_service: ConfigBackupService | None = None,
+        existing_config: ProviderConfig | None = None,
     ) -> None:
         """Initialize wizard with dependencies.
 
@@ -54,7 +55,7 @@ class WizardService:
         self.validation = validation_service or ProviderValidationService()
         self.backup = backup_service or ConfigBackupService()
         self.existing_config = existing_config or ProviderConfig.load()
-        self.state: Optional[WizardState] = None
+        self.state: WizardState | None = None
         self._backup_created = False
 
     def run(self, force_reconfigure: bool = False) -> WizardResult:
@@ -76,9 +77,8 @@ class WizardService:
 
         # Check for existing configuration
         if self.existing_config.is_configured():
-            if not force_reconfigure:
-                if not self._confirm_reconfigure():
-                    return WizardResult.canceled()
+            if not force_reconfigure and not self._confirm_reconfigure():
+                return WizardResult.canceled()
 
             # Create backup before changes (always, whether forced or confirmed)
             backup = self.backup.create_backup(
@@ -105,7 +105,11 @@ class WizardService:
             elif provider == ProviderType.GITLAB:
                 config_values = self.collect_gitlab_config()
             else:
-                return WizardResult.error(f"Unsupported provider: {provider}")
+                # Catch-all for future ProviderType variants; mypy marks
+                # this branch unreachable given the current enum shape.
+                return WizardResult.error(  # type: ignore[unreachable]
+                    f"Unsupported provider: {provider}"
+                )
 
             self.state.collected_values = config_values
 
@@ -124,7 +128,7 @@ class WizardService:
         else:
             return WizardResult.error(result.error_message or "Validation failed")
 
-    def detect_provider(self) -> tuple[Optional[ProviderType], Optional[str]]:
+    def detect_provider(self) -> tuple[ProviderType | None, str | None]:
         """Detect provider from git remote URL.
 
         Returns:
@@ -137,12 +141,10 @@ class WizardService:
             )
             return detected, "git_remote"
 
-        self.console.print(
-            "[yellow]Could not auto-detect provider from git remote.[/yellow]\n"
-        )
+        self.console.print("[yellow]Could not auto-detect provider from git remote.[/yellow]\n")
         return None, None
 
-    def select_provider(self, detected: Optional[ProviderType]) -> ProviderType:
+    def select_provider(self, detected: ProviderType | None) -> ProviderType:
         """Interactive provider selection with detected provider as default.
 
         Args:
@@ -187,9 +189,7 @@ class WizardService:
         Raises:
             WizardStepError: gh CLI not installed or not authenticated
         """
-        self.console.print(
-            Panel("[bold]GitHub Configuration[/bold]", expand=False)
-        )
+        self.console.print(Panel("[bold]GitHub Configuration[/bold]", expand=False))
 
         # Check gh CLI installed
         if not self.validation.check_gh_cli_installed():
@@ -217,8 +217,7 @@ class WizardService:
         if not is_authed:
             self.console.print("[red]GitHub CLI is not authenticated.[/red]")
             self.console.print(
-                "\n[yellow]Run this command to authenticate:[/yellow]\n"
-                "  gh auth login"
+                "\n[yellow]Run this command to authenticate:[/yellow]\n  gh auth login"
             )
 
             retry = Confirm.ask("\nRetry after authenticating?", default=True)
@@ -251,16 +250,12 @@ class WizardService:
         Returns:
             Dict with organization, project, and auth info
         """
-        self.console.print(
-            Panel("[bold]Azure DevOps Configuration[/bold]", expand=False)
-        )
+        self.console.print(Panel("[bold]Azure DevOps Configuration[/bold]", expand=False))
 
         # Check for PAT in environment
         pat_from_env = os.environ.get("AZURE_DEVOPS_PAT")
         if pat_from_env:
-            self.console.print(
-                "[green]Found AZURE_DEVOPS_PAT environment variable[/green]\n"
-            )
+            self.console.print("[green]Found AZURE_DEVOPS_PAT environment variable[/green]\n")
 
         # Organization
         organization = Prompt.ask("Organization name")
@@ -306,9 +301,7 @@ class WizardService:
         Returns:
             Dict with host and auth info
         """
-        self.console.print(
-            Panel("[bold]GitLab Configuration[/bold]", expand=False)
-        )
+        self.console.print(Panel("[bold]GitLab Configuration[/bold]", expand=False))
 
         self.console.print(
             "[yellow]Note: GitLab support is currently limited (stub implementation).[/yellow]\n"
@@ -318,9 +311,7 @@ class WizardService:
         host = Prompt.ask("GitLab host", default="gitlab.com")
 
         # Token
-        self.console.print(
-            "\n[dim]Required token scopes: api, read_repository[/dim]"
-        )
+        self.console.print("\n[dim]Required token scopes: api, read_repository[/dim]")
         if "gitlab.com" in host:
             self.console.print(
                 "[dim]Create token at: https://gitlab.com/-/profile/personal_access_tokens[/dim]\n"
@@ -425,9 +416,7 @@ class WizardService:
                 table.add_row("Authenticated", validation.details["authenticated_user"])
             table.add_row("Feature Support", "[yellow]Limited[/yellow]")
 
-        self.console.print(
-            Panel(table, title="[bold green]Configuration Complete[/bold green]")
-        )
+        self.console.print(Panel(table, title="[bold green]Configuration Complete[/bold green]"))
 
     def handle_cancellation(self) -> None:
         """Handle user cancellation, restore previous state if needed."""
@@ -437,11 +426,13 @@ class WizardService:
                 try:
                     config = self.backup.restore_backup(latest.backup_id)
                     config.save()
+                    self.console.print("[dim]Previous configuration restored from backup.[/dim]")
+                except (OSError, ValueError) as exc:
+                    # Restore is best-effort on cancel — surface a hint,
+                    # don't re-raise since the user already cancelled.
                     self.console.print(
-                        "[dim]Previous configuration restored from backup.[/dim]"
+                        f"[yellow]Could not restore backup automatically: {exc}[/yellow]"
                     )
-                except Exception:
-                    pass
 
     def _display_header(self) -> None:
         """Display wizard header."""
@@ -457,9 +448,7 @@ class WizardService:
     def _confirm_reconfigure(self) -> bool:
         """Ask user to confirm reconfiguration."""
         current_provider = self.existing_config.get_provider_display_name()
-        self.console.print(
-            f"[yellow]Existing configuration found: {current_provider}[/yellow]\n"
-        )
+        self.console.print(f"[yellow]Existing configuration found: {current_provider}[/yellow]\n")
         return Confirm.ask("Do you want to reconfigure?", default=False)
 
     def _provider_name(self, provider: ProviderType) -> str:

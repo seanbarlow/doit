@@ -1,7 +1,8 @@
 """Parser for user stories from spec.md files."""
 
+from __future__ import annotations
+
 import re
-from typing import Optional
 
 from ..models.diagram_models import AcceptanceScenario, ParsedUserStory
 
@@ -41,7 +42,7 @@ class UserStoryParser:
         Returns:
             List of ParsedUserStory objects
         """
-        stories = []
+        stories: list[ParsedUserStory] = []
 
         # Find all story headers and their positions
         header_matches = list(self.STORY_HEADER_PATTERN.finditer(content))
@@ -83,7 +84,7 @@ class UserStoryParser:
 
         return stories
 
-    def parse_single(self, content: str) -> Optional[ParsedUserStory]:
+    def parse_single(self, content: str) -> ParsedUserStory | None:
         """Parse a single user story from content.
 
         Args:
@@ -107,7 +108,7 @@ class UserStoryParser:
             Description text
         """
         lines = story_content.split("\n")
-        description_lines = []
+        description_lines: list[str] = []
 
         for line in lines:
             stripped = line.strip()
@@ -128,9 +129,7 @@ class UserStoryParser:
 
         return " ".join(description_lines).strip()
 
-    def _extract_scenarios(
-        self, story_content: str, story_number: int
-    ) -> list[AcceptanceScenario]:
+    def _extract_scenarios(self, story_content: str, story_number: int) -> list[AcceptanceScenario]:
         """Extract acceptance scenarios from story content.
 
         Args:
@@ -183,7 +182,7 @@ class UserStoryParser:
         text = " ".join(text.split())
         return text.strip()
 
-    def _find_next_section(self, content: str, start_pos: int) -> Optional[int]:
+    def _find_next_section(self, content: str, start_pos: int) -> int | None:
         """Find the position of the next major section.
 
         Args:
@@ -202,9 +201,7 @@ class UserStoryParser:
 
         return None
 
-    def get_story_by_number(
-        self, content: str, story_number: int
-    ) -> Optional[ParsedUserStory]:
+    def get_story_by_number(self, content: str, story_number: int) -> ParsedUserStory | None:
         """Get a specific user story by number.
 
         Args:

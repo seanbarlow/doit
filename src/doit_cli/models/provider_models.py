@@ -4,10 +4,11 @@ This module defines unified data models that work across all git providers
 (GitHub, Azure DevOps, GitLab).
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 
 class IssueType(Enum):
@@ -47,8 +48,8 @@ class Label:
     """A label/tag that can be applied to issues and pull requests."""
 
     name: str
-    color: Optional[str] = None
-    description: Optional[str] = None
+    color: str | None = None
+    description: str | None = None
 
 
 @dataclass
@@ -62,10 +63,10 @@ class Issue:
     url: str
     created_at: datetime
     updated_at: datetime
-    body: Optional[str] = None
+    body: str | None = None
     type: IssueType = IssueType.TASK
     labels: list[Label] = field(default_factory=list)
-    milestone_id: Optional[str] = None
+    milestone_id: str | None = None
 
 
 @dataclass
@@ -80,10 +81,10 @@ class PullRequest:
     state: PRState
     url: str
     created_at: datetime
-    body: Optional[str] = None
+    body: str | None = None
     labels: list[Label] = field(default_factory=list)
     closes_issues: list[str] = field(default_factory=list)  # Issue IDs
-    merged_at: Optional[datetime] = None
+    merged_at: datetime | None = None
 
 
 @dataclass
@@ -94,11 +95,11 @@ class Milestone:
     provider_id: str  # Provider-specific ID
     title: str
     state: MilestoneState
-    description: Optional[str] = None
-    due_date: Optional[datetime] = None
+    description: str | None = None
+    due_date: datetime | None = None
     issue_count: int = 0
     closed_issue_count: int = 0
-    url: Optional[str] = None
+    url: str | None = None
 
 
 # =============================================================================
@@ -111,31 +112,31 @@ class IssueCreateRequest:
     """Request to create a new issue."""
 
     title: str
-    body: Optional[str] = None
+    body: str | None = None
     type: IssueType = IssueType.TASK
     labels: list[str] = field(default_factory=list)
-    milestone_id: Optional[str] = None
+    milestone_id: str | None = None
 
 
 @dataclass
 class IssueUpdateRequest:
     """Request to update an existing issue."""
 
-    title: Optional[str] = None
-    body: Optional[str] = None
-    state: Optional[IssueState] = None
-    labels: Optional[list[str]] = None
-    milestone_id: Optional[str] = None
+    title: str | None = None
+    body: str | None = None
+    state: IssueState | None = None
+    labels: list[str] | None = None
+    milestone_id: str | None = None
 
 
 @dataclass
 class IssueFilters:
     """Filters for querying issues."""
 
-    state: Optional[IssueState] = None
-    labels: Optional[list[str]] = None
-    milestone_id: Optional[str] = None
-    type: Optional[IssueType] = None
+    state: IssueState | None = None
+    labels: list[str] | None = None
+    milestone_id: str | None = None
+    type: IssueType | None = None
     limit: int = 100
 
 
@@ -146,7 +147,7 @@ class PRCreateRequest:
     title: str
     source_branch: str
     target_branch: str = "main"
-    body: Optional[str] = None
+    body: str | None = None
     labels: list[str] = field(default_factory=list)
     closes_issues: list[str] = field(default_factory=list)
 
@@ -155,9 +156,9 @@ class PRCreateRequest:
 class PRFilters:
     """Filters for querying pull requests."""
 
-    state: Optional[PRState] = None
-    source_branch: Optional[str] = None
-    target_branch: Optional[str] = None
+    state: PRState | None = None
+    source_branch: str | None = None
+    target_branch: str | None = None
     limit: int = 100
 
 
@@ -166,5 +167,5 @@ class MilestoneCreateRequest:
     """Request to create a new milestone."""
 
     title: str
-    description: Optional[str] = None
-    due_date: Optional[datetime] = None
+    description: str | None = None
+    due_date: datetime | None = None

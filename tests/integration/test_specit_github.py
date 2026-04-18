@@ -8,25 +8,16 @@ This test suite validates the end-to-end workflow:
 5. GitHub epic body contains spec file path
 """
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from doit_cli.services.roadmap_matcher import (
-    RoadmapMatcherService,
-    RoadmapItem,
-    MatchResult
-)
-from doit_cli.services.github_linker import (
-    GitHubLinkerService,
-    EpicReference,
-    SpecReference
-)
-from doit_cli.utils.spec_parser import (
-    parse_spec_file,
-    get_epic_reference
-)
+from unittest.mock import Mock, patch
+
+import pytest
+
+from doit_cli.services.github_linker import GitHubLinkerService
+from doit_cli.services.roadmap_matcher import RoadmapMatcherService
+from doit_cli.utils.spec_parser import get_epic_reference, parse_spec_file
 
 
 @pytest.fixture
@@ -113,20 +104,12 @@ As a developer, when I create a new spec, I want it to automatically link to the
 class TestEndToEndAutoLinking:
     """Integration tests for automatic epic linking workflow."""
 
-    def test_complete_workflow_success(
-        self,
-        temp_project_dir,
-        sample_roadmap,
-        sample_spec
-    ):
+    def test_complete_workflow_success(self, temp_project_dir, sample_roadmap, sample_spec):
         """Test complete workflow: match roadmap → link to epic → verify bidirectional links."""
 
         # Step 1: Match feature to roadmap (use exact or near-exact title)
         matcher = RoadmapMatcherService(sample_roadmap)
-        match = matcher.find_best_match(
-            "GitHub Issue Auto-linking in Spec Creation",
-            threshold=0.8
-        )
+        match = matcher.find_best_match("GitHub Issue Auto-linking in Spec Creation", threshold=0.8)
 
         assert match is not None, "Should find matching roadmap item"
         assert match.item.github_number == 123
@@ -134,12 +117,13 @@ class TestEndToEndAutoLinking:
         assert match.similarity_score >= 0.8
 
         # Step 2: Mock only GitHub-specific operations, allow file I/O
-        with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
-             patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate, \
-             patch.object(GitHubLinkerService, '_update_epic_via_cli') as mock_update_cli, \
-             patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
-             patch.object(GitHubLinkerService, '_get_relative_path') as mock_relative_path:
-
+        with (
+            patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic,
+            patch.object(GitHubLinkerService, "validate_epic_for_linking") as mock_validate,
+            patch.object(GitHubLinkerService, "_update_epic_via_cli") as mock_update_cli,
+            patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo"),
+            patch.object(GitHubLinkerService, "_get_relative_path") as mock_relative_path,
+        ):
             # Mock epic details
             mock_get_epic.return_value = {
                 "number": 123,
@@ -148,7 +132,7 @@ class TestEndToEndAutoLinking:
                 "state": "open",
                 "labels": ["epic", "priority:P1"],
                 "url": "https://github.com/owner/repo/issues/123",
-                "priority": "P1"
+                "priority": "P1",
             }
 
             # Mock validation
@@ -160,9 +144,7 @@ class TestEndToEndAutoLinking:
             # Step 3: Link spec to epic
             linker = GitHubLinkerService()
             success = linker.link_spec_to_epic(
-                sample_spec,
-                epic_number=match.item.github_number,
-                overwrite=False
+                sample_spec, epic_number=match.item.github_number, overwrite=False
             )
 
             assert success is True, "Linking should succeed"
@@ -186,12 +168,7 @@ class TestEndToEndAutoLinking:
             assert "## Specification" in new_body
             assert "040-spec-github-linking/spec.md" in new_body
 
-    def test_no_roadmap_match_graceful_skip(
-        self,
-        temp_project_dir,
-        sample_roadmap,
-        sample_spec
-    ):
+    def test_no_roadmap_match_graceful_skip(self, temp_project_dir, sample_roadmap, sample_spec):
         """Test that non-matching feature names skip linking gracefully."""
 
         matcher = RoadmapMatcherService(sample_roadmap)
@@ -206,27 +183,20 @@ class TestEndToEndAutoLinking:
         assert "Automatically link" in body
 
     def test_github_api_failure_graceful_fallback(
-        self,
-        temp_project_dir,
-        sample_roadmap,
-        sample_spec
+        self, temp_project_dir, sample_roadmap, sample_spec
     ):
         """Test that GitHub API failures don't prevent spec creation."""
 
         # Step 1: Match succeeds (use exact title)
         matcher = RoadmapMatcherService(sample_roadmap)
-        match = matcher.find_best_match(
-            "GitHub Issue Auto-linking in Spec Creation",
-            threshold=0.8
-        )
+        match = matcher.find_best_match("GitHub Issue Auto-linking in Spec Creation", threshold=0.8)
         assert match is not None
 
         # Step 2: Mock GitHub API failure
-        with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
-             patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate:
-
-            from doit_cli.services.github_service import GitHubServiceError
-
+        with (
+            patch.object(GitHubLinkerService, "get_epic_details"),
+            patch.object(GitHubLinkerService, "validate_epic_for_linking") as mock_validate,
+        ):
             # Validation fails due to API error
             mock_validate.return_value = (False, "GitHub API Error: Rate limit exceeded")
 
@@ -234,29 +204,20 @@ class TestEndToEndAutoLinking:
 
             # Should raise ValueError when validation fails
             with pytest.raises(ValueError, match="Cannot link to epic"):
-                linker.link_spec_to_epic(
-                    sample_spec,
-                    epic_number=123,
-                    overwrite=False
-                )
+                linker.link_spec_to_epic(sample_spec, epic_number=123, overwrite=False)
 
         # Spec should remain valid even if linking failed
-        frontmatter, body = parse_spec_file(sample_spec)
+        frontmatter, _body = parse_spec_file(sample_spec)
         assert frontmatter.feature_name == "GitHub Issue Auto-linking"
 
-    def test_fuzzy_matching_threshold(
-        self,
-        temp_project_dir,
-        sample_roadmap
-    ):
+    def test_fuzzy_matching_threshold(self, temp_project_dir, sample_roadmap):
         """Test that fuzzy matching respects threshold settings."""
 
         matcher = RoadmapMatcherService(sample_roadmap)
 
         # Exact match
         exact_match = matcher.find_best_match(
-            "GitHub Issue Auto-linking in Spec Creation",
-            threshold=0.8
+            "GitHub Issue Auto-linking in Spec Creation", threshold=0.8
         )
         assert exact_match is not None
         assert exact_match.is_exact_match is True
@@ -264,38 +225,28 @@ class TestEndToEndAutoLinking:
         # Close match with lower threshold (partial title)
         close_match = matcher.find_best_match(
             "GitHub Issue Auto-linking",
-            threshold=0.7  # Lower threshold for partial match
+            threshold=0.7,  # Lower threshold for partial match
         )
         assert close_match is not None
         assert close_match.similarity_score >= 0.7
 
         # Very short query - should not match with high threshold
-        distant_match = matcher.find_best_match(
-            "GitHub",
-            threshold=0.8
-        )
+        distant_match = matcher.find_best_match("GitHub", threshold=0.8)
         assert distant_match is None, "Short query should not match with high threshold"
 
-    def test_already_linked_spec_preservation(
-        self,
-        temp_project_dir,
-        sample_roadmap,
-        sample_spec
-    ):
+    def test_already_linked_spec_preservation(self, temp_project_dir, sample_roadmap, sample_spec):
         """Test that already-linked specs are not overwritten without overwrite flag."""
 
-        with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
-             patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate, \
-             patch.object(GitHubLinkerService, '_update_epic_via_cli') as mock_update_cli, \
-             patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
-             patch('doit_cli.services.github_linker.add_epic_to_spec') as mock_add_epic, \
-             patch('doit_cli.services.github_linker.get_epic_reference') as mock_get_epic_ref, \
-             patch('subprocess.run') as mock_run:
-
-            mock_get_epic.return_value = {
-                "priority": "P1",
-                "body": "Test body"
-            }
+        with (
+            patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic,
+            patch.object(GitHubLinkerService, "validate_epic_for_linking") as mock_validate,
+            patch.object(GitHubLinkerService, "_update_epic_via_cli"),
+            patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo"),
+            patch("doit_cli.services.github_linker.add_epic_to_spec") as mock_add_epic,
+            patch("doit_cli.services.github_linker.get_epic_reference") as mock_get_epic_ref,
+            patch("subprocess.run") as mock_run,
+        ):
+            mock_get_epic.return_value = {"priority": "P1", "body": "Test body"}
             mock_validate.return_value = (True, "")
             mock_run.return_value = Mock(stdout=str(temp_project_dir) + "\n")
 
@@ -314,24 +265,17 @@ class TestEndToEndAutoLinking:
             # Verify add_epic was only called once (for first link)
             assert mock_add_epic.call_count == 1
 
-    def test_roadmap_priority_propagation(
-        self,
-        temp_project_dir,
-        sample_roadmap,
-        sample_spec
-    ):
+    def test_roadmap_priority_propagation(self, temp_project_dir, sample_roadmap, sample_spec):
         """Test that roadmap epic priority is propagated to spec frontmatter."""
 
-        with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
-             patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate, \
-             patch.object(GitHubLinkerService, '_update_epic_via_cli'), \
-             patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
-             patch('subprocess.run') as mock_run:
-
-            mock_get_epic.return_value = {
-                "priority": "P1",
-                "body": "Test"
-            }
+        with (
+            patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic,
+            patch.object(GitHubLinkerService, "validate_epic_for_linking") as mock_validate,
+            patch.object(GitHubLinkerService, "_update_epic_via_cli"),
+            patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo"),
+            patch("subprocess.run") as mock_run,
+        ):
+            mock_get_epic.return_value = {"priority": "P1", "body": "Test"}
             mock_validate.return_value = (True, "")
             mock_run.return_value = Mock(stdout=str(temp_project_dir) + "\n")
 
@@ -361,11 +305,7 @@ class TestRoadmapMatcherIntegration:
         p2_items = [item for item in items if item.priority == "P2"]
         assert len(p2_items) == 2
 
-    def test_find_all_matches_multiple_github_items(
-        self,
-        temp_project_dir,
-        sample_roadmap
-    ):
+    def test_find_all_matches_multiple_github_items(self, temp_project_dir, sample_roadmap):
         """Test finding all matches when multiple items contain search term."""
         matcher = RoadmapMatcherService(sample_roadmap)
 
@@ -404,11 +344,8 @@ class TestErrorRecovery:
 
     def test_closed_epic_validation_failure(self, sample_spec):
         """Test that closed epics fail validation."""
-        with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic:
-            mock_get_epic.return_value = {
-                "state": "closed",
-                "labels": ["epic"]
-            }
+        with patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic:
+            mock_get_epic.return_value = {"state": "closed", "labels": ["epic"]}
 
             linker = GitHubLinkerService()
             is_valid, error = linker.validate_epic_for_linking(123)
@@ -418,10 +355,10 @@ class TestErrorRecovery:
 
     def test_non_epic_issue_validation_failure(self, sample_spec):
         """Test that non-epic issues fail validation."""
-        with patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic:
+        with patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic:
             mock_get_epic.return_value = {
                 "state": "open",
-                "labels": ["feature", "bug"]  # Missing "epic" label
+                "labels": ["feature", "bug"],  # Missing "epic" label
             }
 
             linker = GitHubLinkerService()
@@ -434,11 +371,7 @@ class TestErrorRecovery:
 class TestNavigationFeatures:
     """Integration tests for User Story 2 - Navigation features."""
 
-    def test_epic_link_is_clickable_markdown_format(
-        self,
-        temp_project_dir,
-        sample_spec
-    ):
+    def test_epic_link_is_clickable_markdown_format(self, temp_project_dir, sample_spec):
         """Test that epic links in spec frontmatter are in clickable markdown format."""
         from doit_cli.utils.spec_parser import add_epic_reference, parse_spec_file
 
@@ -447,23 +380,19 @@ class TestNavigationFeatures:
             sample_spec,
             epic_number=123,
             epic_url="https://github.com/owner/repo/issues/123",
-            priority="P1"
+            priority="P1",
         )
 
         # Read spec and verify markdown link format
-        frontmatter, body = parse_spec_file(sample_spec)
+        frontmatter, _body = parse_spec_file(sample_spec)
 
         # Check that Epic field contains markdown link
         assert frontmatter.data.get("Epic") == "[#123](https://github.com/owner/repo/issues/123)"
         assert frontmatter.epic_number == 123
         assert frontmatter.epic_url == "https://github.com/owner/repo/issues/123"
 
-    def test_multiple_specs_listed_in_epic_body(
-        self,
-        temp_project_dir
-    ):
+    def test_multiple_specs_listed_in_epic_body(self, temp_project_dir):
         """Test that multiple specs can be linked to the same epic."""
-        from pathlib import Path
         from doit_cli.services.github_linker import GitHubLinkerService
 
         linker = GitHubLinkerService()
@@ -484,24 +413,19 @@ class TestNavigationFeatures:
         spec_section = body.split("## Specification")[1]
         assert spec_section.count("- `") == 2
 
-    def test_spec_path_format_is_relative_to_repo_root(
-        self,
-        temp_project_dir,
-        sample_spec
-    ):
+    def test_spec_path_format_is_relative_to_repo_root(self, temp_project_dir, sample_spec):
         """Test that spec paths in epic body are relative to repository root."""
+        from unittest.mock import patch
+
         from doit_cli.services.github_linker import GitHubLinkerService
-        from unittest.mock import patch, Mock
 
-        with patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
-             patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
-             patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate, \
-             patch.object(GitHubLinkerService, '_update_epic_via_cli') as mock_update:
-
-            mock_get_epic.return_value = {
-                "priority": "P1",
-                "body": "Test body"
-            }
+        with (
+            patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo"),
+            patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic,
+            patch.object(GitHubLinkerService, "validate_epic_for_linking") as mock_validate,
+            patch.object(GitHubLinkerService, "_update_epic_via_cli") as mock_update,
+        ):
+            mock_get_epic.return_value = {"priority": "P1", "body": "Test body"}
             mock_validate.return_value = (True, "")
 
             linker = GitHubLinkerService()
@@ -514,26 +438,25 @@ class TestNavigationFeatures:
             _, new_body = mock_update.call_args[0]
 
             # The body should contain a relative path starting with "specs/"
-            assert "specs/040-spec-github-linking/spec.md" in new_body or \
-                   "40-spec-github-linking/spec.md" in new_body  # Allow flexible path matching
+            assert (
+                "specs/040-spec-github-linking/spec.md" in new_body
+                or "40-spec-github-linking/spec.md" in new_body
+            )  # Allow flexible path matching
 
 
 class TestEpicCreation:
     """Integration tests for User Story 3 (P3) - Epic Creation when missing."""
 
-    def test_create_epic_for_roadmap_item_success(
-        self,
-        temp_project_dir
-    ):
+    def test_create_epic_for_roadmap_item_success(self, temp_project_dir):
         """Test creating a GitHub epic when roadmap item has no epic."""
-        from pathlib import Path
-        from doit_cli.services.github_linker import GitHubLinkerService
+        from unittest.mock import patch
+
         from doit_cli.models.github_epic import GitHubEpic
-        from unittest.mock import patch, Mock
+        from doit_cli.services.github_linker import GitHubLinkerService
 
         linker = GitHubLinkerService()
 
-        with patch.object(linker.github_service, 'create_epic') as mock_create:
+        with patch.object(linker.github_service, "create_epic") as mock_create:
             # Mock epic creation
             mock_create.return_value = GitHubEpic(
                 number=789,
@@ -541,14 +464,12 @@ class TestEpicCreation:
                 state="open",
                 labels=["epic", "priority:P2"],
                 body="Epic for feature: Test Feature\n\n## Specification\n\n_Spec file will be added when created_",
-                url="https://github.com/owner/repo/issues/789"
+                url="https://github.com/owner/repo/issues/789",
             )
 
             # Create epic
             epic_number, epic_url = linker.create_epic_for_roadmap_item(
-                title="Test Feature",
-                priority="P2",
-                feature_description="Test feature description"
+                title="Test Feature", priority="P2", feature_description="Test feature description"
             )
 
             # Verify epic was created
@@ -562,12 +483,8 @@ class TestEpicCreation:
             assert call_args[1]["priority"] == "P2"
             assert "Test feature description" in call_args[1]["body"]
 
-    def test_update_roadmap_with_new_epic(
-        self,
-        temp_project_dir
-    ):
+    def test_update_roadmap_with_new_epic(self, temp_project_dir):
         """Test updating roadmap.md with newly created epic reference."""
-        from pathlib import Path
         from doit_cli.services.github_linker import GitHubLinkerService
 
         # Create roadmap file
@@ -591,7 +508,7 @@ class TestEpicCreation:
             roadmap_path=roadmap_path,
             roadmap_title="Test Feature",
             epic_number=789,
-            epic_url="https://github.com/owner/repo/issues/789"
+            epic_url="https://github.com/owner/repo/issues/789",
         )
 
         # Read updated roadmap
@@ -604,16 +521,12 @@ class TestEpicCreation:
         # Verify other rows weren't affected
         assert "[#123](https://github.com/owner/repo/issues/123)" in updated_content
 
-    def test_end_to_end_epic_creation_and_linking(
-        self,
-        temp_project_dir,
-        sample_spec
-    ):
+    def test_end_to_end_epic_creation_and_linking(self, temp_project_dir, sample_spec):
         """Test complete workflow: create epic → update roadmap → link spec."""
-        from pathlib import Path
-        from doit_cli.services.github_linker import GitHubLinkerService
+        from unittest.mock import patch
+
         from doit_cli.models.github_epic import GitHubEpic
-        from unittest.mock import patch, Mock
+        from doit_cli.services.github_linker import GitHubLinkerService
 
         # Create roadmap
         roadmap_path = temp_project_dir / ".doit" / "memory" / "roadmap.md"
@@ -628,13 +541,14 @@ class TestEpicCreation:
 
         linker = GitHubLinkerService()
 
-        with patch.object(linker.github_service, 'create_epic') as mock_create, \
-             patch.object(GitHubLinkerService, 'get_epic_details') as mock_get_epic, \
-             patch.object(GitHubLinkerService, 'validate_epic_for_linking') as mock_validate, \
-             patch.object(GitHubLinkerService, '_update_epic_via_cli') as mock_update_cli, \
-             patch.object(GitHubLinkerService, '_get_repo_slug', return_value='owner/repo'), \
-             patch.object(GitHubLinkerService, '_get_relative_path') as mock_relative_path:
-
+        with (
+            patch.object(linker.github_service, "create_epic") as mock_create,
+            patch.object(GitHubLinkerService, "get_epic_details") as mock_get_epic,
+            patch.object(GitHubLinkerService, "validate_epic_for_linking") as mock_validate,
+            patch.object(GitHubLinkerService, "_update_epic_via_cli"),
+            patch.object(GitHubLinkerService, "_get_repo_slug", return_value="owner/repo"),
+            patch.object(GitHubLinkerService, "_get_relative_path") as mock_relative_path,
+        ):
             # Mock epic creation
             mock_create.return_value = GitHubEpic(
                 number=999,
@@ -642,7 +556,7 @@ class TestEpicCreation:
                 state="open",
                 labels=["epic", "priority:P1"],
                 body="Epic for feature\n\n## Specification\n\n_Spec file will be added when created_",
-                url="https://github.com/owner/repo/issues/999"
+                url="https://github.com/owner/repo/issues/999",
             )
 
             # Mock epic details (for linking)
@@ -653,7 +567,7 @@ class TestEpicCreation:
                 "state": "open",
                 "labels": ["epic", "priority:P1"],
                 "url": "https://github.com/owner/repo/issues/999",
-                "priority": "P1"
+                "priority": "P1",
             }
 
             mock_validate.return_value = (True, "")
@@ -663,7 +577,7 @@ class TestEpicCreation:
             epic_number, epic_url = linker.create_epic_for_roadmap_item(
                 title="GitHub Issue Auto-linking in Spec Creation",
                 priority="P1",
-                feature_description="Auto-link specs to GitHub epics"
+                feature_description="Auto-link specs to GitHub epics",
             )
 
             assert epic_number == 999
@@ -674,7 +588,7 @@ class TestEpicCreation:
                 roadmap_path=roadmap_path,
                 roadmap_title="GitHub Issue Auto-linking in Spec Creation",
                 epic_number=epic_number,
-                epic_url=epic_url
+                epic_url=epic_url,
             )
 
             # Verify roadmap was updated
@@ -688,35 +602,29 @@ class TestEpicCreation:
 
             # Verify spec was updated
             from doit_cli.utils.spec_parser import get_epic_reference
+
             epic_ref = get_epic_reference(sample_spec)
             assert epic_ref is not None
             assert epic_ref[0] == 999
 
-    def test_epic_creation_with_invalid_priority(
-        self,
-        temp_project_dir
-    ):
+    def test_epic_creation_with_invalid_priority(self, temp_project_dir):
         """Test that invalid priority raises ValueError."""
-        from doit_cli.services.github_linker import GitHubLinkerService
         import pytest
+
+        from doit_cli.services.github_linker import GitHubLinkerService
 
         linker = GitHubLinkerService()
 
         with pytest.raises(ValueError, match="Invalid priority"):
             linker.create_epic_for_roadmap_item(
-                title="Test Feature",
-                priority="INVALID",
-                feature_description="Test"
+                title="Test Feature", priority="INVALID", feature_description="Test"
             )
 
-    def test_update_roadmap_with_nonexistent_item(
-        self,
-        temp_project_dir
-    ):
+    def test_update_roadmap_with_nonexistent_item(self, temp_project_dir):
         """Test that updating non-existent roadmap item raises ValueError."""
-        from pathlib import Path
-        from doit_cli.services.github_linker import GitHubLinkerService
         import pytest
+
+        from doit_cli.services.github_linker import GitHubLinkerService
 
         # Create roadmap
         roadmap_path = temp_project_dir / ".doit" / "memory" / "roadmap.md"
@@ -736,5 +644,5 @@ class TestEpicCreation:
                 roadmap_path=roadmap_path,
                 roadmap_title="Nonexistent Feature",
                 epic_number=999,
-                epic_url="https://github.com/owner/repo/issues/999"
+                epic_url="https://github.com/owner/repo/issues/999",
             )

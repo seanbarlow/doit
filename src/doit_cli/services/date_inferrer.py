@@ -7,11 +7,12 @@ a multi-tier fallback strategy:
 3. Fall back to file system timestamps
 """
 
+from __future__ import annotations
+
 import re
 import subprocess
 from datetime import date, datetime
 from pathlib import Path
-from typing import Optional
 
 
 class DateInferrer:
@@ -22,12 +23,8 @@ class DateInferrer:
     """
 
     # Patterns for extracting dates from spec metadata
-    CREATED_PATTERN = re.compile(
-        r"\*\*Created\*\*:\s*(\d{4}-\d{2}-\d{2})", re.IGNORECASE
-    )
-    DATE_PATTERN = re.compile(
-        r"\*\*Date\*\*:\s*(\d{4}-\d{2}-\d{2})", re.IGNORECASE
-    )
+    CREATED_PATTERN = re.compile(r"\*\*Created\*\*:\s*(\d{4}-\d{2}-\d{2})", re.IGNORECASE)
+    DATE_PATTERN = re.compile(r"\*\*Date\*\*:\s*(\d{4}-\d{2}-\d{2})", re.IGNORECASE)
     STATUS_COMPLETE_PATTERN = re.compile(
         r"\*\*Status\*\*:\s*(Complete|Completed|Approved)", re.IGNORECASE
     )
@@ -39,7 +36,7 @@ class DateInferrer:
             project_root: Root directory of the project
         """
         self.project_root = project_root
-        self._git_available: Optional[bool] = None
+        self._git_available: bool | None = None
 
     def _is_git_available(self) -> bool:
         """Check if git is available and project is a git repo."""
@@ -60,7 +57,7 @@ class DateInferrer:
 
         return self._git_available
 
-    def infer_created_date(self, spec_path: Path) -> Optional[date]:
+    def infer_created_date(self, spec_path: Path) -> date | None:
         """Infer the creation date for a spec.
 
         Tries sources in order:
@@ -90,7 +87,7 @@ class DateInferrer:
         # Tier 3: File system
         return self._get_file_creation_date(spec_path)
 
-    def infer_completed_date(self, spec_path: Path) -> Optional[date]:
+    def infer_completed_date(self, spec_path: Path) -> date | None:
         """Infer the completion date for a spec.
 
         Tries sources in order:
@@ -125,7 +122,7 @@ class DateInferrer:
         # Tier 3: File modification time
         return self._get_file_modification_date(spec_path)
 
-    def _parse_created_from_metadata(self, spec_path: Path) -> Optional[date]:
+    def _parse_created_from_metadata(self, spec_path: Path) -> date | None:
         """Parse creation date from spec metadata.
 
         Args:
@@ -167,7 +164,7 @@ class DateInferrer:
         except (OSError, UnicodeDecodeError):
             return False
 
-    def _get_git_first_commit_date(self, spec_path: Path) -> Optional[date]:
+    def _get_git_first_commit_date(self, spec_path: Path) -> date | None:
         """Get the date of the first git commit for a file.
 
         Args:
@@ -205,7 +202,7 @@ class DateInferrer:
 
         return None
 
-    def _get_git_last_modified_date(self, spec_path: Path) -> Optional[date]:
+    def _get_git_last_modified_date(self, spec_path: Path) -> date | None:
         """Get the date of the last git modification for a file.
 
         Args:
@@ -238,7 +235,7 @@ class DateInferrer:
 
         return None
 
-    def _get_git_status_change_date(self, spec_path: Path) -> Optional[date]:
+    def _get_git_status_change_date(self, spec_path: Path) -> date | None:
         """Get the date when status changed to Complete/Approved.
 
         Args:
@@ -278,7 +275,7 @@ class DateInferrer:
 
         return None
 
-    def _get_file_creation_date(self, spec_path: Path) -> Optional[date]:
+    def _get_file_creation_date(self, spec_path: Path) -> date | None:
         """Get file system creation date.
 
         Args:
@@ -298,7 +295,7 @@ class DateInferrer:
 
         return None
 
-    def _get_file_modification_date(self, spec_path: Path) -> Optional[date]:
+    def _get_file_modification_date(self, spec_path: Path) -> date | None:
         """Get file system modification date.
 
         Args:
@@ -317,7 +314,7 @@ class DateInferrer:
         return None
 
     @staticmethod
-    def _parse_date_string(date_str: str) -> Optional[date]:
+    def _parse_date_string(date_str: str) -> date | None:
         """Parse a YYYY-MM-DD date string.
 
         Args:
@@ -332,7 +329,7 @@ class DateInferrer:
             return None
 
     @staticmethod
-    def _parse_iso_datetime(iso_str: str) -> Optional[date]:
+    def _parse_iso_datetime(iso_str: str) -> date | None:
         """Parse an ISO 8601 datetime string to date.
 
         Args:

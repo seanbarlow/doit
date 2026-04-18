@@ -1,7 +1,6 @@
 """E2E tests for .DS_Store and macOS-specific file handling."""
 
 import pytest
-from pathlib import Path
 
 
 @pytest.mark.macos

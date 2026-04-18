@@ -1,12 +1,9 @@
 """Integration tests for verify command CLI workflows."""
 
-import pytest
 import json
-from pathlib import Path
+
+import pytest
 from typer.testing import CliRunner
-
-from doit_cli.models.agent import Agent
-
 
 runner = CliRunner()
 
@@ -36,9 +33,7 @@ class TestVerifyCommand:
         """Test verify with --agent claude flag."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["verify", str(claude_project.path), "--agent", "claude"]
-        )
+        result = runner.invoke(app, ["verify", str(claude_project.path), "--agent", "claude"])
 
         # Should show Claude-related checks
         assert "claude" in result.output.lower()
@@ -47,9 +42,7 @@ class TestVerifyCommand:
         """Test verify with --agent copilot flag."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["verify", str(copilot_project.path), "--agent", "copilot"]
-        )
+        result = runner.invoke(app, ["verify", str(copilot_project.path), "--agent", "copilot"])
 
         # Should show Copilot-related checks
         assert "copilot" in result.output.lower()
@@ -58,9 +51,7 @@ class TestVerifyCommand:
         """Test verify with invalid agent name."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["verify", str(initialized_project.path), "--agent", "invalid"]
-        )
+        result = runner.invoke(app, ["verify", str(initialized_project.path), "--agent", "invalid"])
 
         assert result.exit_code == 1
         assert "unknown agent" in result.output.lower()
@@ -69,9 +60,7 @@ class TestVerifyCommand:
         """Test verify with --json flag."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["verify", str(initialized_project.path), "--json"]
-        )
+        result = runner.invoke(app, ["verify", str(initialized_project.path), "--json"])
 
         # Output should be valid JSON
         try:
@@ -86,9 +75,7 @@ class TestVerifyCommand:
         """Test verify JSON output structure."""
         from doit_cli.main import app
 
-        result = runner.invoke(
-            app, ["verify", str(initialized_project.path), "--json"]
-        )
+        result = runner.invoke(app, ["verify", str(initialized_project.path), "--json"])
 
         output = json.loads(result.output)
 
@@ -167,15 +154,11 @@ class TestVerifyWithInitIntegration:
         from doit_cli.main import app
 
         # Run init first
-        init_result = runner.invoke(
-            app, ["init", str(project_dir), "--agent", "claude", "--yes"]
-        )
+        init_result = runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
         assert init_result.exit_code == 0
 
         # Run verify
-        verify_result = runner.invoke(
-            app, ["verify", str(project_dir), "--agent", "claude"]
-        )
+        verify_result = runner.invoke(app, ["verify", str(project_dir), "--agent", "claude"])
 
         # Should have some checks passing
         assert len(verify_result.output) > 0

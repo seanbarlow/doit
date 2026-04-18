@@ -1,91 +1,182 @@
-"""Service to transform command templates to GitHub Copilot prompt format."""
+"""Transform doit command templates into GitHub Copilot `.prompt.md` files.
+
+The source templates in `src/doit_cli/templates/commands/` are authored for
+Claude Code (see https://code.claude.com/docs/en/skills) and carry Claude-
+specific frontmatter fields: `allowed-tools`, `handoffs`, `effort`. VS Code
+Copilot's `.prompt.md` spec (April 2026,
+https://code.visualstudio.com/docs/copilot/customization/prompt-files)
+recognizes a different set: `description`, `agent`, `tools`, `model`.
+
+This transformer:
+
+1. Rewrites frontmatter to the Copilot-native shape
+   (`description`, `agent: agent`, `tools: [...]`).
+2. Maps the Claude `allowed-tools` entries to VS Code tool identifiers via
+   a table. GitHub CLI-heavy commands also get the `githubRepo` tool.
+3. Rewrites `$ARGUMENTS` / `$N` placeholders to Copilot's `${input:...}`
+   variable syntax so the prompt prompts the user at invocation time.
+
+The body (markdown content below the frontmatter) is preserved verbatim
+apart from the placeholder rewrite — instructions that work for Claude
+generally work for Copilot once tool names are normalized.
+"""
+
+from __future__ import annotations
 
 import re
+from collections.abc import Iterable
+
+try:
+    import yaml
+except ImportError:  # pragma: no cover - pyyaml is a hard dependency
+    yaml = None  # type: ignore[assignment]
 
 from ..models.sync_models import CommandTemplate
 
+# Mapping: Claude `allowed-tools` token -> Copilot tool identifier(s).
+# Claude tools are coarse-grained verbs; Copilot tools are named after
+# the VS Code feature they expose. Multiple Claude tools can map to the
+# same Copilot tool — we deduplicate at the end.
+_CLAUDE_TO_COPILOT_TOOLS: dict[str, tuple[str, ...]] = {
+    "Read": ("editFiles",),
+    "Write": ("editFiles",),
+    "Edit": ("editFiles",),
+    "Glob": ("search", "codebase"),
+    "Grep": ("search", "codebase"),
+    "Bash": ("runCommands",),
+}
+
+# If the body mentions the `gh` CLI, also grant githubRepo so Copilot can
+# read issues/PRs directly. Heuristic; the alternative is per-template
+# metadata which isn't worth the extra frontmatter in every file.
+_GH_MARKERS = ("gh pr", "gh issue", "gh api", "gh auth")
+
 
 class PromptTransformer:
-    """Transforms doit command templates to GitHub Copilot prompt format."""
+    """Rewrites a Claude-format command template as a Copilot `.prompt.md`."""
 
     def transform(self, template: CommandTemplate) -> str:
-        """Transform a command template to Copilot prompt format.
+        """Return the Copilot-native prompt content for `template`."""
+        source_fm, body = _split_frontmatter(template.content)
+        copilot_fm = self._build_copilot_frontmatter(source_fm, body)
+        new_body = self._rewrite_placeholders(body)
+        return _render(copilot_fm, new_body)
 
-        Transformation rules (from research.md):
-        - Remove YAML frontmatter entirely (Copilot prompts are plain markdown)
-        - Replace $ARGUMENTS with natural language
-        - Preserve ## Outline, ## Key Rules, and other sections
+    # -- frontmatter -----------------------------------------------------
 
-        Args:
-            template: The command template to transform.
+    def _build_copilot_frontmatter(
+        self, source_fm: dict[str, object], body: str
+    ) -> dict[str, object]:
+        """Map Claude frontmatter to the VS Code Copilot schema.
 
-        Returns:
-            Transformed content suitable for Copilot prompt file.
+        Drops: `allowed-tools`, `handoffs`, `effort` (not VS Code-recognized).
+        Keeps: `description`, `model` (if present and valid).
+        Adds: `agent: agent`, `tools: [...]` (derived from allowed-tools + body).
         """
-        content = template.content
+        out: dict[str, object] = {}
+        description = source_fm.get("description")
+        if description:
+            out["description"] = str(description).strip()
 
-        # Step 1: Strip YAML frontmatter
-        content = self._strip_yaml_frontmatter(content)
+        out["agent"] = "agent"
 
-        # Step 2: Add description as header if available
-        if template.description:
-            header = f"# {self._title_from_name(template.name)}\n\n{template.description}\n\n"
-            content = header + content.lstrip()
+        tools = self._derive_tools(source_fm.get("allowed-tools", ""), body)
+        if tools:
+            out["tools"] = tools
 
-        # Step 3: Replace $ARGUMENTS placeholder with natural language
-        content = self._replace_arguments_placeholder(content)
+        # Pass through model if the source overrode it — VS Code accepts it.
+        model = source_fm.get("model")
+        if model:
+            out["model"] = str(model)
 
-        return content.strip() + "\n"
+        return out
 
-    def _strip_yaml_frontmatter(self, content: str) -> str:
-        """Remove YAML frontmatter from content.
+    def _derive_tools(self, allowed_tools: object, body: str) -> list[str]:
+        """Return the Copilot `tools:` list for this template."""
+        tokens = _tokenize_allowed_tools(allowed_tools)
+        mapped: list[str] = []
+        for tok in tokens:
+            for copilot_tool in _CLAUDE_TO_COPILOT_TOOLS.get(tok, ()):
+                if copilot_tool not in mapped:
+                    mapped.append(copilot_tool)
 
-        Args:
-            content: Markdown content potentially with YAML frontmatter.
+        if any(marker in body for marker in _GH_MARKERS) and "githubRepo" not in mapped:
+            mapped.append("githubRepo")
 
-        Returns:
-            Content with frontmatter removed.
-        """
-        if not content.startswith("---"):
-            return content
+        return mapped
 
-        # Find the closing ---
-        try:
-            end_idx = content.index("---", 3)
-            # Skip the closing --- and any trailing newline
-            return content[end_idx + 3:].lstrip("\n")
-        except ValueError:
-            # No closing ---, return original
-            return content
+    # -- body placeholders ----------------------------------------------
 
-    def _replace_arguments_placeholder(self, content: str) -> str:
-        """Replace $ARGUMENTS placeholder with natural language.
+    def _rewrite_placeholders(self, body: str) -> str:
+        """Convert Claude `$ARGUMENTS` / `$N` to Copilot `${input:...}` variables."""
+        # The canonical user-input code block at the top of most templates.
+        body = re.sub(
+            r"```text\s*\n\$ARGUMENTS\s*\n```",
+            "${input:args:Describe what you want to do for this command.}",
+            body,
+        )
+        # Any remaining standalone $ARGUMENTS references.
+        body = body.replace("$ARGUMENTS", "${input:args}")
 
-        Args:
-            content: Content potentially containing $ARGUMENTS.
+        # Positional arguments: $0, $1, $2 -> ${input:argN}
+        def positional_sub(match: re.Match[str]) -> str:
+            index = int(match.group(1))
+            return f"${{input:arg{index}}}"
 
-        Returns:
-            Content with placeholder replaced.
-        """
-        # Replace the code block containing $ARGUMENTS
-        pattern = r"```text\s*\n\$ARGUMENTS\s*\n```"
-        replacement = "Consider any arguments or options the user provides."
-        content = re.sub(pattern, replacement, content)
+        body = re.sub(r"\$(\d+)\b", positional_sub, body)
+        return body
 
-        # Also replace standalone $ARGUMENTS references
-        content = content.replace("$ARGUMENTS", "the user's input")
 
-        return content
+# --------------------------------------------------------------------------
+# helpers
 
-    def _title_from_name(self, name: str) -> str:
-        """Convert command name to title case.
 
-        Args:
-            name: Command name like "doit.checkin".
+def _tokenize_allowed_tools(value: object) -> list[str]:
+    """Normalize the `allowed-tools` value into a flat list of tool names.
 
-        Returns:
-            Title like "Doit Checkin".
-        """
-        # doit.checkin -> Doit Checkin
-        parts = name.replace("doit.", "").split(".")
-        return "Doit " + " ".join(p.title() for p in parts)
+    Claude Code accepts both comma-separated strings and YAML lists, and
+    allows `Bash(pattern)` constraints; this strips the parenthesized
+    constraints and returns just the tool name.
+    """
+    if isinstance(value, list):
+        items: Iterable[str] = (str(v) for v in value)
+    else:
+        text = str(value).replace(",", " ")
+        items = text.split()
+
+    result: list[str] = []
+    for item in items:
+        name = re.sub(r"\(.*?\)", "", item).strip()
+        if name and name not in result:
+            result.append(name)
+    return result
+
+
+def _split_frontmatter(raw: str) -> tuple[dict[str, object], str]:
+    """Split YAML frontmatter from the body. Returns ({}, raw) if absent."""
+    if not raw.startswith("---"):
+        return {}, raw
+
+    try:
+        end = raw.index("\n---", 3)
+    except ValueError:
+        return {}, raw  # malformed; leave body untouched
+
+    fm_text = raw[3:end].strip()
+    body = raw[end + len("\n---") :].lstrip("\n")
+
+    if yaml is None:  # pragma: no cover
+        return {}, body  # type: ignore[unreachable]
+
+    parsed = yaml.safe_load(fm_text) or {}
+    if not isinstance(parsed, dict):
+        return {}, body
+    return parsed, body
+
+
+def _render(frontmatter: dict[str, object], body: str) -> str:
+    """Serialize frontmatter + body back into a `.prompt.md` string."""
+    if yaml is None:  # pragma: no cover
+        return body  # type: ignore[unreachable]
+    dumped = yaml.safe_dump(frontmatter, sort_keys=False, default_flow_style=False).strip()
+    return f"---\n{dumped}\n---\n\n{body.lstrip()}"

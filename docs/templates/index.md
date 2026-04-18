@@ -1,7 +1,7 @@
 # Doit Template System Documentation
 
-**Version**: 1.0.0
-**Last Updated**: 2026-01-10
+**Version**: 1.1.0
+**Last Updated**: 2026-04-17
 
 ## Overview
 
@@ -77,18 +77,24 @@ flowchart TD
 | [checklist-template.md](root-templates.md#checklist-template) | Generic checklist format | Various checklist files |
 | [agent-file-template.md](root-templates.md#agent-file-template) | AI agent context file | `CLAUDE.md` |
 
-### Command Templates (9 files)
+### Command Templates (13 files)
+
+The `-it` suffix (April 2025+) replaced the earlier short names (e.g. `doit.specify` → `doit.specit`). Older documentation still referencing the short names predates this rename.
 
 | Command | Purpose | Phase |
 |---------|---------|-------|
 | [doit.constitution](commands.md#doitconstitution) | Project principles & tech stack | Initialization |
-| [doit.scaffold](commands.md#doitscaffold) | Generate project structure | Initialization |
-| [doit.specify](commands.md#doitspecify) | Create feature specifications | Specification |
-| [doit.plan](commands.md#doitplan) | Generate implementation plan | Planning |
-| [doit.tasks](commands.md#doittasks) | Break down into tasks | Task Generation |
-| [doit.implement](commands.md#doitimplement) | Execute tasks | Implementation |
-| [doit.review](commands.md#doitreview) | Code review & manual testing | QA |
-| [doit.test](commands.md#doittest) | Automated test execution | QA |
+| [doit.scaffoldit](commands.md#doitscaffoldit) | Generate project structure | Initialization |
+| [doit.roadmapit](commands.md#doitroadmapit) | Prioritize and manage the roadmap | Initialization |
+| [doit.researchit](commands.md#doitresearchit) | Product-owner Q&A capture | Pre-spec |
+| [doit.specit](commands.md#doitspecit) | Create feature specifications | Specification |
+| [doit.planit](commands.md#doitplanit) | Generate implementation plan | Planning |
+| [doit.taskit](commands.md#doittaskit) | Break down into tasks | Task Generation |
+| [doit.implementit](commands.md#doitimplementit) | Execute tasks | Implementation |
+| [doit.reviewit](commands.md#doitreviewit) | Code review & manual testing | QA |
+| [doit.testit](commands.md#doittestit) | Automated test execution | QA |
+| [doit.fixit](commands.md#doitfixit) | Bug-fix workflow | Maintenance |
+| [doit.documentit](commands.md#doitdocumentit) | Documentation audit | Maintenance |
 | [doit.checkin](commands.md#doitcheckin) | Finalize & create PR | Completion |
 
 ## Artifact Flow

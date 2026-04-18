@@ -12,6 +12,12 @@ on:
       - develop
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+
 jobs:
   windows-e2e:
     name: Windows E2E Testing
@@ -123,7 +129,8 @@ jobs:
 
       - name: Comment PR with test results
         if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v8
+        continue-on-error: true
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');

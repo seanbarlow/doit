@@ -1,7 +1,8 @@
 """Rich terminal formatter for status output."""
 
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Optional
 
 from rich.console import Console
 from rich.panel import Panel
@@ -20,7 +21,7 @@ class RichFormatter(StatusFormatter):
     - Summary panels
     """
 
-    def __init__(self, console: Optional[Console] = None) -> None:
+    def __init__(self, console: Console | None = None) -> None:
         """Initialize formatter with optional console.
 
         Args:
@@ -60,9 +61,7 @@ class RichFormatter(StatusFormatter):
         """
         self._render_to_console(report, verbose, self.console)
 
-    def _render_to_console(
-        self, report: StatusReport, verbose: bool, console: Console
-    ) -> None:
+    def _render_to_console(self, report: StatusReport, verbose: bool, console: Console) -> None:
         """Internal method to render report to a console.
 
         Args:
@@ -77,9 +76,7 @@ class RichFormatter(StatusFormatter):
         header = f"[bold]📊 Project:[/bold] {project_name}\n"
         header += f"[bold]📅 Generated:[/bold] {generated}"
 
-        console.print(
-            Panel(header, title="Spec Status Dashboard", border_style="blue")
-        )
+        console.print(Panel(header, title="Spec Status Dashboard", border_style="blue"))
         console.print()
 
         # Specs table
@@ -93,13 +90,10 @@ class RichFormatter(StatusFormatter):
             console.print(summary)
         else:
             console.print(
-                "[yellow]No specifications found.[/yellow] "
-                "Run 'doit specit' to create one."
+                "[yellow]No specifications found.[/yellow] Run 'doit specit' to create one."
             )
 
-    def _create_specs_table(
-        self, report: StatusReport, verbose: bool
-    ) -> Table:
+    def _create_specs_table(self, report: StatusReport, verbose: bool) -> Table:
         """Create the main specs table.
 
         Args:
@@ -187,7 +181,9 @@ class RichFormatter(StatusFormatter):
 
         summary = f"{status_line}\n{completion}  │  {ready}"
 
-        return Panel(summary, title="Summary", border_style="green" if report.is_ready_to_commit else "red")
+        return Panel(
+            summary, title="Summary", border_style="green" if report.is_ready_to_commit else "red"
+        )
 
     def _get_status_style(self, status: SpecState) -> str:
         """Get Rich style for a status.

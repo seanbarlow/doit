@@ -1,7 +1,5 @@
 """Unit tests for Agent model."""
 
-import pytest
-
 from doit_cli.models.agent import Agent
 
 
@@ -78,9 +76,7 @@ class TestNeedsTransformation:
 
     def test_only_copilot_needs_transformation(self):
         """Test only Copilot needs transformation among all agents."""
-        agents_needing_transformation = [
-            agent for agent in Agent if agent.needs_transformation
-        ]
+        agents_needing_transformation = [agent for agent in Agent if agent.needs_transformation]
         assert agents_needing_transformation == [Agent.COPILOT]
 
 

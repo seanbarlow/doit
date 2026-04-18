@@ -1,5 +1,7 @@
 """Service to read and scan doit command templates."""
 
+from __future__ import annotations
+
 import importlib.resources
 from pathlib import Path
 
@@ -80,6 +82,7 @@ class TemplateReader:
             # Try to get path via traversable
             # For installed packages, get the actual location
             import doit_cli
+
             pkg_location = Path(doit_cli.__file__).parent
             templates_dir = pkg_location / "templates" / "commands"
             if templates_dir.exists():

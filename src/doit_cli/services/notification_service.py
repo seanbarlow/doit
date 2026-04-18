@@ -4,11 +4,12 @@ This module provides the NotificationService class for managing
 change notifications between team members.
 """
 
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
 
 from doit_cli.models.team_models import (
     Notification,
@@ -23,25 +24,21 @@ class NotificationState:
 
     notifications: list[Notification] = field(default_factory=list)
     settings: NotificationSettings = field(default_factory=NotificationSettings)
-    last_batch_sent: Optional[datetime] = None
+    last_batch_sent: datetime | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
             "notifications": [n.to_dict() for n in self.notifications],
             "settings": self.settings.to_dict(),
-            "last_batch_sent": self.last_batch_sent.isoformat()
-            if self.last_batch_sent
-            else None,
+            "last_batch_sent": self.last_batch_sent.isoformat() if self.last_batch_sent else None,
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "NotificationState":
+    def from_dict(cls, data: dict) -> NotificationState:
         """Create from dictionary."""
         return cls(
-            notifications=[
-                Notification.from_dict(n) for n in data.get("notifications", [])
-            ],
+            notifications=[Notification.from_dict(n) for n in data.get("notifications", [])],
             settings=NotificationSettings.from_dict(data.get("settings", {})),
             last_batch_sent=datetime.fromisoformat(data["last_batch_sent"])
             if data.get("last_batch_sent")
@@ -63,14 +60,14 @@ class NotificationService:
     MAX_NOTIFICATIONS = 100  # Keep last 100 notifications
     MAX_BATCH_SIZE = 10  # Maximum notifications per batch
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path | None = None):
         """Initialize NotificationService.
 
         Args:
             project_root: Project root directory. Defaults to cwd.
         """
         self.project_root = project_root or Path.cwd()
-        self._state: Optional[NotificationState] = None
+        self._state: NotificationState | None = None
 
     @property
     def state_path(self) -> Path:
@@ -81,7 +78,7 @@ class NotificationService:
         """Load notification state from file."""
         if self.state_path.exists():
             try:
-                with open(self.state_path, "r", encoding="utf-8") as f:
+                with open(self.state_path, encoding="utf-8") as f:
                     data = json.load(f)
                 return NotificationState.from_dict(data)
             except (json.JSONDecodeError, KeyError):
@@ -98,9 +95,7 @@ class NotificationService:
         with open(self.state_path, "w", encoding="utf-8") as f:
             json.dump(state.to_dict(), f, indent=2)
 
-    def _prune_notifications(
-        self, notifications: list[Notification]
-    ) -> list[Notification]:
+    def _prune_notifications(self, notifications: list[Notification]) -> list[Notification]:
         """Remove expired and excess notifications."""
         # Remove expired
         active = [n for n in notifications if not n.is_expired()]
@@ -123,7 +118,7 @@ class NotificationService:
         title: str,
         content: str,
         source_member: str,
-        affected_files: list[str] = None,
+        affected_files: list[str] | None = None,
     ) -> Notification:
         """Create a new notification.
 
@@ -156,7 +151,7 @@ class NotificationService:
         self,
         unread_only: bool = False,
         limit: int = 50,
-        notification_type: NotificationType = None,
+        notification_type: NotificationType | None = None,
     ) -> list[Notification]:
         """Get notifications.
 
@@ -190,7 +185,7 @@ class NotificationService:
         state = self.get_state()
         return sum(1 for n in state.notifications if not n.read)
 
-    def mark_read(self, notification_id: str = None) -> int:
+    def mark_read(self, notification_id: str | None = None) -> int:
         """Mark notification(s) as read.
 
         Args:
@@ -220,11 +215,11 @@ class NotificationService:
 
     def update_settings(
         self,
-        enabled: bool = None,
-        batch_interval_minutes: int = None,
-        on_sync: bool = None,
-        on_conflict: bool = None,
-        on_member_change: bool = None,
+        enabled: bool | None = None,
+        batch_interval_minutes: int | None = None,
+        on_sync: bool | None = None,
+        on_conflict: bool | None = None,
+        on_member_change: bool | None = None,
     ) -> NotificationSettings:
         """Update notification settings.
 
@@ -318,7 +313,7 @@ class NotificationService:
         self,
         source_member: str,
         affected_files: list[str],
-    ) -> Optional[Notification]:
+    ) -> Notification | None:
         """Create a memory changed notification."""
         settings = self.get_settings()
         if not settings.enabled or not settings.on_sync:
@@ -340,7 +335,7 @@ class NotificationService:
         self,
         source_member: str,
         affected_files: list[str],
-    ) -> Optional[Notification]:
+    ) -> Notification | None:
         """Create a conflict detected notification."""
         settings = self.get_settings()
         if not settings.enabled or not settings.on_conflict:
@@ -360,7 +355,7 @@ class NotificationService:
         self,
         new_member_email: str,
         added_by: str,
-    ) -> Optional[Notification]:
+    ) -> Notification | None:
         """Create a member joined notification."""
         settings = self.get_settings()
         if not settings.enabled or not settings.on_member_change:
@@ -378,7 +373,7 @@ class NotificationService:
         member_email: str,
         changed_by: str,
         new_permission: str,
-    ) -> Optional[Notification]:
+    ) -> Notification | None:
         """Create a permission changed notification."""
         settings = self.get_settings()
         if not settings.enabled or not settings.on_member_change:

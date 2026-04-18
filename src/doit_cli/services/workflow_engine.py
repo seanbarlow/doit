@@ -4,25 +4,27 @@ This module provides the WorkflowEngine class that manages workflow execution,
 step navigation, state persistence, and user input collection.
 """
 
+from __future__ import annotations
+
 import signal
 from datetime import datetime
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from rich.console import Console
 
 from ..models.workflow_models import (
+    NavigationCommand,
+    StepResponse,
     Workflow,
-    WorkflowStep,
     WorkflowState,
     WorkflowStatus,
-    StepResponse,
-    ValidationResult,
-    WorkflowError,
-    NavigationCommand,
+    WorkflowStep,
 )
 from ..prompts.interactive import InteractivePrompt, ProgressDisplay
-from .input_validator import validate_step, get_validator
+from .input_validator import get_validator
 
+if TYPE_CHECKING:
+    from .state_manager import StateManager
 
 # =============================================================================
 # WorkflowEngine Protocol
@@ -73,7 +75,7 @@ class WorkflowEngine:
     def __init__(
         self,
         console: Console | None = None,
-        state_manager: "StateManager | None" = None,
+        state_manager: StateManager | None = None,
     ):
         """Initialize the workflow engine.
 
@@ -222,14 +224,12 @@ class WorkflowEngine:
 
                 # Skip steps that already have responses (Fix MT-007)
                 if step.id in state.responses:
-                    self.console.print(
-                        f"[dim]Skipping {step.name} (provided via CLI)[/dim]"
-                    )
+                    self.console.print(f"[dim]Skipping {step.name} (provided via CLI)[/dim]")
                     state.current_step += 1
                     continue
 
                 try:
-                    state, response = self.execute_step(state, step)
+                    state, _response = self.execute_step(state, step)
                 except NavigationCommand as nav:
                     state = self._handle_navigation(state, nav, steps)
 
@@ -263,10 +263,7 @@ class WorkflowEngine:
         self.progress.show_summary(len(state.responses))
 
         # Return responses as simple dict
-        return {
-            step_id: resp.value
-            for step_id, resp in state.responses.items()
-        }
+        return {step_id: resp.value for step_id, resp in state.responses.items()}
 
     def cancel(self, state: WorkflowState) -> None:
         """Cancel workflow and save state for resume.
@@ -308,7 +305,7 @@ class WorkflowEngine:
             return self._go_back(state, steps)
         elif nav.command == "skip":
             return self._skip_step(state, steps)
-        return state
+        return state  # type: ignore[unreachable]
 
     def _go_back(
         self,
@@ -387,13 +384,12 @@ class WorkflowEngine:
             f"[warning]Found interrupted workflow from "
             f"{state.updated_at.strftime('%Y-%m-%d %H:%M')}[/warning]"
         )
-        self.console.print(
-            f"[info]Progress: {len(state.responses)} steps completed[/info]"
-        )
+        self.console.print(f"[info]Progress: {len(state.responses)} steps completed[/info]")
         return self.prompt.prompt_confirm("Resume where you left off?", default=True)
 
     def _setup_interrupt_handler(self) -> None:
         """Setup signal handler for Ctrl+C."""
+
         def handler(signum, frame):
             self._interrupted = True
 

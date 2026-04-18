@@ -1,7 +1,6 @@
 """End-to-end tests for 'doit specit' command on Windows."""
+
 import sys
-import subprocess
-from pathlib import Path
 
 import pytest
 
@@ -38,7 +37,7 @@ def test_specit_handles_windows_absolute_path(temp_project_dir, path_validator):
     spec_dir.mkdir(parents=True, exist_ok=True)
 
     spec_file = spec_dir / "spec.md"
-    spec_content = f"""# Feature Specification: Test Feature
+    spec_content = """# Feature Specification: Test Feature
 
 **Path**: C:\\Users\\Test\\project\\file.txt
 
@@ -50,7 +49,10 @@ This is a test specification with Windows paths.
 
     # Read back and verify
     read_content = spec_file.read_text(encoding="utf-8")
-    assert "C:\\Users\\Test\\project\\file.txt" in read_content or "C:/Users/Test/project/file.txt" in read_content
+    assert (
+        "C:\\Users\\Test\\project\\file.txt" in read_content
+        or "C:/Users/Test/project/file.txt" in read_content
+    )
     assert "# Feature Specification" in read_content
 
 

@@ -1,14 +1,18 @@
 ---
-description: Finalize feature implementation, close issues, update roadmaps, and create pull request
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-effort: high
+description: Finalize feature implementation, close issues, update roadmaps, and create
+  pull request
+agent: agent
+tools:
+- editFiles
+- search
+- codebase
+- runCommands
+- githubRepo
 ---
 
 ## User Input
 
-```text
-$ARGUMENTS
-```
+${input:args:Describe what you want to do for this command.}
 
 You **MUST** consider the user input before proceeding (if not empty).
 
@@ -249,7 +253,7 @@ Before generating or modifying code:
 
 9. **Create pull request**:
    - Determine target branch:
-     - Check $ARGUMENTS for `--target [branch]` flag
+     - Check ${input:args} for `--target [branch]` flag
      - If not specified, check for `develop` branch
      - If no `develop`, use `main` or `master`
    - Check for gh CLI:

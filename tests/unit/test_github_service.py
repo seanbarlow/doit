@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from doit_cli.models.fixit_models import GitHubIssue, IssueState
+from doit_cli.models.fixit_models import IssueState
 from doit_cli.services.github_service import GitHubService, GitHubServiceError
 
 
@@ -62,6 +62,7 @@ class TestGitHubServiceIsAvailable:
             def side_effect(*args, **kwargs):
                 if "rate_limit" in str(args):
                     from subprocess import TimeoutExpired
+
                     raise TimeoutExpired(cmd="gh", timeout=5)
                 return init_mock
 

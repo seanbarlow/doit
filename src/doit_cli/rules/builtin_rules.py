@@ -1,5 +1,7 @@
 """Built-in validation rules for spec files."""
 
+from __future__ import annotations
+
 from dataclasses import replace
 
 from ..models.validation_models import Severity, ValidationRule

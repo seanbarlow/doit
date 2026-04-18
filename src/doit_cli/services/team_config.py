@@ -3,9 +3,10 @@
 This module handles loading, saving, and validating team.yaml configuration.
 """
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -34,7 +35,7 @@ class TeamNotInitializedError(TeamConfigError):
 class TeamConfigValidationError(TeamConfigError):
     """Team configuration validation failed."""
 
-    def __init__(self, message: str, errors: list[str] = None):
+    def __init__(self, message: str, errors: list[str] | None = None):
         super().__init__(message)
         self.errors = errors or []
 
@@ -47,13 +48,13 @@ MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10MB
 WARN_FILE_SIZE_BYTES = 1 * 1024 * 1024  # 1MB
 
 
-def get_config_path(project_root: Path = None) -> Path:
+def get_config_path(project_root: Path | None = None) -> Path:
     """Get the path to team.yaml configuration file."""
     root = project_root or Path.cwd()
     return root / ".doit" / "config" / "team.yaml"
 
 
-def get_state_dir(project_root: Path = None) -> Path:
+def get_state_dir(project_root: Path | None = None) -> Path:
     """Get the path to team state directory."""
     root = project_root or Path.cwd()
     return root / ".doit" / "state"
@@ -112,7 +113,7 @@ def validate_team_config(config: TeamConfig) -> list[str]:
     return errors
 
 
-def load_team_config(project_root: Path = None) -> TeamConfig:
+def load_team_config(project_root: Path | None = None) -> TeamConfig:
     """Load team configuration from team.yaml.
 
     Args:
@@ -133,10 +134,10 @@ def load_team_config(project_root: Path = None) -> TeamConfig:
         )
 
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
     except yaml.YAMLError as e:
-        raise TeamConfigValidationError(f"Invalid YAML in team.yaml: {e}")
+        raise TeamConfigValidationError(f"Invalid YAML in team.yaml: {e}") from e
 
     if not data:
         raise TeamConfigValidationError("team.yaml is empty")
@@ -144,7 +145,7 @@ def load_team_config(project_root: Path = None) -> TeamConfig:
     try:
         config = TeamConfig.from_dict(data)
     except (KeyError, ValueError) as e:
-        raise TeamConfigValidationError(f"Invalid team configuration: {e}")
+        raise TeamConfigValidationError(f"Invalid team configuration: {e}") from e
 
     # Validate configuration
     errors = validate_team_config(config)
@@ -157,7 +158,7 @@ def load_team_config(project_root: Path = None) -> TeamConfig:
     return config
 
 
-def save_team_config(config: TeamConfig, project_root: Path = None) -> None:
+def save_team_config(config: TeamConfig, project_root: Path | None = None) -> None:
     """Save team configuration to team.yaml.
 
     Args:
@@ -193,7 +194,7 @@ def save_team_config(config: TeamConfig, project_root: Path = None) -> None:
         )
 
 
-def team_exists(project_root: Path = None) -> bool:
+def team_exists(project_root: Path | None = None) -> bool:
     """Check if team.yaml exists."""
     return get_config_path(project_root).exists()
 
@@ -201,7 +202,7 @@ def team_exists(project_root: Path = None) -> bool:
 def create_initial_config(
     team_name: str,
     owner_email: str,
-    project_root: Path = None,
+    project_root: Path | None = None,
 ) -> TeamConfig:
     """Create initial team configuration.
 
@@ -245,7 +246,7 @@ def create_initial_config(
     return config
 
 
-def ensure_state_directory(project_root: Path = None) -> Path:
+def ensure_state_directory(project_root: Path | None = None) -> Path:
     """Ensure team state directory exists and return its path."""
     state_dir = get_state_dir(project_root)
     state_dir.mkdir(parents=True, exist_ok=True)
@@ -256,7 +257,7 @@ def ensure_state_directory(project_root: Path = None) -> Path:
     return state_dir
 
 
-def get_large_files_warning(config: TeamConfig, project_root: Path = None) -> list[str]:
+def get_large_files_warning(config: TeamConfig, project_root: Path | None = None) -> list[str]:
     """Check for large shared files and return warnings.
 
     Returns:

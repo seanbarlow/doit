@@ -1,9 +1,10 @@
 """Parser for extracting tasks and cross-references from tasks.md files."""
 
+from __future__ import annotations
+
 import hashlib
 import re
 from pathlib import Path
-from typing import Optional
 
 from ..models.crossref_models import Task, TaskReference
 
@@ -24,14 +25,12 @@ class TaskParser:
 
     # Pattern to extract [FR-XXX] or [FR-001, FR-002] references
     # Matches single or comma-separated FR references
-    REFERENCE_PATTERN = re.compile(
-        r"\[(?P<refs>FR-\d{3}(?:,\s*FR-\d{3})*)\]"
-    )
+    REFERENCE_PATTERN = re.compile(r"\[(?P<refs>FR-\d{3}(?:,\s*FR-\d{3})*)\]")
 
     # Pattern to extract individual FR-XXX from comma-separated list
     FR_PATTERN = re.compile(r"FR-\d{3}")
 
-    def __init__(self, tasks_path: Optional[Path] = None) -> None:
+    def __init__(self, tasks_path: Path | None = None) -> None:
         """Initialize parser with optional tasks file path.
 
         Args:
@@ -39,7 +38,7 @@ class TaskParser:
         """
         self.tasks_path = tasks_path
 
-    def parse(self, tasks_path: Optional[Path] = None) -> list[Task]:
+    def parse(self, tasks_path: Path | None = None) -> list[Task]:
         """Parse tasks.md and extract all tasks with their references.
 
         Args:
@@ -160,7 +159,7 @@ class TaskParser:
         return hashlib.md5(normalized.encode()).hexdigest()[:8]
 
     def get_tasks_for_requirement(
-        self, requirement_id: str, tasks_path: Optional[Path] = None
+        self, requirement_id: str, tasks_path: Path | None = None
     ) -> list[Task]:
         """Get all tasks that reference a specific requirement.
 
@@ -174,7 +173,7 @@ class TaskParser:
         tasks = self.parse(tasks_path)
         return [t for t in tasks if requirement_id in t.requirement_ids]
 
-    def get_all_referenced_ids(self, tasks_path: Optional[Path] = None) -> set[str]:
+    def get_all_referenced_ids(self, tasks_path: Path | None = None) -> set[str]:
         """Get set of all requirement IDs referenced in tasks.
 
         Args:
@@ -214,7 +213,7 @@ class TaskParser:
         used_old_tasks: set[str] = set()
 
         for new_task in new_tasks:
-            best_match: Optional[Task] = None
+            best_match: Task | None = None
             best_score = 0.0
 
             for old_task in old_tasks:
@@ -222,9 +221,7 @@ class TaskParser:
                 if old_task.id in used_old_tasks:
                     continue
 
-                score = self._calculate_similarity(
-                    new_task.description, old_task.description
-                )
+                score = self._calculate_similarity(new_task.description, old_task.description)
                 if score > best_score and score >= similarity_threshold:
                     best_score = score
                     best_match = old_task
@@ -232,9 +229,7 @@ class TaskParser:
             if best_match and best_match.references:
                 # Preserve references from the matched old task
                 used_old_tasks.add(best_match.id)
-                preserved_task = dataclass_replace(
-                    new_task, references=list(best_match.references)
-                )
+                preserved_task = dataclass_replace(new_task, references=list(best_match.references))
                 result.append(preserved_task)
             else:
                 result.append(new_task)

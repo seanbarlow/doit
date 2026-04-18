@@ -8,8 +8,6 @@ This module provides utilities to work with extended attributes in tests.
 import os
 import platform
 import subprocess
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 
 class ExtendedAttributeHandler:
@@ -19,7 +17,7 @@ class ExtendedAttributeHandler:
         """Initialize extended attribute handler."""
         self.is_macos = platform.system() == "Darwin"
 
-    def get_xattr(self, filepath: str, attr_name: str) -> Optional[str]:
+    def get_xattr(self, filepath: str, attr_name: str) -> str | None:
         """Get a specific extended attribute value.
 
         Args:
@@ -37,10 +35,7 @@ class ExtendedAttributeHandler:
 
         try:
             result = subprocess.run(
-                ["xattr", "-p", attr_name, filepath],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["xattr", "-p", attr_name, filepath], capture_output=True, text=True, timeout=5
             )
 
             if result.returncode == 0:
@@ -73,7 +68,7 @@ class ExtendedAttributeHandler:
                 ["xattr", "-w", attr_name, attr_value, filepath],
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
             )
 
             return result.returncode == 0
@@ -81,7 +76,7 @@ class ExtendedAttributeHandler:
         except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
             return False
 
-    def list_xattrs(self, filepath: str) -> List[str]:
+    def list_xattrs(self, filepath: str) -> list[str]:
         """List all extended attributes for a file.
 
         Args:
@@ -98,10 +93,7 @@ class ExtendedAttributeHandler:
 
         try:
             result = subprocess.run(
-                ["xattr", "-l", filepath],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["xattr", "-l", filepath], capture_output=True, text=True, timeout=5
             )
 
             if result.returncode == 0:
@@ -137,10 +129,7 @@ class ExtendedAttributeHandler:
 
         try:
             result = subprocess.run(
-                ["xattr", "-d", attr_name, filepath],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["xattr", "-d", attr_name, filepath], capture_output=True, text=True, timeout=5
             )
 
             return result.returncode == 0
@@ -165,10 +154,7 @@ class ExtendedAttributeHandler:
 
         try:
             result = subprocess.run(
-                ["xattr", "-c", filepath],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["xattr", "-c", filepath], capture_output=True, text=True, timeout=5
             )
 
             return result.returncode == 0
@@ -176,7 +162,7 @@ class ExtendedAttributeHandler:
         except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
             return False
 
-    def compare_xattrs(self, filepath1: str, filepath2: str) -> Tuple[bool, List[str]]:
+    def compare_xattrs(self, filepath1: str, filepath2: str) -> tuple[bool, list[str]]:
         """Compare extended attributes between two files.
 
         Args:
@@ -244,7 +230,7 @@ class ExtendedAttributeHandler:
         """
         return self.remove_xattr(filepath, "com.apple.quarantine")
 
-    def get_finder_info(self, filepath: str) -> Optional[str]:
+    def get_finder_info(self, filepath: str) -> str | None:
         """Get Finder info extended attribute.
 
         Args:
@@ -255,7 +241,7 @@ class ExtendedAttributeHandler:
         """
         return self.get_xattr(filepath, "com.apple.FinderInfo")
 
-    def get_metadata_attrs(self, filepath: str) -> Dict[str, str]:
+    def get_metadata_attrs(self, filepath: str) -> dict[str, str]:
         """Get all com.apple.metadata.* attributes.
 
         Args:
@@ -299,13 +285,12 @@ class ExtendedAttributeHandler:
 
         for attr in attrs:
             value = self.get_xattr(source, attr)
-            if value is not None:
-                if not self.set_xattr(dest, attr, value):
-                    success = False
+            if value is not None and not self.set_xattr(dest, attr, value):
+                success = False
 
         return success
 
-    def get_xattr_summary(self, filepath: str) -> Dict[str, any]:
+    def get_xattr_summary(self, filepath: str) -> dict[str, any]:
         """Get a summary of all extended attributes for a file.
 
         Args:
@@ -322,7 +307,7 @@ class ExtendedAttributeHandler:
             "has_quarantine": False,
             "has_finder_info": False,
             "has_metadata": False,
-            "attributes": []
+            "attributes": [],
         }
 
         if not summary["exists"] or not self.is_macos:

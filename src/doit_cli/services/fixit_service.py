@@ -4,16 +4,17 @@ This module provides the FixitService class for managing
 the complete bug-fix workflow lifecycle.
 """
 
+from __future__ import annotations
+
 import re
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from ..models.fixit_models import (
     FindingType,
+    FixitWorkflowState,
     FixPhase,
     FixWorkflow,
-    FixitWorkflowState,
     GitHubIssue,
     InvestigationCheckpoint,
     InvestigationFinding,
@@ -22,6 +23,9 @@ from ..models.fixit_models import (
 )
 from .github_service import GitHubService
 from .state_manager import StateManager
+
+if TYPE_CHECKING:
+    from ..models.fixit_models import FixPlan
 
 
 class FixitServiceError(Exception):
@@ -41,8 +45,8 @@ class FixitService:
 
     def __init__(
         self,
-        github_service: Optional[GitHubService] = None,
-        state_manager: Optional[StateManager] = None,
+        github_service: GitHubService | None = None,
+        state_manager: StateManager | None = None,
     ):
         """Initialize the fixit service.
 
@@ -61,7 +65,7 @@ class FixitService:
         self,
         issue_id: int,
         resume: bool = False,
-        manual_branch: Optional[str] = None,
+        manual_branch: str | None = None,
     ) -> FixWorkflow:
         """Start a new bug-fix workflow for an issue.
 
@@ -91,9 +95,7 @@ class FixitService:
         if issue is None:
             raise FixitServiceError(f"Issue #{issue_id} not found.")
         if issue.state == IssueState.CLOSED:
-            raise FixitServiceError(
-                f"Issue #{issue_id} is already closed. Cannot start workflow."
-            )
+            raise FixitServiceError(f"Issue #{issue_id} is already closed. Cannot start workflow.")
 
         # Determine branch name
         branch_name = manual_branch or self._create_branch_name(issue_id, issue.title)
@@ -102,8 +104,7 @@ class FixitService:
         local_exists, remote_exists = self.github.check_branch_exists(branch_name)
         if local_exists or remote_exists:
             raise FixitServiceError(
-                f"Branch '{branch_name}' already exists. "
-                "Use --branch to specify a different name."
+                f"Branch '{branch_name}' already exists. Use --branch to specify a different name."
             )
 
         # Create the branch
@@ -166,10 +167,7 @@ class FixitService:
 
         # Optionally close the issue
         if close_issue:
-            self.github.close_issue(
-                issue_id,
-                comment="Fixed via doit fixit workflow."
-            )
+            self.github.close_issue(issue_id, comment="Fixed via doit fixit workflow.")
 
         return True
 
@@ -177,7 +175,7 @@ class FixitService:
     # Query Methods
     # =========================================================================
 
-    def get_active_workflow(self) -> Optional[FixWorkflow]:
+    def get_active_workflow(self) -> FixWorkflow | None:
         """Get the currently active workflow.
 
         Returns:
@@ -187,10 +185,10 @@ class FixitService:
         if result is None:
             return None
 
-        issue_id, state_data = result
+        _issue_id, state_data = result
         return FixWorkflow.from_dict(state_data["workflow"])
 
-    def get_workflow(self, issue_id: int) -> Optional[FixWorkflow]:
+    def get_workflow(self, issue_id: int) -> FixWorkflow | None:
         """Get workflow for a specific issue.
 
         Args:
@@ -204,7 +202,7 @@ class FixitService:
             return None
         return FixWorkflow.from_dict(state_data["workflow"])
 
-    def get_workflow_state(self, issue_id: int) -> Optional[FixitWorkflowState]:
+    def get_workflow_state(self, issue_id: int) -> FixitWorkflowState | None:
         """Get complete workflow state for an issue.
 
         Args:
@@ -303,7 +301,7 @@ class FixitService:
     # Investigation Methods (T022-T024)
     # =========================================================================
 
-    def start_investigation(self, issue_id: int) -> Optional["InvestigationPlan"]:
+    def start_investigation(self, issue_id: int) -> InvestigationPlan | None:
         """Start investigation for a workflow.
 
         Creates an InvestigationPlan with keywords extracted from the issue.
@@ -338,10 +336,18 @@ class FixitService:
             workflow_id=state_data["workflow"]["id"],
             keywords=keywords,
             checkpoints=[
-                InvestigationCheckpoint(id=f"cp-{uuid4().hex[:6]}", title="Review error logs and stack traces"),
-                InvestigationCheckpoint(id=f"cp-{uuid4().hex[:6]}", title="Identify affected code paths"),
-                InvestigationCheckpoint(id=f"cp-{uuid4().hex[:6]}", title="Search for related issues or commits"),
-                InvestigationCheckpoint(id=f"cp-{uuid4().hex[:6]}", title="Formulate root cause hypothesis"),
+                InvestigationCheckpoint(
+                    id=f"cp-{uuid4().hex[:6]}", title="Review error logs and stack traces"
+                ),
+                InvestigationCheckpoint(
+                    id=f"cp-{uuid4().hex[:6]}", title="Identify affected code paths"
+                ),
+                InvestigationCheckpoint(
+                    id=f"cp-{uuid4().hex[:6]}", title="Search for related issues or commits"
+                ),
+                InvestigationCheckpoint(
+                    id=f"cp-{uuid4().hex[:6]}", title="Formulate root cause hypothesis"
+                ),
             ],
         )
 
@@ -355,12 +361,12 @@ class FixitService:
     def add_finding(
         self,
         issue_id: int,
-        finding_type: "FindingType",
+        finding_type: FindingType,
         description: str,
         evidence: str = "",
-        file_path: Optional[str] = None,
-        line_number: Optional[int] = None,
-    ) -> Optional["InvestigationFinding"]:
+        file_path: str | None = None,
+        line_number: int | None = None,
+    ) -> InvestigationFinding | None:
         """Add a finding to the investigation.
 
         Args:
@@ -483,7 +489,7 @@ class FixitService:
 
         return True
 
-    def get_investigation_plan(self, issue_id: int) -> Optional["InvestigationPlan"]:
+    def get_investigation_plan(self, issue_id: int) -> InvestigationPlan | None:
         """Get the investigation plan for a workflow.
 
         Args:
@@ -506,7 +512,7 @@ class FixitService:
     # Fix Plan Methods (T028)
     # =========================================================================
 
-    def generate_fix_plan(self, issue_id: int) -> Optional["FixPlan"]:
+    def generate_fix_plan(self, issue_id: int) -> FixPlan | None:
         """Generate a fix plan from investigation findings.
 
         Creates a FixPlan with root cause from confirmed_cause findings
@@ -519,7 +525,8 @@ class FixitService:
             FixPlan if created, None if no workflow or no confirmed cause.
         """
         from uuid import uuid4
-        from ..models.fixit_models import ChangeType, FixPlan, FileChange, PlanStatus, RiskLevel
+
+        from ..models.fixit_models import ChangeType, FileChange, FixPlan, PlanStatus, RiskLevel
 
         state_data = self.state_manager.load_fixit_state(issue_id)
         if not state_data:
@@ -544,20 +551,24 @@ class FixitService:
         file_changes = []
         for f in findings:
             if f.get("type") == "affected_file" and f.get("file_path"):
-                file_changes.append(FileChange(
-                    file_path=f["file_path"],
-                    change_type=ChangeType.MODIFY,
-                    description=f["description"],
-                ))
+                file_changes.append(
+                    FileChange(
+                        file_path=f["file_path"],
+                        change_type=ChangeType.MODIFY,
+                        description=f["description"],
+                    )
+                )
 
         # Also include files from confirmed_cause
         for f in confirmed_causes:
             if f.get("file_path"):
-                file_changes.append(FileChange(
-                    file_path=f["file_path"],
-                    change_type=ChangeType.MODIFY,
-                    description=f"Fix: {f['description']}",
-                ))
+                file_changes.append(
+                    FileChange(
+                        file_path=f["file_path"],
+                        change_type=ChangeType.MODIFY,
+                        description=f"Fix: {f['description']}",
+                    )
+                )
 
         # Create fix plan
         fix_plan = FixPlan(
@@ -577,7 +588,7 @@ class FixitService:
 
         return fix_plan
 
-    def get_fix_plan(self, issue_id: int) -> Optional["FixPlan"]:
+    def get_fix_plan(self, issue_id: int) -> FixPlan | None:
         """Get the fix plan for a workflow.
 
         Args:

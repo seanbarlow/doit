@@ -4,18 +4,16 @@ This module provides the MemorySearchService for searching constitution,
 roadmap, and spec files with relevance scoring and highlighting.
 """
 
-import os
+from __future__ import annotations
+
 import re
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
 from ..models.search_models import (
-    ContentSnippet,
     MemorySource,
     QueryType,
     SearchHistory,
@@ -24,8 +22,8 @@ from ..models.search_models import (
     SourceFilter,
     SourceType,
 )
-from .context_loader import ContextLoader, estimate_tokens, extract_keywords
-from .query_interpreter import QueryInterpreter, InterpretedQuery
+from .context_loader import ContextLoader
+from .query_interpreter import InterpretedQuery, QueryInterpreter
 
 
 class MemorySearchService:
@@ -44,7 +42,7 @@ class MemorySearchService:
         "functional requirements": 0.5,
     }
 
-    def __init__(self, project_root: Path, console: Optional[Console] = None):
+    def __init__(self, project_root: Path, console: Console | None = None):
         """Initialize the memory search service.
 
         Args:
@@ -100,7 +98,7 @@ class MemorySearchService:
         lines = content.splitlines()
         current_section = ""
 
-        for i, line in enumerate(lines[:line_number], 1):
+        for _i, line in enumerate(lines[:line_number], 1):
             if line.startswith("## "):
                 current_section = line[3:].strip().lower()
             elif line.startswith("# ") and not current_section:
@@ -190,9 +188,7 @@ class MemorySearchService:
 
         return context_before, matched_line, context_after
 
-    def search_keyword(
-        self, query: SearchQuery
-    ) -> tuple[list[SearchResult], list[MemorySource]]:
+    def search_keyword(self, query: SearchQuery) -> tuple[list[SearchResult], list[MemorySource]]:
         """Search for keywords across memory files.
 
         Args:
@@ -223,7 +219,7 @@ class MemorySearchService:
         try:
             regex = re.compile(pattern, flags)
         except re.error as e:
-            raise ValueError(f"Invalid regex pattern: {e}")
+            raise ValueError(f"Invalid regex pattern: {e}") from e
 
         # Search each file
         for file_path in files:
@@ -252,12 +248,12 @@ class MemorySearchService:
 
             # Calculate relevance for each match
             match_count = len(file_matches)
-            for line_number, matched_text, start, end in file_matches:
+            for line_number, matched_text, _start, _end in file_matches:
                 relevance = self._calculate_relevance_score(
                     content, query.query_text, line_number, match_count, len(lines)
                 )
 
-                context_before, matched_line, context_after = self._extract_context(
+                context_before, _matched_line, context_after = self._extract_context(
                     content, line_number
                 )
 
@@ -296,7 +292,9 @@ class MemorySearchService:
         interpreted = self.query_interpreter.interpret(query.query_text)
 
         # Get search terms from interpretation
-        search_terms = interpreted.search_terms if interpreted.search_terms else interpreted.keywords
+        search_terms = (
+            interpreted.search_terms if interpreted.search_terms else interpreted.keywords
+        )
 
         if not search_terms:
             # Fall back to original query if no keywords extracted
@@ -381,8 +379,9 @@ class MemorySearchService:
         # Use natural language processing for NATURAL query type
         if query_type == QueryType.NATURAL:
             results, sources, interpreted = self.search_natural(query)
-            # Store interpreted query info (could be used for display)
-            query._interpreted = interpreted
+            # Store interpreted query info (could be used for display).
+            # `_interpreted` is a monkey-patched attribute used downstream.
+            query._interpreted = interpreted  # type: ignore[attr-defined]
         else:
             results, sources = self.search_keyword(query)
 
@@ -489,7 +488,9 @@ class MemorySearchService:
                 {
                     "id": r.id,
                     "source": {
-                        "path": str(source_map[r.source_id].file_path.relative_to(self.project_root))
+                        "path": str(
+                            source_map[r.source_id].file_path.relative_to(self.project_root)
+                        )
                         if r.source_id in source_map
                         else "unknown",
                         "type": source_map[r.source_id].source_type.value

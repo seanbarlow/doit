@@ -95,9 +95,7 @@ class TestFetchEpics:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_epics_empty_list(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_epics_empty_list(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_epics returns empty list when no epics exist."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -151,9 +149,7 @@ class TestFetchEpics:
 
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
-    def test_fetch_epics_not_authenticated(
-        self, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_epics_not_authenticated(self, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_epics raises error when not authenticated."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = False
@@ -189,9 +185,7 @@ class TestFetchEpics:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_epics_timeout(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_epics_timeout(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_epics handles timeout."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -207,9 +201,7 @@ class TestFetchEpics:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_epics_invalid_json(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_epics_invalid_json(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_epics handles invalid JSON response."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -258,9 +250,7 @@ class TestFetchEpics:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_epics_gh_not_in_path(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_epics_gh_not_in_path(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_epics handles gh CLI not in PATH."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -309,9 +299,7 @@ class TestFetchFeaturesForEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_features_empty_list(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_features_empty_list(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_features_for_epic with no features."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -330,9 +318,7 @@ class TestFetchFeaturesForEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_features_rate_limit(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_features_rate_limit(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_features_for_epic handles rate limit."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -351,9 +337,7 @@ class TestFetchFeaturesForEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_fetch_features_timeout(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_fetch_features_timeout(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test fetch_features_for_epic handles timeout."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -422,9 +406,7 @@ class TestCreateEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_create_epic_success(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_create_epic_success(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test successful epic creation."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -514,9 +496,7 @@ class TestCreateEpic:
             stderr="",
         )
 
-        epic = github_service.create_epic(
-            title="[Epic]: Default Priority", body="Description"
-        )
+        epic = github_service.create_epic(title="[Epic]: Default Priority", body="Description")
 
         assert "priority:P3" in epic.labels
 
@@ -531,9 +511,7 @@ class TestCreateEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_create_epic_rate_limit(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_create_epic_rate_limit(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test create_epic handles rate limit."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -552,9 +530,7 @@ class TestCreateEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_create_epic_timeout(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_create_epic_timeout(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test create_epic handles timeout."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -569,9 +545,7 @@ class TestCreateEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_create_epic_invalid_url(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_create_epic_invalid_url(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test create_epic handles invalid URL response."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True
@@ -590,9 +564,7 @@ class TestCreateEpic:
     @patch("doit_cli.services.github_service.is_gh_authenticated")
     @patch("doit_cli.services.github_service.has_gh_cli")
     @patch("subprocess.run")
-    def test_create_epic_general_error(
-        self, mock_run, mock_has_cli, mock_is_auth, github_service
-    ):
+    def test_create_epic_general_error(self, mock_run, mock_has_cli, mock_is_auth, github_service):
         """Test create_epic handles general GitHub errors."""
         mock_has_cli.return_value = True
         mock_is_auth.return_value = True

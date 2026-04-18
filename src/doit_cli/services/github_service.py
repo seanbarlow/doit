@@ -1,19 +1,37 @@
-"""Service for GitHub operations via gh CLI.
+"""Service for GitHub operations via gh CLI (deprecated, legacy shim).
 
-This module provides the GitHubService class for interacting
-with GitHub issues, epics, milestones, and branches using the gh CLI tool.
+This module predates the provider abstraction at
+`doit_cli.services.providers.github.GitHubProvider`. It remains in the
+tree because the provider layer does not yet expose:
 
-Note:
-    This service is maintained for backward compatibility.
-    New code should use the provider abstraction layer instead:
+- bug-label filtered issue listing (`list_bugs`)
+- adding comments to issues (`add_comment`)
+- closing issues with an optional comment (`close_issue`)
+- epic operations (`fetch_epics`, `fetch_features_for_epic`, `create_epic`)
+- milestone operations beyond create/get (`get_all_milestones`,
+  `close_milestone`)
+- git branch operations (`check_branch_exists`, `create_branch`)
 
-    from doit_cli.services.provider_factory import ProviderFactory
-    provider = ProviderFactory.create()
+Until those methods land on GitHubProvider (tracked separately),
+`fixit_service`, `github_linker`, `milestone_service`, and `roadmapit_impl`
+continue to depend on this shim. New code should use the provider where
+possible.
+
+When you edit a caller, consider one of:
+    - Move a method it uses onto GitHubProvider, then update the caller
+      to use the provider directly.
+    - Add a deprecation-aware wrapper here and leave the caller alone
+      temporarily.
+    - Use `service.get_provider()` to escape into the provider API for
+      the subset of operations the provider already supports.
 """
+
+from __future__ import annotations
 
 import json
 import subprocess
-from typing import TYPE_CHECKING, List, Optional
+import warnings
+from typing import TYPE_CHECKING
 
 from ..models.fixit_models import GitHubIssue
 from ..models.github_epic import GitHubEpic
@@ -21,7 +39,27 @@ from ..models.milestone import Milestone
 from ..utils.github_auth import has_gh_cli, is_gh_authenticated
 
 if TYPE_CHECKING:
+    from ..models.github_feature import GitHubFeature
     from .providers.github import GitHubProvider
+
+
+_DEPRECATION_MSG = (
+    "doit_cli.services.github_service is a legacy shim. New code should "
+    "use doit_cli.services.providers.github.GitHubProvider where the "
+    "required method exists. See the module docstring for the migration "
+    "plan and remaining gaps."
+)
+
+_deprecation_emitted = False
+
+
+def _emit_deprecation_once() -> None:
+    """Emit the module-level DeprecationWarning at most once per process."""
+    global _deprecation_emitted
+    if _deprecation_emitted:
+        return
+    _deprecation_emitted = True
+    warnings.warn(_DEPRECATION_MSG, DeprecationWarning, stacklevel=3)
 
 
 class GitHubServiceError(Exception):
@@ -45,21 +83,30 @@ class GitHubAPIError(GitHubServiceError):
 class GitHubService:
     """Manages GitHub operations via gh CLI.
 
-    This service handles all GitHub API interactions using the gh CLI tool,
-    including fetching/creating issues, epics, milestones, and branch operations.
+    .. deprecated::
+        Prefer `doit_cli.services.providers.github.GitHubProvider`. This
+        class remains because the provider abstraction does not yet cover
+        every operation the workflow services need (see module docstring).
     """
 
     def __init__(self, timeout: int = 30):
         """Initialize the GitHub service.
 
+        Emits a one-time DeprecationWarning the first time a
+        ``GitHubService`` is instantiated in a process. Library consumers
+        can silence it with the standard ``warnings`` filter API, but
+        the warning is intentionally visible so new code is nudged
+        toward the provider abstraction.
+
         Args:
             timeout: Timeout in seconds for gh CLI commands (default: 30)
         """
+        _emit_deprecation_once()
         self.timeout = timeout
-        self._provider: Optional["GitHubProvider"] = None
+        self._provider: GitHubProvider | None = None
         self._verify_gh_cli()
 
-    def get_provider(self) -> "GitHubProvider":
+    def get_provider(self) -> GitHubProvider:
         """Get the GitHubProvider instance for provider abstraction operations.
 
         This method provides access to the new provider abstraction layer
@@ -75,6 +122,7 @@ class GitHubService:
         """
         if self._provider is None:
             from .providers.github import GitHubProvider
+
             self._provider = GitHubProvider(timeout=self.timeout)
         return self._provider
 
@@ -92,7 +140,7 @@ class GitHubService:
         except FileNotFoundError:
             raise GitHubServiceError(
                 "GitHub CLI (gh) not found. Install it from https://cli.github.com/"
-            )
+            ) from None
 
     def _ensure_authenticated(self) -> None:
         """Verify GitHub CLI is available and authenticated.
@@ -106,9 +154,7 @@ class GitHubService:
             )
 
         if not is_gh_authenticated():
-            raise GitHubAuthError(
-                "GitHub CLI not authenticated. Run: gh auth login"
-            )
+            raise GitHubAuthError("GitHub CLI not authenticated. Run: gh auth login")
 
     def is_available(self) -> bool:
         """Check if GitHub API is available."""
@@ -127,7 +173,7 @@ class GitHubService:
     # Issue Operations
     # ==========================================================================
 
-    def get_issue(self, issue_id: int) -> Optional[GitHubIssue]:
+    def get_issue(self, issue_id: int) -> GitHubIssue | None:
         """Fetch a GitHub issue by ID.
 
         Args:
@@ -137,10 +183,7 @@ class GitHubService:
             GitHubIssue if found, None otherwise.
         """
         result = subprocess.run(
-            [
-                "gh", "issue", "view", str(issue_id),
-                "--json", "number,title,body,state,labels"
-            ],
+            ["gh", "issue", "view", str(issue_id), "--json", "number,title,body,state,labels"],
             capture_output=True,
             text=True,
         )
@@ -165,11 +208,17 @@ class GitHubService:
         """
         result = subprocess.run(
             [
-                "gh", "issue", "list",
-                "--label", label,
-                "--state", "open",
-                "--limit", str(limit),
-                "--json", "number,title,body,state,labels"
+                "gh",
+                "issue",
+                "list",
+                "--label",
+                label,
+                "--state",
+                "open",
+                "--limit",
+                str(limit),
+                "--json",
+                "number,title,body,state,labels",
             ],
             capture_output=True,
             text=True,
@@ -220,7 +269,7 @@ class GitHubService:
     # Epic Operations
     # ==========================================================================
 
-    def fetch_epics(self, state: str = "open") -> List[GitHubEpic]:
+    def fetch_epics(self, state: str = "open") -> list[GitHubEpic]:
         """Fetch all GitHub issues labeled as 'epic'.
 
         Args:
@@ -290,15 +339,15 @@ class GitHubService:
             raise GitHubAPIError(
                 f"GitHub CLI timeout after {self.timeout} seconds. "
                 "Try increasing timeout or use --skip-github flag."
-            )
+            ) from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
         except FileNotFoundError:
             raise GitHubAuthError(
                 "GitHub CLI (gh) not found in PATH. Install from: https://cli.github.com"
-            )
+            ) from None
 
-    def fetch_features_for_epic(self, epic_number: int) -> List["GitHubFeature"]:  # type: ignore
+    def fetch_features_for_epic(self, epic_number: int) -> list[GitHubFeature]:
         """Fetch all feature issues linked to a specific epic.
 
         Searches for issues that reference the epic using "Part of Epic #XXX" pattern.
@@ -344,9 +393,7 @@ class GitHubService:
 
             if result.returncode != 0:
                 if "rate limit" in result.stderr.lower():
-                    raise GitHubAPIError(
-                        "GitHub API rate limit exceeded. Try again later."
-                    )
+                    raise GitHubAPIError("GitHub API rate limit exceeded. Try again later.")
                 raise GitHubAPIError(f"GitHub CLI error: {result.stderr}")
 
             issues_data = json.loads(result.stdout)
@@ -366,12 +413,12 @@ class GitHubService:
             return features
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     def create_epic(
-        self, title: str, body: str, priority: str = "P3", labels: Optional[List[str]] = None
+        self, title: str, body: str, priority: str = "P3", labels: list[str] | None = None
     ) -> GitHubEpic:
         """Create a new GitHub epic issue.
 
@@ -447,15 +494,15 @@ class GitHubService:
             )
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except (ValueError, IndexError) as e:
-            raise GitHubAPIError(f"Failed to parse created issue URL: {e}")
+            raise GitHubAPIError(f"Failed to parse created issue URL: {e}") from e
 
     # ==========================================================================
     # Milestone Operations
     # ==========================================================================
 
-    def get_all_milestones(self, state: str = "open") -> List[Milestone]:
+    def get_all_milestones(self, state: str = "open") -> list[Milestone]:
         """Fetch all GitHub milestones for the repository.
 
         Args:
@@ -496,9 +543,7 @@ class GitHubService:
 
             if result.returncode != 0:
                 if "rate limit" in result.stderr.lower():
-                    raise GitHubAPIError(
-                        "GitHub API rate limit exceeded. Try again later."
-                    )
+                    raise GitHubAPIError("GitHub API rate limit exceeded. Try again later.")
                 raise GitHubAPIError(f"GitHub CLI error: {result.stderr}")
 
             # Parse JSON response
@@ -527,11 +572,9 @@ class GitHubService:
             return milestones
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(
-                f"GitHub CLI timeout after {self.timeout} seconds."
-            )
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds.") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     def create_milestone(self, title: str, description: str) -> Milestone:
         """Create a new GitHub milestone.
@@ -586,9 +629,7 @@ class GitHubService:
                 if "rate limit" in result.stderr.lower():
                     raise GitHubAPIError("GitHub API rate limit exceeded")
                 if "422" in result.stderr:
-                    raise GitHubAPIError(
-                        f"Milestone with title '{title}' already exists"
-                    )
+                    raise GitHubAPIError(f"Milestone with title '{title}' already exists")
                 raise GitHubAPIError(f"Failed to create milestone: {result.stderr}")
 
             # Parse JSON response
@@ -604,9 +645,9 @@ class GitHubService:
             )
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     def close_milestone(self, milestone_number: int) -> Milestone:
         """Close a GitHub milestone.
@@ -653,9 +694,7 @@ class GitHubService:
                 if "rate limit" in result.stderr.lower():
                     raise GitHubAPIError("GitHub API rate limit exceeded")
                 if "404" in result.stderr:
-                    raise GitHubAPIError(
-                        f"Milestone #{milestone_number} not found"
-                    )
+                    raise GitHubAPIError(f"Milestone #{milestone_number} not found")
                 raise GitHubAPIError(f"Failed to close milestone: {result.stderr}")
 
             # Parse JSON response
@@ -671,9 +710,9 @@ class GitHubService:
             )
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds")
+            raise GitHubAPIError(f"GitHub CLI timeout after {self.timeout} seconds") from None
         except json.JSONDecodeError as e:
-            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}")
+            raise GitHubAPIError(f"Failed to parse GitHub CLI response: {e}") from e
 
     # ==========================================================================
     # Branch Operations
@@ -772,6 +811,6 @@ class GitHubService:
             return slug
 
         except subprocess.TimeoutExpired:
-            raise GitHubAPIError("Git command timeout")
+            raise GitHubAPIError("Git command timeout") from None
         except Exception as e:
-            raise GitHubAPIError(f"Failed to get repository slug: {e}")
+            raise GitHubAPIError(f"Failed to get repository slug: {e}") from e

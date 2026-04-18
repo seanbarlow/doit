@@ -1,57 +1,56 @@
 """Sync-prompts command for synchronizing agent commands with doit command templates."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.agent import Agent
 from ..models.sync_models import FileOperation, OperationType, SyncResult
 from ..services.command_writer import CommandWriter
 from ..services.prompt_writer import PromptWriter
+from ..services.skill_reader import SkillReader
+from ..services.skill_writer import SkillWriter
 from ..services.template_reader import TemplateReader
-
 
 console = Console()
 
 # Type aliases for CLI options
-JsonFlag = Annotated[
-    bool,
-    typer.Option(
-        "--json", "-j",
-        help="Output results as JSON"
-    )
-]
+JsonFlag = Annotated[bool, typer.Option("--json", "-j", help="Output results as JSON")]
 
 CheckFlag = Annotated[
-    bool,
-    typer.Option(
-        "--check", "-c",
-        help="Check sync status without making changes"
-    )
+    bool, typer.Option("--check", "-c", help="Check sync status without making changes")
 ]
 
 ForceFlag = Annotated[
-    bool,
-    typer.Option(
-        "--force", "-f",
-        help="Force sync even if files are up-to-date"
-    )
+    bool, typer.Option("--force", "-f", help="Force sync even if files are up-to-date")
 ]
 
 AgentOption = Annotated[
-    Optional[str],
-    typer.Option(
-        "--agent", "-a",
-        help="Target agent(s): copilot (default), claude, or both"
-    )
+    str | None,
+    typer.Option("--agent", "-a", help="Target agent(s): copilot (default), claude, or both"),
 ]
 
+SkillsOption = Annotated[
+    bool,
+    typer.Option(
+        "--skills/--no-skills",
+        help=(
+            "When targeting Claude, also write Agent-Skills-format directories "
+            "to .claude/skills/. Defaults to on so new projects get the April "
+            "2026 layout; pass --no-skills to keep only the legacy .claude/commands/ "
+            "output."
+        ),
+    ),
+]
 
-def parse_sync_agents(agent_str: Optional[str]) -> list[Agent]:
+def parse_sync_agents(agent_str: str | None) -> list[Agent]:
     """Parse agent string for sync command.
 
     Defaults to Copilot-only for backward compatibility.
@@ -78,9 +77,7 @@ def parse_sync_agents(agent_str: Optional[str]) -> list[Agent]:
         elif name == "both":
             return [Agent.CLAUDE, Agent.COPILOT]
         else:
-            raise typer.BadParameter(
-                f"Unknown agent: {name}. Use 'copilot', 'claude', or 'both'"
-            )
+            raise typer.BadParameter(f"Unknown agent: {name}. Use 'copilot', 'claude', or 'both'")
 
     return agents
 
@@ -229,51 +226,114 @@ def _check_agent_status(
         target_path = get_path_fn(template)
 
         if not target_path.exists():
-            result.add_operation(FileOperation(
-                file_path=str(target_path),
-                operation_type=OperationType.FAILED,
-                success=False,
-                message="Missing - needs sync",
-            ))
+            result.add_operation(
+                FileOperation(
+                    file_path=str(target_path),
+                    operation_type=OperationType.FAILED,
+                    success=False,
+                    message="Missing - needs sync",
+                )
+            )
         else:
             target_mtime = target_path.stat().st_mtime
             template_mtime = template.modified_at.timestamp()
 
             if target_mtime < template_mtime:
-                result.add_operation(FileOperation(
-                    file_path=str(target_path),
-                    operation_type=OperationType.UPDATED,
-                    success=True,
-                    message="Out-of-sync - needs update",
-                ))
+                result.add_operation(
+                    FileOperation(
+                        file_path=str(target_path),
+                        operation_type=OperationType.UPDATED,
+                        success=True,
+                        message="Out-of-sync - needs update",
+                    )
+                )
             else:
-                result.add_operation(FileOperation(
-                    file_path=str(target_path),
+                result.add_operation(
+                    FileOperation(
+                        file_path=str(target_path),
+                        operation_type=OperationType.SKIPPED,
+                        success=True,
+                        message="Up-to-date",
+                    )
+                )
+    return result
+
+
+def _sync_skills(
+    project_root: Path,
+    *,
+    command_name: str | None,
+    force: bool,
+    check_only: bool,
+) -> SyncResult:
+    """Write bundled Agent-Skills-format skills to the project's .claude/skills/.
+
+    Returns a SyncResult describing the per-skill outcome (CREATED for
+    first-time writes, UPDATED when the directory already exists, SKIPPED
+    in check mode or when the target is up-to-date in a future tighter
+    implementation).
+    """
+    reader = SkillReader()
+    skills = reader.scan_bundled_skills()
+
+    if command_name:
+        skills = [s for s in skills if s.name == command_name]
+
+    result = SyncResult(total_commands=len(skills))
+    writer = SkillWriter(project_root=project_root)
+
+    for skill in skills:
+        target_dir = writer.skills_dir / skill.directory.name
+        if check_only:
+            op_type = OperationType.SKIPPED if target_dir.exists() else OperationType.FAILED
+            result.add_operation(
+                FileOperation(
+                    file_path=str(target_dir),
+                    operation_type=op_type,
+                    success=target_dir.exists(),
+                    message="Present" if target_dir.exists() else "Missing — needs sync",
+                )
+            )
+            continue
+
+        if target_dir.exists() and not force:
+            result.add_operation(
+                FileOperation(
+                    file_path=str(target_dir),
                     operation_type=OperationType.SKIPPED,
                     success=True,
-                    message="Up-to-date",
-                ))
+                    message="Already present (use --force to overwrite)",
+                )
+            )
+            continue
+
+        write_result = writer.write_skill(skill, overwrite=True)
+        result.add_operation(
+            FileOperation(
+                file_path=str(write_result.target_dir),
+                operation_type=(
+                    OperationType.UPDATED
+                    if write_result.was_overwrite
+                    else OperationType.CREATED
+                ),
+                success=True,
+                message=f"Wrote {len(write_result.files_written)} files",
+            )
+        )
+
     return result
 
 
 def sync_prompts_command(
     command_name: Annotated[
-        Optional[str],
-        typer.Argument(
-            help="Specific command to sync (e.g., 'doit.checkin')"
-        )
+        str | None, typer.Argument(help="Specific command to sync (e.g., 'doit.checkin')")
     ] = None,
     agent: AgentOption = None,
+    skills: SkillsOption = True,
     check: CheckFlag = False,
     force: ForceFlag = False,
     json_output: JsonFlag = False,
-    path: Annotated[
-        Path,
-        typer.Option(
-            "--path", "-p",
-            help="Project directory path"
-        )
-    ] = Path("."),
+    path: Annotated[Path, typer.Option("--path", "-p", help="Project directory path")] = Path(),
 ) -> None:
     """Synchronize agent commands with doit command templates.
 
@@ -299,7 +359,7 @@ def sync_prompts_command(
         target_agents = parse_sync_agents(agent)
     except typer.BadParameter as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
     # Initialize services
     reader = TemplateReader(project_root=project_root)
@@ -319,7 +379,7 @@ def sync_prompts_command(
             console.print(json.dumps({"error": msg}))
         else:
             console.print(f"[red]Error:[/red] {msg}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     all_results = []
 
@@ -346,17 +406,32 @@ def sync_prompts_command(
 
         all_results.append(result)
 
-    # Display combined results
-    if len(target_agents) == 1:
+        # When syncing Claude, also write Agent-Skills-format directories
+        # to .claude/skills/ unless the caller opted out with --no-skills.
+        if target_agent == Agent.CLAUDE and skills:
+            skill_result = _sync_skills(
+                project_root,
+                command_name=command_name,
+                force=force,
+                check_only=check,
+            )
+            if not json_output and len(target_agents) > 1:
+                display_sync_result(skill_result, title="Claude Skills Sync Results")
+            all_results.append(skill_result)
+
+    # Display combined results. We merge whenever the loop produced more
+    # than one SyncResult — that happens either with multi-agent sync or
+    # with single-Claude-plus-skills sync.
+    if len(all_results) == 1:
         combined = all_results[0]
     else:
         combined = _merge_results(all_results)
 
     if json_output:
         display_json_result(combined)
-    elif len(target_agents) == 1:
+    else:
         display_sync_result(combined)
 
     # Exit with appropriate code
     if not combined.success:
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)

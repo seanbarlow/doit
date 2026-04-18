@@ -150,9 +150,12 @@ class TestStatusCommandIntegration:
         """Test status command with invalid format."""
         result = run_status_command(doit_project, "--format", "invalid")
 
-        # Should fail with exit code 2
+        # Typer emits its own usage-error message on stderr with the shared
+        # resolve_format helper's hint appended.
         assert result.returncode == 2
-        assert "Invalid format" in result.stdout
+        combined = (result.stdout or "") + (result.stderr or "")
+        assert "Unknown format" in combined
+        assert "invalid" in combined
 
     def test_status_output_to_file(self, doit_project, tmp_path):
         """Test status command with file output."""

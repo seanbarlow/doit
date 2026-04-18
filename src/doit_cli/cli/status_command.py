@@ -7,17 +7,21 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
+from ..exit_codes import ExitCode
 from ..formatters.json_formatter import JsonFormatter
 from ..formatters.markdown_formatter import MarkdownFormatter
 from ..formatters.rich_formatter import RichFormatter
 from ..models.status_models import SpecState
 from ..services.spec_scanner import NotADoitProjectError
 from ..services.status_reporter import StatusReporter
+from .output import OutputFormat, format_option, resolve_format
 
 console = Console()
 
 # Valid status filter values
 VALID_STATUSES = ["draft", "in-progress", "complete", "approved"]
+
+_STATUS_FORMATS = (OutputFormat.RICH, OutputFormat.JSON, OutputFormat.MARKDOWN)
 
 
 def status_command(
@@ -32,8 +36,9 @@ def status_command(
     recent: int | None = typer.Option(
         None, "--recent", "-r", help="Show specs modified in last N days"
     ),
-    output_format: str = typer.Option(
-        "rich", "--format", "-f", help="Output format: rich, json, markdown"
+    output_format: str = format_option(
+        default=OutputFormat.RICH,
+        allowed=_STATUS_FORMATS,
     ),
     output_file: Path | None = typer.Option(None, "--output", "-o", help="Write report to file"),
 ) -> None:
@@ -42,10 +47,10 @@ def status_command(
     Shows a dashboard of all specs with their status, validation results,
     and commit blocking indicators.
 
-    Exit codes:
-      0 - Success, no blocking specs
-      1 - Success, but blocking specs exist
-      2 - Error (not a doit project, invalid options)
+    Exit codes (see doit_cli.exit_codes.ExitCode):
+      0 (SUCCESS)          — no blocking specs
+      1 (FAILURE)          — blocking specs exist
+      2 (VALIDATION_ERROR) — invalid options or not a doit project
     """
     try:
         # Validate status filter
@@ -57,17 +62,10 @@ def status_command(
                     f"[red]Error:[/red] Invalid status '{status_filter}'. "
                     f"Valid: {', '.join(VALID_STATUSES)}"
                 )
-                raise typer.Exit(code=2)
+                raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
             spec_state_filter = SpecState.from_string(status_lower)
 
-        # Validate format
-        valid_formats = ["rich", "json", "markdown"]
-        if output_format not in valid_formats:
-            console.print(
-                f"[red]Error:[/red] Invalid format '{output_format}'. "
-                f"Valid: {', '.join(valid_formats)}"
-            )
-            raise typer.Exit(code=2)
+        fmt = resolve_format(output_format, _STATUS_FORMATS)
 
         # Initialize reporter
         reporter = StatusReporter()
@@ -80,9 +78,10 @@ def status_command(
         )
 
         # Select formatter based on format option
-        if output_format == "json":
+        formatter: JsonFormatter | MarkdownFormatter | RichFormatter
+        if fmt is OutputFormat.JSON:
             formatter = JsonFormatter()
-        elif output_format == "markdown":
+        elif fmt is OutputFormat.MARKDOWN:
             formatter = MarkdownFormatter()
         else:
             formatter = RichFormatter(console)
@@ -94,7 +93,7 @@ def status_command(
         if output_file:
             output_file.write_text(output_str)
             console.print(f"[green]Report written to {output_file}[/green]")
-        elif output_format == "rich":
+        elif fmt is OutputFormat.RICH:
             # Rich formatter should print directly for better terminal rendering
             RichFormatter(console).format_to_console(report, verbose=verbose)
         else:
@@ -103,10 +102,9 @@ def status_command(
 
         # Determine exit code based on blocking status
         if report.blocking_count > 0:
-            raise typer.Exit(code=1)
-        else:
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.FAILURE)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e

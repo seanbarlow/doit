@@ -506,7 +506,7 @@ class ContextLoader:
     def get_spec_files(self) -> list[Path]:
         """Return all `specs/*/spec.md` paths that exist, sorted."""
         specs_dir = self.project_root / "specs"
-        files = []
+        files: list[Path] = []
 
         if not specs_dir.exists():
             return files

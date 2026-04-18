@@ -151,7 +151,7 @@ class NotificationService:
         self,
         unread_only: bool = False,
         limit: int = 50,
-        notification_type: NotificationType = None,
+        notification_type: NotificationType | None = None,
     ) -> list[Notification]:
         """Get notifications.
 

@@ -105,7 +105,11 @@ class WizardService:
             elif provider == ProviderType.GITLAB:
                 config_values = self.collect_gitlab_config()
             else:
-                return WizardResult.error(f"Unsupported provider: {provider}")
+                # Catch-all for future ProviderType variants; mypy marks
+                # this branch unreachable given the current enum shape.
+                return WizardResult.error(  # type: ignore[unreachable]
+                    f"Unsupported provider: {provider}"
+                )
 
             self.state.collected_values = config_values
 

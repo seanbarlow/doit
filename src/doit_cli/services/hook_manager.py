@@ -40,9 +40,11 @@ class HookManager:
         Returns:
             Path to the template file, or None if not found.
         """
-        # Try to get from package resources
+        # Try to get from package resources. importlib.resources.files returns
+        # a Traversable that doesn't type-check as a context manager (stdlib
+        # stub limitation); at runtime it acts like one via a wrapper.
         try:
-            with resources.files("doit_cli.templates.hooks") as templates_dir:
+            with resources.files("doit_cli.templates.hooks") as templates_dir:  # type: ignore[attr-defined]
                 template_path = Path(templates_dir) / f"{hook_name}.sh"
                 if template_path.exists():
                     return template_path

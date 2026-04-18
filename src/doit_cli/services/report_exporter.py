@@ -7,7 +7,7 @@ Markdown and JSON formats.
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from ..models.analytics_models import AnalyticsReport
@@ -117,10 +117,16 @@ class ReportExporter:
                 ]
             )
 
-        # Individual specs (top 10 most recent)
+        # Individual specs (top 10 most recent). The filter above guarantees
+        # `completed_at` is not None on any remaining element, but mypy can't
+        # see through it. Use a sort key that substitutes a sentinel rather
+        # than deal with Optional in the comparison.
         if self.report.specs:
             completed_specs = [s for s in self.report.specs if s.completed_at]
-            completed_specs.sort(key=lambda s: s.completed_at, reverse=True)
+            completed_specs.sort(
+                key=lambda s: s.completed_at or date.min,  # pragma: no branch
+                reverse=True,
+            )
 
             if completed_specs:
                 lines.extend(

@@ -305,7 +305,7 @@ class WorkflowEngine:
             return self._go_back(state, steps)
         elif nav.command == "skip":
             return self._skip_step(state, steps)
-        return state
+        return state  # type: ignore[unreachable]
 
     def _go_back(
         self,

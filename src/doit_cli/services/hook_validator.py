@@ -315,8 +315,10 @@ class HookValidator:
                     f"Allowed statuses: {', '.join(allowed)}\n\nTo fix: Update spec.md status to 'In Progress' before committing code",
                 )
 
-        # Run spec validation if enabled
-        if self.config.pre_commit.validate_spec:
+        # Run spec validation if enabled. spec_exists() above guarantees
+        # spec_path is not None when we reach here, but narrow explicitly
+        # to satisfy mypy.
+        if self.config.pre_commit.validate_spec and spec_path is not None:
             validation_result = self._validate_spec_quality(spec_path)
             if not validation_result.success:
                 return validation_result

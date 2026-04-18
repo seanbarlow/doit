@@ -42,7 +42,7 @@ class UserStoryParser:
         Returns:
             List of ParsedUserStory objects
         """
-        stories = []
+        stories: list[ParsedUserStory] = []
 
         # Find all story headers and their positions
         header_matches = list(self.STORY_HEADER_PATTERN.finditer(content))
@@ -108,7 +108,7 @@ class UserStoryParser:
             Description text
         """
         lines = story_content.split("\n")
-        description_lines = []
+        description_lines: list[str] = []
 
         for line in lines:
             stripped = line.strip()

@@ -414,7 +414,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -466,7 +466,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -527,7 +527,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -579,7 +579,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -631,7 +631,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -683,7 +683,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -735,7 +735,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],
@@ -789,7 +789,7 @@ Use the agent mode (`@workspace /doit-*`) for multi-step workflows.
         Returns:
             Dict with 'created', 'updated', 'skipped' lists of paths
         """
-        result = {
+        result: dict[str, list[Path]] = {
             "created": [],
             "updated": [],
             "skipped": [],

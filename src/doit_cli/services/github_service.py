@@ -347,7 +347,7 @@ class GitHubService:
                 "GitHub CLI (gh) not found in PATH. Install from: https://cli.github.com"
             ) from None
 
-    def fetch_features_for_epic(self, epic_number: int) -> list[GitHubFeature]:  # type: ignore
+    def fetch_features_for_epic(self, epic_number: int) -> list[GitHubFeature]:
         """Fetch all feature issues linked to a specific epic.
 
         Searches for issues that reference the epic using "Part of Epic #XXX" pattern.

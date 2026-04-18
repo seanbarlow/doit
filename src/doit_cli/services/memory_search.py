@@ -379,8 +379,9 @@ class MemorySearchService:
         # Use natural language processing for NATURAL query type
         if query_type == QueryType.NATURAL:
             results, sources, interpreted = self.search_natural(query)
-            # Store interpreted query info (could be used for display)
-            query._interpreted = interpreted
+            # Store interpreted query info (could be used for display).
+            # `_interpreted` is a monkey-patched attribute used downstream.
+            query._interpreted = interpreted  # type: ignore[attr-defined]
         else:
             results, sources = self.search_keyword(query)
 

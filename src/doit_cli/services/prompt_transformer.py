@@ -166,7 +166,7 @@ def _split_frontmatter(raw: str) -> tuple[dict[str, object], str]:
     body = raw[end + len("\n---") :].lstrip("\n")
 
     if yaml is None:  # pragma: no cover
-        return {}, body
+        return {}, body  # type: ignore[unreachable]
 
     parsed = yaml.safe_load(fm_text) or {}
     if not isinstance(parsed, dict):
@@ -177,6 +177,6 @@ def _split_frontmatter(raw: str) -> tuple[dict[str, object], str]:
 def _render(frontmatter: dict[str, object], body: str) -> str:
     """Serialize frontmatter + body back into a `.prompt.md` string."""
     if yaml is None:  # pragma: no cover
-        return body
+        return body  # type: ignore[unreachable]
     dumped = yaml.safe_dump(frontmatter, sort_keys=False, default_flow_style=False).strip()
     return f"---\n{dumped}\n---\n\n{body.lstrip()}"

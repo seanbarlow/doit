@@ -130,13 +130,12 @@ exclude = [
     ".venv",
 ]
 
-# Modules slated for refactor in Phase 3 — type debt tracked separately.
-# Once those services are split and modernized, remove each entry to re-enable checking.
-# `doit_cli` (package __init__.py) was removed from this list once its
-# legacy Typer app was deleted.
+# Modules excluded from mypy enforcement. Keep this list minimal — every
+# entry is tech debt. Prefer fixing types in-file over extending this.
 [[tool.mypy.overrides]]
 module = [
-    "doit_cli.services.context_loader",
+    # Legacy services not yet cleaned up by the modernization effort.
+    # Remove each entry after its module has been properly typed.
     "doit_cli.services.template_manager",
     "doit_cli.services.github_service",
     "doit_cli.services.wizard_service",

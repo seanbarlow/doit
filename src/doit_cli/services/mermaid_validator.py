@@ -223,8 +223,8 @@ class MermaidValidator:
         Returns:
             Tuple of (errors, warnings)
         """
-        errors = []
-        warnings = []
+        errors: list[str] = []
+        warnings: list[str] = []
 
         lines = content.split("\n")
         entities_defined: set[str] = set()

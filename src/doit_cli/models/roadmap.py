@@ -35,7 +35,7 @@ class RoadmapItem:
     source: str = "local"
     github_number: int | None = None
     github_url: str | None = None
-    features: list = None  # List of GitHubFeature objects
+    features: list | None = None  # List of GitHubFeature objects; initialized in __post_init__
 
     def __post_init__(self):
         """Validate roadmap item after initialization."""
@@ -90,7 +90,7 @@ class RoadmapItem:
         return self.title
 
     @classmethod
-    def from_github_epic(cls, epic: GitHubEpic, priority: str) -> RoadmapItem:  # type: ignore
+    def from_github_epic(cls, epic: GitHubEpic, priority: str) -> RoadmapItem:
         """Create RoadmapItem from GitHub epic.
 
         Args:

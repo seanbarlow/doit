@@ -13,6 +13,7 @@ enum) without replacing those formatters.
 from __future__ import annotations
 
 from enum import Enum
+from typing import Any
 
 import typer
 
@@ -52,7 +53,7 @@ def format_option(
     default: OutputFormat = OutputFormat.RICH,
     allowed: tuple[OutputFormat, ...] | None = None,
     help_text: str | None = None,
-) -> typer.models.OptionInfo:
+) -> Any:
     """Return a Typer Option configured with the shared `--format/-f` convention.
 
     Pass the set of formats a command supports via `allowed`; Typer will

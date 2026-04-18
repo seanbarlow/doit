@@ -77,7 +77,10 @@ def status_command(
             recent_days=recent,
         )
 
-        # Select formatter based on format option
+        # Select formatter based on format option.
+        # The three concrete classes share a StatusFormatter protocol; mypy
+        # narrows `formatter` to JsonFormatter after the first branch unless
+        # we annotate the union explicitly.
         formatter: JsonFormatter | MarkdownFormatter | RichFormatter
         if fmt is OutputFormat.JSON:
             formatter = JsonFormatter()

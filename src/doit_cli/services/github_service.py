@@ -1,20 +1,36 @@
-"""Service for GitHub operations via gh CLI.
+"""Service for GitHub operations via gh CLI (deprecated, legacy shim).
 
-This module provides the GitHubService class for interacting
-with GitHub issues, epics, milestones, and branches using the gh CLI tool.
+This module predates the provider abstraction at
+`doit_cli.services.providers.github.GitHubProvider`. It remains in the
+tree because the provider layer does not yet expose:
 
-Note:
-    This service is maintained for backward compatibility.
-    New code should use the provider abstraction layer instead:
+- bug-label filtered issue listing (`list_bugs`)
+- adding comments to issues (`add_comment`)
+- closing issues with an optional comment (`close_issue`)
+- epic operations (`fetch_epics`, `fetch_features_for_epic`, `create_epic`)
+- milestone operations beyond create/get (`get_all_milestones`,
+  `close_milestone`)
+- git branch operations (`check_branch_exists`, `create_branch`)
 
-    from doit_cli.services.provider_factory import ProviderFactory
-    provider = ProviderFactory.create()
+Until those methods land on GitHubProvider (tracked separately),
+`fixit_service`, `github_linker`, `milestone_service`, and `roadmapit_impl`
+continue to depend on this shim. New code should use the provider where
+possible.
+
+When you edit a caller, consider one of:
+    - Move a method it uses onto GitHubProvider, then update the caller
+      to use the provider directly.
+    - Add a deprecation-aware wrapper here and leave the caller alone
+      temporarily.
+    - Use `service.get_provider()` to escape into the provider API for
+      the subset of operations the provider already supports.
 """
 
 from __future__ import annotations
 
 import json
 import subprocess
+import warnings
 from typing import TYPE_CHECKING
 
 from ..models.fixit_models import GitHubIssue
@@ -25,6 +41,25 @@ from ..utils.github_auth import has_gh_cli, is_gh_authenticated
 if TYPE_CHECKING:
     from ..models.github_feature import GitHubFeature
     from .providers.github import GitHubProvider
+
+
+_DEPRECATION_MSG = (
+    "doit_cli.services.github_service is a legacy shim. New code should "
+    "use doit_cli.services.providers.github.GitHubProvider where the "
+    "required method exists. See the module docstring for the migration "
+    "plan and remaining gaps."
+)
+
+_deprecation_emitted = False
+
+
+def _emit_deprecation_once() -> None:
+    """Emit the module-level DeprecationWarning at most once per process."""
+    global _deprecation_emitted
+    if _deprecation_emitted:
+        return
+    _deprecation_emitted = True
+    warnings.warn(_DEPRECATION_MSG, DeprecationWarning, stacklevel=3)
 
 
 class GitHubServiceError(Exception):
@@ -48,16 +83,25 @@ class GitHubAPIError(GitHubServiceError):
 class GitHubService:
     """Manages GitHub operations via gh CLI.
 
-    This service handles all GitHub API interactions using the gh CLI tool,
-    including fetching/creating issues, epics, milestones, and branch operations.
+    .. deprecated::
+        Prefer `doit_cli.services.providers.github.GitHubProvider`. This
+        class remains because the provider abstraction does not yet cover
+        every operation the workflow services need (see module docstring).
     """
 
     def __init__(self, timeout: int = 30):
         """Initialize the GitHub service.
 
+        Emits a one-time DeprecationWarning the first time a
+        ``GitHubService`` is instantiated in a process. Library consumers
+        can silence it with the standard ``warnings`` filter API, but
+        the warning is intentionally visible so new code is nudged
+        toward the provider abstraction.
+
         Args:
             timeout: Timeout in seconds for gh CLI commands (default: 30)
         """
+        _emit_deprecation_once()
         self.timeout = timeout
         self._provider: GitHubProvider | None = None
         self._verify_gh_cli()

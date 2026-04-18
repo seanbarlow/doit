@@ -22,9 +22,13 @@ from ..exit_codes import ExitCode
 from ..models.status_models import SpecState
 from ..services.analytics_service import AnalyticsService
 from ..services.spec_scanner import NotADoitProjectError, SpecNotFoundError
+from .output import OutputFormat, format_option, resolve_format
 
 app = typer.Typer(help="Spec analytics and metrics dashboard")
 console = Console()
+
+_TABULAR_FORMATS = (OutputFormat.TABLE, OutputFormat.JSON, OutputFormat.CSV)
+_EXPORT_FORMATS = (OutputFormat.MARKDOWN, OutputFormat.JSON)
 
 
 def _get_status_emoji(status: SpecState) -> str:
@@ -264,25 +268,28 @@ def _print_cycles_tables(stats, records, days: int | None, since: str | None) ->
 @app.command()
 def velocity(
     weeks: int = typer.Option(8, "--weeks", "-w", help="Number of weeks to display"),
-    format_type: str = typer.Option(
-        "table", "--format", "-f", help="Output format: table, json, csv"
+    format_type: str = format_option(
+        default=OutputFormat.TABLE,
+        allowed=_TABULAR_FORMATS,
     ),
 ) -> None:
     """Display velocity trends over time.
 
     Shows specs completed per week with visual indicators.
 
-    Exit codes:
-      0 - Success
-      1 - Insufficient data (< 2 weeks)
-      2 - Not a doit project
+    Exit codes (see doit_cli.exit_codes.ExitCode):
+      0 (SUCCESS)          — success
+      1 (FAILURE)          — insufficient data (< 2 weeks)
+      2 (VALIDATION_ERROR) — not a doit project
     """
+    fmt = resolve_format(format_type, _TABULAR_FORMATS)
+
     try:
         service = AnalyticsService()
         velocity_data = service.get_velocity_data(weeks=weeks)
 
         if len(velocity_data) < 2:
-            if format_type == "json":
+            if fmt is OutputFormat.JSON:
                 print(json.dumps({"success": False, "error": "Insufficient data"}))
             else:
                 console.print(
@@ -293,9 +300,9 @@ def velocity(
                     console.print(f"Available data points: {len(velocity_data)}")
             raise typer.Exit(code=ExitCode.FAILURE)
 
-        if format_type == "json":
+        if fmt is OutputFormat.JSON:
             _print_velocity_json(velocity_data)
-        elif format_type == "csv":
+        elif fmt is OutputFormat.CSV:
             _print_velocity_csv(velocity_data)
         else:
             _print_velocity_table(velocity_data, weeks)
@@ -507,8 +514,9 @@ def _print_spec_details(metadata) -> None:
 
 @app.command()
 def export(
-    format_type: str = typer.Option(
-        "markdown", "--format", "-f", help="Export format: markdown, json"
+    format_type: str = format_option(
+        default=OutputFormat.MARKDOWN,
+        allowed=_EXPORT_FORMATS,
     ),
     output_path: Path | None = typer.Option(None, "--output", "-o", help="Output file path"),
 ) -> None:
@@ -516,11 +524,13 @@ def export(
 
     Creates a report in .doit/reports/ by default.
 
-    Exit codes:
-      0 - Success
-      1 - Export failed
-      2 - Not a doit project
+    Exit codes (see doit_cli.exit_codes.ExitCode):
+      0 (SUCCESS)          — success
+      1 (FAILURE)          — export failed
+      2 (VALIDATION_ERROR) — not a doit project
     """
+    fmt = resolve_format(format_type, _EXPORT_FORMATS)
+
     try:
         service = AnalyticsService()
         report = service.generate_report()
@@ -531,11 +541,11 @@ def export(
             reports_dir.mkdir(parents=True, exist_ok=True)
 
             timestamp = datetime.now().strftime("%Y-%m-%d")
-            ext = "json" if format_type == "json" else "md"
+            ext = "json" if fmt is OutputFormat.JSON else "md"
             output_path = reports_dir / f"analytics-{timestamp}.{ext}"
 
         # Generate content
-        if format_type == "json":
+        if fmt is OutputFormat.JSON:
             content = json.dumps(report.to_dict(), indent=2)
         else:
             content = _generate_markdown_report(report)

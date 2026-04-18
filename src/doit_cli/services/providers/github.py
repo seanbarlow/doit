@@ -515,6 +515,126 @@ class GitHubProvider(GitProvider):
             raise ProviderError(f"Failed to parse GitHub response: {e}") from e
 
     # -------------------------------------------------------------------------
+    # Issue Comments and Closing
+    # -------------------------------------------------------------------------
+
+    def add_issue_comment(self, issue_id: str, comment: str) -> bool:
+        """Post a comment on an issue.
+
+        Args:
+            issue_id: Issue number (provider ID or the full "GH-123" form).
+            comment: Comment body text.
+
+        Returns:
+            True if the comment posted, False if the CLI returned a non-zero
+            exit code. Raises on auth/network failure.
+        """
+        self._ensure_authenticated()
+        provider_id = self._extract_provider_id(issue_id)
+
+        try:
+            result = subprocess.run(
+                ["gh", "issue", "comment", provider_id, "--body", comment],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+            return result.returncode == 0
+        except subprocess.TimeoutExpired:
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
+
+    def close_issue(self, issue_id: str, comment: str | None = None) -> bool:
+        """Close an issue, optionally posting a closing comment first.
+
+        Args:
+            issue_id: Issue number (provider ID or the full "GH-123" form).
+            comment: Optional comment body to post before closing.
+
+        Returns:
+            True if the close succeeded. Raises on auth/network failure.
+        """
+        self._ensure_authenticated()
+        provider_id = self._extract_provider_id(issue_id)
+
+        cmd = ["gh", "issue", "close", provider_id]
+        if comment:
+            cmd.extend(["--comment", comment])
+
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+            return result.returncode == 0
+        except subprocess.TimeoutExpired:
+            raise NetworkError("GitHub CLI timeout", is_timeout=True) from None
+
+    # -------------------------------------------------------------------------
+    # Branch Operations
+    # -------------------------------------------------------------------------
+
+    def check_branch_exists(self, branch_name: str) -> tuple[bool, bool]:
+        """Check whether a branch exists locally and/or on the remote.
+
+        Runs `git branch --list` and `git ls-remote --heads origin <branch>`
+        to distinguish the two cases. Neither call requires network for the
+        local check; the remote check fails gracefully to `False` if the
+        remote is unreachable.
+
+        Returns:
+            Tuple of (local_exists, remote_exists).
+        """
+        local_exists = False
+        remote_exists = False
+
+        try:
+            local = subprocess.run(
+                ["git", "branch", "--list", branch_name],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            local_exists = bool(local.returncode == 0 and local.stdout.strip())
+        except (subprocess.SubprocessError, FileNotFoundError):
+            pass
+
+        try:
+            remote = subprocess.run(
+                ["git", "ls-remote", "--heads", "origin", branch_name],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+            )
+            remote_exists = bool(remote.returncode == 0 and remote.stdout.strip())
+        except (subprocess.SubprocessError, FileNotFoundError):
+            pass
+
+        return local_exists, remote_exists
+
+    def create_branch(self, branch_name: str, from_branch: str = "main") -> bool:
+        """Create a new local branch from `from_branch` and switch to it.
+
+        Does not push to the remote. Callers that need a remote branch
+        should follow up with `git push -u origin <branch>` or use the
+        provider's PR APIs once work is staged.
+
+        Returns:
+            True if the branch was created, False if git returned non-zero.
+        """
+        try:
+            result = subprocess.run(
+                ["git", "checkout", "-b", branch_name, from_branch],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            return result.returncode == 0
+        except (subprocess.SubprocessError, FileNotFoundError):
+            return False
+
+    # -------------------------------------------------------------------------
     # Helper Methods
     # -------------------------------------------------------------------------
 

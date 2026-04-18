@@ -179,3 +179,61 @@ $ARGUMENTS
 
         assert result.exit_code == 1
         assert "not found" in result.stdout.lower()
+
+
+class TestSyncPromptsSkillsTarget:
+    """Integration tests for the --skills / --no-skills flag (Phase 5d)."""
+
+    def test_claude_sync_writes_skills_by_default(self, temp_dir):
+        """--agent claude writes BOTH .claude/commands/ and .claude/skills/."""
+        result = runner.invoke(
+            app, ["sync-prompts", "--agent", "claude", "--path", str(temp_dir)]
+        )
+        assert result.exit_code == 0
+
+        commands_dir = temp_dir / ".claude" / "commands"
+        skills_dir = temp_dir / ".claude" / "skills"
+
+        assert commands_dir.is_dir(), "flat .claude/commands/ missing"
+        assert skills_dir.is_dir(), "new .claude/skills/ missing"
+
+        # At least the constitution skill should exist as a directory with SKILL.md
+        constitution_skill = skills_dir / "doit.constitution"
+        assert constitution_skill.is_dir()
+        assert (constitution_skill / "SKILL.md").is_file()
+
+    def test_no_skills_flag_skips_skills_sync(self, temp_dir):
+        """--no-skills suppresses the .claude/skills/ write."""
+        result = runner.invoke(
+            app,
+            ["sync-prompts", "--agent", "claude", "--no-skills", "--path", str(temp_dir)],
+        )
+        assert result.exit_code == 0
+
+        assert (temp_dir / ".claude" / "commands").is_dir()
+        assert not (temp_dir / ".claude" / "skills").exists()
+
+    def test_copilot_sync_does_not_touch_skills(self, temp_dir):
+        """--agent copilot (default) must not write to .claude/skills/."""
+        result = runner.invoke(app, ["sync-prompts", "--path", str(temp_dir)])
+        assert result.exit_code == 0
+
+        assert not (temp_dir / ".claude" / "skills").exists()
+        # Copilot prompts should still be produced
+        assert (temp_dir / ".github" / "prompts").is_dir()
+
+    def test_claude_force_rewrites_existing_skill(self, temp_dir):
+        """--force replaces an existing skill directory atomically."""
+        runner.invoke(app, ["sync-prompts", "--agent", "claude", "--path", str(temp_dir)])
+        stray = temp_dir / ".claude" / "skills" / "doit.constitution" / "stray.md"
+        stray.write_text("stray\n")
+
+        result = runner.invoke(
+            app,
+            ["sync-prompts", "--agent", "claude", "--force", "--path", str(temp_dir)],
+        )
+        assert result.exit_code == 0
+        assert not stray.exists()
+        assert (
+            temp_dir / ".claude" / "skills" / "doit.constitution" / "SKILL.md"
+        ).is_file()

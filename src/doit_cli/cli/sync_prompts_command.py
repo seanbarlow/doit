@@ -50,7 +50,6 @@ SkillsOption = Annotated[
     ),
 ]
 
-
 def parse_sync_agents(agent_str: str | None) -> list[Agent]:
     """Parse agent string for sync command.
 

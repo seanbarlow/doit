@@ -433,13 +433,19 @@ class TestUnifiedTemplates:
         assert yaml_found, "Expected at least one Claude template with YAML frontmatter"
 
     def test_transform_and_write_generates_correct_filenames(self, temp_dir):
-        """Test _transform_and_write_templates generates correct filenames."""
+        """Test command copier emits correct Copilot filenames for each template.
+
+        The underlying logic now lives in CommandCopier; this test drives
+        it through TemplateManager.copy_templates_for_agent to keep the
+        public contract tested via its canonical entry point.
+        """
+        from doit_cli.models.agent import Agent
+
         manager = TemplateManager()
         target_dir = temp_dir / "transform_test"
         target_dir.mkdir()
 
-        templates = manager._get_command_templates()
-        result = manager._transform_and_write_templates(templates, target_dir)
+        result = manager.copy_templates_for_agent(Agent.COPILOT, target_dir)
 
         # Each created file should match doit.{name}.prompt.md pattern
         for path in result["created"]:

@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import logging
-import shutil
 from pathlib import Path
 
 from ..models.agent import Agent
 from ..models.sync_models import CommandTemplate
 from ..models.template import DOIT_COMMANDS, Template
-from .prompt_transformer import PromptTransformer
+from .templates import CommandCopier, safe_copy
 
 logger = logging.getLogger(__name__)
 
@@ -77,14 +76,10 @@ class TemplateManager:
     def _safe_copy(source_path: Path, target_path: Path) -> bool:
         """Copy file only if source and target are different files.
 
-        Returns True if copy was performed, False if skipped (same file).
-        Fixes #650: SameFileError when running doit init --update
-        inside the doit repository itself.
+        Back-compat shim — new code should import
+        `doit_cli.services.templates.safe_copy` directly.
         """
-        if source_path.resolve() == target_path.resolve():
-            return False
-        shutil.copy2(source_path, target_path)
-        return True
+        return safe_copy(source_path, target_path)
 
     def __init__(self, custom_source: Path | None = None):
         """Initialize template manager.
@@ -265,78 +260,11 @@ class TemplateManager:
         return warnings
 
     def _get_command_templates(self) -> list[Template]:
-        """Get all command templates from the unified source directory.
+        """Get all command templates from the unified `commands/` source directory.
 
-        Always reads from commands/ directory and parses as Claude format,
-        since that's the canonical source for all agents.
-
-        Returns:
-            List of Template objects with names extracted from source files.
+        Back-compat shim — the logic now lives in `CommandCopier`.
         """
-        source_dir = self.get_base_template_path() / "commands"
-
-        if not source_dir.exists():
-            return []
-
-        templates = []
-        for file_path in source_dir.iterdir():
-            if file_path.is_file() and file_path.suffix == ".md":
-                try:
-                    # Always parse as Claude format since source is commands/
-                    template = Template.from_file(file_path, Agent.CLAUDE)
-                    templates.append(template)
-                except (OSError, ValueError, UnicodeDecodeError) as exc:
-                    logger.debug("skipping unparseable template %s: %s", file_path, exc)
-                    continue
-
-        return templates
-
-    def _transform_and_write_templates(
-        self,
-        templates: list[Template],
-        target_dir: Path,
-        overwrite: bool = False,
-    ) -> dict:
-        """Transform command templates to Copilot prompt format and write them.
-
-        Args:
-            templates: List of source templates (in Claude/command format)
-            target_dir: Destination directory
-            overwrite: Whether to overwrite existing files
-
-        Returns:
-            Dict with 'created', 'updated', 'skipped' lists of paths
-        """
-        result = {
-            "created": [],
-            "updated": [],
-            "skipped": [],
-        }
-
-        transformer = PromptTransformer()
-
-        for template in templates:
-            # Create CommandTemplate for the transformer
-            command_template = CommandTemplate.from_path(template.source_path)
-
-            # Transform the content
-            transformed_content = transformer.transform(command_template)
-
-            # Generate Copilot filename: doit.{name}.prompt.md
-            target_filename = f"doit.{template.name}.prompt.md"
-            target_path = target_dir / target_filename
-
-            if target_path.exists():
-                if overwrite:
-                    target_path.write_text(transformed_content, encoding="utf-8")
-                    result["updated"].append(target_path)
-                else:
-                    result["skipped"].append(target_path)
-            else:
-                target_path.write_text(transformed_content, encoding="utf-8")
-                result["created"].append(target_path)
-
-        return result
+        return self._command_copier().read_templates()
 
     def copy_templates_for_agent(
         self,
@@ -344,50 +272,18 @@ class TemplateManager:
         target_dir: Path,
         overwrite: bool = False,
     ) -> dict:
-        """Copy templates for an agent to target directory.
+        """Copy templates for an agent into `target_dir`.
 
-        For Claude: Direct copy from commands/ directory.
-        For Copilot: Transform command templates to prompt format.
-
-        Args:
-            agent: Target agent
-            target_dir: Destination directory
-            overwrite: Whether to overwrite existing files
-
-        Returns:
-            Dict with 'created', 'updated', 'skipped' lists of paths
+        Delegates to `CommandCopier`, which handles both the Claude direct
+        copy and the Copilot transformation path.
         """
-        # Get templates from unified source (commands/)
-        templates = self._get_command_templates()
+        result = self._command_copier().copy_for_agent(
+            agent, target_dir, overwrite=overwrite
+        )
+        return result.as_dict()
 
-        if agent.needs_transformation:
-            # Copilot: Transform command templates to prompt format
-            return self._transform_and_write_templates(templates, target_dir, overwrite)
-
-        # Claude: Direct copy with correct filename
-        result = {
-            "created": [],
-            "updated": [],
-            "skipped": [],
-        }
-
-        for template in templates:
-            target_path = target_dir / template.target_filename
-
-            if target_path.exists():
-                if overwrite:
-                    # Overwrite existing file
-                    target_path.write_text(template.content, encoding="utf-8")
-                    result["updated"].append(target_path)
-                else:
-                    # Skip existing file
-                    result["skipped"].append(target_path)
-            else:
-                # Create new file
-                target_path.write_text(template.content, encoding="utf-8")
-                result["created"].append(target_path)
-
-        return result
+    def _command_copier(self) -> CommandCopier:
+        return CommandCopier(self.get_base_template_path() / "commands")
 
     def copy_single_template(
         self,

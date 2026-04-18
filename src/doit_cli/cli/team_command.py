@@ -29,6 +29,8 @@ from doit_cli.services.team_service import (
     TeamService,
 )
 
+from ..exit_codes import ExitCode
+
 app = typer.Typer(help="Team collaboration commands")
 console = Console()
 
@@ -50,7 +52,7 @@ def _require_initialized(service: TeamService) -> None:
             "[red]Error:[/red] Team collaboration not initialized.\n"
             "Run [cyan]doit team init[/cyan] first."
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
 
 def _format_time_ago(dt: datetime | None) -> str:
@@ -138,7 +140,7 @@ def init_team(
         if e.errors:
             for error in e.errors:
                 console.print(f"  • {error}")
-        raise typer.Exit(code=1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 # =============================================================================
@@ -215,13 +217,13 @@ def add_member(
 
     except MemberAlreadyExistsError:
         console.print(f"[red]Error:[/red] Member already exists: {email}")
-        raise typer.Exit(code=2) from None
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from None
     except TeamConfigValidationError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
     except PermissionDeniedError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=3) from e
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR) from e
 
 
 @app.command("remove")
@@ -250,14 +252,14 @@ def remove_member(
     member = service.get_member(email)
     if not member:
         console.print(f"[red]Error:[/red] Member not found: {email}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Confirm unless forced
     if not force:
         confirm = typer.confirm(f"Remove {email} from team?")
         if not confirm:
             console.print("Cancelled.")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     try:
         service.remove_member(email)
@@ -265,10 +267,10 @@ def remove_member(
 
     except TeamConfigValidationError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
     except PermissionDeniedError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=3) from e
+        raise typer.Exit(code=ExitCode.PROVIDER_ERROR) from e
 
 
 # =============================================================================
@@ -400,7 +402,7 @@ def sync_memory(
             console.print()
             console.print("Run [cyan]doit team sync --force[/cyan] to keep local versions,")
             console.print("or resolve manually and run [cyan]doit team sync[/cyan] again.")
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         if result.success:
             console.print()
@@ -426,16 +428,16 @@ def sync_memory(
             console.print("  Last sync: [cyan]just now[/cyan]")
         else:
             console.print(f"[red]Error:[/red] {result.error_message}")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
     except NoRemoteError as e:
         console.print(f"[red]Error:[/red] {e}")
         console.print("Push your repository to a remote first.")
-        raise typer.Exit(code=1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
     except NetworkError as e:
         console.print(f"[yellow]Warning:[/yellow] {e}")
         console.print("Changes saved locally. They will sync when connectivity returns.")
-        raise typer.Exit(code=1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 # =============================================================================
@@ -610,7 +612,7 @@ def list_notifications(
             console.print(
                 "Valid types: memory_changed, conflict_detected, member_joined, permission_changed"
             )
-            raise typer.Exit(code=1) from None
+            raise typer.Exit(code=ExitCode.FAILURE) from None
 
     notifications = notif_service.get_notifications(
         unread_only=not all_notifications,
@@ -737,7 +739,7 @@ def clear_notifications(
         confirm = typer.confirm(f"Clear all {count} notifications?")
         if not confirm:
             console.print("Cancelled.")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     cleared = notif_service.clear_all()
     console.print(f"[green]✓ Cleared {cleared} notification{'s' if cleared != 1 else ''}[/green]")
@@ -959,7 +961,7 @@ def show_conflict(
 
     if not conflict:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     console.print()
     console.print(f"[bold]Conflict:[/bold] {conflict.file_path}")
@@ -1060,7 +1062,7 @@ def resolve_conflict(
         console.print(
             "[red]Error:[/red] Specify exactly one resolution: --keep-local, --keep-remote, or --manual"
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     if keep_local:
         resolution = ConflictResolution.KEEP_LOCAL
@@ -1095,7 +1097,7 @@ def resolve_conflict(
 
     if not conflict:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     try:
         resolved = conflict_service.resolve_conflict(conflict.id, resolution)
@@ -1108,7 +1110,7 @@ def resolve_conflict(
 
     except ConflictNotFoundError:
         console.print(f"[red]Error:[/red] Conflict not found: {conflict_id}")
-        raise typer.Exit(code=1) from None
+        raise typer.Exit(code=ExitCode.FAILURE) from None
 
 
 @conflict_app.command("clear")
@@ -1144,7 +1146,7 @@ def clear_conflicts(
         confirm = typer.confirm("Continue?")
         if not confirm:
             console.print("Cancelled.")
-            raise typer.Exit(code=0)
+            raise typer.Exit(code=ExitCode.SUCCESS)
 
     count = conflict_service.clear_active_conflicts()
     console.print(f"[green]✓ Cleared {count} conflict(s)[/green]")
@@ -1207,7 +1209,7 @@ def team_config(
         access_service = AccessService()
         if not access_service.check_manage_permission():
             console.print("[red]Error:[/red] Only team owners can modify settings.")
-            raise typer.Exit(code=3)
+            raise typer.Exit(code=ExitCode.PROVIDER_ERROR)
 
         config = service.config
 
@@ -1219,7 +1221,7 @@ def team_config(
             if conflict_strategy not in ["prompt", "keep-local", "keep-remote"]:
                 console.print(f"[red]Error:[/red] Invalid conflict strategy: {conflict_strategy}")
                 console.print("Valid options: prompt, keep-local, keep-remote")
-                raise typer.Exit(code=1)
+                raise typer.Exit(code=ExitCode.FAILURE)
             config.sync.conflict_strategy = conflict_strategy
 
         service._save_config()

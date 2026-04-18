@@ -10,6 +10,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.agent import Agent
 from ..models.sync_models import FileOperation, OperationType, SyncResult
 from ..services.command_writer import CommandWriter
@@ -278,7 +279,7 @@ def sync_prompts_command(
         target_agents = parse_sync_agents(agent)
     except typer.BadParameter as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
     # Initialize services
     reader = TemplateReader(project_root=project_root)
@@ -298,7 +299,7 @@ def sync_prompts_command(
             console.print(json.dumps({"error": msg}))
         else:
             console.print(f"[red]Error:[/red] {msg}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     all_results = []
 
@@ -338,4 +339,4 @@ def sync_prompts_command(
 
     # Exit with appropriate code
     if not combined.success:
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)

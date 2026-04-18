@@ -11,6 +11,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.tree import Tree
 
+from ..exit_codes import ExitCode
 from ..models.agent import Agent
 from ..models.project import Project
 from ..models.results import InitResult
@@ -120,7 +121,7 @@ def map_workflow_responses(responses: dict) -> tuple[list[Agent], Path | None]:
     # Check confirmation
     if responses.get("confirm-path") == "no":
         console.print("[yellow]Initialization cancelled.[/yellow]")
-        raise typer.Exit(0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     # Parse agent selection
     agent_str = responses.get("select-agent", "claude")
@@ -548,7 +549,7 @@ def init_command(
             agents = parse_agent_string(agent)
         except typer.BadParameter as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1) from e
+            raise typer.Exit(code=ExitCode.FAILURE) from e
 
     # Non-interactive mode: bypass workflow entirely (FR-003, FR-008)
     if yes:
@@ -562,7 +563,7 @@ def init_command(
         )
         display_init_result(result, agents or result.project.agents or [Agent.CLAUDE])
         if not result.success:
-            raise typer.Exit(1)
+            raise typer.Exit(code=ExitCode.FAILURE)
         return
 
     # Interactive mode: use workflow engine (FR-001, FR-002, FR-005)
@@ -592,7 +593,7 @@ def init_command(
         responses = engine.run(workflow, initial_responses=initial_responses)
     except KeyboardInterrupt:
         # State is saved by workflow engine (FR-007)
-        raise typer.Exit(130) from None
+        raise typer.Exit(code=ExitCode.USER_CANCEL) from None
 
     # Map workflow responses to init parameters (FR-006)
     workflow_agents, template_source = map_workflow_responses(responses)
@@ -617,4 +618,4 @@ def init_command(
     display_init_result(result, final_agents or result.project.agents or [Agent.CLAUDE])
 
     if not result.success:
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)

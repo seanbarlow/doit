@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.crossref_models import CoverageReport, CoverageStatus
 from ..services.crossref_service import CrossReferenceService
 from ..services.spec_scanner import NotADoitProjectError
@@ -183,7 +184,7 @@ def coverage_command(
                     "[red]Error:[/red] Could not detect spec. "
                     "Please provide spec name or run from a feature branch."
                 )
-                raise typer.Exit(code=2)
+                raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Validate format
         valid_formats = ["rich", "json", "markdown"]
@@ -192,7 +193,7 @@ def coverage_command(
                 f"[red]Error:[/red] Invalid format '{output_format}'. "
                 f"Valid: {', '.join(valid_formats)}"
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Get coverage report
         service = CrossReferenceService()
@@ -200,7 +201,7 @@ def coverage_command(
             report = service.get_coverage(spec_name=spec_name)
         except FileNotFoundError as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2) from e
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
         # Format output
         if output_format == "json":
@@ -227,15 +228,15 @@ def coverage_command(
         has_uncovered = report.uncovered_count > 0
 
         if has_orphaned:
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
         if strict and has_uncovered:
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 @xref_app.command(name="locate")
@@ -263,7 +264,7 @@ def locate_command(
                 "[red]Error:[/red] Could not detect spec. "
                 "Please provide --spec or run from a feature branch."
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Validate format
         valid_formats = ["rich", "json", "line"]
@@ -272,7 +273,7 @@ def locate_command(
                 f"[red]Error:[/red] Invalid format '{output_format}'. "
                 f"Valid: {', '.join(valid_formats)}"
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Find requirement
         service = CrossReferenceService()
@@ -280,11 +281,11 @@ def locate_command(
             req = service.locate_requirement(requirement_id, spec_name=spec_name)
         except (FileNotFoundError, ValueError) as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2) from e
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
         if req is None:
             console.print(f"[yellow]Requirement {requirement_id} not found in spec.[/yellow]")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
         # Format output
         if output_format == "json":
@@ -303,11 +304,11 @@ def locate_command(
             console.print(f"[cyan]{req.id}[/cyan]: {req.description}")
             console.print(f"Location: [dim]{req.spec_path}:{req.line_number}[/dim]")
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 @xref_app.command(name="tasks")
@@ -333,7 +334,7 @@ def tasks_command(
                 "[red]Error:[/red] Could not detect spec. "
                 "Please provide --spec or run from a feature branch."
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Validate format
         valid_formats = ["rich", "json", "markdown"]
@@ -342,7 +343,7 @@ def tasks_command(
                 f"[red]Error:[/red] Invalid format '{output_format}'. "
                 f"Valid: {', '.join(valid_formats)}"
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Get tasks
         service = CrossReferenceService()
@@ -350,11 +351,11 @@ def tasks_command(
             tasks = service.get_tasks_for_requirement(requirement_id, spec_name=spec_name)
         except (FileNotFoundError, ValueError) as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2) from e
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
         if not tasks:
             console.print(f"[yellow]No tasks found implementing {requirement_id}[/yellow]")
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
         # Format output
         if output_format == "json":
@@ -411,11 +412,11 @@ def tasks_command(
                 f"\nFound {len(tasks)} tasks ({completed} complete, {len(tasks) - completed} pending)"
             )
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
 
 @xref_app.command(name="validate")
@@ -446,7 +447,7 @@ def validate_command(
                     "[red]Error:[/red] Could not detect spec. "
                     "Please provide spec name or run from a feature branch."
                 )
-                raise typer.Exit(code=2)
+                raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Validate format
         valid_formats = ["rich", "json"]
@@ -455,7 +456,7 @@ def validate_command(
                 f"[red]Error:[/red] Invalid format '{output_format}'. "
                 f"Valid: {', '.join(valid_formats)}"
             )
-            raise typer.Exit(code=2)
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
 
         # Validate references
         service = CrossReferenceService()
@@ -464,7 +465,7 @@ def validate_command(
             report = service.get_coverage(spec_name=spec_name)
         except FileNotFoundError as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(code=2) from e
+            raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e
 
         # Count issues
         error_count = len(orphaned)  # Orphaned references are always errors
@@ -530,10 +531,10 @@ def validate_command(
 
         # Determine exit code
         if error_count > 0:
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=ExitCode.FAILURE)
 
-        raise typer.Exit(code=0)
+        raise typer.Exit(code=ExitCode.SUCCESS)
 
     except NotADoitProjectError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(code=2) from e
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR) from e

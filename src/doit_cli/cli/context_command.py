@@ -8,6 +8,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.context_config import ContextConfig
 from ..services.context_loader import ContextLoader
 
@@ -73,7 +74,7 @@ def show_context(
         context = loader.load()
     except Exception as e:
         console.print(f"\n[red]Error loading context: {e}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
     # Show command-specific info
     if command:
@@ -261,7 +262,7 @@ def audit_context(
         console.print(
             f"[red]Invalid format '{output_format}'. Use one of: {', '.join(valid_formats)}[/red]"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Validate severity option
     valid_severities = ["critical", "major", "minor"]
@@ -269,7 +270,7 @@ def audit_context(
         console.print(
             f"[red]Invalid severity '{severity}'. Use one of: {', '.join(valid_severities)}[/red]"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     # Create auditor
     auditor = ContextAuditor(templates_dir=templates_dir)
@@ -279,7 +280,7 @@ def audit_context(
         console.print(
             "[dim]Run this command from the repository root or specify --templates-dir[/dim]"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     console.print(f"[bold]Auditing templates in:[/bold] {auditor.templates_dir}")
     console.print("")
@@ -313,6 +314,6 @@ def audit_context(
 
     if report.total_findings > 0:
         console.print(f"\n[dim]Total findings: {report.total_findings}[/dim]")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
     else:
         console.print("[green]✓ All templates pass audit[/green]")

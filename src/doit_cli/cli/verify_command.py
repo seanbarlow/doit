@@ -11,6 +11,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from ..exit_codes import ExitCode
 from ..models.agent import Agent
 from ..models.project import Project
 from ..models.results import VerifyResult, VerifyStatus
@@ -172,7 +173,7 @@ def verify_command(
                 console.print(json.dumps({"error": str(e)}))
             else:
                 console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1) from e
+            raise typer.Exit(code=ExitCode.FAILURE) from e
 
     # Create project and validator
     project = Project(path=path.resolve())
@@ -189,4 +190,4 @@ def verify_command(
 
     # Exit with appropriate code
     if not result.passed:
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)

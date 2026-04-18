@@ -7,6 +7,7 @@ import sys
 import typer
 from rich.console import Console
 
+from ..exit_codes import ExitCode
 from ..services.hook_manager import HookManager
 from ..services.hook_validator import HookValidator
 
@@ -36,7 +37,7 @@ def install_hooks(
     if not manager.is_git_repo():
         console.print("[red]Error: Not a Git repository.[/red]")
         console.print("Run 'git init' first to initialize a Git repository.")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     try:
         installed, skipped = manager.install_hooks(backup=backup, force=force)
@@ -57,7 +58,7 @@ def install_hooks(
 
     except RuntimeError as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 @hooks_app.command("uninstall")
@@ -88,7 +89,7 @@ def hooks_status() -> None:
 
     if not manager.is_git_repo():
         console.print("[red]Not a Git repository[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     installed = manager.get_installed_hooks()
 
@@ -149,7 +150,7 @@ def restore_hooks(
 
     except RuntimeError as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(code=ExitCode.FAILURE) from e
 
 
 @hooks_app.command("validate")
@@ -161,7 +162,7 @@ def validate_hook(
     if hook_type not in valid_types:
         console.print(f"[red]Invalid hook type: {hook_type}[/red]")
         console.print(f"Valid types: {', '.join(valid_types)}")
-        raise typer.Exit(1)
+        raise typer.Exit(code=ExitCode.FAILURE)
 
     validator = HookValidator()
 

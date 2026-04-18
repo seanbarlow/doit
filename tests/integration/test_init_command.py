@@ -50,6 +50,45 @@ class TestInitCommand:
         assert (project_dir / ".claude" / "commands").exists()
         assert (project_dir / ".github" / "prompts").exists()
 
+    def test_init_claude_writes_skills_by_default(self, project_dir):
+        """init with Claude writes both .claude/commands/ AND .claude/skills/."""
+        from doit_cli.main import app
+
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "claude", "--yes"])
+
+        assert result.exit_code == 0
+        commands_dir = project_dir / ".claude" / "commands"
+        skills_dir = project_dir / ".claude" / "skills"
+
+        assert commands_dir.is_dir(), "legacy .claude/commands/ missing"
+        assert skills_dir.is_dir(), ".claude/skills/ was not written by default"
+        # At least constitution should exist as a skill directory with SKILL.md
+        constitution = skills_dir / "doit.constitution"
+        assert constitution.is_dir()
+        assert (constitution / "SKILL.md").is_file()
+
+    def test_init_no_skills_flag_skips_skills(self, project_dir):
+        """--no-skills writes only the legacy .claude/commands/ layout."""
+        from doit_cli.main import app
+
+        result = runner.invoke(
+            app,
+            ["init", str(project_dir), "--agent", "claude", "--no-skills", "--yes"],
+        )
+
+        assert result.exit_code == 0
+        assert (project_dir / ".claude" / "commands").is_dir()
+        assert not (project_dir / ".claude" / "skills").exists()
+
+    def test_init_copilot_only_skips_skills(self, project_dir):
+        """Copilot-only init does not create .claude/skills/ even when --skills is on."""
+        from doit_cli.main import app
+
+        result = runner.invoke(app, ["init", str(project_dir), "--agent", "copilot", "--yes"])
+
+        assert result.exit_code == 0
+        assert not (project_dir / ".claude" / "skills").exists()
+
     def test_init_invalid_agent(self, project_dir):
         """Test init with invalid agent name."""
         from doit_cli.main import app

@@ -44,6 +44,19 @@ ForceFlag = Annotated[
 
 YesFlag = Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompts")]
 
+SkillsFlag = Annotated[
+    bool,
+    typer.Option(
+        "--skills/--no-skills",
+        help=(
+            "When targeting Claude, also write Agent-Skills-format directories to "
+            ".claude/skills/ alongside the legacy .claude/commands/ flat files. "
+            "Defaults on so new projects get the April 2026 layout; pass --no-skills "
+            "to emit only the legacy layout."
+        ),
+    ),
+]
+
 
 # =============================================================================
 # InitWorkflow Factory (Feature 031)
@@ -326,6 +339,47 @@ def validate_custom_templates(template_source: Path, yes: bool = False) -> bool:
     return True
 
 
+def _install_bundled_skills(
+    project: Project,
+    *,
+    overwrite: bool,
+) -> tuple[list[Path], list[Path], list[Path]]:
+    """Write every bundled Agent-Skills directory into `.claude/skills/`.
+
+    Skills layer sits alongside the legacy `.claude/commands/` layout; both
+    are written when Claude is a target so existing user tooling keeps
+    working while new Claude sessions pick up the richer directory format.
+
+    Returns:
+        (created, updated, skipped) lists of per-skill target directories,
+        matching the InitResult file-list shape used by the caller.
+    """
+    from ..services.skill_reader import SkillReader
+    from ..services.skill_writer import SkillWriter
+
+    created: list[Path] = []
+    updated: list[Path] = []
+    skipped: list[Path] = []
+
+    skills = SkillReader().scan_bundled_skills()
+    writer = SkillWriter(project_root=project.path)
+
+    for skill in skills:
+        target_dir = writer.skills_dir / skill.directory.name
+
+        if target_dir.exists() and not overwrite:
+            skipped.append(target_dir)
+            continue
+
+        write_result = writer.write_skill(skill, overwrite=True)
+        if write_result.was_overwrite:
+            updated.append(write_result.target_dir)
+        else:
+            created.append(write_result.target_dir)
+
+    return created, updated, skipped
+
+
 def run_init(
     path: Path,
     agents: list[Agent] | None = None,
@@ -333,6 +387,7 @@ def run_init(
     force: bool = False,
     yes: bool = False,
     template_source: Path | None = None,
+    skills: bool = True,
 ) -> InitResult:
     """Run the initialization process.
 
@@ -343,6 +398,8 @@ def run_init(
         force: Force overwrite without backup
         yes: Skip confirmation prompts
         template_source: Custom template source path
+        skills: When Claude is a target, also write Agent-Skills directories
+                to .claude/skills/. Defaults True.
 
     Returns:
         InitResult with operation details
@@ -495,6 +552,19 @@ def run_init(
         result.updated_files.extend(copy_result.get("updated", []))
         result.skipped_files.extend(copy_result.get("skipped", []))
 
+        # For Claude, also write the Agent-Skills directory layout alongside
+        # the legacy .claude/commands/ flat files. Driven by the --skills flag
+        # (default on) so new projects pick up the April 2026 layout without
+        # a second `doit sync-prompts` step.
+        if agent == Agent.CLAUDE and skills:
+            skill_created, skill_updated, skill_skipped = _install_bundled_skills(
+                project,
+                overwrite=update or force,
+            )
+            result.created_files.extend(skill_created)
+            result.updated_files.extend(skill_updated)
+            result.skipped_files.extend(skill_skipped)
+
         # For Copilot agent, also create/update copilot-instructions.md
         if agent == Agent.COPILOT:
             copilot_instructions_path = project.path / ".github" / "copilot-instructions.md"
@@ -528,11 +598,15 @@ def init_command(
     update: UpdateFlag = False,
     force: ForceFlag = False,
     yes: YesFlag = False,
+    skills: SkillsFlag = True,
 ) -> None:
     """Initialize a new doit project with bundled templates.
 
     This command creates the .doit/ folder structure and copies command
-    templates for the specified AI agent(s).
+    templates for the specified AI agent(s). When Claude is a target, the
+    April 2026 Agent Skills directory layout is written to .claude/skills/
+    alongside the legacy .claude/commands/ flat files unless --no-skills
+    is passed.
 
     Examples:
         doit init .                    # Initialize in current directory
@@ -540,6 +614,7 @@ def init_command(
         doit init . --agent copilot    # Copilot only
         doit init . -a claude,copilot  # Both agents
         doit init . --update           # Update existing templates
+        doit init . --no-skills        # Legacy-only layout for Claude
         doit init . --yes              # Non-interactive mode
     """
     # Parse agent string if provided via CLI
@@ -560,6 +635,7 @@ def init_command(
             force=force,
             yes=True,
             template_source=templates,
+            skills=skills,
         )
         display_init_result(result, agents or result.project.agents or [Agent.CLAUDE])
         if not result.success:
@@ -612,6 +688,7 @@ def init_command(
         force=force,
         yes=False,
         template_source=final_templates,
+        skills=skills,
     )
 
     # Display results

@@ -200,6 +200,9 @@ See [Enhancement Recommendations](enhancements.md) for proposed improvements to 
 
 ## Related Documentation
 
+- [Agent Skills Format](agent-skills.md) - Current Claude Code template layout (0.2.0+)
+- [Copilot Prompt Files](copilot-prompts.md) - Native VS Code `.prompt.md` schema
 - [Root Templates](root-templates.md) - Detailed documentation for document templates
-- [Command Templates](commands.md) - Detailed documentation for workflow commands
+- [Command Templates (Legacy)](commands.md) - Back-compat reference for flat `.claude/commands/` files
+- [JSON Schemas](schemas.md) - Bundled contracts (e.g. constitution frontmatter)
 - [Enhancement Recommendations](enhancements.md) - Proposed improvements

@@ -1,4 +1,10 @@
-# Command Templates Documentation
+# Command Templates Documentation (Legacy)
+
+> **Status as of 0.2.0**: The Agent Skills layout
+> ([agent-skills.md](agent-skills.md)) is the current standard for Claude
+> Code templates. Flat `.claude/commands/doit.*.md` files are still
+> generated alongside skills for back-compat, but are deprecated. This
+> page remains the workflow reference during the transition.
 
 Command templates define the workflow logic for the doit development system. Each command orchestrates a specific phase of the development lifecycle.
 
@@ -81,7 +87,7 @@ flowchart TD
 
 **Phase**: Initialization
 
-**Output**: Project directories, config files, `.claude/commands/`
+**Output**: Project directories, config files, `.claude/skills/` (and legacy `.claude/commands/`)
 
 ### Workflow
 
@@ -137,20 +143,31 @@ flowchart LR
 
 ### Doit Commands Generation
 
-Copies all 9 command templates to `.claude/commands/`:
+Generates all 13 workflow templates in both the current Skills layout and
+the legacy flat commands layout:
 
 ```text
-.claude/commands/
-├── doit.checkin.md
-├── doit.constitution.md
-├── doit.implement.md
-├── doit.plan.md
-├── doit.review.md
-├── doit.scaffold.md
-├── doit.specify.md
-├── doit.tasks.md
-└── doit.test.md
+.claude/skills/                   # current standard (0.2.0+)
+├── doit.checkin/SKILL.md
+├── doit.constitution/SKILL.md
+├── doit.documentit/SKILL.md
+├── doit.fixit/SKILL.md
+├── doit.implementit/SKILL.md
+├── doit.planit/SKILL.md
+├── doit.researchit/SKILL.md
+├── doit.reviewit/SKILL.md
+├── doit.roadmapit/SKILL.md
+├── doit.scaffoldit/SKILL.md
+├── doit.specit/SKILL.md
+├── doit.taskit/SKILL.md
+└── doit.testit/SKILL.md
+
+.claude/commands/                 # legacy, back-compat only
+└── doit.*.md                     # one file per skill above
 ```
+
+Copilot counterparts land at `.github/prompts/doit.*.prompt.md` — see
+[copilot-prompts.md](copilot-prompts.md).
 
 ### Handoffs
 

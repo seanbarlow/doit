@@ -7,6 +7,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-20
+
+### Added
+
+- **Agent Skills template layout for Claude Code**
+  - New `.claude/skills/doit.<name>/SKILL.md` layout generated alongside the
+    legacy flat commands by `doit init` and `doit sync-prompts`
+  - All 13 workflow commands migrated (`constitution`, `roadmapit`,
+    `researchit`, `specit`, `planit`, `taskit`, `implementit`, `reviewit`,
+    `testit`, `fixit`, `documentit`, `scaffoldit`, `checkin`)
+  - Oversized templates split into `SKILL.md` + supporting reference files
+    to stay under the 500-line budget per Anthropic's skill authoring guide
+  - `SkillTemplate.validate()` enforces the 500-line and 1,536-char
+    combined `description + when_to_use` budgets in CI contract tests
+- **Native GitHub Copilot `.prompt.md` frontmatter**
+  - `.github/prompts/doit.*.prompt.md` now emit the April 2026 VS Code
+    schema: `description`, `agent: agent`, `tools: [...]`, optional `model`
+  - `PromptTransformer` maps Claude's `allowed-tools` verbs to VS Code
+    tool identifiers (`editFiles`, `search`, `codebase`, `runCommands`,
+    `githubRepo`) and rewrites `$ARGUMENTS` to `${input:args}`
+  - Contract test `tests/contract/test_copilot_prompt_format.py` fails CI
+    if shipped prompts drift from the transformer output — run
+    `doit sync-prompts --agent copilot` to resync
+- **`DoitError` exception hierarchy**
+  - Raise subclasses at boundaries instead of bare exceptions; chain with
+    `raise X(...) from e` (ruff B904 enforced)
+  - Lives in [src/doit_cli/errors.py](src/doit_cli/errors.py)
+- **`ExitCode` constants**
+  - Every `typer.Exit(code=…)` uses a symbolic constant from
+    [src/doit_cli/exit_codes.py](src/doit_cli/exit_codes.py) — no numeric
+    literals
+  - Canonical codes: `SUCCESS=0`, `FAILURE=1`, `VALIDATION_ERROR=2`,
+    `PROVIDER_ERROR=3`, `AUTH_ERROR=4`, `STATE_ERROR=5`, `USER_CANCEL=130`
+- **`format_option()` helper + `OutputFormat` enum**
+  - Shared `--format / -f` flag across report-producing commands with
+    per-command `allowed` subsets and case-insensitive parsing
+  - Lives in [src/doit_cli/cli/output.py](src/doit_cli/cli/output.py)
+- **Constitution frontmatter JSON Schema**
+  - New canonical schema at
+    [src/doit_cli/schemas/frontmatter.schema.json](src/doit_cli/schemas/frontmatter.schema.json)
+    defining the YAML frontmatter contract for
+    `.doit/memory/constitution.md`
+  - Kept in sync with the `platform-docs-site` copy for integration with
+    the doit-docs portal
+- **`context_loader` service split into a package**
+  - Refactored from a single module into a package with one responsibility
+    per submodule (loader, merger, cache); public API unchanged
+- **GitHub provider branch + issue operations**
+  - New branch-creation helpers plus issue-close and issue-comment flows,
+    used by `doit.checkin` and the bug-fix workflow
+- **mypy enforcement as a pre-commit hook**
+  - Type-check errors now block commits; run
+    `pre-commit run mypy --hook-stage manual --all-files` locally
+
+### Changed
+
+- `doit sync-prompts` now emits both `.claude/skills/doit.<name>/` and the
+  legacy `.claude/commands/doit.<name>.md` files so teams can roll forward
+  to the Skills layout at their own pace
+- Every `src/doit_cli/**/*.py` starts with `from __future__ import
+  annotations`; type hints use `list[X] / X | None` instead of
+  `List / Optional`
+
+### Deprecated
+
+- Flat `.claude/commands/doit.<name>.md` templates continue to work in
+  this release per Anthropic's back-compat window, but the Skills layout
+  is preferred. A future minor release will remove the flat-command
+  generator
+
+### Fixed
+
+- Removed unreachable code flagged by ruff in the services layer
+- Legacy `github_service` call sites now route through the provider
+  abstraction; the standalone service remains only as a shim
+
 ## [0.1.17] - 2026-03-26
 
 ### Added

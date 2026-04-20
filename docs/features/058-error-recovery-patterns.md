@@ -4,6 +4,11 @@
 **Branch**: `058-error-recovery-patterns`
 **Epic**: #767
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 Added structured `## Error Recovery` sections to all 13 command templates, following the pattern established by `doit.fixit.md`. Previously, only 1 of 13 templates had error recovery documentation. This feature closes that gap — every command now provides 3-5 documented error scenarios with plain-language summaries, severity indicators, numbered recovery steps, verification commands, prevention tips, and escalation paths.

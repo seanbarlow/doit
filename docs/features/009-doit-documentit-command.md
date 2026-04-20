@@ -4,6 +4,11 @@
 **Branch**: `009-doit-documentit-command`
 **PR**: Pending
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 Added `/doit.documentit` command for documentation management (organize, index, audit, cleanup, enhance-templates) and enhanced `/doit.scaffoldit` to generate `.doit/memory/tech-stack.md` capturing technology choices at scaffold time.

@@ -4,6 +4,11 @@
 **Branch**: 057-persona-aware-user-story-generation
 **Epic**: #744
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 When `/doit.specit` generates user stories, it now automatically maps each story to the most relevant persona from `.doit/memory/personas.md` (project-level) or `specs/{feature}/personas.md` (feature-level) using existing P-NNN traceability IDs. This completes the persona pipeline established by specs 053 (Stakeholder Persona Templates) and 056 (Project-Level Personas with Context Injection).

@@ -4,6 +4,11 @@
 **Branch**: 008-doit-roadmapit-command
 **PR**: Pending
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 The `/doit.roadmapit` command creates and manages project roadmaps with prioritized requirements, deferred functionality, and AI-suggested enhancements. It provides guided prompts to help users articulate their project vision and maintains a structured approach to requirement management.

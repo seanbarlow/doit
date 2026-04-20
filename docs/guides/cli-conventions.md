@@ -82,6 +82,28 @@ destination.
 doit status --format markdown --output report.md
 ```
 
+## Errors at boundaries
+
+Raise a subclass of [`DoitError`](../../src/doit_cli/errors.py) at every
+boundary where a command can fail — validation failures, provider calls,
+state reads. Inside `except` blocks, chain the original with
+`raise X(...) from e`; ruff B904 fails CI on bare re-raises.
+
+```python
+from doit_cli.errors import ProviderError
+
+try:
+    client.fetch_epics()
+except HTTPError as e:
+    raise ProviderError("GitHub epic fetch failed") from e
+```
+
+The hierarchy pairs naturally with `ExitCode`: a `ValidationError`
+surfaces as `ExitCode.VALIDATION_ERROR`, a `ProviderError` as
+`ExitCode.PROVIDER_ERROR`, and so on. Callers in `src/doit_cli/cli/` map
+them in one place; service code should raise and let the mapping handle
+exit.
+
 ## Shared Rich console
 
 Every command uses `rich.console.Console()` at the module level. Keep these
@@ -91,16 +113,17 @@ that adds noticeable latency on slow terminals.
 
 ## Migration status
 
-As of April 2026, the infrastructure for these conventions lives in:
+As of 0.2.0, the infrastructure for these conventions lives in:
 
-- [`src/doit_cli/exit_codes.py`](../../src/doit_cli/exit_codes.py)
-- [`src/doit_cli/cli/output.py`](../../src/doit_cli/cli/output.py)
+- [`src/doit_cli/errors.py`](../../src/doit_cli/errors.py) — `DoitError`
+  hierarchy
+- [`src/doit_cli/exit_codes.py`](../../src/doit_cli/exit_codes.py) —
+  `ExitCode` constants
+- [`src/doit_cli/cli/output.py`](../../src/doit_cli/cli/output.py) —
+  `format_option()` + `OutputFormat`
 
-The following commands are fully migrated and serve as reference:
-
-- `doit status` ([status_command.py](../../src/doit_cli/cli/status_command.py))
-- `doit fixit` (all subcommands)
-
-Other commands will be migrated progressively as they're next edited. When
-you touch one, bring it onto the shared helpers — they're opt-in per call
-site, so partial migration is safe.
+`doit status` ([status_command.py](../../src/doit_cli/cli/status_command.py))
+and every `doit fixit` subcommand are fully migrated and serve as
+reference implementations. Other commands adopt the shared helpers as
+they're next edited — adoption is opt-in per call site, so partial
+migration is safe.

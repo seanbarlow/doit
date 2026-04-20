@@ -1,4 +1,6 @@
-# Agent Skills Format (April 2026)
+# Agent Skills Format
+
+**Available in**: doit 0.2.0+ (all 13 commands shipped as skills).
 
 As of April 2026, doit's Claude Code templates follow the
 [Agent Skills open standard](https://agentskills.io). This page documents
@@ -80,18 +82,19 @@ rewrites these to `${input:args:…}` when syncing to `.github/prompts/`.
 
 ## Migration status
 
-As of April 2026, only the constitution template has been migrated to
-the skills layout. Templates still in the flat `.claude/commands/`
-format:
+As of 0.2.0, **all 13 workflow commands** ship as skills:
 
-- `doit.scaffoldit`, `doit.roadmapit`, `doit.researchit`, `doit.specit`,
-  `doit.planit`, `doit.taskit`, `doit.implementit`, `doit.reviewit`,
-  `doit.testit`, `doit.fixit`, `doit.documentit`, `doit.checkin`.
+- `doit.constitution`, `doit.scaffoldit`, `doit.roadmapit`,
+  `doit.researchit`, `doit.specit`, `doit.planit`, `doit.taskit`,
+  `doit.implementit`, `doit.reviewit`, `doit.testit`, `doit.fixit`,
+  `doit.documentit`, `doit.checkin`.
 
-Follow-up PRs (labelled Phase 5b, 5c in the modernization tracker)
-migrate the rest — oversized templates (specit, researchit, scaffoldit,
-documentit) will split into SKILL.md + supporting files to stay under
-the 500-line budget.
+Oversized templates (`specit`, `researchit`, `scaffoldit`, `documentit`)
+were split into `SKILL.md` + supporting reference files to stay under
+Anthropic's 500-line skill budget. The legacy flat
+`.claude/commands/doit.*.md` layout is still generated alongside the
+skill directories — it remains functional during Anthropic's back-compat
+window but is **deprecated** and will be removed in a future release.
 
 ## Where this lives in the package
 

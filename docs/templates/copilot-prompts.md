@@ -1,4 +1,6 @@
-# GitHub Copilot Prompt Files (April 2026)
+# GitHub Copilot Prompt Files
+
+**Available in**: doit 0.2.0+ (native VS Code `.prompt.md` schema).
 
 doit generates GitHub Copilot slash-command prompts at
 `<project>/.github/prompts/doit.*.prompt.md`. Each is a semantic rewrite

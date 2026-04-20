@@ -1,6 +1,6 @@
 [project]
 name = "doit-toolkit-cli"
-version = "0.1.17"
+version = "0.2.0"
 description = "Doit CLI - A tool to bootstrap your projects for Spec-Driven Development (SDD)."
 readme = "README.md"
 license = {text = "MIT"}

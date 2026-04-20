@@ -5,6 +5,11 @@
 **Epic**: #254
 **Feature**: #255
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 Integrates the `doit context show` command into all 11 doit command templates, enabling AI agents (Claude Code, GitHub Copilot) to automatically load project context before executing workflow commands. This completes the context injection workflow by bridging the CLI infrastructure (from feature 026-ai-context-injection) with the actual command templates that AI agents execute.

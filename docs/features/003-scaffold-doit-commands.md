@@ -4,6 +4,11 @@
 **Branch**: 003-scaffold-doit-commands
 **PR**: Pending
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 When initializing a new project using the `/doit.scaffoldit` command, the doit command suite is now automatically generated. This feature also renamed the configuration folder from `.specify` to `.doit` for consistent naming, removed unused templates, and created command templates for scaffolding.

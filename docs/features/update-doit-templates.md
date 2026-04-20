@@ -4,6 +4,11 @@
 **Branch**: 002-update-doit-templates
 **PR**: Pending
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 Updated the template files in `.specify/templates/` to remove references to non-existent doit commands (`/doit.checklist`, `/doit.clarify`) and fixed incorrect path references. This ensures template documentation accurately reflects the actual doit command suite.

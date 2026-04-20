@@ -4,6 +4,11 @@
 **Branch**: `024-unified-templates`
 **PR**: #189
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 Consolidated doit command templates into a single source of truth (`templates/commands/`), eliminating the need to maintain separate template files for Claude Code commands and GitHub Copilot prompts. Copilot prompts are now generated dynamically via transformation rather than stored as duplicate files.

@@ -35,6 +35,13 @@ from .diagram_models import (
     ValidationResult as DiagramValidationResult,
 )
 from .project import Project
+from .memory_contract import (
+    ConstitutionFrontmatter,
+    MemoryContractIssue,
+    MemoryIssueSeverity,
+    OpenQuestion,
+    split_frontmatter,
+)
 from .results import InitResult, VerifyCheck, VerifyResult, VerifyStatus
 from .search_models import (
     ContentSnippet,
@@ -98,6 +105,8 @@ __all__ = [
     "Cardinality",
     "CommandOverride",
     "ConfigBackup",
+    # Memory-file contract
+    "ConstitutionFrontmatter",
     "ContentSnippet",
     "ContextConfig",
     "ContextSource",
@@ -116,8 +125,11 @@ __all__ = [
     "GeneratedDiagram",
     "InitResult",
     "LoadedContext",
+    "MemoryContractIssue",
+    "MemoryIssueSeverity",
     "MemorySource",
     "NavigationCommand",
+    "OpenQuestion",
     "ParsedEntity",
     "ParsedUserStory",
     "Project",

@@ -4,6 +4,32 @@
 
 ---
 
+## Upgrading to 0.2.0
+
+**TL;DR**: Run the CLI upgrade, then `doit init --here --force --ai
+claude,copilot` to pick up the Agent Skills layout and native Copilot
+`.prompt.md` frontmatter.
+
+```bash
+uv tool install doit-toolkit-cli --force
+doit init --here --force --ai claude,copilot
+```
+
+What lands in your project:
+
+- `.claude/skills/doit.<name>/SKILL.md` — the current Claude Code layout
+  for all 13 workflow commands (preferred).
+- `.claude/commands/doit.<name>.md` — legacy flat commands still
+  generated for back-compat. They continue to work in 0.2.0 but are
+  deprecated and will be removed in a future release.
+- `.github/prompts/doit.<name>.prompt.md` — native VS Code schema
+  (`agent: agent`, `tools: [...]`, `${input:args}`).
+
+**No breaking changes**; Python 3.11+ remains the baseline. Custom
+constitution and template backup guidance below still applies.
+
+---
+
 ## Quick Reference
 
 | What to Upgrade | Command | When to Use |
@@ -50,7 +76,7 @@ When Doit releases new features (like new slash commands or updated templates), 
 
 Running `doit init --here --force` will update:
 
-- ✅ **Slash command files** (`.claude/commands/`, `.github/prompts/`, etc.)
+- ✅ **Slash command files** (`.claude/skills/` (preferred), `.claude/commands/` (legacy), `.github/prompts/`, etc.)
 - ✅ **Script files** (`.doit/scripts/`)
 - ✅ **Template files** (`.doit/templates/`)
 - ✅ **Shared memory files** (`.doit/memory/`) - **⚠️ See warnings below**
@@ -288,7 +314,8 @@ This tells Doit which feature directory to use when creating specs, plans, and t
 2. **For CLI-based agents**, verify files exist:
 
    ```bash
-   ls -la .claude/commands/      # Claude Code
+   ls -la .claude/skills/        # Claude Code (preferred, 0.2.0+)
+   ls -la .claude/commands/      # Claude Code (legacy, back-compat)
    ls -la .github/prompts/       # GitHub Copilot
    ```
 
@@ -407,7 +434,10 @@ Once you've run `doit init`, the slash commands (like `/doit.specit`, `/doit.pla
    # For GitHub Copilot
    ls -la .github/prompts/
 
-   # For Claude
+   # For Claude (preferred, 0.2.0+)
+   ls -la .claude/skills/
+
+   # For Claude (legacy fallback, back-compat)
    ls -la .claude/commands/
    ```
 

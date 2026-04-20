@@ -1,77 +1,105 @@
-# Release Notes - v0.1.17
+# Release Notes - v0.2.0
 
-**Release Date**: 2026-03-26
+**Release Date**: 2026-04-20
 
 ## Highlights
 
-This release introduces **MCP server integration**, **project-level personas**, and **error recovery documentation** across all command templates — completing the persona pipeline and significantly improving developer experience.
+This release completes the **April 2026 modernization sweep**: Claude Code
+templates now ship as [Agent Skills](https://agentskills.io), GitHub Copilot
+prompts adopt the native VS Code `.prompt.md` schema, and a new
+`DoitError` / `ExitCode` / `format_option` foundation gives every CLI
+command a uniform contract. A new JSON Schema contract for the
+constitution frontmatter lands alongside.
+
+No breaking changes. Legacy `.claude/commands/` templates continue to work
+during Anthropic's back-compat window — upgrade at your own pace.
 
 ## What's New
 
-### MCP Server for doit Operations (#055)
+### Agent Skills layout for Claude Code
 
-Expose doit CLI operations as MCP (Model Context Protocol) tools, enabling AI assistants to call doit directly from the conversation.
+All 13 workflow commands now ship as skill directories under
+`.claude/skills/doit.<name>/SKILL.md`, generated alongside the legacy flat
+command files. Oversized templates (`specit`, `researchit`, `scaffoldit`,
+`documentit`) split into `SKILL.md` + supporting reference files to stay
+under Anthropic's 500-line skill budget. See
+[docs/templates/agent-skills.md](docs/templates/agent-skills.md).
 
-**Key Features**:
+### Native GitHub Copilot `.prompt.md` frontmatter
 
-- Tools exposed: `doit_validate`, `doit_status`, `doit_verify`, and more
-- Built on official MCP Python SDK with FastMCP
-- Zero-config auto-discovery in Claude Code via `.claude/settings.json`
-- Structured JSON responses optimized for AI consumption
+`.github/prompts/doit.*.prompt.md` now use the April 2026 VS Code schema:
+`description`, `agent: agent`, `tools: [...]`, optional `model`. The
+`PromptTransformer` translates Claude's coarse verbs
+(`Read`, `Write`, `Bash`) to VS Code tool identifiers
+(`editFiles`, `search`, `runCommands`) and rewrites `$ARGUMENTS`
+placeholders to `${input:args}`. A contract test fails CI if shipped
+prompts drift from the transformer output. See
+[docs/templates/copilot-prompts.md](docs/templates/copilot-prompts.md).
 
-### Project-Level Personas with Context Injection (#056)
+### CLI conventions foundation
 
-Personas are now a first-class context source in the doit workflow.
+- **`DoitError` hierarchy** at
+  [src/doit_cli/errors.py](src/doit_cli/errors.py) — subclass at
+  boundaries, chain with `raise X(...) from e`.
+- **`ExitCode` constants** at
+  [src/doit_cli/exit_codes.py](src/doit_cli/exit_codes.py) — no more
+  numeric literals in `typer.Exit`.
+- **`format_option()` + `OutputFormat`** at
+  [src/doit_cli/cli/output.py](src/doit_cli/cli/output.py) — one
+  `--format / -f` flag with per-command `allowed` subsets.
 
-**Key Features**:
+See [docs/guides/cli-conventions.md](docs/guides/cli-conventions.md).
 
-- Auto-generates `.doit/memory/personas.md` during `/doit.roadmapit`
-- Registered in `context.yaml` at priority 3
-- Automatically injected into `/doit.researchit`, `/doit.planit`, and `/doit.specit`
+### Constitution frontmatter JSON Schema
 
-### Persona-Aware User Story Generation (#057)
+A canonical contract for `.doit/memory/constitution.md` YAML frontmatter
+ships at
+[src/doit_cli/schemas/frontmatter.schema.json](src/doit_cli/schemas/frontmatter.schema.json).
+Required fields: `id`, `name`, `kind`, `phase`, `icon`, `tagline`,
+`dependencies`. See
+[docs/templates/schemas.md](docs/templates/schemas.md).
 
-`/doit.specit` now auto-maps user stories to the most relevant persona using P-NNN traceability IDs.
+### Quality foundation
 
-**Key Features**:
-
-- Automatic persona matching from project-level or feature-level persona files
-- Completes the full persona pipeline: templates (053) → context injection (056) → story mapping (057)
-
-### Error Recovery Patterns in All Commands (#058)
-
-All 13 command templates now include structured `## Error Recovery` sections.
-
-**Key Features**:
-
-- 3-5 documented error scenarios per command
-- Severity indicators (ERROR/WARNING)
-- Numbered recovery steps with verification commands
-- Prevention tips and escalation paths
-
-### Update/Upgrade Flow Improvements
-
-- Fixed `doit init --update` to sync all commands to both Claude and Copilot
+- mypy now runs as a pre-commit hook and blocks commits on type errors.
+- `context_loader` service refactored into a package.
+- GitHub provider gains branch-creation, issue-close, and issue-comment
+  helpers used by `doit.checkin` and `doit.fixit`.
 
 ## Breaking Changes
 
 None.
 
+## Deprecations
+
+- Flat `.claude/commands/doit.<name>.md` templates continue to work in
+  0.2.0 but are deprecated in favor of the Skills layout. A future minor
+  release will remove the flat-command generator.
+
 ## Upgrade Instructions
 
-1. Update to the latest version:
+1. Upgrade the CLI:
 
    ```bash
-   pip install --upgrade doit-toolkit-cli
+   uv tool install doit-toolkit-cli --force
    ```
 
-2. Run init update to get new templates and MCP server:
+2. Refresh project files to get the Skills layout and new Copilot
+   frontmatter:
 
    ```bash
-   doit init --update
+   doit init --here --force --ai claude,copilot
    ```
 
-3. Configure MCP server in your AI assistant (see docs for setup)
+3. Verify the new layout:
+
+   ```bash
+   ls .claude/skills/           # doit.* skill directories
+   ls .github/prompts/          # native-schema .prompt.md files
+   ```
+
+See the [Upgrade Guide](docs/upgrade.md) for detailed scenarios and the
+"0.1.x → 0.2.0" section.
 
 ## Contributors
 

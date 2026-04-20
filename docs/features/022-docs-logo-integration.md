@@ -4,6 +4,11 @@
 **Branch**: `022-docs-logo-integration`
 **PR**: Pending
 
+> **Historical note (0.2.0)**: As of doit 0.2.0, Claude Code templates
+> also ship as Agent Skills at `.claude/skills/doit.<name>/SKILL.md`
+> alongside the legacy `.claude/commands/doit.<name>.md` files referenced
+> throughout this spec. See [agent-skills.md](../templates/agent-skills.md).
+
 ## Overview
 
 Integrated the Do-It framework logos and icons from the `media/` folder into the project README and documentation to establish consistent visual branding. Added the logo to key entry points (README.md and docs/index.md) and created comprehensive usage guidelines for contributors.

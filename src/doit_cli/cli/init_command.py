@@ -501,6 +501,51 @@ def run_init(
     result.updated_files.extend(memory_result.get("updated", []))
     result.skipped_files.extend(memory_result.get("skipped", []))
 
+    # Migrate legacy constitution.md to the 0.3.0 memory-contract shape.
+    # Prepends a placeholder YAML frontmatter block when missing, or patches
+    # in absent required fields. Preserves body bytes. Safe to run on every
+    # init/update invocation — idempotent when frontmatter is already
+    # complete, a NO_OP when no constitution.md exists yet. Running on
+    # first-time init catches the case where a user had a pre-existing
+    # legacy constitution that `copy_memory_templates` left alone.
+    from ..errors import DoitValidationError
+    from ..services.constitution_migrator import (
+        MigrationAction,
+        migrate_constitution,
+    )
+
+    migration = migrate_constitution(
+        project.doit_folder / "memory" / "constitution.md"
+    )
+    if migration.action is MigrationAction.PREPENDED:
+        console.print(
+            "[yellow]Added YAML frontmatter to "
+            ".doit/memory/constitution.md — run /doit.constitution to "
+            "fill in placeholders.[/yellow]"
+        )
+        result.updated_files.append(migration.path)
+    elif migration.action is MigrationAction.PATCHED:
+        console.print(
+            "[yellow]Added "
+            f"{len(migration.added_fields)} missing frontmatter field(s) "
+            "to .doit/memory/constitution.md: "
+            f"{', '.join(migration.added_fields)}[/yellow]"
+        )
+        result.updated_files.append(migration.path)
+    elif migration.action is MigrationAction.ERROR and migration.error is not None:
+        console.print(
+            f"[red]Could not migrate constitution.md: {migration.error}[/red]"
+        )
+        # Map error type to the most specific exit code: YAML parse
+        # problems are validation errors; other migration failures
+        # (I/O, permissions) are generic failures.
+        err_code = (
+            ExitCode.VALIDATION_ERROR
+            if isinstance(migration.error, DoitValidationError)
+            else ExitCode.FAILURE
+        )
+        raise typer.Exit(code=err_code)
+
     # Copy config templates to .doit/config/
     config_result = template_manager.copy_config_templates(
         target_dir=project.doit_folder / "config",

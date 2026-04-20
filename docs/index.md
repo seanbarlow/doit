@@ -74,6 +74,7 @@ Spec-Driven Development **flips the script** on traditional software development
 | [Project-Level Personas with Context Injection](./features/056-persona-context-injection.md) | Project-level personas as first-class context source in doit workflow... | 2026-03-26 |
 | [Persona-Aware User Story Generation](./features/057-persona-aware-user-story-generation.md) | Auto-map user stories to relevant personas using P-NNN traceability IDs... | 2026-03-26 |
 | [Error Recovery Patterns](./features/058-error-recovery-patterns.md) | Structured error recovery sections in all 13 command templates... | 2026-03-26 |
+| [Constitution Frontmatter Migration](./features/059-constitution-frontmatter-migration.md) | Auto-migrate legacy `.doit/memory/constitution.md` to the 0.2.0+ frontmatter shape via `doit update` + `/doit.constitution` enrichment... | 2026-04-20 |
 | [AI Context Optimization](./features/ai-context-optimization.md) | Optimized AI context injection with double-injection elimination... | 2026-01-29 |
 | [Update Doit Templates](./features/update-doit-templates.md) | Updated the template files to remove references to non-existent files... | 2026-01-10 |
 

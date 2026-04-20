@@ -275,10 +275,14 @@ class TestInitMemoryFilesPreservation:
     """Tests for memory file preservation during init --update (Issue #542)."""
 
     def test_update_preserves_memory_files(self, project_dir):
-        """Test that --update does NOT overwrite existing memory files.
+        """Test that --update preserves user content in memory files.
 
         Memory files (constitution.md, roadmap.md, completed_roadmap.md) contain
-        user-customized project content and should only be overwritten with --force.
+        user-customized project content and should never be overwritten by
+        --update — only --force replaces them wholesale. As of 0.3.0, the
+        constitution migrator may *prepend* a placeholder YAML frontmatter
+        block when none is present (spec 059), but the prose body MUST remain
+        byte-identical.
         """
         from doit_cli.main import app
 
@@ -303,13 +307,28 @@ class TestInitMemoryFilesPreservation:
 
         assert result.exit_code == 0
 
-        # Memory files should be preserved (not overwritten)
-        assert constitution_file.read_text() == custom_constitution, (
-            "constitution.md should NOT be overwritten by --update"
-        )
+        # roadmap.md is untouched — migration only applies to constitution.md
         assert roadmap_file.read_text() == custom_roadmap, (
             "roadmap.md should NOT be overwritten by --update"
         )
+
+        # constitution.md body is preserved byte-for-byte; frontmatter may be
+        # prepended by the 0.3.0 migrator when it was absent.
+        new_contents = constitution_file.read_text()
+        if new_contents.startswith("---\n"):
+            # Migrator prepended a frontmatter block. Body after the closing
+            # `---\n` delimiter must be byte-identical to the custom input.
+            body_start = new_contents.find("\n---\n", 4)
+            assert body_start != -1, "expected closing frontmatter delimiter"
+            body = new_contents[body_start + len("\n---\n") :]
+            assert body == custom_constitution, (
+                "constitution.md body should be preserved byte-for-byte"
+            )
+        else:
+            # No frontmatter change — file bytes must match the custom input.
+            assert new_contents == custom_constitution, (
+                "constitution.md should NOT be overwritten by --update"
+            )
 
     def test_force_overwrites_memory_files(self, project_dir):
         """Test that --force DOES overwrite existing memory files."""
@@ -370,10 +389,19 @@ class TestInitMemoryFilesPreservation:
                 "Command templates should be updated with --update"
             )
 
-            # Memory file should be preserved
-            assert constitution_file.read_text(encoding="utf-8") == custom_constitution, (
-                "Memory files should be preserved with --update"
-            )
+            # Memory file body should be preserved (frontmatter may be prepended
+            # by the 0.3.0 constitution migrator — spec 059).
+            post = constitution_file.read_text(encoding="utf-8")
+            if post.startswith("---\n"):
+                body_start = post.find("\n---\n", 4)
+                assert body_start != -1
+                assert post[body_start + len("\n---\n") :] == custom_constitution, (
+                    "Memory file body should be preserved with --update"
+                )
+            else:
+                assert post == custom_constitution, (
+                    "Memory files should be preserved with --update"
+                )
 
 
 class TestInitTechStackCreation:

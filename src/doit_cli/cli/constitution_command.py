@@ -6,6 +6,7 @@ for the doit CLI tool.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import typer
@@ -15,6 +16,10 @@ from rich.table import Table
 
 from ..exit_codes import ExitCode
 from ..services.cleanup_service import CleanupService
+from ..services.constitution_enricher import (
+    EnrichmentAction,
+    enrich_constitution,
+)
 
 app = typer.Typer(help="Constitution management commands")
 console = Console()
@@ -207,3 +212,103 @@ def _display_result(result, project_root: Path) -> None:
             border_style="green",
         )
     )
+
+
+@app.command("enrich")
+def enrich(
+    path: Path | None = typer.Argument(
+        None,
+        help="Project root directory (default: current directory)",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        "-j",
+        help="Emit the enrichment result as JSON",
+    ),
+) -> None:
+    """Infer real values for placeholder frontmatter in constitution.md.
+
+    Reads ``.doit/memory/constitution.md``, detects fields whose values
+    still match the placeholder sentinels written by ``doit update`` /
+    ``doit init``, and replaces each with a concrete value inferred from
+    the constitution body and the project directory name.
+
+    This is a deterministic, LLM-free first pass. The
+    ``/doit.constitution`` skill can invoke it as a pre-step and then
+    prompt the user about any remaining unresolved fields.
+
+    The body (every byte after the closing ``---\\n``) is preserved
+    byte-for-byte.
+
+    Exit codes:
+      0 = success (ENRICHED or NO_OP)
+      1 = enrichment is partial — some fields remain as placeholders
+      2 = validation / file error
+
+    Examples:
+        doit constitution enrich
+        doit constitution enrich /path/to/project
+        doit constitution enrich --json
+    """
+
+    project_root = path or Path.cwd()
+    target = project_root / ".doit" / "memory" / "constitution.md"
+
+    result = enrich_constitution(target)
+
+    if json_output:
+        typer.echo(
+            json.dumps(
+                {
+                    "path": str(result.path),
+                    "action": result.action.value,
+                    "enriched_fields": list(result.enriched_fields),
+                    "unresolved_fields": list(result.unresolved_fields),
+                    "error": str(result.error) if result.error else None,
+                },
+                indent=2,
+            )
+        )
+    else:
+        if result.action is EnrichmentAction.NO_OP:
+            console.print(
+                "[green]Nothing to enrich:[/green] no placeholder frontmatter "
+                "detected in .doit/memory/constitution.md."
+            )
+        elif result.action is EnrichmentAction.ERROR:
+            console.print(
+                f"[red]Enrichment failed:[/red] {result.error}"
+            )
+        else:
+            table = Table(
+                show_header=True,
+                header_style="bold cyan",
+                title="Constitution enrichment",
+            )
+            table.add_column("Status", width=10)
+            table.add_column("Field", width=16)
+            table.add_column("Note")
+            for key in result.enriched_fields:
+                table.add_row(
+                    "[green]✓ filled[/green]",
+                    key,
+                    "replaced placeholder with inferred value",
+                )
+            for key in result.unresolved_fields:
+                table.add_row(
+                    "[yellow]! unresolved[/yellow]",
+                    key,
+                    "low-confidence inference; placeholder retained",
+                )
+            console.print(table)
+            if result.unresolved_fields:
+                console.print(
+                    "[yellow]Unresolved fields need human input:[/yellow] "
+                    + ", ".join(result.unresolved_fields)
+                )
+
+    if result.action is EnrichmentAction.ERROR:
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
+    if result.action is EnrichmentAction.PARTIAL:
+        raise typer.Exit(code=ExitCode.FAILURE)

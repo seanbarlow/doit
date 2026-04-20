@@ -11,6 +11,12 @@ prompts adopt the native VS Code `.prompt.md` schema, and a new
 command a uniform contract. A new JSON Schema contract for the
 constitution frontmatter lands alongside.
 
+**Coming next in 0.3.0** (on `develop`): auto-migration of legacy
+`.doit/memory/constitution.md` files via `doit update`, paired with an
+enrichment step in the `/doit.constitution` skill that fills in
+placeholder values by reading the constitution body. See
+[Unreleased](CHANGELOG.md#unreleased) in the changelog.
+
 No breaking changes. Legacy `.claude/commands/` templates continue to work
 during Anthropic's back-compat window — upgrade at your own pace.
 

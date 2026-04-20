@@ -4,6 +4,43 @@
 
 ---
 
+## Upgrading to 0.3.0
+
+**TL;DR**: `doit update --here --force` now auto-migrates a legacy
+`.doit/memory/constitution.md` (no YAML frontmatter) to the 0.2.0+
+memory-contract shape. No manual editing required.
+
+```bash
+uv tool install doit-toolkit-cli --force
+doit update --here --force --ai claude,copilot
+```
+
+What happens to your constitution:
+
+- **No frontmatter**: a placeholder YAML block is prepended; your prose
+  body is untouched byte-for-byte.
+- **Partial frontmatter**: missing required fields are added as
+  placeholders; existing values preserved verbatim.
+- **Complete frontmatter**: no change (idempotent).
+- **Malformed YAML**: clear error, file unchanged; fix the YAML and
+  rerun.
+
+After migration, run `/doit.constitution` in Claude Code or Copilot and
+the skill will detect the `[PROJECT_*]` placeholders and replace them
+with concrete values inferred from your constitution body — no
+interactive questions.
+
+Verify the result:
+
+```bash
+doit verify-memory .   # exits 0 with warnings until the skill runs
+```
+
+See the feature spec:
+[specs/059-constitution-frontmatter-migration/spec.md](../specs/059-constitution-frontmatter-migration/spec.md).
+
+---
+
 ## Upgrading to 0.2.0
 
 **TL;DR**: Run the CLI upgrade, then `doit init --here --force --ai

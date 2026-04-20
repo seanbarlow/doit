@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Auto-migration of legacy constitution frontmatter** (#059)
+  - `doit update` (and `doit init --update`) now detects a
+    `.doit/memory/constitution.md` with missing or incomplete YAML
+    frontmatter and prepends a placeholder skeleton containing every
+    required field from
+    [src/doit_cli/schemas/frontmatter.schema.json](src/doit_cli/schemas/frontmatter.schema.json).
+  - Existing field values are preserved verbatim; only missing required
+    fields are added. Unknown/extra keys are preserved too.
+  - Body bytes are preserved byte-for-byte (SHA-256-verified by
+    integration tests).
+  - Malformed YAML frontmatter surfaces a clear error without modifying
+    the file (atomic write).
+  - `/doit.constitution` skill gains an enrichment branch that detects
+    the new `[PROJECT_*]` sentinels and infers real values by reading
+    the body and `doit context show` output — no interactive prompts.
+- `doit_cli.utils.atomic_write.write_text_atomic()` helper for crash-
+  safe file writes.
+- `doit_cli.models.memory_contract.PLACEHOLDER_REGISTRY` and
+  `is_placeholder_value()` — authoritative placeholder-detection
+  primitives shared by the migrator and the validator.
+
+### Changed
+
+- `ConstitutionFrontmatter.validate()` now classifies placeholder values
+  as `WARNING` (not `ERROR`) so a freshly-migrated constitution passes
+  `doit verify-memory` immediately.
+- `ConstitutionFrontmatter.phase` accepts `int | str` to preserve
+  placeholder values through construction; runtime validity is enforced
+  in `validate()`.
+
 ## [0.2.0] - 2026-04-20
 
 ### Added

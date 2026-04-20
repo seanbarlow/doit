@@ -34,7 +34,6 @@ from .diagram_models import (
 from .diagram_models import (
     ValidationResult as DiagramValidationResult,
 )
-from .project import Project
 from .memory_contract import (
     ConstitutionFrontmatter,
     MemoryContractIssue,
@@ -42,6 +41,7 @@ from .memory_contract import (
     OpenQuestion,
     split_frontmatter,
 )
+from .project import Project
 from .results import InitResult, VerifyCheck, VerifyResult, VerifyStatus
 from .search_models import (
     ContentSnippet,

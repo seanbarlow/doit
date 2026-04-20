@@ -111,6 +111,42 @@ Follow this execution flow:
 
    If no specific section mentioned, proceed with full constitution review.
 
+   **Placeholder-frontmatter enrichment (auto-triggered)**: `doit update` prepends a YAML frontmatter skeleton with sentinel values (e.g. `[PROJECT_ID]`, `[PROJECT_NAME]`, `[PROJECT_PHASE]`) when a legacy constitution has no frontmatter. This skill's job on the next run is to replace those sentinels with concrete values inferred from the body — **without** an interactive interview.
+
+   **Do the mechanical pass first via the CLI, then follow up on anything unresolved.** The CLI command performs deterministic, LLM-free enrichment (heading parsing, slugification, icon initials, dependency detection) atomically and body-safely:
+
+   ```bash
+   doit constitution enrich --json
+   ```
+
+   Exit codes:
+
+   - `0` — every placeholder was either enriched or there was nothing to do.
+   - `1` — partial: some fields were enriched, others remain as placeholders because the body lacks enough signal. The JSON payload lists them under `unresolved_fields`.
+   - `2` — file / validation error. Read the `error` field and stop.
+
+   **If exit was 0**: run `doit verify-memory . --json` to confirm zero placeholder warnings, then fall through to step 3 (handling any non-frontmatter sections the user asked about).
+
+   **If exit was 1**: the `unresolved_fields` list is the user's "Needs human input" set. For each, read the body once more yourself — you may find context the deterministic CLI missed — and propose a value. Confirm with the user before writing. Use the `Edit` tool to replace only the YAML line for each field; never re-render the body.
+
+   **Sentinel reference** (used by both the CLI and the validator; do not invent new tokens):
+
+   | Field | Sentinel |
+   |:------|:---------|
+   | `id` | `[PROJECT_ID]` |
+   | `name` | `[PROJECT_NAME]` |
+   | `kind` | `[PROJECT_KIND]` |
+   | `phase` | `[PROJECT_PHASE]` |
+   | `icon` | `[PROJECT_ICON]` |
+   | `tagline` | `[PROJECT_TAGLINE]` |
+   | `dependencies` | `[[PROJECT_DEPENDENCIES]]` (single-item list) |
+
+   **Body preservation**: whether the CLI or you writes the frontmatter, every byte after the closing `---\n` MUST be byte-identical before and after. Only rewrite the YAML block.
+
+   **Verification**: after any edit, run `doit verify-memory . --json` and confirm every required field has zero placeholder warnings. If a field you believed you enriched still shows a `placeholder` warning, it still equals the sentinel — revert and flag it.
+
+   **When the CLI reports NO_OP (exit 0 with empty `enriched_fields`)**: there were no sentinels to replace. Fall through to step 3 — this enrichment is only for migrated constitutions.
+
 3. **Guided Prompts for New Placeholders**:
    When collecting values for the following placeholders, use these prompts if values not provided:
 

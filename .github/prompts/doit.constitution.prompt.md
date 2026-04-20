@@ -109,6 +109,40 @@ Follow this execution flow:
 
    If no specific section mentioned, proceed with full constitution review.
 
+   **Placeholder-frontmatter enrichment (auto-triggered)**: `doit update` prepends a YAML frontmatter skeleton with sentinel values (e.g. `[PROJECT_ID]`, `[PROJECT_NAME]`, `[PROJECT_PHASE]`) when a legacy constitution has no frontmatter. On the next run, replace those sentinels with concrete values inferred from the body — **without** an interactive interview.
+
+   **Do the mechanical pass first via the CLI, then follow up on anything unresolved.** The CLI command performs deterministic, LLM-free enrichment atomically and body-safely:
+
+   ```bash
+   doit constitution enrich --json
+   ```
+
+   Exit codes:
+
+   - `0` — every placeholder was either enriched or there was nothing to do.
+   - `1` — partial: some fields were enriched, others remain as placeholders. The JSON payload lists them under `unresolved_fields`.
+   - `2` — file / validation error.
+
+   **If exit was 0**: run `doit verify-memory . --json` to confirm zero placeholder warnings, then proceed.
+
+   **If exit was 1**: the `unresolved_fields` list is the user's "Needs human input" set. Propose a value for each by reading the body once more; confirm with the user before writing. Use the `Edit` tool to replace only the YAML line for each field; never re-render the body.
+
+   **Sentinel reference** (used by both the CLI and the validator):
+
+   | Field | Sentinel |
+   |:------|:---------|
+   | `id` | `[PROJECT_ID]` |
+   | `name` | `[PROJECT_NAME]` |
+   | `kind` | `[PROJECT_KIND]` |
+   | `phase` | `[PROJECT_PHASE]` |
+   | `icon` | `[PROJECT_ICON]` |
+   | `tagline` | `[PROJECT_TAGLINE]` |
+   | `dependencies` | `[[PROJECT_DEPENDENCIES]]` |
+
+   **Body preservation**: every byte after the closing `---\n` MUST be byte-identical before and after enrichment.
+
+   **When the CLI reports NO_OP (exit 0 with empty `enriched_fields`)**: there were no sentinels to replace. Fall through to step 3 — this enrichment is only for migrated constitutions.
+
 3. **Guided Prompts for New Placeholders**:
    When collecting values for the following placeholders, use these prompts if values not provided:
 

@@ -21,15 +21,60 @@ The canonical JSON Schema is shipped at
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
-
+from typing import Any, Final
 
 ID_PATTERN = re.compile(r"^(app|platform)-[a-z][a-z0-9-]+$")
 ICON_PATTERN = re.compile(r"^[A-Z0-9]{2,4}$")
 VALID_KINDS = frozenset({"application", "service"})
 VALID_PHASES = frozenset({1, 2, 3, 4})
 VALID_PRIORITIES = ("High", "Medium", "Low")
+
+
+REQUIRED_FRONTMATTER_FIELDS: Final[tuple[str, ...]] = (
+    "id",
+    "name",
+    "kind",
+    "phase",
+    "icon",
+    "tagline",
+    "dependencies",
+)
+"""Required frontmatter keys, in schema order.
+
+Authoritative source for both the memory validator and the constitution
+migrator. Mirrors the ``required`` array in
+``src/doit_cli/schemas/frontmatter.schema.json`` index-by-index.
+"""
+
+
+PLACEHOLDER_REGISTRY: Final[Mapping[str, Any]] = {
+    "id": "[PROJECT_ID]",
+    "name": "[PROJECT_NAME]",
+    "kind": "[PROJECT_KIND]",
+    "phase": "[PROJECT_PHASE]",
+    "icon": "[PROJECT_ICON]",
+    "tagline": "[PROJECT_TAGLINE]",
+    "dependencies": ["[PROJECT_DEPENDENCIES]"],
+}
+"""Exact-match sentinel values the constitution migrator emits.
+
+The migrator prepends these when a required frontmatter field is missing;
+the validator classifies matching values as WARNING (not ERROR). Callers
+detect placeholders with ``==`` — reuse of a sentinel across fields would
+make detection ambiguous.
+"""
+
+
+def is_placeholder_value(field_name: str, value: Any) -> bool:
+    """Return ``True`` when ``value`` exactly matches ``field_name``'s placeholder."""
+
+    expected = PLACEHOLDER_REGISTRY.get(field_name)
+    if expected is None:
+        return False
+    return value == expected
 
 
 class MemoryIssueSeverity(str, Enum):
@@ -80,15 +125,19 @@ class ConstitutionFrontmatter:
     id: str
     name: str
     kind: str
-    phase: int
+    phase: int | str
     icon: str
     tagline: str
     competitor: str | None = None
-    dependencies: list[str] = field(default_factory=list)
+    # `dependencies` is typed as ``Any`` at the dataclass layer because
+    # YAML can yield anything here and the validator must be able to flag
+    # non-list values at runtime. :meth:`from_dict` no longer coerces via
+    # ``list(...)`` for the same reason.
+    dependencies: Any = field(default_factory=list)
     consumers: str | None = None
     status: str | None = None
 
-    REQUIRED_FIELDS = ("id", "name", "kind", "phase", "icon", "tagline", "dependencies")
+    REQUIRED_FIELDS = REQUIRED_FRONTMATTER_FIELDS
 
     @classmethod
     def from_dict(cls, data: dict) -> ConstitutionFrontmatter:
@@ -96,24 +145,55 @@ class ConstitutionFrontmatter:
 
         Missing optional fields default to ``None`` / ``[]``. Missing required
         fields are allowed here — they'll surface as issues when
-        :meth:`validate` runs.
+        :meth:`validate` runs. Placeholder values (e.g. ``[PROJECT_PHASE]``)
+        are preserved verbatim so :meth:`validate` can classify them as
+        WARNING rather than raising during construction.
         """
+
+        phase_raw = data.get("phase")
+        phase_val: int | str
+        if isinstance(phase_raw, bool):
+            # bools are ints in Python; treat as bad input preserving the value.
+            phase_val = str(phase_raw)
+        elif isinstance(phase_raw, int):
+            phase_val = phase_raw
+        elif isinstance(phase_raw, str):
+            try:
+                phase_val = int(phase_raw)
+            except ValueError:
+                phase_val = phase_raw  # placeholder or otherwise non-numeric
+        else:
+            phase_val = 0
+
+        # Preserve the raw ``dependencies`` value (no ``list(...)`` coercion):
+        # the validator needs to see a non-list input as a contract error,
+        # and ``list("string")`` would silently split it into characters.
+        deps_raw: Any = data.get("dependencies")
+        if deps_raw is None:
+            deps_raw = []
 
         return cls(
             id=data.get("id", ""),
             name=data.get("name", ""),
             kind=data.get("kind", ""),
-            phase=int(data["phase"]) if data.get("phase") is not None else 0,
+            phase=phase_val,
             icon=data.get("icon", ""),
             tagline=data.get("tagline", ""),
             competitor=data.get("competitor"),
-            dependencies=list(data.get("dependencies") or []),
+            dependencies=deps_raw,
             consumers=data.get("consumers"),
             status=data.get("status"),
         )
 
     def validate(self, file: str = "constitution.md") -> list[MemoryContractIssue]:
-        """Return a list of contract issues. Empty list means valid."""
+        """Return a list of contract issues. Empty list means valid.
+
+        Fields whose values exactly match the corresponding
+        :data:`PLACEHOLDER_REGISTRY` entry are reported as
+        :attr:`MemoryIssueSeverity.WARNING` ("run /doit.constitution to
+        enrich") instead of ERROR, so a freshly-migrated constitution
+        passes ``doit verify-memory`` immediately.
+        """
 
         issues: list[MemoryContractIssue] = []
 
@@ -127,7 +207,23 @@ class ConstitutionFrontmatter:
                 )
             )
 
-        if not self.id:
+        def warn(field_name: str) -> None:
+            issues.append(
+                MemoryContractIssue(
+                    file=file,
+                    severity=MemoryIssueSeverity.WARNING,
+                    message=(
+                        f"frontmatter field '{field_name}' contains placeholder value"
+                        " — run /doit.constitution to enrich"
+                    ),
+                    field_name=field_name,
+                )
+            )
+
+        # id -----------------------------------------------------------------
+        if is_placeholder_value("id", self.id):
+            warn("id")
+        elif not self.id:
             err("frontmatter field 'id' is required", "id")
         elif not ID_PATTERN.match(self.id):
             err(
@@ -135,10 +231,16 @@ class ConstitutionFrontmatter:
                 "id",
             )
 
-        if not self.name:
+        # name ---------------------------------------------------------------
+        if is_placeholder_value("name", self.name):
+            warn("name")
+        elif not self.name:
             err("frontmatter field 'name' is required", "name")
 
-        if not self.kind:
+        # kind ---------------------------------------------------------------
+        if is_placeholder_value("kind", self.kind):
+            warn("kind")
+        elif not self.kind:
             err("frontmatter field 'kind' is required", "kind")
         elif self.kind not in VALID_KINDS:
             err(
@@ -146,13 +248,19 @@ class ConstitutionFrontmatter:
                 "kind",
             )
 
-        if self.phase not in VALID_PHASES:
+        # phase --------------------------------------------------------------
+        if is_placeholder_value("phase", self.phase):
+            warn("phase")
+        elif self.phase not in VALID_PHASES:
             err(
-                f"frontmatter phase {self.phase} must be 1, 2, 3, or 4",
+                f"frontmatter phase {self.phase!r} must be 1, 2, 3, or 4",
                 "phase",
             )
 
-        if not self.icon:
+        # icon ---------------------------------------------------------------
+        if is_placeholder_value("icon", self.icon):
+            warn("icon")
+        elif not self.icon:
             err("frontmatter field 'icon' is required", "icon")
         elif not ICON_PATTERN.match(self.icon):
             err(
@@ -160,11 +268,20 @@ class ConstitutionFrontmatter:
                 "icon",
             )
 
-        if not self.tagline:
+        # tagline ------------------------------------------------------------
+        if is_placeholder_value("tagline", self.tagline):
+            warn("tagline")
+        elif not self.tagline:
             err("frontmatter field 'tagline' is required", "tagline")
 
-        if not isinstance(self.dependencies, list):
-            err("frontmatter field 'dependencies' must be a list", "dependencies")
+        # dependencies -------------------------------------------------------
+        if is_placeholder_value("dependencies", self.dependencies):
+            warn("dependencies")
+        elif not isinstance(self.dependencies, list):
+            err(
+                "frontmatter field 'dependencies' must be a list",
+                "dependencies",
+            )
 
         return issues
 
@@ -227,7 +344,7 @@ def split_frontmatter(source: str) -> tuple[dict, str, int]:
         return {}, source, 1
 
     try:
-        import yaml  # type: ignore[import-untyped]
+        import yaml
     except ImportError:  # pragma: no cover - pyyaml is a base dep
         return {}, source, 1
 

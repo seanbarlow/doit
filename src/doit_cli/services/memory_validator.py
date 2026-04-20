@@ -27,7 +27,6 @@ from ..models.memory_contract import (
     split_frontmatter,
 )
 
-
 # Tokens a freshly-scaffolded file contains. When three or more distinct
 # tokens are present we treat the file as unfilled; fewer tokens are
 # tolerated because the platform-event-bus / app-cc-in-a-box constitutions

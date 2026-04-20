@@ -8,7 +8,6 @@ from pathlib import Path
 from doit_cli.models.memory_contract import MemoryIssueSeverity
 from doit_cli.services.memory_validator import validate_project
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 

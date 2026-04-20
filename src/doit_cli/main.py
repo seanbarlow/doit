@@ -19,7 +19,7 @@ from .cli.sync_prompts_command import sync_prompts_command
 from .cli.team_command import app as team_app
 from .cli.update_command import update_command
 from .cli.validate_command import validate_command
-from .cli.verify_command import verify_command
+from .cli.verify_command import verify_command, verify_memory_command
 from .cli.xref_command import xref_app
 
 # Create a new typer app for the refactored commands
@@ -36,6 +36,7 @@ app.command(name="sync-prompts")(sync_prompts_command)
 app.command(name="update")(update_command)
 app.command(name="validate")(validate_command)
 app.command(name="verify")(verify_command)
+app.command(name="verify-memory")(verify_memory_command)
 
 # Register subcommand groups
 app.add_typer(analytics_app, name="analytics")

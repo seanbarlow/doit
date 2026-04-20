@@ -13,8 +13,10 @@ from rich.table import Table
 
 from ..exit_codes import ExitCode
 from ..models.agent import Agent
+from ..models.memory_contract import MemoryIssueSeverity
 from ..models.project import Project
 from ..models.results import VerifyResult, VerifyStatus
+from ..services.memory_validator import validate_project
 from ..services.validator import Validator
 
 console = Console()
@@ -191,3 +193,85 @@ def verify_command(
     # Exit with appropriate code
     if not result.passed:
         raise typer.Exit(code=ExitCode.FAILURE)
+
+
+# ---------------------------------------------------------------------------
+# `doit verify memory` subcommand
+
+
+def _render_memory_report(report, path: Path, json_output: bool) -> None:
+    """Pretty-print or JSON-emit a memory validation report."""
+
+    if json_output:
+        # Use typer.echo (plain stdout) so Rich never word-wraps the payload;
+        # callers parse this directly.
+        typer.echo(json.dumps(report.to_dict(), indent=2, default=str))
+        return
+
+    table = Table(
+        show_header=True,
+        header_style="bold cyan",
+        title=f"Memory validation: {path}",
+    )
+    table.add_column("", width=3, justify="center")
+    table.add_column("File", width=40)
+    table.add_column("Field", width=14)
+    table.add_column("Message")
+
+    for issue in report.issues:
+        style = "red" if issue.severity is MemoryIssueSeverity.ERROR else "yellow"
+        symbol = "✗" if issue.severity is MemoryIssueSeverity.ERROR else "!"
+        table.add_row(
+            f"[{style}]{symbol}[/{style}]",
+            issue.file,
+            issue.field_name or "",
+            issue.message,
+        )
+
+    console.print()
+    if report.issues:
+        console.print(table)
+    else:
+        console.print(
+            Panel(
+                "[green]✓ Memory files conform to the contract.[/green]",
+                border_style="green",
+            )
+        )
+
+    console.print()
+    console.print(
+        f"[bold]Summary:[/bold] {len(report.errors)} error(s), "
+        f"{len(report.warnings)} warning(s)",
+    )
+    if report.placeholder_files:
+        console.print(
+            f"[dim]Placeholder files (not yet filled in): "
+            f"{', '.join(report.placeholder_files)}[/dim]"
+        )
+
+
+def verify_memory_command(
+    path: Annotated[
+        Path,
+        typer.Argument(help="Project directory (use '.' for current)."),
+    ] = Path(),
+    json_output: JsonFlag = False,
+) -> None:
+    """Validate .doit/memory/* against the memory-file contract.
+
+    Reports shape issues (frontmatter, required headings, Open Questions
+    table) that downstream tools like platform-docs-site depend on.
+    """
+
+    resolved = path.resolve()
+    report = validate_project(resolved)
+    _render_memory_report(report, resolved, json_output)
+
+    if report.has_errors():
+        raise typer.Exit(code=ExitCode.FAILURE)
+
+
+# No sub-app: keep `doit verify` flat (it takes a positional <path> that
+# would otherwise shadow subcommand dispatch) and register the memory
+# checker as a separate top-level command `doit verify-memory`.

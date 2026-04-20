@@ -59,3 +59,23 @@
 - Use `/doit.roadmapit add [item]` to add new items
 - Use `/doit.roadmapit defer [item]` to move items to deferred section
 - Use `/doit.roadmapit reprioritize` to change item priorities
+- Use `/doit.roadmapit add-question` to append a row to the Open Questions table below
+
+---
+
+## Open Questions
+
+<!--
+Unresolved decisions, required clarifications, and future trade-offs. Rows surface in
+downstream docs generators (e.g. velocity-platform/platform-docs-site) via
+`doit verify memory` + the memory contract.
+
+- Priority MUST be one of High | Medium | Low.
+- Owner is free text; use `—` or `N/A` for unassigned.
+- Pipes inside the question text must be escaped as `\|`.
+- Keep the column order: Priority | Question | Owner.
+- An empty table (header + divider only) is a valid state.
+-->
+
+| Priority | Question | Owner |
+| -------- | -------- | ----- |

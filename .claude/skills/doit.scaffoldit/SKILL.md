@@ -388,6 +388,24 @@ Example output structure:
 **Generated**: 2026-01-10
 **Last Updated**: 2026-01-10
 
+### 12. Post-Scaffold Summary
+
+Once scaffolding finishes, surface the next steps clearly. The freshly
+written `.doit/memory/constitution.md` carries a **YAML frontmatter stub
+full of `[PROJECT_…]` placeholders**; those MUST be filled in before the
+project passes `doit verify-memory`. Direct the user to run
+`/doit.constitution` next — that skill prompts for every frontmatter field
+(`id`, `name`, `kind`, `phase`, `icon`, `tagline`, `competitor`,
+`dependencies`, `consumers`) as well as the principles/governance body.
+
+Optional follow-ups to mention:
+
+- `doit verify-memory` — one-shot contract check; expected to fail until
+  `/doit.constitution` runs.
+- `/doit.roadmapit` — populate the roadmap (includes the `## Open
+  Questions` table that downstream docs generators consume).
+- `doit memory schema` — print the frontmatter JSON Schema for reference.
+
 ## Additional Reference
 
 For the full set of sections that follow this playbook, see [reference.md](reference.md). Claude loads it on demand when the content is needed.

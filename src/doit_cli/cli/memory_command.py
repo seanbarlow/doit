@@ -279,3 +279,42 @@ def history_command(
     console.print(table)
     console.print()
     console.print(f"{len(history.entries)} queries this session")
+
+
+# ---------------------------------------------------------------------------
+# `doit memory schema` — expose the JSON Schema for constitution frontmatter
+#
+# Downstream generators (e.g. platform-docs-site/tools/gen-data) can consume
+# this instead of hand-maintaining a second copy of the schema.
+# ---------------------------------------------------------------------------
+
+
+@memory_app.command(name="schema")
+def schema_command(
+    raw: bool = typer.Option(
+        False,
+        "--raw",
+        help="Print the schema without surrounding formatting (machine-readable).",
+    ),
+) -> None:
+    """Print the JSON Schema for constitution.md frontmatter."""
+    from importlib.resources import files
+
+    try:
+        schema_bytes = (
+            files("doit_cli").joinpath("schemas/frontmatter.schema.json").read_bytes()
+        )
+    except FileNotFoundError:
+        console.print(
+            "[red]Error:[/red] schema file missing — "
+            "run `pip install --upgrade doit-toolkit-cli`.",
+        )
+        raise typer.Exit(code=ExitCode.FAILURE)
+
+    schema = json.loads(schema_bytes)
+    if raw:
+        # typer.echo avoids Rich's automatic word wrap so the stdout is
+        # byte-for-byte the canonical schema.
+        typer.echo(json.dumps(schema, indent=2))
+    else:
+        console.print_json(json.dumps(schema))

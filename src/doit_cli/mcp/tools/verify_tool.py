@@ -85,3 +85,48 @@ def register_verify_tool(mcp: FastMCP) -> None:
             },
             indent=2,
         )
+
+    @mcp.tool()
+    def doit_verify_memory(project_root: str | None = None) -> str:
+        """Validate a project's ``.doit/memory/*.md`` against the memory contract.
+
+        Surfaces the same errors and warnings that ``doit verify-memory`` does:
+        frontmatter shape (id, name, kind, phase, icon, tagline, dependencies),
+        required headings in ``constitution.md`` and ``roadmap.md``, and the
+        column order + priority values of the ``## Open Questions`` table.
+
+        Args:
+            project_root: Project directory to validate. Defaults to the
+                process cwd so the caller can simply invoke the tool from
+                inside a project.
+
+        Returns:
+            JSON with keys ``issues`` (list of
+            ``{file, severity, message, line, field}``),
+            ``placeholder_files``, ``error_count``, ``warning_count``,
+            and ``all_passed``.
+        """
+        from ...services.memory_validator import validate_project
+
+        root = Path(project_root) if project_root else Path.cwd()
+
+        try:
+            report = validate_project(root)
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.warning("memory validator crashed: %s", exc)
+            return json.dumps(
+                {
+                    "issues": [],
+                    "placeholder_files": [],
+                    "error_count": 0,
+                    "warning_count": 0,
+                    "all_passed": False,
+                    "error": f"memory validator crashed: {exc}",
+                },
+                indent=2,
+            )
+
+        payload = report.to_dict()
+        payload["all_passed"] = not report.has_errors()
+        payload["project_root"] = str(root)
+        return json.dumps(payload, indent=2)

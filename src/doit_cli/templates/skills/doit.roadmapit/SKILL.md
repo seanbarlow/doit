@@ -77,6 +77,7 @@ Extract the operation and details from `$ARGUMENTS`:
 | `reprioritize` | Review and change priorities | `/doit.roadmapit reprioritize` |
 | `sync-milestones` | Sync priorities to GitHub milestones | `/doit.roadmapit sync-milestones` |
 | `sync-milestones --dry-run` | Preview milestone sync | `/doit.roadmapit sync-milestones --dry-run` |
+| `add-question [High\|Medium\|Low] "…" [owner]` | Append a row to the `## Open Questions` table | `/doit.roadmapit add-question High "Should we pick option A?" Product` |
 | (empty or `update`) | Interactive update | `/doit.roadmapit` |
 
 If no arguments provided or unrecognized pattern, proceed to step 2 for detection.
@@ -266,6 +267,17 @@ Write the modified roadmap back to `.doit/memory/roadmap.md`
 
 After updating, proceed to Step 6 (AI Suggestions).
 
+#### 4.7 Add Open Question (`add-question` operation)
+
+Invocation: `/doit.roadmapit add-question [High|Medium|Low] "<question>" [owner]`. Without args, prompt Priority → Question → Owner.
+
+1. Normalise priority (`High`, `Medium`, `Low`; case-insensitive). Blank / `—` owner stores as `N/A`. Escape `|` in the question as `\|`.
+2. Load `.doit/memory/roadmap.md`. If `## Open Questions` is missing, append it at end-of-file with the header `| Priority | Question | Owner |` + divider.
+3. Append `| <priority> | <question> | <owner> |` below the existing rows; keep padding consistent.
+4. Update the **Last Updated** date at the top.
+5. Run `doit verify-memory --json`; any error targeting `roadmap.md` blocks the write (roll back, report).
+6. Report priority/question/owner + new total + per-priority counts.
+
 ---
 
 ### 5. Handle Edge Cases
@@ -339,6 +351,16 @@ Based on your roadmap and project context, here are some features you might cons
 - If user selects suggestions: Add them to the appropriate priority sections
 - If user modifies: Apply customizations then add
 - If user skips: Complete without changes
+
+#### 6.4 Open Question Suggestions
+
+Scan for unanswered decisions and propose up to **three** rows for `## Open Questions`:
+
+- Frontmatter dependencies on external services without an SLA → High.
+- Priority items whose rationale names an unconfirmed provider / vendor / SDK → Medium.
+- Constitution principles flagged `NON-NEGOTIABLE` with no enforcement mechanism → Medium.
+
+Offer `numbers`, `all`, or `skip`. Apply via the step 4.7 flow (one edit each).
 
 ---
 

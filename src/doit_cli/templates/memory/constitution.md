@@ -1,3 +1,18 @@
+---
+# Contract: doit_cli/schemas/frontmatter.schema.json
+# /doit.constitution fills these in; `doit verify memory` checks the shape.
+id: "[PROJECT_ID]"             # e.g. app-foo or platform-foo (matches repo dir)
+name: "[PROJECT_NAME]"
+kind: "[PROJECT_KIND]"         # application | service
+phase: 1                       # 1 (scoping) | 2 | 3 | 4
+icon: "[PROJECT_ICON]"         # 2-4 uppercase chars/digits
+tagline: >-
+  [PROJECT_TAGLINE]
+competitor: null               # replace with a string, or leave null
+dependencies: []               # list of component ids or free strings
+consumers: null                # describe who consumes this component, or null
+---
+
 # [PROJECT_NAME] Constitution
 
 > **See also**: [Tech Stack](tech-stack.md) for languages, frameworks, and deployment details.

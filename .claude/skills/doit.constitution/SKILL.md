@@ -91,10 +91,13 @@ Before generating or modifying code:
 
 You are updating the project constitution at `.doit/memory/constitution.md`. This file is a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`, `[PRINCIPLE_1_NAME]`). Your job is to (a) collect/derive concrete values, (b) fill the template precisely, and (c) propagate any amendments across dependent artifacts.
 
+Constitution files also carry a YAML **frontmatter block** at the very top. That block drives downstream tooling (the memory contract validator `doit verify memory` and site generators like `platform-docs-site/tools/gen-data`). You must fill or keep it in sync every time you modify this file — never leave placeholder tokens like `"[PROJECT_ID]"` or `"[PROJECT_KIND]"` in the frontmatter.
+
 Follow this execution flow:
 
 1. Load the existing constitution template at `.doit/memory/constitution.md`.
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
+   - If the file begins with a `---` block, treat it as frontmatter and parse it with any YAML loader. Missing/placeholder fields are handled in step 3.
    **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
 
 2. **Section-by-Section Update Mode**:
@@ -110,6 +113,40 @@ Follow this execution flow:
 
 3. **Guided Prompts for New Placeholders**:
    When collecting values for the following placeholders, use these prompts if values not provided:
+
+   **Frontmatter (REQUIRED — fill before body placeholders):**
+   Collect these nine fields first. If the existing frontmatter already has a valid value for a field (non-placeholder, passes the shape rules below), keep it and skip the prompt unless the user asked for a full review.
+
+   - `id`: "Component id? Must match the repo directory name and the pattern `^(app|platform)-[a-z][a-z0-9-]+$` (e.g. `app-cloud-control`, `platform-event-bus`)."
+   - `name`: "Human-readable display name? (e.g. `Cloud Control`, `Platform Event Bus`)"
+   - `kind`: "`application` or `service`?" (exactly one of those two values)
+   - `phase`: "Delivery phase, 1–4?" (integer; 1 is earliest scoping, 4 is last)
+   - `icon`: "Short icon, 2–4 uppercase chars/digits? (e.g. `CC`, `PIS`)"
+   - `tagline`: "One-sentence purpose (≤ 140 chars)?"
+   - `competitor`: "Named competitor this displaces, or `null`?"
+   - `dependencies`: "Component ids this depends on (comma-separated list)? Free strings also OK for external services — component ids get linked in the docs site."
+   - `consumers`: "Short description of who consumes this component, or `null`?"
+
+   Write the result as a YAML block at the top of the file (before the `# <name> Constitution` heading). Example:
+
+   ```yaml
+   ---
+   id: app-cloud-control
+   name: Cloud Control
+   kind: application
+   phase: 2
+   icon: CC
+   tagline: >-
+     ML-powered Azure Virtual Desktop management platform for MSPs and enterprise IT.
+   competitor: Nerdio
+   dependencies:
+     - platform-identity-service
+     - platform-event-bus
+   consumers: null
+   ---
+   ```
+
+   Never emit placeholder strings like `"[PROJECT_ID]"` in a finished frontmatter — either fill them or defer the whole step and tell the user why.
 
    **Purpose & Goals:**
    - [PROJECT_PURPOSE]: "What is the main purpose of this project? What problem does it solve?"
@@ -166,6 +203,7 @@ Follow this execution flow:
    - Version line matches report.
    - Dates ISO format YYYY-MM-DD.
    - Principles are declarative, testable, and free of vague language ("should" → replace with MUST/SHOULD rationale where appropriate).
+   - Frontmatter contract: run `doit verify memory --json` if available. Exit code must be 0 — any error in the JSON output for `constitution.md` is a blocker, not a warning. Fix the offending field before writing the file.
 
 9. Write the completed constitution back to `.doit/memory/constitution.md` (overwrite).
 

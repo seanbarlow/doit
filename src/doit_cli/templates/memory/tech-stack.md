@@ -2,6 +2,14 @@
 
 > **See also**: [Constitution](constitution.md) for project principles and governance.
 
+<!--
+Heading structure is parsed by downstream docs generators:
+- Keep `### Languages`, `### Frameworks`, `### Libraries` under `## Tech Stack`.
+- Keep `### Hosting`, `### Cloud Provider`, `### Database` under `## Infrastructure`.
+- Keep `### CI/CD Pipeline`, `### Deployment Strategy`, `### Environments` under `## Deployment`.
+Empty sections are fine — leave the heading so consumers see a stable shape.
+-->
+
 ## Tech Stack
 
 ### Languages

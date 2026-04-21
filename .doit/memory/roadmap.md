@@ -57,6 +57,10 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 <!-- Items that add value but can wait for later iterations -->
 
+- [ ] Personas.md migration (extends memory-file migrator pattern)
+  - **Rationale**: Closes the memory-file-migration pattern across all four files (constitution, roadmap, tech-stack, personas). Applies the same shape-migrator + enricher + atomic-write primitives from specs 059 and 060 to `.doit/memory/personas.md`. Flagged as natural follow-up in the spec 060 test-report
+  - **Aligns with**: Spec 060 (memory-files-migration) closure, Persistent Memory principle (II)
+
 - [ ] Cross-platform CI & test infrastructure
   - **Rationale**: Expand GitHub Actions to run tests on Windows, Linux, and macOS in parallel with matrix strategy. Includes coverage reporting, performance benchmarking, and regression test suite across all platforms
   - **Aligns with**: Windows E2E CI/CD integration (US4), Cross-platform parity goals

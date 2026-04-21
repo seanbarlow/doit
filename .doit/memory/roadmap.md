@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Project**: Do-It
-**Last Updated**: 2026-03-26
+**Last Updated**: 2026-04-21
 **Managed by**: `/doit.roadmapit`
 
 ## Vision
@@ -11,6 +11,33 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 ---
 
 ## Active Requirements
+
+<!-- [060] completed-items-hint START -->
+<!-- Completed items from .doit/memory/completed_roadmap.md.
+     Do not re-add unless there's a new change in scope. -->
+<!--
+  - [DONE] Memory files migration (roadmap.md, tech-stack.md)
+  - [DONE] Constitution frontmatter migration
+  - [DONE] Error recovery patterns in all commands
+  - [DONE] Persona-aware user story generation
+  - [DONE] Project-level personas with context injection
+  - [DONE] MCP Server for doit Operations
+  - [DONE] Research-to-Spec Auto-Pipeline
+  - [DONE] Stakeholder Persona Templates
+  - [DONE] Research command for Product Owners (`/doit.researchit`)
+  - [DONE] macOS E2E testing infrastructure
+  - [DONE] Windows E2E testing infrastructure
+  - [DONE] GitLab git provider support
+  - [DONE] Git provider configuration wizard
+  - [DONE] Constitution and tech stack separation
+  - [DONE] Azure DevOps git provider support
+  - [DONE] Git provider abstraction layer
+  - [DONE] Unified CLI package consolidation
+  - [DONE] Team collaboration features (shared memory, notifications)
+  - [DONE] GitHub Milestone Generation from Priorities
+  - [DONE] GitHub Issue Auto-linking in Spec Creation
+-->
+<!-- [060] completed-items-hint END -->
 
 ### P1 - Critical (Must Have for MVP)
 

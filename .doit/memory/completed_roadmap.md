@@ -12,6 +12,8 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Memory files migration (roadmap.md, tech-stack.md) | P2 | 2026-04-21 | `060-memory-files-migration` | Extends spec 059's migrator + enricher pattern to `.doit/memory/roadmap.md` and `tech-stack.md`. `doit update` inserts `## Active Requirements` + `### P1..P4` and `## Tech Stack` + `### Languages/Frameworks/Libraries` with placeholder stubs. New `doit memory enrich roadmap` and `doit memory enrich tech-stack` CLIs + `doit memory migrate` umbrella. Preserves CRLF line endings. 57 feature tests (8 contract, 14 unit, 20+15 integration), 91% coverage, 100% FR/SC automated. Full suite 2127/2127. |
+| Constitution frontmatter migration | P2 | 2026-04-20 | `059-constitution-frontmatter-migration` | `doit update` auto-migrates legacy `.doit/memory/constitution.md` to the 0.3.0+ YAML-frontmatter shape (prepend / patch / idempotent NO_OP / atomic-write error). New `doit constitution enrich` CLI deterministically fills placeholders from the body. `ConstitutionFrontmatter.validate()` classifies placeholder values as WARNING (not ERROR). 40 feature tests, 86% coverage, 100% FR/SC automated. Full suite 2070/2070. |
 | Error recovery patterns in all commands | P2 | 2026-03-26 | `058-error-recovery-patterns` | Structured `## Error Recovery` sections added to all 13 command templates. 3-5 error scenarios per template with plain-language summaries, severity indicators, numbered recovery steps, verification steps, prevention tips, and escalation paths. Migrated 9 existing On Error sections, wrote 3 from scratch, aligned fixit reference. 159 new tests, 12 FR requirements, 8 user stories. Documentation-only feature (no Python code changes). |
 | Persona-aware user story generation | P2 | 2026-03-26 | `057-persona-aware-user-story-generation` | Auto-map stories to personas using P-NNN IDs during `/doit.specit`. 6-level matching rules (goal, pain point, context, role, multi-persona, no match). Traceability table auto-update in personas.md. Coverage report. Graceful fallback when no personas. Template-only: specit.md, spec-template.md, user-stories-template.md. 54 tests, 13 FR requirements, 8 user stories |
 | Project-level personas with context injection | P2 | 2026-03-26 | `056-persona-context-injection` | Personas as first-class context source (priority 3). `load_personas()` in ContextLoader with feature-level precedence. Roadmapit generates `.doit/memory/personas.md`. Persona context injected into researchit, specit, planit. Per-command overrides disable for non-target commands. Fixed `_from_dict` command merge bug. 127 tests (16 new personas + 2 merge tests), 12 FR requirements, 6 user stories |
@@ -30,8 +32,7 @@
 | Team collaboration features (shared memory, notifications) | P4 | 2026-01-22 | `042-team-collaboration` | Git-based sync for constitution/roadmap, change notifications via watchdog, conflict resolution UI, access control (read-only/read-write), 28 tasks (100% complete), 18 integration tests passed |
 | GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` | Auto-create GitHub milestones for priority levels (P1-P4), assign epics to milestones, close completed milestones, --dry-run support, 21 tasks (100% complete), 1,327 tests passed |
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` | Auto-link specs to GitHub epics via `/doit.specit`, fuzzy roadmap matching (80% threshold), bidirectional linking, epic creation workflow, 124 tests (100% pass) |
-| Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` | GitHub epic state display (open/closed), synced with roadmap items, part of GitHub integration |
-| Auto-create GitHub Epics from Roadmap Items | P3 | 2026-01-21 | `039-github-roadmap-sync` | `doit roadmapit add` creates GitHub epics with priority labels, descriptions, and custom labels |
+
 ---
 
 ## Archive
@@ -43,6 +44,8 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
+| Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` |
+| Auto-create GitHub Epics from Roadmap Items | P3 | 2026-01-21 | `039-github-roadmap-sync` |
 | GitHub epic and issue integration for roadmap command | P2 | 2026-01-21 | `039-github-roadmap-sync` |
 | Context roadmap summary and AI context condensation | P2 | 2026-01-20 | `038-context-roadmap-summary` |
 | Documentation audit and link fixes | — | 2026-01-17 | — |

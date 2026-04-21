@@ -1,3 +1,13 @@
+---
+id: app-doit
+name: Do-It
+kind: application
+phase: 3
+icon: DI
+tagline: Do-It is a spec-driven development framework that enables teams to see their
+  architecture before they build it.
+dependencies: []
+---
 # Do-It Constitution
 
 ## Purpose & Goals

@@ -108,6 +108,7 @@ def validate_project(project_root: Path | str) -> MemoryValidationReport:
     issues.extend(_validate_constitution(memory_dir, placeholder_files))
     issues.extend(_validate_tech_stack(memory_dir, placeholder_files))
     issues.extend(_validate_roadmap(memory_dir, placeholder_files))
+    issues.extend(_validate_personas(memory_dir, placeholder_files))
 
     return MemoryValidationReport(issues=issues, placeholder_files=placeholder_files)
 
@@ -302,6 +303,98 @@ def _validate_roadmap(
     # present its table must obey the fixed column order.
     if _has_heading(source, 2, "Open Questions"):
         issues.extend(_validate_open_questions_table(rel, source))
+
+    return issues
+
+
+_PERSONA_ID_RE = re.compile(r"^Persona: P-\d{3}$")
+"""Canonical persona heading regex — scoped to ## Detailed Profiles."""
+
+
+def _validate_personas(
+    memory_dir: Path, placeholder_files: list[str]
+) -> list[MemoryContractIssue]:
+    """Validate ``.doit/memory/personas.md`` when present.
+
+    Opt-in: absent file produces zero issues. See spec 062
+    contracts/migrators.md §4 for the full rule list.
+    """
+
+    # Single source of truth: iterate the migrator's canonical tuple rather
+    # than hardcoding titles here. The contract test
+    # ``test_personas_required_h2_matches_validator`` locks this tuple to the
+    # expected two-H2 set; using it directly eliminates drift risk.
+    from .personas_migrator import REQUIRED_PERSONAS_H2
+
+    path = memory_dir / "personas.md"
+    rel = str(path.relative_to(memory_dir.parent.parent))
+
+    if not path.exists():
+        # Opt-in semantic: personas.md is NOT required. No issue.
+        return []
+
+    source = path.read_text(encoding="utf-8")
+
+    if _is_placeholder(source):
+        placeholder_files.append(rel)
+        return [
+            MemoryContractIssue(
+                file=rel,
+                severity=MemoryIssueSeverity.WARNING,
+                message="personas.md still contains template placeholders",
+            )
+        ]
+
+    issues: list[MemoryContractIssue] = []
+
+    for h2_title in REQUIRED_PERSONAS_H2:
+        if not _has_heading(source, 2, h2_title):
+            issues.append(
+                MemoryContractIssue(
+                    file=rel,
+                    severity=MemoryIssueSeverity.ERROR,
+                    message=f"missing required `## {h2_title}` section",
+                )
+            )
+
+    # If either required H2 is missing the ID-format check is noise — return.
+    if issues:
+        return issues
+
+    # Count + validate `### Persona: …` headings under ## Detailed Profiles.
+    persona_headings = _subheadings_under(source, "Detailed Profiles")
+    valid_count = 0
+    for heading in persona_headings:
+        stripped = heading.strip()
+        if _PERSONA_ID_RE.match(stripped):
+            valid_count += 1
+            continue
+        # Only flag headings that LOOK like persona attempts — avoid false
+        # positives from glossary entries or unrelated H3s under Detailed
+        # Profiles.
+        if stripped.lower().startswith("persona"):
+            issues.append(
+                MemoryContractIssue(
+                    file=rel,
+                    severity=MemoryIssueSeverity.ERROR,
+                    message=(
+                        f"malformed persona ID `{stripped}` — expected "
+                        "`Persona: P-NNN` (three-digit zero-padded)"
+                    ),
+                )
+            )
+
+    if valid_count == 0 and not issues:
+        issues.append(
+            MemoryContractIssue(
+                file=rel,
+                severity=MemoryIssueSeverity.WARNING,
+                message=(
+                    "`## Detailed Profiles` has no `### Persona: P-NNN` entries "
+                    "— nothing for the docs generator to pick up"
+                ),
+            )
+        )
 
     return issues
 

@@ -449,6 +449,51 @@ def enrich_roadmap_cmd(
         raise typer.Exit(code=ExitCode.FAILURE)
 
 
+@enrich_app.command("personas")
+def enrich_personas_cmd(
+    path: Path | None = typer.Argument(
+        None,
+        help="Project root directory (default: current directory)",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        "-j",
+        help="Emit the enrichment result as JSON",
+    ),
+) -> None:
+    """Report placeholder state in .doit/memory/personas.md (linter mode).
+
+    Unlike the other enrichers, this one NEVER modifies the file — persona
+    content (names, roles, goals) is intrinsically project-specific and
+    belongs to `/doit.roadmapit` or `/doit.researchit`. When placeholders
+    remain, the CLI exits 1 with a hint pointing at those skills.
+
+    Exit codes: 0 = NO_OP (no file or no placeholders); 1 = PARTIAL
+    (placeholders remain); 2 = VALIDATION / file error.
+    """
+
+    from ..services.constitution_enricher import EnrichmentAction
+    from ..services.personas_enricher import enrich_personas
+
+    project_root = path or Path.cwd()
+    target = project_root / ".doit" / "memory" / "personas.md"
+    result = enrich_personas(target)
+    _emit_enrichment_result(result, json_output)
+
+    if result.action is EnrichmentAction.ERROR:
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
+    if result.action is EnrichmentAction.PARTIAL:
+        # Personas-specific remediation hint (linter mode — no auto-fill).
+        if not json_output:
+            console.print(
+                "[dim]Run [cyan]/doit.roadmapit[/cyan] or "
+                "[cyan]/doit.researchit[/cyan] to populate personas "
+                "interactively.[/dim]"
+            )
+        raise typer.Exit(code=ExitCode.FAILURE)
+
+
 @memory_app.command("migrate")
 def migrate_memory_cmd(
     path: Path | None = typer.Argument(
@@ -462,7 +507,7 @@ def migrate_memory_cmd(
         help="Emit the migration results as JSON",
     ),
 ) -> None:
-    """Run constitution + roadmap + tech-stack migrators in sequence.
+    """Run constitution + roadmap + tech-stack + personas migrators in sequence.
 
     Equivalent to the memory-shape migration block that `doit update` runs
     internally. In normal workflows `doit update` handles this automatically;
@@ -484,6 +529,7 @@ def migrate_memory_cmd(
         MigrationAction,
         migrate_constitution,
     )
+    from ..services.personas_migrator import migrate_personas
     from ..services.roadmap_migrator import migrate_roadmap
     from ..services.tech_stack_migrator import migrate_tech_stack
 
@@ -494,6 +540,7 @@ def migrate_memory_cmd(
         ("constitution.md", migrate_constitution),
         ("roadmap.md", migrate_roadmap),
         ("tech-stack.md", migrate_tech_stack),
+        ("personas.md", migrate_personas),
     )
 
     results = []

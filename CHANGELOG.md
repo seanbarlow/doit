@@ -37,6 +37,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     the body and `doit context show` output — no interactive prompts.
 - `doit_cli.utils.atomic_write.write_text_atomic()` helper for crash-
   safe file writes.
+- `doit_cli.services._memory_shape.insert_section_if_missing` gains an
+  optional `matchers: Mapping[str, Callable[[str], bool]] | None`
+  parameter so callers can customise H3 heading-presence detection per
+  required title (#061). Default `None` preserves the spec-060
+  exact-case-insensitive behaviour; `tech_stack_migrator` is unchanged.
+
+### Changed
+
+- Roadmap migrator now recognises decorated priority H3 headings (#061).
+  `### P1 - Critical (Must Have for MVP)`, `### P2 - High Priority
+  (Significant Business Value)`, and any other `### P[1-4] <decoration>`
+  shape is treated as satisfying the `P1..P4` contract, matching
+  `memory_validator._validate_roadmap`'s `^p[1-4]\b` regex semantics.
+  `doit memory migrate` on such roadmaps now reports `NO_OP` instead of
+  `PATCHED`.
+
+### Fixed
+
+- Roadmap migrator no longer appends duplicate empty `### P1..P4` stubs
+  to roadmaps whose priority headings carry suffix decoration (#061 —
+  regression introduced in #060 and surfaced by dogfooding against
+  doit's own `.doit/memory/roadmap.md`). If an earlier run of the
+  buggy migrator added spurious duplicate bare stubs to your
+  `roadmap.md`, delete them manually; future `doit update` runs will
+  stabilise to `NO_OP`.
+
 - `doit_cli.models.memory_contract.PLACEHOLDER_REGISTRY` and
   `is_placeholder_value()` — authoritative placeholder-detection
   primitives shared by the migrator and the validator.

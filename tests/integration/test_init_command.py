@@ -307,9 +307,12 @@ class TestInitMemoryFilesPreservation:
 
         assert result.exit_code == 0
 
-        # roadmap.md is untouched — migration only applies to constitution.md
-        assert roadmap_file.read_text() == custom_roadmap, (
-            "roadmap.md should NOT be overwritten by --update"
+        # roadmap.md body is preserved; the 0.4.0 migrator may APPEND
+        # `## Active Requirements` + `### P1..P4` stubs when that section
+        # is missing (spec 060). Pre-existing prose must remain intact.
+        new_roadmap = roadmap_file.read_text()
+        assert custom_roadmap in new_roadmap, (
+            "roadmap.md pre-existing content should be preserved"
         )
 
         # constitution.md body is preserved byte-for-byte; frontmatter may be
@@ -508,7 +511,11 @@ class TestInitTechStackCreation:
 
         assert result.exit_code == 0
 
-        # tech-stack.md should be preserved
-        assert tech_stack_file.read_text() == custom_tech_stack, (
-            "tech-stack.md should NOT be overwritten by --update"
+        # tech-stack.md body is preserved; the 0.4.0 migrator may APPEND
+        # `## Tech Stack` + `### Languages/Frameworks/Libraries` stubs
+        # when that section is missing (spec 060). Pre-existing prose
+        # must remain intact.
+        new_tech_stack = tech_stack_file.read_text()
+        assert custom_tech_stack in new_tech_stack, (
+            "tech-stack.md pre-existing content should be preserved"
         )

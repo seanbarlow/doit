@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Shape migration for `.doit/memory/roadmap.md` and `.doit/memory/tech-stack.md`** (#060)
+  - `doit update` (and `doit init`) now detects legacy roadmap/tech-stack files
+    missing required H2/H3 sections and inserts placeholder stubs in place,
+    preserving all prose byte-for-byte.
+  - Roadmap gets `## Active Requirements` with `### P1..P4` when missing.
+  - Tech-stack gets `## Tech Stack` with `### Languages/Frameworks/Libraries`
+    when missing; patches in only missing subsections when the H2 is present.
+  - Both migrations are idempotent and body-preserving (SHA-256 verified).
+- New `doit_cli.services._memory_shape.insert_section_if_missing` shared
+  helper for section-aware markdown rewriting.
+
 - **Auto-migration of legacy constitution frontmatter** (#059)
   - `doit update` (and `doit init --update`) now detects a
     `.doit/memory/constitution.md` with missing or incomplete YAML

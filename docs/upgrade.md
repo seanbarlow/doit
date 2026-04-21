@@ -4,6 +4,42 @@
 
 ---
 
+## Upgrading to 0.4.0
+
+**TL;DR**: `doit update` now also auto-migrates `.doit/memory/roadmap.md` and
+`.doit/memory/tech-stack.md` shape. No manual editing required.
+
+```bash
+uv tool install doit-toolkit-cli --force
+doit update --here --force --ai claude,copilot
+```
+
+What happens to your files:
+
+- **roadmap.md**: if `## Active Requirements` is missing, the section plus
+  `### P1`/`### P2`/`### P3`/`### P4` stubs are inserted. Existing prose is
+  preserved byte-for-byte. Partial-priority cases only add the missing
+  subsections.
+- **tech-stack.md**: if `## Tech Stack` is missing, the section plus
+  `### Languages`/`### Frameworks`/`### Libraries` stubs are inserted.
+- Both migrations are idempotent — re-running produces a zero-byte diff.
+
+After migration, run `doit memory enrich tech-stack` to pull tech-stack
+content from your constitution, or `doit memory enrich roadmap` to seed
+Vision and completed-items hints. Priority items remain for you and the
+`/doit.roadmapit` skill.
+
+Verify:
+
+```bash
+doit verify-memory .   # exit 0 with WARNINGs for placeholder stubs
+```
+
+See spec 060:
+[specs/060-memory-files-migration/spec.md](../specs/060-memory-files-migration/spec.md).
+
+---
+
 ## Upgrading to 0.3.0
 
 **TL;DR**: `doit update --here --force` now auto-migrates a legacy

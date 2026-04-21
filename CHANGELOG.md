@@ -42,6 +42,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parameter so callers can customise H3 heading-presence detection per
   required title (#061). Default `None` preserves the spec-060
   exact-case-insensitive behaviour; `tech_stack_migrator` is unchanged.
+- **Personas.md migration** (#062)
+  - New `doit_cli.services.personas_migrator.migrate_personas` — shape
+    migrator for `.doit/memory/personas.md` (opt-in: absent file is a
+    valid NO_OP, never auto-created). Patches in `## Persona Summary` /
+    `## Detailed Profiles` stubs when either required H2 is missing;
+    preserves all other prose byte-for-byte. Closes the memory-file
+    migration pattern across all four `.doit/memory/*.md` files.
+  - New `doit_cli.services.personas_enricher.enrich_personas` — linter
+    mode: detects remaining `{placeholder}` tokens, reports `PARTIAL`
+    with a sorted, deduplicated `unresolved_fields` tuple, and exits 1
+    via the CLI. Never modifies the file; points users at
+    `/doit.roadmapit` or `/doit.researchit` for interactive content
+    authoring.
+  - New `doit memory enrich personas` CLI subcommand (exit 0 / 1 / 2
+    matches the `enrich roadmap` / `enrich tech-stack` convention).
+  - New `memory_validator._validate_personas` rule: when file present,
+    enforces both required H2s and the canonical `### Persona: P-NNN`
+    three-digit-zero-padded ID regex; zero issues when file is absent.
+  - New contract test locks validator ↔ migrator ID bijection over a
+    representative ID corpus; mirrors the spec 061 alignment pattern.
 
 ### Changed
 
@@ -52,6 +72,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `memory_validator._validate_roadmap`'s `^p[1-4]\b` regex semantics.
   `doit memory migrate` on such roadmaps now reports `NO_OP` instead of
   `PATCHED`.
+- `doit memory migrate` now reports four rows instead of three — the
+  fourth row is personas.md (#062). Order is deterministic:
+  constitution → roadmap → tech-stack → personas. The personas.md row
+  is emitted even when the file is absent (`action: no_op`), matching
+  the opt-in semantic — this is a metadata-only change, not a behaviour
+  change for the other three files.
 
 ### Fixed
 

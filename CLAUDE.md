@@ -112,6 +112,7 @@ Two template layouts ship side by side during the April 2026 Agent Skills transi
 - File-based — markdown in `.doit/memory/{roadmap,tech-stack}.md` (060-memory-files-migration)
 - Python 3.11+ (constitution baseline) + Typer (CLI), Rich (logging), standard library `re` / `collections.abc` — no new deps (061-fix-roadmap-h3-matching)
 - File-based — markdown in `.doit/memory/roadmap.md` (no schema changes) (061-fix-roadmap-h3-matching)
+- File-based — markdown in `.doit/memory/personas.md` (opt-in; absence is valid) (062-personas-migration)
 
 ## Recent Changes
 - 055-mcp-server: Added Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output)

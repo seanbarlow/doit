@@ -169,3 +169,37 @@ def test_migrated_tech_stack_passes_validator(tmp_path: Path) -> None:
     assert ts_errors == [], (
         f"Expected validator to stop erroring on tech-stack after migration; got {ts_errors}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Spec 062 — personas migrator alignment
+
+
+def test_personas_required_h2_matches_validator() -> None:
+    """`REQUIRED_PERSONAS_H2` covers the H2s `_validate_personas` looks for.
+
+    If the validator's H2 check drifts from the migrator's
+    ``REQUIRED_PERSONAS_H2`` tuple, freshly-migrated files would fail
+    validation — the point of this test is to fail loudly when that
+    happens.
+    """
+
+    from doit_cli.services.personas_migrator import REQUIRED_PERSONAS_H2
+
+    assert REQUIRED_PERSONAS_H2 == ("Persona Summary", "Detailed Profiles")
+
+
+def test_personas_migrator_reuses_constitution_migration_types() -> None:
+    """Personas migrator returns a MigrationResult with MigrationAction values.
+
+    Mirrors the existing reuse tests for roadmap and tech-stack.
+    Prevents a new hierarchy from being accidentally introduced.
+    """
+
+    from doit_cli.services.constitution_migrator import MigrationAction, MigrationResult
+    from doit_cli.services.personas_migrator import migrate_personas
+
+    result = migrate_personas(Path("/nonexistent/personas.md"))
+    assert isinstance(result, MigrationResult)
+    assert isinstance(result.action, MigrationAction)
+    assert result.action is MigrationAction.NO_OP  # absent file = opt-in NO_OP

@@ -12,6 +12,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch | Notes |
 |------|-------------------|----------------|----------------|-------|
+| Personas.md migration (extends memory-file migrator pattern) | P3 | 2026-04-21 | `062-personas-migration` | Closes the memory-file-migration pattern across all four `.doit/memory/*.md` files (constitution, roadmap, tech-stack, personas). New `personas_migrator.migrate_personas` applies the spec-060 shape-migrator pattern — opt-in semantic: absent file is a valid NO_OP, never auto-created. New `personas_enricher.enrich_personas` is linter-only (reports `{placeholder}` tokens via PARTIAL; never modifies the file; points users at `/doit.roadmapit` or `/doit.researchit` via a CLI hint). New `doit memory enrich personas` subcommand + `_validate_personas` rule enforcing required H2s and canonical `Persona: P-NNN` three-digit regex. Umbrella `doit memory migrate` now emits 4 rows (constitution → roadmap → tech-stack → personas). 47 feature tests (9 unit + 10 integration + 28 contract), 81% coverage on new files, full suite 2296/2296. |
 | Fix roadmap migrator H3 matching for decorated priority headings | P1 (bug fix) | 2026-04-21 | `061-fix-roadmap-h3-matching` | Regression fix for spec 060 found by dogfooding against doit's own `.doit/memory/roadmap.md`. Migrator now mirrors `memory_validator._validate_roadmap`'s `^p[1-4]\b` prefix regex so decorated headings (`### P1 - Critical (MVP)`) are recognised as present; no more spurious duplicate stubs. Shared helper `_memory_shape.insert_section_if_missing` gained an optional per-H3 `matchers` parameter (default preserves spec 060 exact-match; tech-stack migrator unchanged). 77 feature tests + 1 repo-dogfood regression guard, 95% coverage on touched files, full suite 2257/2257. |
 | Memory files migration (roadmap.md, tech-stack.md) | P2 | 2026-04-21 | `060-memory-files-migration` | Extends spec 059's migrator + enricher pattern to `.doit/memory/roadmap.md` and `tech-stack.md`. `doit update` inserts `## Active Requirements` + `### P1..P4` and `## Tech Stack` + `### Languages/Frameworks/Libraries` with placeholder stubs. New `doit memory enrich roadmap` and `doit memory enrich tech-stack` CLIs + `doit memory migrate` umbrella. Preserves CRLF line endings. 57 feature tests (8 contract, 14 unit, 20+15 integration), 91% coverage, 100% FR/SC automated. Full suite 2127/2127. |
 | Constitution frontmatter migration | P2 | 2026-04-20 | `059-constitution-frontmatter-migration` | `doit update` auto-migrates legacy `.doit/memory/constitution.md` to the 0.3.0+ YAML-frontmatter shape (prepend / patch / idempotent NO_OP / atomic-write error). New `doit constitution enrich` CLI deterministically fills placeholders from the body. `ConstitutionFrontmatter.validate()` classifies placeholder values as WARNING (not ERROR). 40 feature tests, 86% coverage, 100% FR/SC automated. Full suite 2070/2070. |
@@ -31,7 +32,6 @@
 | Git provider abstraction layer | P2 | 2026-01-22 | `044-git-provider-abstraction` | Unified interface for GitHub/Azure DevOps/GitLab, provider auto-detection from git remote, 31 tasks (100% complete), full GitHub+ADO implementation, GitLab stub |
 | Unified CLI package consolidation | P2 | 2026-01-22 | `043-unified-cli` | Merged doit_toolkit_cli into doit_cli, single package structure, 17 files migrated, github_service.py merged, 1345 tests pass, cleaner imports |
 | Team collaboration features (shared memory, notifications) | P4 | 2026-01-22 | `042-team-collaboration` | Git-based sync for constitution/roadmap, change notifications via watchdog, conflict resolution UI, access control (read-only/read-write), 28 tasks (100% complete), 18 integration tests passed |
-| GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` | Auto-create GitHub milestones for priority levels (P1-P4), assign epics to milestones, close completed milestones, --dry-run support, 21 tasks (100% complete), 1,327 tests passed |
 
 ---
 
@@ -44,6 +44,7 @@
 
 | Item | Original Priority | Completed Date | Feature Branch |
 |------|-------------------|----------------|----------------|
+| GitHub Milestone Generation from Priorities | P3 | 2026-01-22 | `041-milestone-generation` |
 | GitHub Issue Auto-linking in Spec Creation | P2 | 2026-01-21 | `040-spec-github-linking` |
 | Roadmap Status Sync from GitHub | P3 | 2026-01-21 | `039-github-roadmap-sync` |
 | Auto-create GitHub Epics from Roadmap Items | P3 | 2026-01-21 | `039-github-roadmap-sync` |
@@ -71,10 +72,10 @@
 
 ## Statistics
 
-- **Total Items Completed**: 34
+- **Total Items Completed**: 35
 - **P1 Items Completed**: 6 (5 archived) — includes 1 bug-fix (spec 061)
 - **P2 Items Completed**: 18 (10 archived)
-- **P3 Items Completed**: 8 (1 archived)
+- **P3 Items Completed**: 9 (2 archived)
 - **P4 Items Completed**: 2
 - **Other**: 1 (documentation audit, archived)
 

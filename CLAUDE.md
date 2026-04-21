@@ -110,6 +110,8 @@ Two template layouts ship side by side during the April 2026 Agent Skills transi
 - File-based — markdown in `.doit/memory/constitution.md` (059-constitution-frontmatter-migration)
 - Python 3.11+ (constitution baseline) + Typer (CLI), Rich (logging), PyYAML (already declared); no new deps (060-memory-files-migration)
 - File-based — markdown in `.doit/memory/{roadmap,tech-stack}.md` (060-memory-files-migration)
+- Python 3.11+ (constitution baseline) + Typer (CLI), Rich (logging), standard library `re` / `collections.abc` — no new deps (061-fix-roadmap-h3-matching)
+- File-based — markdown in `.doit/memory/roadmap.md` (no schema changes) (061-fix-roadmap-h3-matching)
 
 ## Recent Changes
 - 055-mcp-server: Added Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output)

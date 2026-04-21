@@ -559,3 +559,126 @@ def test_cli_memory_migrate_umbrella(tmp_project: Path) -> None:
     assert files["constitution.md"] == "prepended"
     assert files["roadmap.md"] == "prepended"
     assert files["tech-stack.md"] == "prepended"
+
+
+# ---------------------------------------------------------------------------
+# Spec 061 — decorated priority H3 headings (regression tests for the
+# prefix-matcher fix). These tests should FAIL against the pre-061
+# implementation and PASS after T003 wires up `_PRIORITY_MATCHERS`.
+
+
+DECORATED_PRIORITIES_ROADMAP = """# Project Roadmap
+
+## Active Requirements
+
+### P1 - Critical (Must Have for MVP)
+
+- [ ] Ship the thing
+
+### P2 - High Priority (Significant Business Value)
+
+- [ ] Nice thing
+
+### P3 - Medium Priority (Valuable)
+
+### P4 - Low Priority (Nice to Have)
+"""
+
+
+DECORATED_PRIORITIES_MISSING_P3 = """# Project Roadmap
+
+## Active Requirements
+
+### P1 - Critical (Must Have for MVP)
+
+- [ ] Ship the thing
+
+### P2 - High Priority (Significant Business Value)
+
+### P4 - Low Priority (Nice to Have)
+"""
+
+
+def test_decorated_priority_headings_yield_no_op(tmp_roadmap: Path) -> None:
+    """FR-001, FR-002, SC-001: decorated `### P1 - Critical (...)` etc.
+
+    A roadmap whose priority H3 subsections carry suffix decoration (the
+    shape both the template and every real-world roadmap drifts toward)
+    must be recognized as already satisfying the P1..P4 requirement.
+    """
+
+    tmp_roadmap.write_text(DECORATED_PRIORITIES_ROADMAP, encoding="utf-8")
+    pre_bytes = tmp_roadmap.read_bytes()
+
+    result = migrate_roadmap(tmp_roadmap)
+
+    assert result.action is MigrationAction.NO_OP
+    assert result.added_fields == ()
+    # Byte-identical — no spurious duplicate stubs appended.
+    assert tmp_roadmap.read_bytes() == pre_bytes
+
+
+def test_decorated_priorities_with_one_missing_patches_only_missing(
+    tmp_roadmap: Path,
+) -> None:
+    """FR-002, FR-004: genuinely missing priority is still patched.
+
+    With decorated P1/P2/P4 but no P3, the migrator must PATCH in only
+    the P3 stub — not duplicate stubs for the decorated priorities.
+    """
+
+    tmp_roadmap.write_text(DECORATED_PRIORITIES_MISSING_P3, encoding="utf-8")
+    result = migrate_roadmap(tmp_roadmap)
+
+    assert result.action is MigrationAction.PATCHED
+    assert result.added_fields == ("P3",)
+
+    post = tmp_roadmap.read_text(encoding="utf-8")
+    # Decorated priorities preserved byte-for-byte.
+    assert "### P1 - Critical (Must Have for MVP)" in post
+    assert "### P2 - High Priority (Significant Business Value)" in post
+    assert "### P4 - Low Priority (Nice to Have)" in post
+    # Exactly one P3 stub inserted (no duplicates for the decorated ones).
+    assert post.count("### P3") == 1
+    # And no bare duplicate for the priorities that already exist.
+    assert post.count("### P1") == 1
+    assert post.count("### P2") == 1
+    assert post.count("### P4") == 1
+
+
+def test_bare_priority_headings_yield_no_op(tmp_roadmap: Path) -> None:
+    """FR-003: bare `### P1` .. `### P4` (the template default) still work.
+
+    Regression guard: the prefix-matcher fix must not break the already-
+    passing template path.
+    """
+
+    tmp_roadmap.write_text(COMPLETE_ROADMAP, encoding="utf-8")
+    pre_bytes = tmp_roadmap.read_bytes()
+
+    result = migrate_roadmap(tmp_roadmap)
+
+    assert result.action is MigrationAction.NO_OP
+    assert result.added_fields == ()
+    assert tmp_roadmap.read_bytes() == pre_bytes
+
+
+def test_absent_active_requirements_prepends_full_block(tmp_roadmap: Path) -> None:
+    """FR-005: H2 absent → PREPENDED with full canonical block (bare titles).
+
+    Regression guard: the PREPENDED path emits bare canonical titles
+    (`### P1` etc.), unaffected by the custom matchers on the PATCHED path.
+    """
+
+    tmp_roadmap.write_text(LEGACY_ROADMAP_NO_ACTIVE_REQS, encoding="utf-8")
+    result = migrate_roadmap(tmp_roadmap)
+
+    assert result.action is MigrationAction.PREPENDED
+    assert "Active Requirements" in result.added_fields
+    for p in REQUIRED_ROADMAP_H3_UNDER_ACTIVE_REQS:
+        assert p in result.added_fields
+
+    post = tmp_roadmap.read_text(encoding="utf-8")
+    # Exactly one bare H3 per priority — no decoration, no duplicates.
+    for p in REQUIRED_ROADMAP_H3_UNDER_ACTIVE_REQS:
+        assert post.count(f"### {p}") == 1

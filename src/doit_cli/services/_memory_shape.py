@@ -10,12 +10,26 @@ This helper does exactly that. It is intentionally private
 (underscore-prefixed) — external callers should go through the
 migrators, which add error handling, atomic writes, and validator
 coordination.
+
+Callers may supply an optional ``matchers`` mapping to override the
+default exact-case-insensitive H3-match with per-H3 predicates (e.g. a
+prefix-regex matcher for roadmap priority headings). See
+``contracts/migrators.md`` in spec 061 for the contract.
 """
 
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+
+H3Matcher = Callable[[str], bool]
+"""Predicate applied to an existing stripped H3 heading title.
+
+Returns ``True`` when the existing heading should be treated as
+satisfying the required H3 that the matcher is associated with. Used as
+the value type in the ``matchers`` mapping of
+:func:`insert_section_if_missing`.
+"""
 
 _H2_LINE_RE = re.compile(r"^(##)\s+(.+?)\s*$")
 _H3_LINE_RE = re.compile(r"^(###)\s+(.+?)\s*$")
@@ -66,6 +80,7 @@ def insert_section_if_missing(
     h3_titles: tuple[str, ...],
     *,
     stub_body: Callable[[str], str],
+    matchers: Mapping[str, H3Matcher] | None = None,
 ) -> tuple[str, list[str]]:
     """Ensure ``source`` has ``## <h2_title>`` + every ``### <h3_title>``.
 
@@ -77,6 +92,15 @@ def insert_section_if_missing(
             a freshly inserted ``### <h3_title>`` heading. Receives the
             H3 title; returns a string that must end with ``\\n\\n`` to
             separate it from following content.
+        matchers: Optional per-H3 matcher override. When provided, for
+            each required H3 ``t`` in ``h3_titles``:
+
+            - If ``t in matchers``, ``t`` is considered present iff any
+              existing (stripped) H3 title satisfies ``matchers[t]``.
+            - Otherwise, fall back to exact case-insensitive equality
+              (the default-``None`` behaviour).
+
+            Keys not in ``h3_titles`` are silently ignored.
 
     Returns:
         ``(new_source, added_titles)`` where ``added_titles`` contains
@@ -97,7 +121,8 @@ def insert_section_if_missing(
     Matching is case-insensitive for both H2 and H3 titles (consistent
     with ``memory_validator._has_heading``). Existing subsection
     ordering is preserved; new H3s are appended after any pre-existing
-    H3s in the section.
+    H3s in the section. H3 matching may be customized per-title via the
+    ``matchers`` parameter; H2 matching is always exact-case-insensitive.
     """
 
     # Detect the source's dominant line ending so we can round-trip
@@ -135,8 +160,17 @@ def insert_section_if_missing(
 
     # H2 present — check H3s.
     start, end = span
-    existing = {_normalise(t) for t in _h3_titles_in_section(lines, start, end)}
-    missing = [h3 for h3 in h3_titles if _normalise(h3) not in existing]
+    # `_h3_titles_in_section` already returns stripped titles.
+    existing_titles = _h3_titles_in_section(lines, start, end)
+    existing_normalised = {_normalise(t) for t in existing_titles}
+
+    def _present(required: str) -> bool:
+        if matchers is not None and required in matchers:
+            matcher = matchers[required]
+            return any(matcher(existing) for existing in existing_titles)
+        return _normalise(required) in existing_normalised
+
+    missing = [h3 for h3 in h3_titles if not _present(h3)]
     if not missing:
         return source, []
 

@@ -14,12 +14,14 @@ that module — no duplicate class definitions.
 from __future__ import annotations
 
 import hashlib
+import re
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Final
 
 from ..errors import DoitError
 from ..utils.atomic_write import write_text_atomic
-from ._memory_shape import insert_section_if_missing
+from ._memory_shape import H3Matcher, insert_section_if_missing
 from .constitution_migrator import (
     ConstitutionMigrationError,
     MigrationAction,
@@ -48,6 +50,32 @@ REQUIRED_ROADMAP_H3_UNDER_ACTIVE_REQS: Final[tuple[str, ...]] = (
 Matches the validator's expectation in
 ``memory_validator._validate_roadmap``: at least one ``### P[1-4]`` must
 exist; we ensure all four are present so stubs render predictably.
+"""
+
+
+def _priority_matcher(required_title: str) -> H3Matcher:
+    """Return a prefix-matching predicate for a priority H3 title.
+
+    Mirrors ``memory_validator._validate_roadmap``'s ``^p[1-4]\\b`` regex
+    semantics so the migrator treats any title the validator accepts
+    (e.g. ``P1 - Critical (Must Have for MVP)``) as already present.
+    The matcher is case-insensitive and word-boundary-anchored — it does
+    NOT accept ``P10 - …`` as matching ``P1``.
+    """
+
+    token = required_title.strip().lower()
+    pattern = re.compile(rf"^{re.escape(token)}\b", re.IGNORECASE)
+    return lambda existing: bool(pattern.match(existing.strip()))
+
+
+_PRIORITY_MATCHERS: Final[Mapping[str, H3Matcher]] = {
+    p: _priority_matcher(p) for p in REQUIRED_ROADMAP_H3_UNDER_ACTIVE_REQS
+}
+"""Per-priority prefix matchers passed to ``insert_section_if_missing``.
+
+Keyed by canonical priority title (``P1``..``P4``); values honour the
+same ``^p[1-4]\\b`` semantics the memory validator uses. See spec 061
+``contracts/migrators.md`` for the full contract.
 """
 
 
@@ -123,6 +151,7 @@ def migrate_roadmap(path: Path) -> MigrationResult:
         h2_title=REQUIRED_ROADMAP_H2[0],
         h3_titles=REQUIRED_ROADMAP_H3_UNDER_ACTIVE_REQS,
         stub_body=_roadmap_stub_body,
+        matchers=_PRIORITY_MATCHERS,
     )
 
     if not added:
@@ -155,8 +184,6 @@ def migrate_roadmap(path: Path) -> MigrationResult:
 
 
 def _has_h2(source: str, title: str) -> bool:
-    import re
-
     pattern = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
     target = title.strip().lower()
     return any(m.group(1).strip().lower() == target for m in pattern.finditer(source))

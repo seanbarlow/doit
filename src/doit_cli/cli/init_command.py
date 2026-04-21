@@ -546,6 +546,50 @@ def run_init(
         )
         raise typer.Exit(code=err_code)
 
+    # Spec 060: also migrate roadmap.md and tech-stack.md shape.
+    # Both are idempotent NO_OPs when files are already valid-shape;
+    # PREPENDED when the required H2 section is missing; PATCHED when
+    # some H3 subsections are missing.
+    #
+    # Error handling: `raise typer.Exit` inside the for-loop short-circuits
+    # subsequent migrators. Concretely, if constitution succeeds but
+    # roadmap errors, tech-stack is skipped — matching research.md §2's
+    # "fail fast on first error" decision. The user re-runs `doit update`
+    # after fixing the root cause; because roadmap hadn't written
+    # anything on error (atomic write), no half-migrated state persists.
+    from ..services.roadmap_migrator import migrate_roadmap
+    from ..services.tech_stack_migrator import migrate_tech_stack
+
+    for migrator_fn, filename in (
+        (migrate_roadmap, "roadmap.md"),
+        (migrate_tech_stack, "tech-stack.md"),
+    ):
+        mig = migrator_fn(project.doit_folder / "memory" / filename)
+        if mig.action is MigrationAction.PREPENDED:
+            console.print(
+                f"[yellow]Added required sections to .doit/memory/{filename}"
+                " — run the relevant skill or `doit memory enrich` to fill"
+                " placeholders.[/yellow]"
+            )
+            result.updated_files.append(mig.path)
+        elif mig.action is MigrationAction.PATCHED:
+            console.print(
+                f"[yellow]Added {len(mig.added_fields)} missing section(s)"
+                f" to .doit/memory/{filename}: "
+                f"{', '.join(mig.added_fields)}[/yellow]"
+            )
+            result.updated_files.append(mig.path)
+        elif mig.action is MigrationAction.ERROR and mig.error is not None:
+            console.print(
+                f"[red]Could not migrate {filename}: {mig.error}[/red]"
+            )
+            err_code = (
+                ExitCode.VALIDATION_ERROR
+                if isinstance(mig.error, DoitValidationError)
+                else ExitCode.FAILURE
+            )
+            raise typer.Exit(code=err_code)
+
     # Copy config templates to .doit/config/
     config_result = template_manager.copy_config_templates(
         target_dir=project.doit_folder / "config",

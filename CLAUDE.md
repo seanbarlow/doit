@@ -108,6 +108,8 @@ Two template layouts ship side by side during the April 2026 Agent Skills transi
 - April 2026 modernization sweep: ruff + mypy + DoitError hierarchy + context_loader package split + ExitCode / OutputFormat CLI conventions + Agent Skills layout for Claude + native Copilot `.prompt.md` frontmatter
 - Python 3.11+ (per constitution; consistent with rest of repo) + Typer (CLI), Rich (logging), PyYAML (already declared `pyyaml>=6.0` in `pyproject.toml:31`) (059-constitution-frontmatter-migration)
 - File-based — markdown in `.doit/memory/constitution.md` (059-constitution-frontmatter-migration)
+- Python 3.11+ (constitution baseline) + Typer (CLI), Rich (logging), PyYAML (already declared); no new deps (060-memory-files-migration)
+- File-based — markdown in `.doit/memory/{roadmap,tech-stack}.md` (060-memory-files-migration)
 
 ## Recent Changes
 - 055-mcp-server: Added Python 3.11+ (per constitution) + mcp (official MCP Python SDK with FastMCP), typer (CLI), rich (output)

@@ -21,7 +21,12 @@ from ..services.memory_search import MemorySearchService
 # Create the memory app
 memory_app = typer.Typer(
     name="memory",
-    help="Search and query project memory (constitution, roadmap, specs)",
+    help=(
+        "Project memory commands: search the memory files, enrich "
+        "placeholder stubs, and run shape migrations. "
+        "Subcommands: `search`, `history`, `schema`, `enrich <file>`, "
+        "`migrate`."
+    ),
     add_completion=False,
 )
 
@@ -318,3 +323,230 @@ def schema_command(
         typer.echo(json.dumps(schema, indent=2))
     else:
         console.print_json(json.dumps(schema))
+
+
+# ---------------------------------------------------------------------------
+# Spec 060: `doit memory enrich <file>` and `doit memory migrate`.
+
+enrich_app = typer.Typer(
+    name="enrich",
+    help="Deterministic enrichment of placeholder-stubbed memory files.",
+    add_completion=False,
+)
+memory_app.add_typer(enrich_app, name="enrich")
+
+
+def _emit_enrichment_result(result: object, json_output: bool) -> None:
+    from ..services.constitution_enricher import EnrichmentAction, EnrichmentResult
+
+    assert isinstance(result, EnrichmentResult)
+    if json_output:
+        typer.echo(
+            json.dumps(
+                {
+                    "path": str(result.path),
+                    "action": result.action.value,
+                    "enriched_fields": list(result.enriched_fields),
+                    "unresolved_fields": list(result.unresolved_fields),
+                    "error": str(result.error) if result.error else None,
+                },
+                indent=2,
+            )
+        )
+    else:
+        if result.action is EnrichmentAction.NO_OP:
+            console.print(
+                "[green]Nothing to enrich[/green] — no placeholders detected."
+            )
+        elif result.action is EnrichmentAction.ERROR:
+            console.print(f"[red]Enrichment failed:[/red] {result.error}")
+        else:
+            table = Table(
+                show_header=True,
+                header_style="bold cyan",
+                title=f"Enrichment: {result.path}",
+            )
+            table.add_column("Status", width=12)
+            table.add_column("Field", width=16)
+            for key in result.enriched_fields:
+                table.add_row("[green]✓ filled[/green]", key)
+            for key in result.unresolved_fields:
+                table.add_row("[yellow]! unresolved[/yellow]", key)
+            console.print(table)
+            if result.unresolved_fields:
+                console.print(
+                    "[yellow]Unresolved:[/yellow] "
+                    + ", ".join(result.unresolved_fields)
+                )
+
+
+@enrich_app.command("tech-stack")
+def enrich_tech_stack_cmd(
+    path: Path | None = typer.Argument(
+        None,
+        help="Project root directory (default: current directory)",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        "-j",
+        help="Emit the enrichment result as JSON",
+    ),
+) -> None:
+    """Populate placeholder-stubbed tech-stack.md subsections from the constitution.
+
+    Exit codes: 0 = ENRICHED or NO_OP; 1 = PARTIAL (some fields unresolved);
+    2 = VALIDATION / file error.
+    """
+
+    from ..services.constitution_enricher import EnrichmentAction
+    from ..services.tech_stack_enricher import enrich_tech_stack
+
+    project_root = path or Path.cwd()
+    target = project_root / ".doit" / "memory" / "tech-stack.md"
+    result = enrich_tech_stack(target, project_root=project_root)
+    _emit_enrichment_result(result, json_output)
+
+    if result.action is EnrichmentAction.ERROR:
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
+    if result.action is EnrichmentAction.PARTIAL:
+        raise typer.Exit(code=ExitCode.FAILURE)
+
+
+@enrich_app.command("roadmap")
+def enrich_roadmap_cmd(
+    path: Path | None = typer.Argument(
+        None,
+        help="Project root directory (default: current directory)",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        "-j",
+        help="Emit the enrichment result as JSON",
+    ),
+) -> None:
+    """Seed roadmap.md Vision + completed-items hint from other memory files.
+
+    Vision is replaced from the constitution's Project Purpose; completed items
+    are extracted from `.doit/memory/completed_roadmap.md`. Priority subsections
+    (P1/P2/P3/P4) are intentionally left alone — that's product judgment.
+
+    Exit codes: 0 = ENRICHED or NO_OP; 1 = PARTIAL; 2 = VALIDATION / file error.
+    """
+
+    from ..services.constitution_enricher import EnrichmentAction
+    from ..services.roadmap_enricher import enrich_roadmap
+
+    project_root = path or Path.cwd()
+    target = project_root / ".doit" / "memory" / "roadmap.md"
+    result = enrich_roadmap(target, project_root=project_root)
+    _emit_enrichment_result(result, json_output)
+
+    if result.action is EnrichmentAction.ERROR:
+        raise typer.Exit(code=ExitCode.VALIDATION_ERROR)
+    if result.action is EnrichmentAction.PARTIAL:
+        raise typer.Exit(code=ExitCode.FAILURE)
+
+
+@memory_app.command("migrate")
+def migrate_memory_cmd(
+    path: Path | None = typer.Argument(
+        None,
+        help="Project root directory (default: current directory)",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        "-j",
+        help="Emit the migration results as JSON",
+    ),
+) -> None:
+    """Run constitution + roadmap + tech-stack migrators in sequence.
+
+    Equivalent to the memory-shape migration block that `doit update` runs
+    internally. In normal workflows `doit update` handles this automatically;
+    run `doit memory migrate` directly when you want to:
+
+    - **Diagnose**: see a per-file migration report without `doit init --update`
+      touching command templates, scripts, or hooks.
+    - **Re-run**: apply migration without re-copying memory templates.
+    - **Audit in CI**: `--json` emits a machine-readable summary.
+
+    Exits with the first non-zero code any migrator produced
+    (`VALIDATION_ERROR` for validation failures, `FAILURE` for other
+    errors). Atomic per file: a failing migrator leaves its target file
+    byte-identical to its pre-run state.
+    """
+
+    from ..errors import DoitValidationError
+    from ..services.constitution_migrator import (
+        MigrationAction,
+        migrate_constitution,
+    )
+    from ..services.roadmap_migrator import migrate_roadmap
+    from ..services.tech_stack_migrator import migrate_tech_stack
+
+    project_root = path or Path.cwd()
+    memory_dir = project_root / ".doit" / "memory"
+
+    steps = (
+        ("constitution.md", migrate_constitution),
+        ("roadmap.md", migrate_roadmap),
+        ("tech-stack.md", migrate_tech_stack),
+    )
+
+    results = []
+    first_error_code: int | None = None
+    for filename, migrator in steps:
+        mig = migrator(memory_dir / filename)
+        results.append((filename, mig))
+        if mig.action is MigrationAction.ERROR and mig.error is not None:
+            first_error_code = (
+                ExitCode.VALIDATION_ERROR
+                if isinstance(mig.error, DoitValidationError)
+                else ExitCode.FAILURE
+            )
+            break
+
+    if json_output:
+        payload = [
+            {
+                "path": str(r.path),
+                "file": filename,
+                "action": r.action.value,
+                "added_fields": list(r.added_fields),
+                "error": str(r.error) if r.error else None,
+            }
+            for filename, r in results
+        ]
+        typer.echo(json.dumps(payload, indent=2))
+    else:
+        table = Table(
+            show_header=True,
+            header_style="bold cyan",
+            title="Memory migration",
+        )
+        table.add_column("File", width=20)
+        table.add_column("Action", width=12)
+        table.add_column("Details")
+        for filename, r in results:
+            if r.action is MigrationAction.NO_OP:
+                status, detail = "[dim]no-op[/dim]", "already valid-shape"
+            elif r.action is MigrationAction.PREPENDED:
+                status, detail = (
+                    "[yellow]prepended[/yellow]",
+                    f"added: {', '.join(r.added_fields)}",
+                )
+            elif r.action is MigrationAction.PATCHED:
+                status, detail = (
+                    "[yellow]patched[/yellow]",
+                    f"added: {', '.join(r.added_fields)}",
+                )
+            else:
+                status, detail = "[red]error[/red]", str(r.error or "")
+            table.add_row(filename, status, detail)
+        console.print(table)
+
+    if first_error_code is not None:
+        raise typer.Exit(code=first_error_code)

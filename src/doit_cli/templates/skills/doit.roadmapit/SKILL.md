@@ -65,6 +65,10 @@ Before generating or modifying code:
 
 This command creates or updates the project roadmap at `.doit/memory/roadmap.md`. The roadmap captures high-level requirements prioritized by business value, deferred items, and project vision.
 
+### 0. Placeholder-shape enrichment (auto-triggered)
+
+`doit update` inserts placeholder `## Active Requirements` + `### P1..P4` stubs when a legacy roadmap is missing them (spec 060). Before any interactive work, delegate the deterministic parts to the CLI: it seeds Vision from the constitution's Project Purpose and inserts a commented-out list of completed items from `.doit/memory/completed_roadmap.md`. Run `doit memory enrich roadmap --json`. Exit codes: `0` enriched or NO_OP; `1` PARTIAL — inspect `unresolved_fields`, propose values (typically a Vision sentence) yourself, confirm with the user, then `Edit` the file; `2` file error — read `error` and stop. **Priority subsections are NOT auto-populated** — that's this skill's product-judgment work in steps 3–4. After the CLI pass, run `doit verify-memory . --json` to confirm no placeholder warnings remain.
+
 ### 1. Parse Command Arguments
 
 Extract the operation and details from `$ARGUMENTS`:

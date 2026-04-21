@@ -16,6 +16,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 <!-- Completed items from .doit/memory/completed_roadmap.md.
      Do not re-add unless there's a new change in scope. -->
 <!--
+  - [DONE] Fix roadmap migrator H3 matching for decorated priority headings
   - [DONE] Memory files migration (roadmap.md, tech-stack.md)
   - [DONE] Constitution frontmatter migration
   - [DONE] Error recovery patterns in all commands
@@ -35,7 +36,6 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
   - [DONE] Unified CLI package consolidation
   - [DONE] Team collaboration features (shared memory, notifications)
   - [DONE] GitHub Milestone Generation from Priorities
-  - [DONE] GitHub Issue Auto-linking in Spec Creation
 -->
 <!-- [060] completed-items-hint END -->
 
@@ -149,13 +149,14 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 ## Recent Releases
 
-| Version | Date       | Key Changes                                                                         |
-|---------|------------|-------------------------------------------------------------------------------------|
-| v0.1.16 | 2026-01-30 | Windows symlink fix, researchit enhancements                                        |
-| v0.1.15 | 2026-01-30 | Research command for product owners                                                 |
-| v0.1.14 | 2026-01-27 | Windows E2E Testing - 146 tests, PowerShell 7.x, cross-platform parity, CI/CD (#645)|
-| v0.1.13 | 2026-01-22 | GitLab Git Provider Support - full REST API implementation, tutorials (#637)        |
-| v0.1.12 | 2026-01-22 | Git provider configuration wizard - interactive setup for GitHub/ADO/GitLab (#636)  |
+| Version      | Date       | Key Changes                                                                                                          |
+|--------------|------------|----------------------------------------------------------------------------------------------------------------------|
+| [Unreleased] | —          | Memory-file migrations: constitution frontmatter (#059), roadmap+tech-stack shape (#060), H3 prefix-match fix (#061) |
+| v0.2.0       | 2026-04-20 | Agent Skills template layout, native Copilot `.prompt.md` schema, `DoitError`/`ExitCode`/`format_option` foundation  |
+| v0.1.17      | 2026-03-26 | MCP Server (#055), project-level personas (#056), persona-aware user stories (#057), error-recovery patterns (#058) |
+| v0.1.16      | 2026-01-30 | Windows symlink fix, researchit enhancements                                                                         |
+| v0.1.15      | 2026-01-30 | Research command for product owners                                                                                  |
+| v0.1.14      | 2026-01-27 | Windows E2E Testing - 146 tests, PowerShell 7.x, cross-platform parity, CI/CD (#645)                                 |
 
 ---
 

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No changes yet — development continues on `develop`._
+
+## [0.3.0] - 2026-04-21
+
+**Memory-file migration closure** — constitution (#059), roadmap +
+tech-stack (#060), roadmap H3 prefix-match fix (#061), and personas
+(#062) all now share the same migrator + enricher + validator + umbrella
+plumbing. See [RELEASE_NOTES.md](./RELEASE_NOTES.md) for the full
+narrative.
+
 ### Added
 
 - **Shape migration for `.doit/memory/roadmap.md` and `.doit/memory/tech-stack.md`** (#060)

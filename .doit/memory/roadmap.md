@@ -147,7 +147,7 @@ An AI-assisted spec-driven development CLI that streamlines the software develop
 
 | Version      | Date       | Key Changes                                                                                                           |
 |--------------|------------|-----------------------------------------------------------------------------------------------------------------------|
-| [Unreleased] | —          | Memory-file migration closure: constitution (#059), roadmap+tech-stack (#060), roadmap H3 fix (#061), personas (#062) |
+| v0.3.0       | 2026-04-21 | Memory-file migration closure: constitution (#059), roadmap+tech-stack (#060), roadmap H3 fix (#061), personas (#062) |
 | v0.2.0       | 2026-04-20 | Agent Skills template layout, native Copilot `.prompt.md` schema, `DoitError`/`ExitCode`/`format_option` foundation   |
 | v0.1.17      | 2026-03-26 | MCP Server (#055), project-level personas (#056), persona-aware user stories (#057), error-recovery patterns (#058)   |
 | v0.1.16      | 2026-01-30 | Windows symlink fix, researchit enhancements                                                                          |
